@@ -1,32 +1,64 @@
 @import "tailwindcss";
 
-/* Calm, neutral, kid-friendly theme — deliberately simpler and lighter than a
-   typical dark-mode developer IDE, so it feels approachable rather than "hacker-y". */
+/* Dark-first theme. Dark is the default (no attribute needed) so a brand-new
+   visitor lands in dark mode; `data-theme="light"` on <html> opts into light. */
 :root {
-  --background: #f4f5f7;
-  --foreground: #23262b;
+  --bg: #0d0d0d;
+  --surface-0: #171717;
+  --surface-1: #1e1e1e;
+  --surface-2: #262626;
+  --surface-3: #333333;
+  --line: #2a2a2a;
+  --line-strong: #3d3d3d;
 
-  --bg: #f4f5f7;
-  --surface-0: #ffffff;
+  --text: #ececec;
+  --text-dim: #b4b4b4;
+  --text-faint: #8a8a8a;
+
+  --accent: #ffffff;
+  --accent-contrast: #0d0d0d;
+  --accent-soft: #2a2a2a;
+  --focus: #6b6b6b;
+
+  --bubble-user: #2f2f2f;
+
+  --danger: #f87171;
+  --danger-soft: #3a1f1f;
+  --success: #4ade80;
+  --success-soft: #16301f;
+  --warn: #fbbf24;
+  --warn-soft: #322612;
+
+  --background: var(--bg);
+  --foreground: var(--text);
+}
+
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --surface-0: #f9f9f9;
   --surface-1: #ffffff;
-  --surface-2: #eef0f3;
-  --surface-3: #e3e6eb;
-  --line: #e2e4e9;
+  --surface-2: #ececec;
+  --surface-3: #e0e0e0;
+  --line: #e5e5e5;
+  --line-strong: #d0d0d0;
 
-  --text: #23262b;
-  --text-dim: #4b505a;
-  --text-faint: #8b909a;
+  --text: #0d0d0d;
+  --text-dim: #4d4d4d;
+  --text-faint: #8f8f8f;
 
-  --accent: #3b7ea1;
-  --accent-strong: #245a76;
-  --accent-soft: #dcedf4;
+  --accent: #0d0d0d;
+  --accent-contrast: #ffffff;
+  --accent-soft: #ececec;
+  --focus: #a0a0a0;
 
-  --danger: #c0463a;
-  --danger-soft: #fbe6e3;
-  --success: #2f8f5b;
-  --success-soft: #e2f4ea;
-  --warn: #b07b26;
-  --warn-soft: #f8ecd7;
+  --bubble-user: #ececec;
+
+  --danger: #b42318;
+  --danger-soft: #fde8e6;
+  --success: #17803d;
+  --success-soft: #e4f6ea;
+  --warn: #9a6400;
+  --warn-soft: #fbf0da;
 }
 
 @theme inline {
@@ -37,7 +69,22 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font-sans), ui-sans-serif, system-ui, Arial, Helvetica, sans-serif;
 }
+
+/* Slim scrollbars so long chats/file trees don't look chunky in dark mode. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-rise { animation: rise 0.22s ease-out both; }

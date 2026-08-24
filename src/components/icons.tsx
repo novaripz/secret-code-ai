@@ -145,8 +145,83 @@ export function BookIcon(props: SVGProps<SVGSVGElement>) {
 export function SettingsIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <circle cx="10" cy="10" r="2.5" />
-      <path d="M10 2.5v2M10 15.5v2M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M2.5 10h2M15.5 10h2M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4" strokeLinecap="round" />
+      <path d="M3 6h9M15 6h2M3 14h2M8 14h9" strokeLinecap="round" />
+      <circle cx="13.5" cy="6" r="2" />
+      <circle cx="6.5" cy="14" r="2" />
+    </svg>
+  );
+}
+export function ChatIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M3 8.5a5 5 0 0 1 5-5h4a5 5 0 0 1 0 10H7.5L4 16.5v-3.2A5 5 0 0 1 3 8.5z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+export function HammerIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M11.5 3.5 8 7l-1.5-1.5L3 9l3 3 3.5-3.5L11 10l3.5-3.5-3-3z" strokeLinejoin="round" />
+      <path d="m12 9 5 5-2 2-5-5" strokeLinejoin="round" />
+    </svg>
+  );
+}
+export function PaperclipIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M14.5 9.5 9.8 14.2a3 3 0 0 1-4.3-4.3l5.4-5.4a2 2 0 0 1 2.9 2.9l-5.4 5.4a1 1 0 0 1-1.4-1.4l4.7-4.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+export function MenuIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M3.5 6h13M3.5 10h13M3.5 14h13" strokeLinecap="round" />
+    </svg>
+  );
+}
+export function SunIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <circle cx="10" cy="10" r="3.5" />
+      <path d="M10 1.5v2M10 16.5v2M3.5 3.5l1.4 1.4M15.1 15.1l1.4 1.4M1.5 10h2M16.5 10h2M3.5 16.5l1.4-1.4M15.1 4.9l1.4-1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+export function MoonIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M16 11.5A6.5 6.5 0 0 1 8.5 4a6.5 6.5 0 1 0 7.5 7.5z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+export function UserIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <circle cx="10" cy="7" r="3" />
+      <path d="M4 16.5a6 6 0 0 1 12 0" strokeLinecap="round" />
+    </svg>
+  );
+}
+export function BrainIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M8 3.5a2.2 2.2 0 0 0-2.2 2.2A2.3 2.3 0 0 0 4 8a2.3 2.3 0 0 0 1.4 2.1A2.2 2.2 0 0 0 7.6 13H8V3.5zM12 3.5a2.2 2.2 0 0 1 2.2 2.2A2.3 2.3 0 0 1 16 8a2.3 2.3 0 0 1-1.4 2.1A2.2 2.2 0 0 1 12.4 13H12V3.5z" strokeLinejoin="round" />
+      <path d="M10 3.5v13" strokeLinecap="round" />
+    </svg>
+  );
+}
+export function PencilIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M13.5 3.5 16.5 6.5 7 16H4v-3l9.5-9.5z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+export function PlusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M10 4v12M4 10h12" strokeLinecap="round" />
     </svg>
   );
 }

@@ -8,21 +8,36 @@ export const runtime = "nodejs";
 const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 const MAX_IMAGE_BASE64_CHARS = 8_000_000; // ~6MB decoded, generous for a tab screenshot
 
+const MAX_IMAGES = 4;
+
 interface RequestBody {
   prompt: string;
   fileTree: string;
   contextFiles: Record<string, string>;
   history?: AiMessage[];
   explainMode?: boolean;
+  homeworkHelp?: boolean;
+  aiHomie?: boolean;
+  chatOnly?: boolean;
   projectMemory?: string;
   studentProfile?: string;
   image?: ImageAttachment;
+  images?: ImageAttachment[];
 }
 
 function isRequestBody(x: unknown): x is RequestBody {
   if (typeof x !== "object" || x === null) return false;
   const b = x as Record<string, unknown>;
-  return typeof b.prompt === "string" && typeof b.fileTree === "string";
+  // fileTree is only meaningful when a project is open; plain chat omits it.
+  return typeof b.prompt === "string" && (typeof b.fileTree === "string" || b.chatOnly === true);
+}
+
+function sanitizeImages(images: unknown): ImageAttachment[] {
+  if (!Array.isArray(images)) return [];
+  return images
+    .map(sanitizeImage)
+    .filter((i): i is ImageAttachment => i !== undefined)
+    .slice(0, MAX_IMAGES);
 }
 
 function sanitizeImage(image: unknown): ImageAttachment | undefined {
@@ -51,21 +66,26 @@ export async function POST(req: NextRequest) {
   if (body.prompt.trim().length === 0) {
     return NextResponse.json({ error: "Prompt must not be empty." }, { status: 400 });
   }
-  if (body.prompt.length > 20000) {
-    return NextResponse.json({ error: "Prompt is too long." }, { status: 400 });
+  // Generous, because attached text/code files are folded into the prompt.
+  if (body.prompt.length > 400_000) {
+    return NextResponse.json({ error: "That's too much text to send at once." }, { status: 400 });
   }
 
   try {
     const provider = getAiProvider();
     const response = await provider.generate({
       prompt: body.prompt,
-      fileTree: body.fileTree,
+      fileTree: body.fileTree ?? "",
       contextFiles: body.contextFiles ?? {},
       history: Array.isArray(body.history) ? body.history.slice(-20) : [],
       explainMode: body.explainMode === true,
+      homeworkHelp: body.homeworkHelp === true,
+      aiHomie: body.aiHomie === true,
+      chatOnly: body.chatOnly === true,
       projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,
       studentProfile: typeof body.studentProfile === "string" ? body.studentProfile.slice(0, 2000) : undefined,
       image: sanitizeImage(body.image),
+      images: sanitizeImages(body.images),
     });
 
     // Validate/sanitize operations server-side too, so a malformed model

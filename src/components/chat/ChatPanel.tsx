@@ -4,11 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useChatStore } from "@/store/useChatStore";
 import { useMemoryStore } from "@/store/useMemoryStore";
+import { useProfileStore } from "@/store/useProfileStore";
 import { selectContextFiles } from "@/lib/ai/contextSelection";
 import { projectFileTreeText } from "@/lib/fileSystem";
-import { captureTabScreenshot, readFileAsImage, type CapturedImage } from "@/lib/tabCapture";
+import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
 import { OperationsPreview } from "./OperationsPreview";
-import { SendIcon, SparkleIcon, CameraIcon, LightbulbIcon, XIcon } from "@/components/icons";
+import { Composer } from "./Composer";
+import { ModePills } from "./ModePills";
+import { MessageText } from "./MessageText";
+import { SparkleIcon } from "@/components/icons";
 
 const SUGGESTIONS = [
   "Make me a simple portfolio site with hero, about, projects, and contact sections",
@@ -23,66 +27,54 @@ export function ChatPanel() {
   const applyOperations = useStudioStore((s) => s.applyOperations);
   const openFile = useStudioStore((s) => s.openFile);
 
-  const { messages, loading, loadForProject, addUserMessage, addAssistantMessage, addErrorMessage, markApplied, markRejected, setLoading } =
-    useChatStore();
+  const {
+    messages,
+    loading,
+    loadForProject,
+    addUserMessage,
+    addAssistantMessage,
+    addErrorMessage,
+    markApplied,
+    markRejected,
+    setLoading,
+  } = useChatStore();
 
-  const { explainMode, setExplainMode, hydrate, profileSummary, projectMemorySummary, addBuildLogEntry } = useMemoryStore();
+  const { hydrate, projectMemorySummary, addBuildLogEntry } = useMemoryStore();
+  const modes = useProfileStore((s) => s.modes);
+  const memoryBlock = useProfileStore((s) => s.memoryBlock);
+  const displayName = useProfileStore((s) => s.displayName);
 
   const [input, setInput] = useState("");
-  const [pendingImage, setPendingImage] = useState<CapturedImage | null>(null);
-  const [capturing, setCapturing] = useState(false);
-  const [captureError, setCaptureError] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (project) {
-      loadForProject(project.id);
-      hydrate(project.id);
-    }
+    if (!project) return;
+    void loadForProject(project.id);
+    void hydrate(project.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project?.id]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, loading]);
-
-  async function handleCapture() {
-    setCaptureError(null);
-    setCapturing(true);
-    try {
-      const img = await captureTabScreenshot();
-      setPendingImage(img);
-    } catch (err) {
-      setCaptureError(err instanceof Error ? err.message : "Couldn't capture the screen.");
-    } finally {
-      setCapturing(false);
-    }
-  }
-
-  async function handleFilePicked(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    try {
-      setPendingImage(await readFileAsImage(file));
-    } catch (err) {
-      setCaptureError(err instanceof Error ? err.message : "Couldn't read that image.");
-    }
-  }
+  }, [messages.length, loading]);
 
   async function send(promptOverride?: string) {
-    const prompt = (promptOverride ?? input).trim();
-    if (!prompt || !project || loading) return;
-    const imageToSend = pendingImage;
+    const typed = (promptOverride ?? input).trim();
+    const outgoing = attachments;
+    if ((!typed && outgoing.length === 0) || !project || loading) return;
+
     setInput("");
-    setPendingImage(null);
-    addUserMessage(prompt);
+    setAttachments([]);
+    addUserMessage(typed || "(sent attachments)");
     setLoading(true);
 
     try {
+      const attachedText = attachmentsToPromptText(outgoing);
+      const prompt = [typed, attachedText].filter(Boolean).join("\n\n");
+
       const fileTree = projectFileTreeText(project);
-      const contextFiles = selectContextFiles(project, { currentFilePath: activeTab ?? undefined, prompt });
+      const contextFiles = selectContextFiles(project, { currentFilePath: activeTab ?? undefined, prompt: typed });
       const history = useChatStore
         .getState()
         .messages.filter((m) => m.content)
@@ -93,14 +85,18 @@ export function ChatPanel() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt,
+          prompt: prompt || "(the user sent attachments with no message)",
           fileTree,
           contextFiles,
           history,
-          explainMode,
+          explainMode: modes.explainMode,
+          homeworkHelp: modes.homeworkHelp,
+          aiHomie: modes.aiHomie,
           projectMemory: projectMemorySummary(),
-          studentProfile: profileSummary(),
-          image: imageToSend ? { data: imageToSend.base64, mimeType: imageToSend.mimeType } : undefined,
+          studentProfile: memoryBlock(),
+          images: outgoing
+            .filter((a) => a.kind === "image" && a.base64 && a.mimeType)
+            .map((a) => ({ data: a.base64!, mimeType: a.mimeType! })),
         }),
       });
 
@@ -111,10 +107,7 @@ export function ChatPanel() {
       }
 
       addAssistantMessage(data.message || "Done.", data.operations);
-
-      if (data.message && project) {
-        addBuildLogEntry(project.id, data.message.slice(0, 200));
-      }
+      if (data.message) addBuildLogEntry(project.id, data.message.slice(0, 200));
 
       if (data.openFiles?.length && (!data.operations || data.operations.length === 0)) {
         for (const path of data.openFiles) openFile(path);
@@ -139,38 +132,28 @@ export function ChatPanel() {
     }
   }
 
+  const name = displayName();
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-[var(--line)] shrink-0">
-        <div className="flex items-center gap-2">
-          <SparkleIcon className="w-4 h-4 text-[var(--accent)]" />
-          <span className="text-xs font-semibold tracking-wide text-[var(--text-dim)] uppercase">Ask for Help</span>
-        </div>
-        <button
-          onClick={() => setExplainMode(!explainMode)}
-          title="Explain Mode: extra simple, step-by-step answers"
-          className={`flex items-center gap-1.5 text-[11px] font-medium px-2 py-1 rounded-full transition-colors ${
-            explainMode ? "bg-[var(--accent-soft)] text-[var(--accent)]" : "bg-[var(--surface-2)] text-[var(--text-faint)]"
-          }`}
-        >
-          <LightbulbIcon className="w-3.5 h-3.5" />
-          Explain Mode {explainMode ? "On" : "Off"}
-        </button>
+    <div className="flex h-full flex-col">
+      <div className="flex shrink-0 items-center gap-2 border-b border-[var(--line)] px-3 py-2.5">
+        <SparkleIcon className="h-4 w-4 text-[var(--text-dim)]" />
+        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">Assistant</span>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
+      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
         {messages.length === 0 && (
           <div className="space-y-3">
-            <p className="text-xs text-[var(--text-faint)] leading-relaxed">
-              Tell me what you want to build or change, kind of like describing it to a friend. I can create, edit,
-              rename, and remove files for you — you&apos;ll always get to look before anything changes.
+            <p className="text-sm leading-relaxed text-[var(--text-dim)]">
+              {name ? `Alright ${name} — what` : "What"} do you want to build or change? Describe it like you&apos;d
+              describe it to a friend. You&apos;ll always see the changes before anything happens.
             </p>
             <div className="space-y-1.5">
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
-                  onClick={() => send(s)}
-                  className="w-full text-left text-xs px-2.5 py-2 rounded-lg bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text-dim)] hover:text-[var(--text)]"
+                  onClick={() => void send(s)}
+                  className="w-full rounded-xl border border-[var(--line)] px-3 py-2.5 text-left text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
                 >
                   {s}
                 </button>
@@ -182,15 +165,19 @@ export function ChatPanel() {
         {messages.map((m) => (
           <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
             <div
-              className={`max-w-[92%] rounded-xl px-3 py-2 text-sm ${
-                m.role === "user" ? "bg-[var(--accent-soft)] text-[var(--accent-strong)]" : "bg-[var(--surface-2)] text-[var(--text)]"
-              }`}
+              className={
+                m.role === "user"
+                  ? "max-w-[92%] rounded-2xl bg-[var(--bubble-user)] px-3.5 py-2 text-sm text-[var(--text)]"
+                  : "w-full text-sm text-[var(--text)]"
+              }
             >
               {m.error ? (
-                <div className="text-[var(--danger)] text-xs">⚠ {m.error}</div>
+                <div className="rounded-xl border border-[var(--danger)] bg-[var(--danger-soft)] px-3 py-2 text-xs text-[var(--danger)]">
+                  {m.error}
+                </div>
               ) : (
                 <>
-                  <div className="whitespace-pre-wrap leading-relaxed">{m.content}</div>
+                  <MessageText content={m.content} />
                   {m.proposedOperations && (
                     <OperationsPreview
                       operations={m.proposedOperations}
@@ -207,65 +194,26 @@ export function ChatPanel() {
         ))}
 
         {loading && (
-          <div className="flex justify-start">
-            <div className="bg-[var(--surface-2)] text-[var(--text-faint)] rounded-xl px-3 py-2 text-sm flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:-0.3s]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:-0.15s]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce" />
-            </div>
+          <div className="flex items-center gap-1.5 text-[var(--text-faint)]">
+            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
+            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
+            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current" />
           </div>
         )}
       </div>
 
-      <div className="border-t border-[var(--line)] p-2.5 shrink-0 space-y-2">
-        {captureError && (
-          <div className="text-[11px] text-[var(--danger)] px-1">{captureError}</div>
-        )}
-        {pendingImage && (
-          <div className="flex items-center gap-2 bg-[var(--surface-2)] rounded-lg p-1.5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={pendingImage.dataUrl} alt="Attached screenshot" className="w-12 h-8 object-cover rounded" />
-            <span className="text-[11px] text-[var(--text-faint)] flex-1">Screenshot attached</span>
-            <button onClick={() => setPendingImage(null)} className="p-1 hover:bg-[var(--surface-3)] rounded">
-              <XIcon className="w-3.5 h-3.5 text-[var(--text-faint)]" />
-            </button>
-          </div>
-        )}
-        <div className="flex items-end gap-2 bg-[var(--surface-2)] rounded-xl px-2.5 py-2 focus-within:ring-2 focus-within:ring-[var(--accent)]">
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFilePicked} />
-          <button
-            onClick={handleCapture}
-            disabled={!project || capturing}
-            title="Capture your screen so I can see what you see"
-            className="shrink-0 p-1.5 rounded-md hover:bg-[var(--surface-3)] text-[var(--text-faint)] disabled:opacity-30"
-          >
-            <CameraIcon className="w-4 h-4" />
-          </button>
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send();
-              }
-            }}
-            placeholder={project ? "What do you want to build or fix?" : "Open a project to start chatting"}
-            disabled={!project}
-            rows={1}
-            className="flex-1 bg-transparent text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] resize-none outline-none max-h-40"
-          />
-          <button
-            onClick={() => send()}
-            disabled={!project || loading || !input.trim()}
-            className="shrink-0 p-1.5 rounded-md bg-[var(--accent)] text-white disabled:opacity-30 disabled:cursor-not-allowed hover:brightness-110"
-          >
-            <SendIcon className="w-4 h-4" />
-          </button>
-        </div>
-        <p className="text-[10px] text-[var(--text-faint)] px-1">
-          Tip: click the camera to show me your screen instead of typing it out — your browser will ask which tab to share.
-        </p>
+      <div className="shrink-0 border-t border-[var(--line)] p-2.5">
+        <Composer
+          value={input}
+          onChange={setInput}
+          attachments={attachments}
+          onAttachmentsChange={setAttachments}
+          onSend={() => void send()}
+          loading={loading}
+          disabled={!project}
+          placeholder={project ? "What should we build or fix?" : "Open a project to start"}
+          footer={<ModePills />}
+        />
       </div>
     </div>
   );

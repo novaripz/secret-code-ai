@@ -5,7 +5,17 @@ import { useRef, useState } from "react";
 import { useStudioStore } from "@/store/useStudioStore";
 import { exportProjectToZip, importProjectFromZip } from "@/lib/zip";
 import { saveProject } from "@/lib/storage";
-import { SaveIcon, DownloadIcon, UploadIcon } from "@/components/icons";
+import { useDialog } from "@/components/ui/Dialog";
+import { useProfileStore } from "@/store/useProfileStore";
+import {
+  SaveIcon,
+  DownloadIcon,
+  UploadIcon,
+  ChatIcon,
+  SettingsIcon,
+  MoonIcon,
+  SunIcon,
+} from "@/components/icons";
 
 export function TopBar() {
   const project = useStudioStore((s) => s.project);
@@ -14,6 +24,9 @@ export function TopBar() {
   const lastSavedAt = useStudioStore((s) => s.lastSavedAt);
   const persist = useStudioStore((s) => s.persist);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dialog = useDialog();
+  const theme = useProfileStore((s) => s.theme);
+  const toggleTheme = useProfileStore((s) => s.toggleTheme);
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState(project?.name ?? "");
 
@@ -37,7 +50,10 @@ export function TopBar() {
       await saveProject(imported);
       setProject(imported);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Couldn't open that file.");
+      await dialog.alert({
+        title: "Couldn't open that file",
+        description: err instanceof Error ? err.message : "That .zip didn't look like a project.",
+      });
     }
   }
 
@@ -52,11 +68,15 @@ export function TopBar() {
   return (
     <header className="h-14 shrink-0 flex items-center justify-between px-3 border-b border-[var(--line)] bg-[var(--surface-0)]">
       <div className="flex items-center gap-3 min-w-0">
-        <Link href="/" className="flex items-center gap-2 shrink-0 text-[var(--text)] hover:opacity-80">
-          <span className="w-7 h-7 rounded-lg bg-[var(--accent)] flex items-center justify-center text-white text-sm font-bold">
-            B
+        <Link
+          href="/build"
+          title="Back to your projects"
+          className="flex items-center gap-2 shrink-0 text-[var(--text)] hover:opacity-80"
+        >
+          <span className="w-7 h-7 rounded-lg bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-[var(--accent-contrast)]">
+            S
           </span>
-          <span className="text-sm font-semibold hidden sm:inline">Build</span>
+          <span className="text-sm font-semibold hidden sm:inline">Projects</span>
         </Link>
         {project && (
           <>
@@ -92,6 +112,28 @@ export function TopBar() {
             {saving ? "Saving…" : lastSavedAt ? `Saved ${new Date(lastSavedAt).toLocaleTimeString()}` : ""}
           </span>
         )}
+        <Link
+          href="/"
+          title="Open chat"
+          className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
+        >
+          <ChatIcon className="w-4 h-4" />
+        </Link>
+        <Link
+          href="/settings"
+          title="Settings"
+          className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
+        >
+          <SettingsIcon className="w-4 h-4" />
+        </Link>
+        <button
+          onClick={toggleTheme}
+          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
+        >
+          {theme === "dark" ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
+        </button>
+        <span className="w-px h-5 bg-[var(--line)] mx-1" />
         <input ref={fileInputRef} type="file" accept=".zip" className="hidden" onChange={handleImportFile} />
         <button
           onClick={() => fileInputRef.current?.click()}

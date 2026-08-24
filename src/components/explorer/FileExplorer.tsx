@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FileNode, Project } from "@/types";
 import { getChildren, joinPath } from "@/lib/fileSystem";
 import { useStudioStore } from "@/store/useStudioStore";
+import { useDialog } from "@/components/ui/Dialog";
 import {
   FolderIcon,
   FolderOpenIcon,
@@ -33,50 +34,73 @@ function TreeNode({
   const addFolder = useStudioStore((s) => s.addFolder);
   const removeNode = useStudioStore((s) => s.removeNode);
   const renamePath = useStudioStore((s) => s.renamePath);
+  const dialog = useDialog();
 
   const children = node.kind === "folder" ? getChildren(project, node.id) : [];
   const isActive = node.kind === "file" && node.path === activePath;
 
-  function commitRename() {
+  async function reportError(err: unknown) {
+    await dialog.alert({
+      title: "That didn't work",
+      description: err instanceof Error ? err.message : String(err),
+    });
+  }
+
+  async function commitRename() {
     setRenaming(false);
     const trimmed = draftName.trim();
     if (!trimmed || trimmed === node.name) return;
     const newPath = joinPath(node.path.split("/").slice(0, -1).join("/"), trimmed);
     try {
       renamePath(node.path, newPath);
-    } catch (e) {
-      alert(e instanceof Error ? e.message : String(e));
+    } catch (err) {
+      await reportError(err);
     }
   }
 
-  function handleNewFile(e: React.MouseEvent) {
+  async function handleNewFile(e: React.MouseEvent) {
     e.stopPropagation();
-    const name = prompt("Name this file (e.g. helpers.js):");
+    const name = await dialog.prompt({
+      title: "New file",
+      description: `It'll go inside "${node.name}".`,
+      placeholder: "helpers.js",
+      confirmLabel: "Create",
+    });
     if (!name) return;
     try {
       addFile(joinPath(node.path, name), "");
       setOpen(true);
     } catch (err) {
-      alert(err instanceof Error ? err.message : String(err));
+      await reportError(err);
     }
   }
 
-  function handleNewFolder(e: React.MouseEvent) {
+  async function handleNewFolder(e: React.MouseEvent) {
     e.stopPropagation();
-    const name = prompt("Name this folder:");
+    const name = await dialog.prompt({
+      title: "New folder",
+      description: `It'll go inside "${node.name}".`,
+      placeholder: "components",
+      confirmLabel: "Create",
+    });
     if (!name) return;
     try {
       addFolder(joinPath(node.path, name));
       setOpen(true);
     } catch (err) {
-      alert(err instanceof Error ? err.message : String(err));
+      await reportError(err);
     }
   }
 
-  function handleDelete(e: React.MouseEvent) {
+  async function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!confirm(`Delete "${node.name}"? You can't undo this.`)) return;
-    removeNode(node.path);
+    const ok = await dialog.confirm({
+      title: `Delete "${node.name}"?`,
+      description: node.kind === "folder" ? "Everything inside it goes too. You can't undo this." : "You can't undo this.",
+      confirmLabel: "Delete",
+      danger: true,
+    });
+    if (ok) removeNode(node.path);
   }
 
   if (node.kind === "folder") {
@@ -173,7 +197,28 @@ function TreeNode({
 export function FileExplorer({ project, activePath }: { project: Project; activePath: string | null }) {
   const addFile = useStudioStore((s) => s.addFile);
   const addFolder = useStudioStore((s) => s.addFolder);
+  const dialog = useDialog();
   const rootChildren = getChildren(project, project.rootId);
+
+  /** Creates a file or folder at the project root, asking for a name in-app. */
+  async function createAtRoot(kind: "file" | "folder") {
+    const name = await dialog.prompt({
+      title: kind === "file" ? "New file" : "New folder",
+      description: "It'll go at the top level of your project.",
+      placeholder: kind === "file" ? "index.html" : "images",
+      confirmLabel: "Create",
+    });
+    if (!name) return;
+    try {
+      if (kind === "file") addFile(name, "");
+      else addFolder(name);
+    } catch (err) {
+      await dialog.alert({
+        title: "That didn't work",
+        description: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -182,32 +227,14 @@ export function FileExplorer({ project, activePath }: { project: Project; active
         <div className="flex items-center gap-1">
           <button
             title="New file"
-            onClick={() => {
-              const name = prompt("Name this file (e.g. index.html):");
-              if (name) {
-                try {
-                  addFile(name, "");
-                } catch (e) {
-                  alert(e instanceof Error ? e.message : String(e));
-                }
-              }
-            }}
+            onClick={() => void createAtRoot("file")}
             className="p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
           >
             <PlusFileIcon className="w-4 h-4" />
           </button>
           <button
             title="New folder"
-            onClick={() => {
-              const name = prompt("Name this folder:");
-              if (name) {
-                try {
-                  addFolder(name);
-                } catch (e) {
-                  alert(e instanceof Error ? e.message : String(e));
-                }
-              }
-            }}
+            onClick={() => void createAtRoot("folder")}
             className="p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
           >
             <PlusFolderIcon className="w-4 h-4" />

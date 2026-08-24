@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { AgentResponse, FileOperation } from "@/types";
 import type { AgentRequest, AiProvider } from "./provider";
-import { EXPLAIN_MODE_ADDENDUM, SYSTEM_PROMPT } from "./systemPrompt";
+import { buildSystemPrompt, CHAT_SYSTEM_PROMPT, SYSTEM_PROMPT } from "./systemPrompt";
 
 const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 
@@ -11,15 +11,41 @@ function buildUserTurnText(req: AgentRequest): string {
     .join("\n\n");
 
   const parts = [
-    req.studentProfile ? `WHAT WE KNOW ABOUT THE STUDENT:\n${req.studentProfile}` : "",
+    req.studentProfile ? `WHAT WE KNOW ABOUT THE USER (remember this across every chat and project):\n${req.studentProfile}` : "",
     req.projectMemory ? `WHAT WE'VE ALREADY BUILT IN THIS PROJECT (working memory):\n${req.projectMemory}` : "",
     `PROJECT FILE TREE:\n${req.fileTree}`,
     contextBlock ? `RELEVANT FILE CONTENTS:\n${contextBlock}` : "RELEVANT FILE CONTENTS: (none selected)",
-    req.image ? "The student also attached a screenshot of their screen — use it to understand what's happening." : "",
+    imageNote(req),
     `STUDENT'S REQUEST:\n${req.prompt}`,
   ].filter(Boolean);
 
   return parts.join("\n\n");
+}
+
+/** Tells the model what it's looking at, so attached images aren't ignored. */
+function imageNote(req: AgentRequest): string {
+  const count = allImages(req).length;
+  if (count === 0) return "";
+  return count === 1
+    ? "The user attached an image (a screenshot or photo) — look at it before answering."
+    : `The user attached ${count} images — look at all of them before answering.`;
+}
+
+/** Text-only turn for plain conversation: no file tree, no operations. */
+function buildChatTurnText(req: AgentRequest): string {
+  const parts = [
+    req.studentProfile ? `WHAT YOU KNOW ABOUT THE USER:\n${req.studentProfile}` : "",
+    imageNote(req),
+    `USER:\n${req.prompt}`,
+  ].filter(Boolean);
+  return parts.join("\n\n");
+}
+
+/** Back-compat: `image` is the single-attachment form, `images` the newer list. */
+function allImages(req: AgentRequest) {
+  const images = req.images ?? [];
+  if (req.image && !images.some((i) => i.data === req.image!.data)) return [req.image, ...images];
+  return images;
 }
 
 function extractJson(text: string): string {
@@ -72,15 +98,18 @@ export class GeminiProvider implements AiProvider {
   }
 
   async generate(req: AgentRequest): Promise<AgentResponse> {
-    const systemInstruction = req.explainMode ? SYSTEM_PROMPT + EXPLAIN_MODE_ADDENDUM : SYSTEM_PROMPT;
+    const systemInstruction = buildSystemPrompt(req.chatOnly ? CHAT_SYSTEM_PROMPT : SYSTEM_PROMPT, {
+      explainMode: req.explainMode,
+      homeworkHelp: req.homeworkHelp,
+      aiHomie: req.aiHomie,
+    });
 
     const model = this.client.getGenerativeModel({
       model: MODEL_NAME,
       systemInstruction,
-      generationConfig: {
-        responseMimeType: "application/json",
-        temperature: 0.4,
-      },
+      generationConfig: req.chatOnly
+        ? { temperature: req.aiHomie ? 0.9 : 0.7 }
+        : { responseMimeType: "application/json", temperature: 0.4 },
     });
 
     const history = req.history.map((m) => ({
@@ -91,13 +120,18 @@ export class GeminiProvider implements AiProvider {
     const chat = model.startChat({ history });
 
     type MessagePart = { text: string } | { inlineData: { data: string; mimeType: string } };
-    const messageParts: MessagePart[] = [{ text: buildUserTurnText(req) }];
-    if (req.image) {
-      messageParts.push({ inlineData: { data: req.image.data, mimeType: req.image.mimeType } });
+    const messageParts: MessagePart[] = [
+      { text: req.chatOnly ? buildChatTurnText(req) : buildUserTurnText(req) },
+    ];
+    for (const image of allImages(req)) {
+      messageParts.push({ inlineData: { data: image.data, mimeType: image.mimeType } });
     }
 
     const result = await chat.sendMessage(messageParts);
     const text = result.response.text();
+
+    // In plain-chat mode the model answers in prose, so there's no JSON to parse.
+    if (req.chatOnly) return { operations: [], message: text.trim() };
     return parseAgentResponse(text);
   }
 }

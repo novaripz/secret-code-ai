@@ -1,19 +1,28 @@
-# Build — a beginner-friendly, browser-based coding environment
+# Studio — chat with an AI that knows you, and build things with it
 
-Code, ask a friendly AI helper for tips, and see your project run — entirely in the browser. No VS Code, no CLI tools, no local installs. Designed for someone moving up from Scratch: a calm, simple UI, plain-language explanations, and an AI that remembers what you've already built together.
+Chat, drop in files and screenshots, and build real projects — entirely in the browser. No VS Code, no CLI tools, no local installs. Chat-first: you land on a conversation, and the Build tab is there when you want to make something.
 
 ## What it is
+
+- **Chat first** — the home screen is a conversation ("What's up, *name*"), with chat history in the sidebar. Ask anything: how to take a screenshot, what an API is, help with a project idea. Threads persist across reloads.
+- **Your profile, everywhere** — first launch asks your name, nickname, birthday (year optional), and what you're into. Everything the AI knows about you follows you across every chat and every project, and you can edit or delete any of it under Settings → Memory.
+- **Three modes** — toggleable from the composer or Settings, and they stay on until you turn them off:
+  - **Explanation mode** — extra-simple, step-by-step answers that cover the *why*.
+  - **Homework help** — for schoolwork, the AI coaches you toward the answer with hints and similar-but-different examples instead of handing it over. It'll still check finished work.
+  - **AI homie** — casual Gen-Z voice; talks to you like a friend instead of a teacher, still accurate.
+- **Dark mode by default** — light mode is one click away in the top bar or Settings → Appearance, and the choice is applied before first paint so there's no flash.
+- **Attach anything** — drag and drop, paste, pick a file, or capture your screen. Images go to the model as images; text and code files are read and quoted. Multiple attachments per message.
+- **No browser dialogs** — naming a file, renaming a chat, confirming a delete: all handled by in-app dialogs. Nothing hands you off to a native browser popup.
 
 - **Project & file system** — create projects, files, and nested folders; rename, delete, work across tabs; everything autosaves to the browser (IndexedDB) as you type.
 - **Code editor** — Monaco (the engine behind VS Code): syntax highlighting, autocomplete, multi-tab editing, unsaved-change dots. Supports HTML, CSS, JS/TS, JSON, Python, Java, C#, C/C++, Go, Rust, Ruby, PHP, Markdown, YAML, and more.
 - **AI coding agent** — a right-side chat panel backed by Google Gemini. It inspects your file tree and relevant file contents, then returns **structured file operations** (create/modify/delete/rename) which you review and apply — never a wall of code to copy-paste by hand.
-- **Explain Mode** — a toggle in the chat panel. When on, the AI writes answers for a total beginner: plain language, coding terms defined the first time they're used, and Scratch-style comparisons where they help.
 - **Working memory** — the AI remembers what's already been built in *this* project (a plain-language "What We Built" log, shown in its own tab) and carries a short profile of the student across *all* their projects, so it doesn't repeat itself or re-explain the basics every time.
-- **Show, don't describe** — click the camera icon to capture your current browser tab (the browser's own "choose what to share" dialog, not silent) and attach it to your question, so the AI can see what you see instead of you having to describe it. Uploading a screenshot file also works.
+- **Show, don't describe** — click the camera icon to capture your screen (the browser's own "choose what to share" prompt, never silent) and attach it to your question, so the AI can see what you see.
 - **Live preview** — sandboxed `<iframe>` that renders your project's `index.html` with local CSS/JS inlined; console/runtime errors are captured and shown in a Messages/Problems panel.
 - **Command panel** — an honest run/console panel. This app does not fake a terminal or run arbitrary shell commands; it clearly executes only what a browser can safely execute (loading your HTML/CSS/JS in a sandbox).
 - **Import/export** — zip a project out, or import an existing folder-as-zip back in.
-- **Calm, simple UI** — a light, uncluttered look with plain-language labels ("Your Files", "Ask for Help", "See It Run") instead of developer jargon. It takes visual inspiration from block-based tools like Scratch in spirit — big, friendly, unintimidating — without copying anyone's branding or pretending to be a different site.
+- **Calm, dark UI** — an uncluttered chat-style layout with plain-language labels ("Your Files", "See It Run") instead of developer jargon.
 
 ## Tech stack
 
@@ -28,7 +37,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000, create a project, and start chatting with the AI — try:
+Open http://localhost:3000, answer the few setup questions, and start chatting. To build something, head to the **Build** tab, create a project, and try:
 
 > "create a simple portfolio website with a hero section, about section, projects section, and contact form"
 
@@ -41,13 +50,16 @@ Then iterate:
 ```
 src/
   app/
-    page.tsx                 project list (home)
+    page.tsx                 chat (home)
+    build/page.tsx           your projects
+    settings/page.tsx        profile, appearance, modes, memory
     project/[id]/page.tsx    the IDE itself
     api/ai/route.ts          server-only Gemini endpoint (the API key never reaches the browser)
   lib/
     fileSystem.ts            in-memory project tree: create/rename/delete/move, path-safe
     paths.ts                 path normalization + traversal protection ("../" is rejected everywhere)
-    storage.ts                IndexedDB persistence (project autosave, project list)
+    storage.ts               IndexedDB persistence (project autosave, project list)
+    attachments.ts           files/images/screenshots on their way into a message
     zip.ts                   import/export as .zip
     buildPreviewDocument.ts  builds a sandboxed, self-contained HTML doc for the live preview
     ai/
@@ -59,8 +71,10 @@ src/
   store/
     useStudioStore.ts        project/editor/tabs/console state (zustand) + autosave
     useChatStore.ts          chat history, persisted per project
-    useMemoryStore.ts        "working memory": per-project build log + cross-project student profile + Explain Mode
-  components/                explorer, editor, chat, preview, layout
+    useMemoryStore.ts        per-project "working memory": a plain-language build log
+    useProfileStore.ts       the user: name, nickname, birthday, likes, theme, modes, memory
+    useAssistantStore.ts     the main chat's threads (outside any single project)
+  components/                explorer, editor, chat, preview, layout, settings, onboarding, ui
 ```
 
 ### How the AI agent works

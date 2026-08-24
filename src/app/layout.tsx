@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AppProviders } from "@/components/AppProviders";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,14 +14,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Build — a friendly place to code",
-  description: "Code, ask a helper for tips, and see your project run — all in the browser.",
+  title: "Studio — chat, build, and ship",
+  description: "Chat with an AI that knows you, drop in files and screenshots, and build real projects in your browser.",
 };
+
+// Applies the saved theme before first paint so a light-mode user never sees a
+// dark flash (and vice versa). Dark is the default when nothing is saved.
+const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("sca:profile:v1");var t=s?JSON.parse(s).theme:null;document.documentElement.dataset.theme=t==="light"?"light":"dark";}catch(e){document.documentElement.dataset.theme="dark";}})();`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[var(--bg)]">{children}</body>
+    <html lang="en" data-theme="dark" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
+      <body className="min-h-full bg-[var(--bg)]">
+        <AppProviders>{children}</AppProviders>
+      </body>
     </html>
   );
 }

@@ -23,12 +23,20 @@ export interface AgentRequest {
   history: AiMessage[];
   /** When true, the model should explain things in very simple, beginner-friendly terms. */
   explainMode?: boolean;
+  /** When true, coach toward the answer instead of handing it over. */
+  homeworkHelp?: boolean;
+  /** When true, answer in a casual, Gen-Z, friend-to-friend voice. */
+  aiHomie?: boolean;
+  /** Plain conversation with no project open: reply as text, never as file operations. */
+  chatOnly?: boolean;
   /** Short plain-language summary of what's already been built in this project ("working memory"). */
   projectMemory?: string;
   /** Short plain-language facts about the student, carried across projects. */
   studentProfile?: string;
   /** Optional screenshot the student captured (e.g. of their preview or the whole tab). */
   image?: ImageAttachment;
+  /** Everything the student attached to this message (screenshots, photos, pasted images). */
+  images?: ImageAttachment[];
 }
 
 /**
