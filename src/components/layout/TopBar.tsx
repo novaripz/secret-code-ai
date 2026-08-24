@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { useStudioStore } from "@/store/useStudioStore";
 import { exportProjectToZip, importProjectFromZip } from "@/lib/zip";
 import { saveProject } from "@/lib/storage";
-import { SaveIcon, DownloadIcon, UploadIcon, SettingsIcon } from "@/components/icons";
+import { SaveIcon, DownloadIcon, UploadIcon } from "@/components/icons";
 
 export function TopBar() {
   const project = useStudioStore((s) => s.project);
@@ -37,7 +37,7 @@ export function TopBar() {
       await saveProject(imported);
       setProject(imported);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to import zip.");
+      alert(err instanceof Error ? err.message : "Couldn't open that file.");
     }
   }
 
@@ -50,15 +50,17 @@ export function TopBar() {
   }
 
   return (
-    <header className="h-12 shrink-0 flex items-center justify-between px-3 border-b border-white/5 bg-zinc-950">
+    <header className="h-14 shrink-0 flex items-center justify-between px-3 border-b border-[var(--line)] bg-[var(--surface-0)]">
       <div className="flex items-center gap-3 min-w-0">
-        <Link href="/" className="flex items-center gap-1.5 shrink-0 text-zinc-300 hover:text-white">
-          <span className="w-5 h-5 rounded bg-gradient-to-br from-sky-400 to-indigo-500" />
-          <span className="text-sm font-semibold hidden sm:inline">Studio</span>
+        <Link href="/" className="flex items-center gap-2 shrink-0 text-[var(--text)] hover:opacity-80">
+          <span className="w-7 h-7 rounded-lg bg-[var(--accent)] flex items-center justify-center text-white text-sm font-bold">
+            B
+          </span>
+          <span className="text-sm font-semibold hidden sm:inline">Build</span>
         </Link>
         {project && (
           <>
-            <span className="text-zinc-700">/</span>
+            <span className="text-[var(--text-faint)]">/</span>
             {renaming ? (
               <input
                 autoFocus
@@ -66,7 +68,7 @@ export function TopBar() {
                 onChange={(e) => setName(e.target.value)}
                 onBlur={commitRename}
                 onKeyDown={(e) => e.key === "Enter" && commitRename()}
-                className="bg-white/5 text-sm text-zinc-100 rounded px-2 py-0.5 outline-none ring-1 ring-sky-500 min-w-0"
+                className="bg-[var(--surface-2)] text-sm text-[var(--text)] rounded-md px-2 py-1 outline-none ring-2 ring-[var(--accent)] min-w-0"
               />
             ) : (
               <button
@@ -74,8 +76,8 @@ export function TopBar() {
                   setName(project.name);
                   setRenaming(true);
                 }}
-                className="text-sm text-zinc-200 font-medium truncate hover:underline"
-                title="Rename project"
+                className="text-sm text-[var(--text)] font-medium truncate hover:underline"
+                title="Rename this project"
               >
                 {project.name}
               </button>
@@ -86,15 +88,15 @@ export function TopBar() {
 
       <div className="flex items-center gap-1.5 shrink-0">
         {project && (
-          <span className="text-[11px] text-zinc-600 mr-2 hidden md:inline">
+          <span className="text-[11px] text-[var(--text-faint)] mr-2 hidden md:inline">
             {saving ? "Saving…" : lastSavedAt ? `Saved ${new Date(lastSavedAt).toLocaleTimeString()}` : ""}
           </span>
         )}
         <input ref={fileInputRef} type="file" accept=".zip" className="hidden" onChange={handleImportFile} />
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md hover:bg-white/10 text-zinc-400"
-          title="Import project from .zip"
+          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
+          title="Bring in a project from a .zip file"
         >
           <UploadIcon className="w-4 h-4" />
           <span className="hidden sm:inline">Import</span>
@@ -102,8 +104,8 @@ export function TopBar() {
         <button
           onClick={handleExport}
           disabled={!project}
-          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md hover:bg-white/10 text-zinc-400 disabled:opacity-30"
-          title="Export project as .zip"
+          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)] disabled:opacity-30"
+          title="Download this project as a .zip file"
         >
           <DownloadIcon className="w-4 h-4" />
           <span className="hidden sm:inline">Export</span>
@@ -111,14 +113,11 @@ export function TopBar() {
         <button
           onClick={() => persist()}
           disabled={!project}
-          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md bg-white/10 hover:bg-white/15 text-zinc-200 disabled:opacity-30"
+          className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text)] font-medium disabled:opacity-30"
           title="Save now"
         >
           <SaveIcon className="w-4 h-4" />
           <span className="hidden sm:inline">Save</span>
-        </button>
-        <button className="p-1.5 rounded-md hover:bg-white/10 text-zinc-500" title="Settings">
-          <SettingsIcon className="w-4 h-4" />
         </button>
       </div>
     </header>

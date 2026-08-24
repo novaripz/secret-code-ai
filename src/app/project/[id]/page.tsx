@@ -30,16 +30,18 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
   if (status === "loading") {
     return (
-      <div className="h-screen flex items-center justify-center bg-zinc-950 text-zinc-500 text-sm">Loading project…</div>
+      <div className="h-screen flex items-center justify-center bg-[var(--bg)] text-[var(--text-faint)] text-sm">
+        Loading your project…
+      </div>
     );
   }
 
   if (status === "not-found") {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-zinc-950 text-zinc-300 gap-3">
-        <p>Project not found in this browser.</p>
-        <Link href="/" className="text-sky-400 text-sm hover:underline">
-          Back to projects
+      <div className="h-screen flex flex-col items-center justify-center bg-[var(--bg)] text-[var(--text)] gap-3">
+        <p>We couldn&apos;t find that project in this browser.</p>
+        <Link href="/" className="text-[var(--accent)] text-sm hover:underline">
+          Back to your projects
         </Link>
       </div>
     );

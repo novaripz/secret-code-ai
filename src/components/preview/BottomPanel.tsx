@@ -2,16 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useStudioStore } from "@/store/useStudioStore";
+import { useMemoryStore } from "@/store/useMemoryStore";
 import { buildPreviewDocument } from "@/lib/buildPreviewDocument";
-import { PlayIcon, RefreshIcon } from "@/components/icons";
+import { PlayIcon, RefreshIcon, BookIcon } from "@/components/icons";
 
-type Tab = "preview" | "console" | "problems";
+type Tab = "preview" | "console" | "problems" | "log";
 
 export function BottomPanel() {
   const project = useStudioStore((s) => s.project);
   const consoleEntries = useStudioStore((s) => s.consoleEntries);
   const pushConsoleEntry = useStudioStore((s) => s.pushConsoleEntry);
   const clearConsole = useStudioStore((s) => s.clearConsole);
+  const buildLog = useMemoryStore((s) => s.buildLog);
 
   const [tab, setTab] = useState<Tab>("preview");
   const [running, setRunning] = useState(false);
@@ -46,21 +48,30 @@ export function BottomPanel() {
 
   const errorCount = consoleEntries.filter((e) => e.level === "error").length;
 
+  const TABS: { key: Tab; label: string }[] = [
+    { key: "preview", label: "See It Run" },
+    { key: "console", label: "Messages" },
+    { key: "problems", label: "Problems" },
+    { key: "log", label: "What We Built" },
+  ];
+
   return (
-    <div className="flex flex-col h-full bg-zinc-950">
-      <div className="flex items-center justify-between border-b border-white/5 px-2 shrink-0">
+    <div className="flex flex-col h-full bg-[var(--surface-0)]">
+      <div className="flex items-center justify-between border-b border-[var(--line)] px-2 shrink-0">
         <div className="flex items-center">
-          {(["preview", "console", "problems"] as Tab[]).map((t) => (
+          {TABS.map((t) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-3 py-2 text-xs font-medium capitalize border-b-2 transition-colors ${
-                tab === t ? "border-sky-400 text-zinc-100" : "border-transparent text-zinc-500 hover:text-zinc-300"
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors ${
+                tab === t.key
+                  ? "border-[var(--accent)] text-[var(--text)]"
+                  : "border-transparent text-[var(--text-faint)] hover:text-[var(--text-dim)]"
               }`}
             >
-              {t}
-              {t === "console" && errorCount > 0 && (
-                <span className="ml-1.5 inline-flex items-center justify-center text-[10px] bg-red-500/20 text-red-400 rounded-full px-1.5 py-0.5">
+              {t.label}
+              {t.key === "console" && errorCount > 0 && (
+                <span className="ml-1.5 inline-flex items-center justify-center text-[10px] bg-[var(--danger-soft)] text-[var(--danger)] rounded-full px-1.5 py-0.5">
                   {errorCount}
                 </span>
               )}
@@ -70,14 +81,14 @@ export function BottomPanel() {
         <div className="flex items-center gap-1 py-1">
           <button
             onClick={run}
-            className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--success-soft)] text-[var(--success)] hover:brightness-95 font-medium"
           >
             <PlayIcon className="w-3.5 h-3.5" /> Run
           </button>
           <button
             onClick={refresh}
-            title="Refresh preview"
-            className="p-1.5 rounded hover:bg-white/10 text-zinc-400"
+            title="Refresh"
+            className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-faint)]"
           >
             <RefreshIcon className="w-3.5 h-3.5" />
           </button>
@@ -88,9 +99,9 @@ export function BottomPanel() {
         {tab === "preview" && (
           <div className="h-full bg-white">
             {!running && !entryFound ? (
-              <div className="h-full flex items-center justify-center text-zinc-500 text-sm bg-zinc-950">
-                Click <span className="mx-1 font-medium text-zinc-300">Run</span> to render your project&apos;s{" "}
-                <code className="mx-1 text-zinc-300">index.html</code>.
+              <div className="h-full flex items-center justify-center text-[var(--text-faint)] text-sm text-center px-6 bg-[var(--surface-0)]">
+                Click <span className="mx-1 font-medium text-[var(--text)]">Run</span> to see your project come to
+                life.
               </div>
             ) : (
               <iframe
@@ -108,8 +119,8 @@ export function BottomPanel() {
         {tab === "console" && (
           <div className="h-full overflow-y-auto font-mono text-xs p-2 space-y-1">
             {consoleEntries.length === 0 ? (
-              <div className="text-zinc-600 px-1 py-4 text-center">
-                No output yet. Run the preview to see console logs and errors here.
+              <div className="text-[var(--text-faint)] px-1 py-4 text-center">
+                Nothing here yet. Click Run to see messages from your project show up here.
               </div>
             ) : (
               consoleEntries.map((entry) => (
@@ -117,10 +128,10 @@ export function BottomPanel() {
                   key={entry.id}
                   className={`px-2 py-1 rounded whitespace-pre-wrap break-words ${
                     entry.level === "error"
-                      ? "bg-red-500/10 text-red-300"
+                      ? "bg-[var(--danger-soft)] text-[var(--danger)]"
                       : entry.level === "warn"
-                      ? "bg-amber-500/10 text-amber-300"
-                      : "text-zinc-400"
+                      ? "bg-[var(--warn-soft)] text-[var(--warn)]"
+                      : "text-[var(--text-dim)]"
                   }`}
                 >
                   {entry.text}
@@ -131,19 +142,41 @@ export function BottomPanel() {
         )}
 
         {tab === "problems" && (
-          <div className="h-full overflow-y-auto text-xs p-3 text-zinc-500">
+          <div className="h-full overflow-y-auto text-xs p-3 text-[var(--text-faint)]">
             {errorCount === 0 ? (
-              <div className="text-center py-4">No problems detected. Runtime errors will surface here after you Run the preview.</div>
+              <div className="text-center py-4">Nothing broken that I can see! Click Run to double-check.</div>
             ) : (
               <div className="space-y-1">
                 {consoleEntries
                   .filter((e) => e.level === "error")
                   .map((e) => (
-                    <div key={e.id} className="px-2 py-1 rounded bg-red-500/10 text-red-300">
+                    <div key={e.id} className="px-2 py-1 rounded bg-[var(--danger-soft)] text-[var(--danger)]">
                       {e.text}
                     </div>
                   ))}
               </div>
+            )}
+          </div>
+        )}
+
+        {tab === "log" && (
+          <div className="h-full overflow-y-auto text-sm p-3">
+            {buildLog.length === 0 ? (
+              <div className="text-center py-6 text-[var(--text-faint)] flex flex-col items-center gap-2">
+                <BookIcon className="w-6 h-6" />
+                Nothing built yet — ask for help to get started, and I&apos;ll keep track of it here.
+              </div>
+            ) : (
+              <ol className="space-y-2">
+                {[...buildLog].reverse().map((entry) => (
+                  <li key={entry.id} className="flex gap-2 px-2 py-1.5 rounded-lg bg-[var(--surface-2)]">
+                    <span className="text-[var(--text-faint)] text-xs shrink-0 pt-0.5">
+                      {new Date(entry.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                    <span className="text-[var(--text-dim)]">{entry.text}</span>
+                  </li>
+                ))}
+              </ol>
             )}
           </div>
         )}

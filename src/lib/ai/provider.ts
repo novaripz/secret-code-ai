@@ -6,6 +6,12 @@ export interface AiMessage {
   content: string;
 }
 
+export interface ImageAttachment {
+  /** Base64-encoded image data, no "data:" prefix. */
+  data: string;
+  mimeType: string;
+}
+
 export interface AgentRequest {
   /** The user's latest natural-language instruction. */
   prompt: string;
@@ -15,6 +21,14 @@ export interface AgentRequest {
   contextFiles: Record<string, string>;
   /** Prior turns, most recent last. */
   history: AiMessage[];
+  /** When true, the model should explain things in very simple, beginner-friendly terms. */
+  explainMode?: boolean;
+  /** Short plain-language summary of what's already been built in this project ("working memory"). */
+  projectMemory?: string;
+  /** Short plain-language facts about the student, carried across projects. */
+  studentProfile?: string;
+  /** Optional screenshot the student captured (e.g. of their preview or the whole tab). */
+  image?: ImageAttachment;
 }
 
 /**

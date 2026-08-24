@@ -18,27 +18,27 @@ export function EditorArea() {
 
   return (
     <div className="flex flex-col h-full min-w-0">
-      <div className="flex items-center overflow-x-auto border-b border-white/5 bg-zinc-950/60 shrink-0">
+      <div className="flex items-center overflow-x-auto border-b border-[var(--line)] bg-[var(--surface-0)] shrink-0">
         {tabs.map((tab) => (
           <button
             key={tab.path}
             onClick={() => setActiveTab(tab.path)}
-            className={`group flex items-center gap-2 px-3 py-2 text-sm border-r border-white/5 whitespace-nowrap ${
+            className={`group flex items-center gap-2 px-3 py-2 text-sm border-r border-[var(--line)] whitespace-nowrap ${
               activeTab === tab.path
-                ? "bg-zinc-900 text-zinc-100"
-                : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+                ? "bg-[var(--surface-1)] text-[var(--text)]"
+                : "text-[var(--text-faint)] hover:text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
             }`}
           >
-            <FileIcon className="w-3.5 h-3.5 shrink-0 text-zinc-500" />
+            <FileIcon className="w-3.5 h-3.5 shrink-0 text-[var(--text-faint)]" />
             <span className="max-w-[160px] truncate">{tab.path.split("/").pop()}</span>
-            {tab.dirty && <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />}
+            {tab.dirty && <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />}
             <span
               role="button"
               onClick={(e) => {
                 e.stopPropagation();
                 closeTab(tab.path);
               }}
-              className="opacity-0 group-hover:opacity-100 hover:bg-white/10 rounded p-0.5 shrink-0"
+              className="opacity-0 group-hover:opacity-100 hover:bg-[var(--surface-3)] rounded p-0.5 shrink-0"
             >
               <XIcon className="w-3 h-3" />
             </span>
@@ -53,11 +53,11 @@ export function EditorArea() {
             path={activeFile.path}
             language={languageForPath(activeFile.path)}
             value={activeFile.content ?? ""}
-            theme="vs-dark"
+            theme="light"
             onChange={(value) => editFileContent(activeFile.path, value ?? "")}
             options={{
-              fontSize: 13,
-              minimap: { enabled: true },
+              fontSize: 14,
+              minimap: { enabled: false },
               automaticLayout: true,
               tabSize: 2,
               scrollBeyondLastLine: false,
@@ -68,8 +68,8 @@ export function EditorArea() {
             }}
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-zinc-600 text-sm">
-            Select a file from the explorer, or ask the AI to create one.
+          <div className="flex items-center justify-center h-full text-[var(--text-faint)] text-sm text-center px-6">
+            Pick a file on the left, or ask for help and I&apos;ll create one for you.
           </div>
         )}
       </div>

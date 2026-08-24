@@ -1,8 +1,32 @@
 @import "tailwindcss";
 
+/* Calm, neutral, kid-friendly theme — deliberately simpler and lighter than a
+   typical dark-mode developer IDE, so it feels approachable rather than "hacker-y". */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f5f7;
+  --foreground: #23262b;
+
+  --bg: #f4f5f7;
+  --surface-0: #ffffff;
+  --surface-1: #ffffff;
+  --surface-2: #eef0f3;
+  --surface-3: #e3e6eb;
+  --line: #e2e4e9;
+
+  --text: #23262b;
+  --text-dim: #4b505a;
+  --text-faint: #8b909a;
+
+  --accent: #3b7ea1;
+  --accent-strong: #245a76;
+  --accent-soft: #dcedf4;
+
+  --danger: #c0463a;
+  --danger-soft: #fbe6e3;
+  --success: #2f8f5b;
+  --success-soft: #e2f4ea;
+  --warn: #b07b26;
+  --warn-soft: #f8ecd7;
 }
 
 @theme inline {
@@ -12,15 +36,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, Arial, Helvetica, sans-serif;
 }

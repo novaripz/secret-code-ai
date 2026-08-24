@@ -119,6 +119,29 @@ export function SparkleIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+export function CameraIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M3 7a1 1 0 0 1 1-1h1.5l1-1.5h5l1 1.5H16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7z" strokeLinejoin="round" />
+      <circle cx="10" cy="11" r="2.5" />
+    </svg>
+  );
+}
+export function LightbulbIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M10 2.5a4.5 4.5 0 0 0-2.5 8.24c.4.28.63.74.63 1.22V13h3.74v-1.04c0-.48.23-.94.63-1.22A4.5 4.5 0 0 0 10 2.5z" strokeLinejoin="round" />
+      <path d="M8 16h4M8.5 17.5h3" strokeLinecap="round" />
+    </svg>
+  );
+}
+export function BookIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M3 4.5c1.8-.9 4-.9 6 0v11c-2-.9-4.2-.9-6 0v-11zM17 4.5c-1.8-.9-4-.9-6 0v11c2-.9 4.2-.9 6 0v-11z" strokeLinejoin="round" />
+    </svg>
+  );
+}
 export function SettingsIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>

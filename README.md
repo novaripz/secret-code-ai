@@ -1,15 +1,19 @@
-# Studio — browser-based AI coding environment
+# Build — a beginner-friendly, browser-based coding environment
 
-Code, chat with an AI agent, and preview your project — entirely in the browser. No VS Code, no CLI tools, no local installs required for your friend to use it.
+Code, ask a friendly AI helper for tips, and see your project run — entirely in the browser. No VS Code, no CLI tools, no local installs. Designed for someone moving up from Scratch: a calm, simple UI, plain-language explanations, and an AI that remembers what you've already built together.
 
 ## What it is
 
-- **Project & file system** — create projects, files, and nested folders; rename, delete, drag through tabs; everything autosaves to the browser (IndexedDB) as you type.
+- **Project & file system** — create projects, files, and nested folders; rename, delete, work across tabs; everything autosaves to the browser (IndexedDB) as you type.
 - **Code editor** — Monaco (the engine behind VS Code): syntax highlighting, autocomplete, multi-tab editing, unsaved-change dots. Supports HTML, CSS, JS/TS, JSON, Python, Java, C#, C/C++, Go, Rust, Ruby, PHP, Markdown, YAML, and more.
 - **AI coding agent** — a right-side chat panel backed by Google Gemini. It inspects your file tree and relevant file contents, then returns **structured file operations** (create/modify/delete/rename) which you review and apply — never a wall of code to copy-paste by hand.
-- **Live preview** — sandboxed `<iframe>` that renders your project's `index.html` with local CSS/JS inlined; console/runtime errors are captured and shown in a Console/Problems panel.
+- **Explain Mode** — a toggle in the chat panel. When on, the AI writes answers for a total beginner: plain language, coding terms defined the first time they're used, and Scratch-style comparisons where they help.
+- **Working memory** — the AI remembers what's already been built in *this* project (a plain-language "What We Built" log, shown in its own tab) and carries a short profile of the student across *all* their projects, so it doesn't repeat itself or re-explain the basics every time.
+- **Show, don't describe** — click the camera icon to capture your current browser tab (the browser's own "choose what to share" dialog, not silent) and attach it to your question, so the AI can see what you see instead of you having to describe it. Uploading a screenshot file also works.
+- **Live preview** — sandboxed `<iframe>` that renders your project's `index.html` with local CSS/JS inlined; console/runtime errors are captured and shown in a Messages/Problems panel.
 - **Command panel** — an honest run/console panel. This app does not fake a terminal or run arbitrary shell commands; it clearly executes only what a browser can safely execute (loading your HTML/CSS/JS in a sandbox).
 - **Import/export** — zip a project out, or import an existing folder-as-zip back in.
+- **Calm, simple UI** — a light, uncluttered look with plain-language labels ("Your Files", "Ask for Help", "See It Run") instead of developer jargon. It takes visual inspiration from block-based tools like Scratch in spirit — big, friendly, unintimidating — without copying anyone's branding or pretending to be a different site.
 
 ## Tech stack
 
@@ -55,6 +59,7 @@ src/
   store/
     useStudioStore.ts        project/editor/tabs/console state (zustand) + autosave
     useChatStore.ts          chat history, persisted per project
+    useMemoryStore.ts        "working memory": per-project build log + cross-project student profile + Explain Mode
   components/                explorer, editor, chat, preview, layout
 ```
 
@@ -72,6 +77,8 @@ src/
 - All file paths — from the UI and from the AI — go through `assertSafePath()`, which rejects `..`, absolute paths, and invalid characters.
 - The preview `<iframe>` uses `sandbox="allow-scripts allow-forms allow-modals"` with **no** `allow-same-origin`, and is fed a self-contained `srcdoc` document (no network fetches of your files) — it cannot reach cookies, localStorage, or the parent app.
 - There is no server-side command execution of any kind, AI-proposed or otherwise. The "Run" button only loads your HTML/CSS/JS into the sandboxed preview.
+- Screen capture uses the browser's native `getDisplayMedia` prompt — it always shows the student what's about to be shared and requires their explicit choice; the app grabs one still frame and immediately stops the stream, it never records continuously. The server validates any attached image's type and size before it's sent to Gemini.
+- "Working memory" is plain text (a short build log and a short student profile) stored locally and passed to the model as context — it's not a hidden surveillance feature; the student can see exactly what's in it via the "What We Built" tab.
 
 ## Optional: Firebase
 

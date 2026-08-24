@@ -51,7 +51,7 @@ function TreeNode({
 
   function handleNewFile(e: React.MouseEvent) {
     e.stopPropagation();
-    const name = prompt("New file name (e.g. utils/helpers.ts):");
+    const name = prompt("Name this file (e.g. helpers.js):");
     if (!name) return;
     try {
       addFile(joinPath(node.path, name), "");
@@ -63,7 +63,7 @@ function TreeNode({
 
   function handleNewFolder(e: React.MouseEvent) {
     e.stopPropagation();
-    const name = prompt("New folder name:");
+    const name = prompt("Name this folder:");
     if (!name) return;
     try {
       addFolder(joinPath(node.path, name));
@@ -75,7 +75,7 @@ function TreeNode({
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!confirm(`Delete "${node.name}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete "${node.name}"? You can't undo this.`)) return;
     removeNode(node.path);
   }
 
@@ -83,16 +83,20 @@ function TreeNode({
     return (
       <div>
         <div
-          className="group flex items-center gap-1 px-2 py-1 rounded-md hover:bg-white/5 cursor-pointer select-none text-sm text-zinc-300"
+          className="group flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-[var(--surface-2)] cursor-pointer select-none text-sm text-[var(--text-dim)]"
           style={{ paddingLeft: depth * 12 + 6 }}
           onClick={() => setOpen((o) => !o)}
         >
           <ChevronRightIcon className={`w-3.5 h-3.5 shrink-0 transition-transform ${open ? "rotate-90" : ""}`} />
-          {open ? <FolderOpenIcon className="w-4 h-4 shrink-0 text-sky-400" /> : <FolderIcon className="w-4 h-4 shrink-0 text-sky-400" />}
+          {open ? (
+            <FolderOpenIcon className="w-4 h-4 shrink-0 text-[var(--accent)]" />
+          ) : (
+            <FolderIcon className="w-4 h-4 shrink-0 text-[var(--accent)]" />
+          )}
           {renaming ? (
             <input
               autoFocus
-              className="bg-zinc-800 text-zinc-100 text-sm px-1 rounded w-full outline-none ring-1 ring-sky-500"
+              className="bg-[var(--surface-2)] text-[var(--text)] text-sm px-1 rounded w-full outline-none ring-2 ring-[var(--accent)]"
               value={draftName}
               onChange={(e) => setDraftName(e.target.value)}
               onBlur={commitRename}
@@ -108,13 +112,13 @@ function TreeNode({
             </span>
           )}
           <div className="hidden group-hover:flex items-center gap-0.5 shrink-0">
-            <button title="New file" onClick={handleNewFile} className="p-0.5 hover:bg-white/10 rounded">
+            <button title="New file" onClick={handleNewFile} className="p-0.5 hover:bg-[var(--surface-3)] rounded">
               <PlusFileIcon className="w-3.5 h-3.5" />
             </button>
-            <button title="New folder" onClick={handleNewFolder} className="p-0.5 hover:bg-white/10 rounded">
+            <button title="New folder" onClick={handleNewFolder} className="p-0.5 hover:bg-[var(--surface-3)] rounded">
               <PlusFolderIcon className="w-3.5 h-3.5" />
             </button>
-            <button title="Delete" onClick={handleDelete} className="p-0.5 hover:bg-white/10 rounded text-red-400">
+            <button title="Delete" onClick={handleDelete} className="p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)]">
               <TrashIcon className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -128,17 +132,19 @@ function TreeNode({
 
   return (
     <div
-      className={`group flex items-center gap-1 px-2 py-1 rounded-md cursor-pointer select-none text-sm ${
-        isActive ? "bg-sky-500/15 text-sky-200" : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+      className={`group flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer select-none text-sm ${
+        isActive
+          ? "bg-[var(--accent-soft)] text-[var(--accent-strong)]"
+          : "text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
       }`}
       style={{ paddingLeft: depth * 12 + 22 }}
       onClick={() => openFile(node.path)}
     >
-      <FileIcon className="w-4 h-4 shrink-0 text-zinc-500" />
+      <FileIcon className="w-4 h-4 shrink-0 text-[var(--text-faint)]" />
       {renaming ? (
         <input
           autoFocus
-          className="bg-zinc-800 text-zinc-100 text-sm px-1 rounded w-full outline-none ring-1 ring-sky-500"
+          className="bg-[var(--surface-2)] text-[var(--text)] text-sm px-1 rounded w-full outline-none ring-2 ring-[var(--accent)]"
           value={draftName}
           onChange={(e) => setDraftName(e.target.value)}
           onBlur={commitRename}
@@ -156,7 +162,7 @@ function TreeNode({
       <button
         title="Delete"
         onClick={handleDelete}
-        className="hidden group-hover:block p-0.5 hover:bg-white/10 rounded text-red-400 shrink-0"
+        className="hidden group-hover:block p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)] shrink-0"
       >
         <TrashIcon className="w-3.5 h-3.5" />
       </button>
@@ -171,13 +177,13 @@ export function FileExplorer({ project, activePath }: { project: Project; active
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-3 py-2 border-b border-white/5">
-        <span className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">Explorer</span>
+      <div className="flex items-center justify-between px-3 py-2.5 border-b border-[var(--line)]">
+        <span className="text-xs font-semibold tracking-wide text-[var(--text-faint)] uppercase">Your Files</span>
         <div className="flex items-center gap-1">
           <button
             title="New file"
             onClick={() => {
-              const name = prompt("New file name (e.g. index.html):");
+              const name = prompt("Name this file (e.g. index.html):");
               if (name) {
                 try {
                   addFile(name, "");
@@ -186,14 +192,14 @@ export function FileExplorer({ project, activePath }: { project: Project; active
                 }
               }
             }}
-            className="p-1 hover:bg-white/10 rounded text-zinc-400"
+            className="p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
           >
             <PlusFileIcon className="w-4 h-4" />
           </button>
           <button
             title="New folder"
             onClick={() => {
-              const name = prompt("New folder name:");
+              const name = prompt("Name this folder:");
               if (name) {
                 try {
                   addFolder(name);
@@ -202,16 +208,16 @@ export function FileExplorer({ project, activePath }: { project: Project; active
                 }
               }
             }}
-            className="p-1 hover:bg-white/10 rounded text-zinc-400"
+            className="p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
           >
             <PlusFolderIcon className="w-4 h-4" />
           </button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto py-1">
+      <div className="flex-1 overflow-y-auto py-1 px-1">
         {rootChildren.length === 0 ? (
-          <div className="px-3 py-6 text-center text-xs text-zinc-500">
-            No files yet. Create one, import a zip, or ask the AI to build something.
+          <div className="px-3 py-6 text-center text-xs text-[var(--text-faint)] leading-relaxed">
+            No files yet. Make one, bring in a .zip, or just ask for help and I&apos;ll build the first files for you.
           </div>
         ) : (
           rootChildren.map((child) => (
