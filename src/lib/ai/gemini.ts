@@ -3,7 +3,7 @@ import type { AgentResponse, FileOperation } from "@/types";
 import type { AgentRequest, AiProvider } from "./provider";
 import { buildSystemPrompt, CHAT_SYSTEM_PROMPT, SYSTEM_PROMPT } from "./systemPrompt";
 
-const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 
 function buildUserTurnText(req: AgentRequest): string {
   const contextBlock = Object.entries(req.contextFiles)

@@ -156,7 +156,7 @@ function Sidebar({ onClose }: { onClose: () => void }) {
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent)] text-sm font-bold text-[var(--accent-contrast)]">
             S
           </span>
-          <span className="truncate text-sm font-semibold">Studio</span>
+          <span className="truncate text-sm font-semibold">Checkered AI</span>
         </Link>
         <button
           onClick={onClose}
