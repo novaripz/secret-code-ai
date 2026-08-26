@@ -23,6 +23,8 @@ interface RequestBody {
   studentProfile?: string;
   image?: ImageAttachment;
   images?: ImageAttachment[];
+  /** Ask for the reply as a text stream instead of one buffered JSON payload. */
+  stream?: boolean;
 }
 
 function isRequestBody(x: unknown): x is RequestBody {
@@ -71,22 +73,66 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "That's too much text to send at once." }, { status: 400 });
   }
 
+  const request = {
+    prompt: body.prompt,
+    fileTree: body.fileTree ?? "",
+    contextFiles: body.contextFiles ?? {},
+    history: Array.isArray(body.history) ? body.history.slice(-20) : [],
+    explainMode: body.explainMode === true,
+    homeworkHelp: body.homeworkHelp === true,
+    aiHomie: body.aiHomie === true,
+    chatOnly: body.chatOnly === true,
+    projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,
+    studentProfile: typeof body.studentProfile === "string" ? body.studentProfile.slice(0, 2000) : undefined,
+    image: sanitizeImage(body.image),
+    images: sanitizeImages(body.images),
+  };
+
+  // Streaming only applies to plain chat. A project turn answers in JSON, which
+  // is unparseable until the last brace arrives, so there is nothing to show
+  // early and it stays on the buffered path.
+  if (body.stream === true && request.chatOnly) {
+    try {
+      const provider = getAiProvider();
+      const chunks = provider.generateStream(request);
+      const encoder = new TextEncoder();
+
+      const stream = new ReadableStream<Uint8Array>({
+        async start(controller) {
+          try {
+            for await (const chunk of chunks) {
+              controller.enqueue(encoder.encode(chunk));
+            }
+          } catch (err) {
+            // The response has already begun, so the status line is spent.
+            // Send the failure inline; the client surfaces whatever arrived
+            // plus this note rather than silently truncating.
+            console.error("[api/ai] stream failed mid-flight:", err);
+            const message = err instanceof Error ? err.message : "The reply stopped early.";
+            controller.enqueue(encoder.encode(`\n\n[stream error] ${message}`));
+          } finally {
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-cache, no-transform",
+          "X-Accel-Buffering": "no",
+        },
+      });
+    } catch (err) {
+      console.error("[api/ai] stream failed to start:", err);
+      const message = err instanceof Error ? err.message : "AI request failed.";
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
+  }
+
   try {
     const provider = getAiProvider();
-    const response = await provider.generate({
-      prompt: body.prompt,
-      fileTree: body.fileTree ?? "",
-      contextFiles: body.contextFiles ?? {},
-      history: Array.isArray(body.history) ? body.history.slice(-20) : [],
-      explainMode: body.explainMode === true,
-      homeworkHelp: body.homeworkHelp === true,
-      aiHomie: body.aiHomie === true,
-      chatOnly: body.chatOnly === true,
-      projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,
-      studentProfile: typeof body.studentProfile === "string" ? body.studentProfile.slice(0, 2000) : undefined,
-      image: sanitizeImage(body.image),
-      images: sanitizeImages(body.images),
-    });
+    const response = await provider.generate(request);
 
     // Validate/sanitize operations server-side too, so a malformed model
     // response can never smuggle an unsafe path past the client.

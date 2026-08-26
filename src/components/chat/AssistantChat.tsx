@@ -21,8 +21,18 @@ function greeting(name: string) {
 }
 
 export function AssistantChat() {
-  const { activeThread, loading, hydrate, hydrated, addUserMessage, addAssistantMessage, addErrorMessage, setLoading } =
-    useAssistantStore();
+  const {
+    activeThread,
+    loading,
+    hydrate,
+    hydrated,
+    addUserMessage,
+    addErrorMessage,
+    setLoading,
+    startAssistantMessage,
+    appendToAssistantMessage,
+    finishAssistantMessage,
+  } = useAssistantStore();
 
   const modes = useProfileStore((s) => s.modes);
   const memoryBlock = useProfileStore((s) => s.memoryBlock);
@@ -32,6 +42,7 @@ export function AssistantChat() {
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const stickToBottom = useRef(true);
 
   useEffect(() => {
     if (!hydrated) void hydrate();
@@ -39,9 +50,23 @@ export function AssistantChat() {
 
   const messages = activeThread?.messages ?? [];
 
+  // Total length changes on every chunk, so this runs as the reply grows.
+  const streamedLength = messages.reduce((n, m) => n + m.content.length, 0);
+
+  function onScroll() {
+    const el = scrollRef.current;
+    if (!el) return;
+    // A small slack, so being a pixel or two off the bottom still counts.
+    stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  }
+
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages.length, loading]);
+    const el = scrollRef.current;
+    if (!el || !stickToBottom.current) return;
+    // `auto` rather than `smooth`: a smooth scroll retargeted many times a
+    // second never settles and the view visibly lags the text.
+    el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
+  }, [streamedLength, messages.length, loading]);
 
   async function send(promptOverride?: string) {
     const typed = (promptOverride ?? input).trim();
@@ -68,6 +93,7 @@ export function AssistantChat() {
         body: JSON.stringify({
           prompt: prompt || "(the user sent attachments with no message)",
           chatOnly: true,
+          stream: true,
           fileTree: "",
           contextFiles: {},
           history,
@@ -81,12 +107,56 @@ export function AssistantChat() {
         }),
       });
 
-      const data = await res.json();
       if (!res.ok) {
+        // A failure before the stream opens still comes back as JSON.
+        const data = await res.json().catch(() => ({}));
         addErrorMessage(data.error ?? "That request didn't go through.");
         return;
       }
-      addAssistantMessage(data.message || "…");
+
+      if (!res.body) {
+        addErrorMessage("The reply came back empty.");
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      const id = startAssistantMessage();
+      // The bubble exists now and text is about to land in it, so the waiting
+      // dots have done their job.
+      setLoading(false);
+
+      let received = false;
+      // Chunks can arrive faster than the screen refreshes. Coalesce whatever
+      // lands within a frame into one update: fewer renders, and the fade
+      // groups a few words instead of flickering per token. No artificial
+      // delay is added — a frame is the display's own tick.
+      let pending = "";
+      let frame = 0;
+
+      const flush = () => {
+        frame = 0;
+        if (!pending) return;
+        appendToAssistantMessage(id, pending);
+        pending = "";
+      };
+
+      try {
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const text = decoder.decode(value, { stream: true });
+          if (!text) continue;
+          received = true;
+          pending += text;
+          if (!frame) frame = requestAnimationFrame(flush);
+        }
+      } finally {
+        if (frame) cancelAnimationFrame(frame);
+        flush();
+        appendToAssistantMessage(id, decoder.decode());
+        finishAssistantMessage(id, received ? undefined : "The reply came back empty.");
+      }
     } catch (err) {
       addErrorMessage(err instanceof Error ? err.message : "Network error — check your connection.");
     } finally {
@@ -134,7 +204,7 @@ export function AssistantChat() {
         </div>
       ) : (
         <>
-          <div ref={scrollRef} className="flex-1 overflow-y-auto">
+          <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-3xl space-y-6 px-4 py-8">
               {messages.map((m) => (
                 <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
@@ -175,7 +245,7 @@ export function AssistantChat() {
                             : "text-[15px] text-[var(--text)]"
                         }
                       >
-                        <MessageText content={m.content} />
+                        <MessageText content={m.content} streaming={m.streaming} />
                       </div>
                     ) : null}
                   </div>

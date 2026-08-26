@@ -97,7 +97,8 @@ export class GeminiProvider implements AiProvider {
     this.client = new GoogleGenerativeAI(apiKey);
   }
 
-  async generate(req: AgentRequest): Promise<AgentResponse> {
+  /** Everything both the buffered and streaming paths need to start a turn. */
+  private startTurn(req: AgentRequest) {
     const systemInstruction = buildSystemPrompt(req.chatOnly ? CHAT_SYSTEM_PROMPT : SYSTEM_PROMPT, {
       explainMode: req.explainMode,
       homeworkHelp: req.homeworkHelp,
@@ -127,11 +128,31 @@ export class GeminiProvider implements AiProvider {
       messageParts.push({ inlineData: { data: image.data, mimeType: image.mimeType } });
     }
 
+    return { chat, messageParts };
+  }
+
+  async generate(req: AgentRequest): Promise<AgentResponse> {
+    const { chat, messageParts } = this.startTurn(req);
+
     const result = await chat.sendMessage(messageParts);
     const text = result.response.text();
 
     // In plain-chat mode the model answers in prose, so there's no JSON to parse.
     if (req.chatOnly) return { operations: [], message: text.trim() };
     return parseAgentResponse(text);
+  }
+
+  /**
+   * Yields text as Gemini produces it. Chunks come out at whatever size the
+   * model emits — no buffering here, so nothing is held back from the UI.
+   */
+  async *generateStream(req: AgentRequest): AsyncIterable<string> {
+    const { chat, messageParts } = this.startTurn(req);
+
+    const result = await chat.sendMessageStream(messageParts);
+    for await (const chunk of result.stream) {
+      const text = chunk.text();
+      if (text) yield text;
+    }
   }
 }

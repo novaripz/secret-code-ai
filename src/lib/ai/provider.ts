@@ -46,4 +46,13 @@ export interface AgentRequest {
  */
 export interface AiProvider {
   generate(request: AgentRequest): Promise<AgentResponse>;
+  /**
+   * Plain-prose streaming for chat. Yields text as the model produces it, so
+   * the UI can render each piece the moment it arrives instead of waiting for
+   * the whole reply.
+   *
+   * Only meaningful for `chatOnly` requests. Project requests answer in JSON,
+   * which cannot be parsed until it is complete, so those still use generate().
+   */
+  generateStream(request: AgentRequest): AsyncIterable<string>;
 }

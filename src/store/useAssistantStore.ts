@@ -19,6 +19,8 @@ export interface AssistantMessage {
   role: "user" | "assistant";
   content: string;
   createdAt: number;
+  /** True while text is still arriving, so the UI knows to animate new pieces. */
+  streaming?: boolean;
   /** Trimmed copy of what the user attached, for re-rendering the thread. */
   attachments?: { id: string; kind: Attachment["kind"]; name: string; dataUrl?: string }[];
   error?: string;
@@ -54,6 +56,13 @@ interface AssistantState {
   addAssistantMessage: (content: string) => void;
   addErrorMessage: (error: string) => void;
   setLoading: (loading: boolean) => void;
+
+  /** Opens an empty assistant message to stream into. Returns its id. */
+  startAssistantMessage: () => string;
+  /** Appends newly arrived text to a streaming message. */
+  appendToAssistantMessage: (id: string, chunk: string) => void;
+  /** Marks the stream done and writes the finished thread to storage. */
+  finishAssistantMessage: (id: string, error?: string) => void;
 }
 
 function titleFrom(text: string) {
@@ -161,6 +170,41 @@ export const useAssistantStore = create<AssistantState>((set, get) => {
 
     addErrorMessage: (error) =>
       append({ id: nanoid(10), role: "assistant", content: "", createdAt: Date.now(), error }),
+
+    startAssistantMessage: () => {
+      const id = nanoid(10);
+      append({ id, role: "assistant", content: "", createdAt: Date.now(), streaming: true });
+      return id;
+    },
+
+    // Chunks land many times a second, so this only touches in-memory state.
+    // Persistence waits for finishAssistantMessage.
+    appendToAssistantMessage: (id, chunk) => {
+      const thread = get().activeThread;
+      if (!thread) return;
+      set({
+        activeThread: {
+          ...thread,
+          messages: thread.messages.map((m) =>
+            m.id === id ? { ...m, content: m.content + chunk } : m,
+          ),
+        },
+      });
+    },
+
+    finishAssistantMessage: (id, error) => {
+      const current = get().activeThread;
+      if (!current) return;
+      const thread: Thread = {
+        ...current,
+        updatedAt: Date.now(),
+        messages: current.messages.map((m) =>
+          m.id === id ? { ...m, streaming: false, error: error ?? m.error } : m,
+        ),
+      };
+      set({ activeThread: thread });
+      void save(thread);
+    },
 
     setLoading: (loading) => set({ loading }),
   };

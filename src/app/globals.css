@@ -88,3 +88,20 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-rise { animation: rise 0.22s ease-out both; }
+
+/* Streaming text: each word fades up once, on the frame it first appears.
+   Kept short and small on purpose — this should read as text arriving, not
+   as a typewriter effect. `both` holds the end state so a word stays put
+   after it lands. */
+@keyframes chunk-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.chunk-in {
+  display: inline;
+  animation: chunk-in 150ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chunk-in { animation: none; }
+}
