@@ -12,33 +12,38 @@
     body { margin: 0; font-family: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif; }
     a { color: #ececec; } a:hover { color: #ffffff; }
 
-    /* Streaming: the panda rolls at the write head as each word lands. */
+    /* Streaming: a soft masked edge washes across each line. */
     @keyframes logoRoll { to { transform: rotate(360deg) } }
     .logo-roll { animation: logoRoll 9s linear infinite; }
-
-    /* A word fades up out of a blur as it lands, the way a real stream
-       delivers one token at a time. */
-    @keyframes wordIn {
-      0% { opacity: 0; filter: blur(4px) }
-      2.95% { opacity: 1; filter: blur(0) }
-      100% { opacity: 1; filter: blur(0) }
+    @keyframes flow0 {
+      0%,0.00% { -webkit-mask-position: 100% 0; mask-position: 100% 0 }
+      12.00% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
+      100% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
     }
-    /* Each head shows for exactly its own word slot, so the visible one
-       hands off to the next and the panda reads as rolling forward. */
-    @keyframes headShow {
-      0% { opacity: 0; transform: translateX(-7px) scale(.8) }
-      0.41% { opacity: 1; transform: translateX(0) scale(1) }
-      1.44% { opacity: 1; transform: translateX(0) scale(1) }
-      1.85% { opacity: 0; transform: translateX(6px) scale(.88) }
-      100% { opacity: 0; transform: translateX(6px) scale(.88) }
+    @keyframes flow1 {
+      0%,12.00% { -webkit-mask-position: 100% 0; mask-position: 100% 0 }
+      24.00% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
+      100% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
     }
-    @keyframes headSpin { to { transform: rotate(360deg) } }
-    /* Last word down: the head is gone and the seated panda settles
-       back into the avatar slot, facing you. */
-    @keyframes settleIn {
-      0%,71% { opacity: 0; transform: translateY(7px) scale(.88) }
-      75% { opacity: 1; transform: translateY(0) scale(1) }
-      100% { opacity: 1; transform: none }
+    @keyframes flow2 {
+      0%,24.00% { -webkit-mask-position: 100% 0; mask-position: 100% 0 }
+      36.00% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
+      100% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
+    }
+    @keyframes flow3 {
+      0%,36.00% { -webkit-mask-position: 100% 0; mask-position: 100% 0 }
+      48.00% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
+      100% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
+    }
+    @keyframes flow4 {
+      0%,48.00% { -webkit-mask-position: 100% 0; mask-position: 100% 0 }
+      60.00% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
+      100% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
+    }
+    @keyframes flow5 {
+      0%,60.00% { -webkit-mask-position: 100% 0; mask-position: 100% 0 }
+      72.00% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
+      100% { -webkit-mask-position: 0% 0; mask-position: 0% 0 }
     }
     @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
     @keyframes blink { 0%,93%,100% { transform: scaleY(1) } 96% { transform: scaleY(.06) } }
@@ -46,20 +51,23 @@
     @keyframes stepIn { from { opacity: 0; transform: translateX(-6px) } to { opacity: 1; transform: none } }
     @keyframes sweep { 0% { background-position: -200px 0 } 100% { background-position: 320px 0 } }
 
-    .w { animation: wordIn 9.0s ease-out infinite both; }
-    /* Zero width, so an invisible head never spaces out the text.
-       The svg overflows the slot and renders at the write head. */
-    .head-slot {
-      display: inline-block; position: relative; width: 0; height: 1em;
-      vertical-align: baseline; overflow: visible;
-      animation: headShow 9.0s linear infinite both;
+    /* The mask is 3x the line width: opaque through its first 58%,
+       then a long fade to clear. Sliding it leaves a soft edge about
+       half a line wide, so text arrives as a wash rather than a pop. */
+    .line {
+      white-space: nowrap;
+      -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 58%, rgba(0,0,0,0) 82%);
+      mask-image: linear-gradient(90deg, #000 0%, #000 58%, rgba(0,0,0,0) 82%);
+      -webkit-mask-size: 300% 100%; mask-size: 300% 100%;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
     }
-    .head {
-      position: absolute; left: 1px; top: 50%; margin-top: -11px;
-      width: 20px; height: 20px; animation: headSpin .6s linear infinite;
-    }
-    .settled { animation: settleIn 9.0s ease-out infinite both; }
-    .settled-bob { animation: bob 3s ease-in-out infinite; }
+    .l0 { animation: flow0 9.0s linear infinite both; }
+    .l1 { animation: flow1 9.0s linear infinite both; }
+    .l2 { animation: flow2 9.0s linear infinite both; }
+    .l3 { animation: flow3 9.0s linear infinite both; }
+    .l4 { animation: flow4 9.0s linear infinite both; }
+    .l5 { animation: flow5 9.0s linear infinite both; }
+    .avatar-bob { animation: bob 3s ease-in-out infinite; }
     .eye { animation: blink 4.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
     .d1 { animation: dot 1.3s ease-in-out infinite }
     .d2 { animation: dot 1.3s ease-in-out infinite .16s }
@@ -152,9 +160,8 @@
         </div>
 
         <div style="display: flex; gap: 14px; align-items: flex-start;">
-          <div style="position: relative; width: 56px; height: 56px; flex-shrink: 0;">
-            <div class="settled settled-bob" style="position: absolute; inset: 0;">
-              <svg viewBox="0 0 200 250" style="width: 56px; height: 70px; margin-top: -8px;">
+          <div class="avatar-bob" style="flex-shrink: 0;">
+            <svg viewBox="0 0 200 250" style="width: 56px; height: 70px; margin-top: -8px;">
       <g class="bamboo">
         <rect x="150" y="112" width="11" height="80" rx="5" fill="#6aa84f"/>
         <rect x="150" y="136" width="11" height="4" fill="#4e7d3a"/>
@@ -187,7 +194,6 @@
       <ellipse cx="100" cy="106" rx="7.5" ry="5.5" fill="#1a1a1a"/>
       <path d="M100 111 L100 115" stroke="#1a1a1a" stroke-width="2.6" stroke-linecap="round"/>
       <path d="M89 117 Q100 126 111 117" stroke="#1a1a1a" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg>
-            </div>
           </div>
 
           <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px;">
@@ -218,397 +224,7 @@
               </div>
             </div>
 
-            <div style="font-size: 15px; line-height: 1.85; color: #ececec;"><span class="w" style="animation-delay: 0.00s">Okay </span><span class="head-slot" style="animation-delay: 0.00s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 0.17s">so </span><span class="head-slot" style="animation-delay: 0.17s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 0.33s">light </span><span class="head-slot" style="animation-delay: 0.33s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 0.50s">isn&#39;t </span><span class="head-slot" style="animation-delay: 0.50s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 0.66s">the </span><span class="head-slot" style="animation-delay: 0.66s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 0.83s">ingredient, </span><span class="head-slot" style="animation-delay: 0.83s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 1.00s">it&#39;s </span><span class="head-slot" style="animation-delay: 1.00s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 1.16s">the </span><span class="head-slot" style="animation-delay: 1.16s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 1.33s"><strong>energy</strong>. </span><span class="head-slot" style="animation-delay: 1.33s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 1.50s">The </span><span class="head-slot" style="animation-delay: 1.50s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 1.66s">plant </span><span class="head-slot" style="animation-delay: 1.66s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 1.83s">already </span><span class="head-slot" style="animation-delay: 1.83s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 1.99s">has </span><span class="head-slot" style="animation-delay: 1.99s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 2.16s">what </span><span class="head-slot" style="animation-delay: 2.16s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 2.33s">it </span><span class="head-slot" style="animation-delay: 2.33s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 2.49s">needs </span><span class="head-slot" style="animation-delay: 2.49s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 2.66s">sitting </span><span class="head-slot" style="animation-delay: 2.66s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 2.82s">there: </span><span class="head-slot" style="animation-delay: 2.82s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 2.99s">water </span><span class="head-slot" style="animation-delay: 2.99s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 3.16s">from </span><span class="head-slot" style="animation-delay: 3.16s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 3.32s">the </span><span class="head-slot" style="animation-delay: 3.32s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 3.49s">roots, </span><span class="head-slot" style="animation-delay: 3.49s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 3.66s">CO&#8322; </span><span class="head-slot" style="animation-delay: 3.66s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 3.82s">from </span><span class="head-slot" style="animation-delay: 3.82s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 3.99s">the </span><span class="head-slot" style="animation-delay: 3.99s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 4.15s">air. </span><span class="head-slot" style="animation-delay: 4.15s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 4.32s">What </span><span class="head-slot" style="animation-delay: 4.32s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 4.49s">it </span><span class="head-slot" style="animation-delay: 4.49s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 4.65s">doesn&#39;t </span><span class="head-slot" style="animation-delay: 4.65s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 4.82s">have </span><span class="head-slot" style="animation-delay: 4.82s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 4.98s">is </span><span class="head-slot" style="animation-delay: 4.98s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 5.15s">a </span><span class="head-slot" style="animation-delay: 5.15s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 5.32s">way </span><span class="head-slot" style="animation-delay: 5.32s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 5.48s">to </span><span class="head-slot" style="animation-delay: 5.48s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 5.65s">force </span><span class="head-slot" style="animation-delay: 5.65s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 5.82s">those </span><span class="head-slot" style="animation-delay: 5.82s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 5.98s">two </span><span class="head-slot" style="animation-delay: 5.98s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 6.15s">to </span><span class="head-slot" style="animation-delay: 6.15s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span><span class="w" style="animation-delay: 6.31s">react. </span><span class="head-slot" style="animation-delay: 6.31s"><svg class="head" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
-      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
-      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
-      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
-      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
-      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
-      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span></div>
+            <div style="font-size: 15px; line-height: 1.8; color: #ececec;"><div class="line l0">Okay so light isn&#39;t the ingredient, it&#39;s the <strong>energy</strong>.</div><div class="line l1">The plant already has what it needs sitting right there,</div><div class="line l2">water from the roots, CO&#8322; from the air. What it doesn&#39;t</div><div class="line l3">have is a way to force those two to react.</div><div class="line l4">That&#39;s the whole job of light. It knocks electrons loose</div><div class="line l5">in the chlorophyll, and that starts everything else.</div></div>
           </div>
         </div>
       </div>

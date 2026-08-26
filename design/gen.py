@@ -369,74 +369,67 @@ CYCLE = 9.0          # whole loop
 WRITE_END = 0.72     # fraction of the loop spent writing
 
 
+ANSWER_LINES = [
+    "Okay so light isn&#39;t the ingredient, it&#39;s the <strong>energy</strong>.",
+    "The plant already has what it needs sitting right there,",
+    "water from the roots, CO&#8322; from the air. What it doesn&#39;t",
+    "have is a way to force those two to react.",
+    "That&#39;s the whole job of light. It knocks electrons loose",
+    "in the chlorophyll, and that starts everything else.",
+]
+
+
 def build_streaming():
-    """The write head.
+    """Text arriving as a continuous flow.
 
-    Each word gets a panda placed immediately after it in the text flow.
-    Only the panda sitting at the current write position is visible, so as
-    words land the panda appears to roll forward into each new one. Because
-    the pandas are inline the head follows line wraps on its own, with no
-    pixel maths, and it keeps spinning the whole way across.
+    No per-word steps. Each line carries a soft-edged gradient mask that is
+    three times its own width, and the mask slides across so the visible
+    edge feathers over about half a line. Text materialises through that
+    edge instead of popping in a word at a time.
+
+    Lines are hard-written rather than wrapped, so each one owns its own
+    sweep and the reveal runs down the paragraph the way it is read.
     """
-    n = len(STREAM_TEXT)
-    step = CYCLE * WRITE_END / n           # seconds per word
-    slot = (step / CYCLE) * 100            # that slot as a % of the loop
-    roll_pct = WRITE_END * 100
+    n = len(ANSWER_LINES)
+    write = WRITE_END * 100                # % of the loop spent writing
+    per = write / n                        # % per line
 
-    head = f'<svg class="head" viewBox="0 0 100 100">{panda_ball()}</svg>'
+    keys = []
+    rules = []
+    for i in range(n):
+        start = i * per
+        end = (i + 1) * per
+        keys.append(
+            "    @keyframes flow%d {\n"
+            "      0%%,%.2f%% { -webkit-mask-position: 100%% 0; mask-position: 100%% 0 }\n"
+            "      %.2f%% { -webkit-mask-position: 0%% 0; mask-position: 0%% 0 }\n"
+            "      100%% { -webkit-mask-position: 0%% 0; mask-position: 0%% 0 }\n"
+            "    }\n" % (i, start, end))
+        rules.append(f"    .l{i} {{ animation: flow{i} {CYCLE}s linear infinite both; }}\n")
 
-    out = []
-    for i, w in enumerate(STREAM_TEXT):
-        d = i * step
-        out.append(f'<span class="w" style="animation-delay: {d:.2f}s">{w} </span>')
-        out.append(f'<span class="head-slot" style="animation-delay: {d:.2f}s">{head}</span>')
-    words = "".join(out)
+    lines = "".join(
+        f'<div class="line l{i}">{t}</div>' for i, t in enumerate(ANSWER_LINES))
 
     styles = (
-        "\n    /* A word fades up out of a blur as it lands, the way a real stream\n"
-        "       delivers one token at a time. */\n"
-        "    @keyframes wordIn {\n"
-        "      0% { opacity: 0; filter: blur(4px) }\n"
-        f"      {slot*1.6:.2f}% {{ opacity: 1; filter: blur(0) }}\n"
-        "      100% { opacity: 1; filter: blur(0) }\n"
-        "    }\n"
-        "    /* Each head shows for exactly its own word slot, so the visible one\n"
-        "       hands off to the next and the panda reads as rolling forward. */\n"
-        "    @keyframes headShow {\n"
-        "      0% { opacity: 0; transform: translateX(-7px) scale(.8) }\n"
-        f"      {slot*0.22:.2f}% {{ opacity: 1; transform: translateX(0) scale(1) }}\n"
-        f"      {slot*0.78:.2f}% {{ opacity: 1; transform: translateX(0) scale(1) }}\n"
-        f"      {slot:.2f}% {{ opacity: 0; transform: translateX(6px) scale(.88) }}\n"
-        "      100% { opacity: 0; transform: translateX(6px) scale(.88) }\n"
-        "    }\n"
-        "    @keyframes headSpin { to { transform: rotate(360deg) } }\n"
-        "    /* Last word down: the head is gone and the seated panda settles\n"
-        "       back into the avatar slot, facing you. */\n"
-        "    @keyframes settleIn {\n"
-        f"      0%,{roll_pct - 1:.0f}% {{ opacity: 0; transform: translateY(7px) scale(.88) }}\n"
-        f"      {roll_pct + 3:.0f}% {{ opacity: 1; transform: translateY(0) scale(1) }}\n"
-        "      100% { opacity: 1; transform: none }\n"
-        "    }\n"
-        "    @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }\n"
+        "".join(keys)
+        + "    @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }\n"
         "    @keyframes blink { 0%,93%,100% { transform: scaleY(1) } 96% { transform: scaleY(.06) } }\n"
         "    @keyframes dot { 0%,80%,100% { opacity: .25; transform: translateY(0) } 40% { opacity: 1; transform: translateY(-3px) } }\n"
         "    @keyframes stepIn { from { opacity: 0; transform: translateX(-6px) } to { opacity: 1; transform: none } }\n"
         "    @keyframes sweep { 0% { background-position: -200px 0 } 100% { background-position: 320px 0 } }\n"
         "\n"
-        f"    .w {{ animation: wordIn {CYCLE}s ease-out infinite both; }}\n"
-        "    /* Zero width, so an invisible head never spaces out the text.\n"
-        "       The svg overflows the slot and renders at the write head. */\n"
-        "    .head-slot {\n"
-        "      display: inline-block; position: relative; width: 0; height: 1em;\n"
-        "      vertical-align: baseline; overflow: visible;\n"
-        f"      animation: headShow {CYCLE}s linear infinite both;\n"
+        "    /* The mask is 3x the line width: opaque through its first 58%,\n"
+        "       then a long fade to clear. Sliding it leaves a soft edge about\n"
+        "       half a line wide, so text arrives as a wash rather than a pop. */\n"
+        "    .line {\n"
+        "      white-space: nowrap;\n"
+        "      -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 58%, rgba(0,0,0,0) 82%);\n"
+        "      mask-image: linear-gradient(90deg, #000 0%, #000 58%, rgba(0,0,0,0) 82%);\n"
+        "      -webkit-mask-size: 300% 100%; mask-size: 300% 100%;\n"
+        "      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;\n"
         "    }\n"
-        "    .head {\n"
-        "      position: absolute; left: 1px; top: 50%; margin-top: -11px;\n"
-        "      width: 20px; height: 20px; animation: headSpin .6s linear infinite;\n"
-        "    }\n"
-        f"    .settled {{ animation: settleIn {CYCLE}s ease-out infinite both; }}\n"
-        "    .settled-bob { animation: bob 3s ease-in-out infinite; }\n"
+        + "".join(rules)
+        + "    .avatar-bob { animation: bob 3s ease-in-out infinite; }\n"
         "    .eye { animation: blink 4.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }\n"
         "    .d1 { animation: dot 1.3s ease-in-out infinite }\n"
         "    .d2 { animation: dot 1.3s ease-in-out infinite .16s }\n"
@@ -465,10 +458,8 @@ def build_streaming():
         </div>
 
         <div style="display: flex; gap: 14px; align-items: flex-start;">
-          <div style="position: relative; width: 56px; height: 56px; flex-shrink: 0;">
-            <div class="settled settled-bob" style="position: absolute; inset: 0;">
-              <svg viewBox="0 0 200 250" style="width: 56px; height: 70px; margin-top: -8px;">{panda_facing(arms="none")}</svg>
-            </div>
+          <div class="avatar-bob" style="flex-shrink: 0;">
+            <svg viewBox="0 0 200 250" style="width: 56px; height: 70px; margin-top: -8px;">{panda_facing(arms="none")}</svg>
           </div>
 
           <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px;">
@@ -499,7 +490,7 @@ def build_streaming():
               </div>
             </div>
 
-            <div style="font-size: 15px; line-height: 1.85; color: {TEXT};">{words}</div>
+            <div style="font-size: 15px; line-height: 1.8; color: {TEXT};">{lines}</div>
           </div>
         </div>
       </div>
@@ -511,7 +502,7 @@ def build_streaming():
 
     body = shell(sidebar("chat") + convo,
                  rail=right_rail(explain_on=True, depth=2, humanize_on=False))
-    return page("Streaming: the panda rolls at the write head as each word lands.", styles, body)
+    return page("Streaming: a soft masked edge washes across each line.", styles, body)
 
 # ------------------------------------------------------- 3. Explain is off
 def build_explainoff():

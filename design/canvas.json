@@ -31,7 +31,7 @@
     {
       "file": "Streaming.dc.html",
       "page": "page-1",
-      "title": "3 \u00b7 Rolling while it writes",
+      "title": "3 \u00b7 Writing",
       "x": 3040,
       "y": 0,
       "w": 1440,
@@ -120,12 +120,12 @@
       "text": "Panda rebuild.\n\nHead came down from rx 59 to rx 47 against a bigger body, and the two now overlap by about 16 units so it reads as one animal instead of a head balanced on a snowman.\n\nEyes are glossy black orbs on an almost-black patch. The white shine is what makes them read as eyes, so it does the work the old white sclera was doing, without the wide-eyed cartoon look."
     },
     {
-      "id": "roll-notes",
+      "id": "flow-notes",
       "page": "page-1",
       "x": 3040,
       "y": -230,
       "w": 520,
-      "text": "Artboard 3 is the one to watch.\n\nThe panda now rides the write head. Each word carries its own panda sitting right after it, and only the one at the current write position shows, so it rolls forward into each new word as that word fades up out of a blur.\n\nThe slots are zero width, so an invisible panda never spaces out the text, and because they sit in the text flow the head follows line wraps on its own. When the last word lands the head is gone and the seated panda settles into the avatar slot facing you."
+      "text": "Artboard 3 is the one to watch.\n\nThe text arrives as a continuous flow rather than a word at a time. Each line carries a gradient mask three times its own width, opaque through the first stretch and then a long fade to clear. Sliding that mask leaves a soft edge about half a line wide, so words materialise through the feather instead of popping in.\n\nLines are written out rather than wrapped, so each owns its own sweep and the reveal runs down the paragraph the way it is read."
     },
     {
       "id": "explain-notes",
