@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useProfileStore } from "@/store/useProfileStore";
 import { DialogProvider } from "@/components/ui/Dialog";
 import { Onboarding } from "@/components/onboarding/Onboarding";
+import { AuthGate } from "@/components/auth/AuthGate";
 
 // Loads the saved profile, then either shows first-run setup or the app.
 // Everything below this renders only after hydration, so we never flash the
@@ -19,8 +20,10 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   }, [hydrate]);
 
   return (
-    <DialogProvider>
-      {!hydrated ? <div className="h-screen bg-[var(--bg)]" /> : onboarded ? children : <Onboarding />}
-    </DialogProvider>
+    <AuthGate>
+      <DialogProvider>
+        {!hydrated ? <div className="h-screen bg-[var(--bg)]" /> : onboarded ? children : <Onboarding />}
+      </DialogProvider>
+    </AuthGate>
   );
 }
