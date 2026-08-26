@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; font-family: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    a { color: #ececec; } a:hover { color: #ffffff; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+    @keyframes peek { 0%,100% { transform: translateY(0) rotate(0deg) } 50% { transform: translateY(-4px) rotate(3deg) } }
+    .rise { animation: rise .42s ease-out both; }
+    .r1 { animation-delay: .05s } .r2 { animation-delay: .12s } .r3 { animation-delay: .19s } .r4 { animation-delay: .26s }
+    .peek { animation: peek 3.8s ease-in-out infinite; }
+  </style>
+</helmet>
+
+<div style="display: flex; height: 900px; width: 1440px; background: #0d0d0d; color: #ececec; overflow: hidden;">
+
+  <!-- Sidebar -->
+  <div style="display: flex; flex-direction: column; width: 260px; flex-shrink: 0; background: #171717; border-right: 1px solid #2a2a2a;">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 12px;">
+      <span style="display: flex; height: 28px; width: 28px; align-items: center; justify-content: center; border-radius: 8px; background: #fafafa; flex-shrink: 0;">
+        <svg viewBox="0 0 200 160" style="width: 20px; height: 20px;">
+          <circle cx="52" cy="46" r="20" fill="#1a1a1a"/><circle cx="148" cy="46" r="20" fill="#1a1a1a"/>
+          <ellipse cx="100" cy="86" rx="56" ry="50" fill="#0d0d0d"/>
+          <ellipse cx="76" cy="80" rx="15" ry="18" fill="#fafafa" transform="rotate(-12 76 80)"/>
+          <ellipse cx="124" cy="80" rx="15" ry="18" fill="#fafafa" transform="rotate(12 124 80)"/>
+          <circle cx="78" cy="80" r="6" fill="#1a1a1a"/><circle cx="122" cy="80" r="6" fill="#1a1a1a"/>
+          <ellipse cx="100" cy="104" rx="8" ry="6" fill="#fafafa"/>
+        </svg>
+      </span>
+      <span style="font-size: 14px; font-weight: 600; letter-spacing: -0.01em;">Pandai</span>
+    </div>
+    <div style="padding: 0 12px 8px;">
+      <div style="display: flex; align-items: center; gap: 8px; border: 1px solid #3d3d3d; border-radius: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#ececec" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        New chat
+      </div>
+    </div>
+    <div style="flex: 1; min-height: 0; overflow: hidden; padding: 8px;">
+      <p style="margin: 0 0 6px; padding: 0 8px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #8a8a8a;">Chats</p>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Photosynthesis notes</div>
+        <div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Algebra 2 — quadratics</div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px; border-top: 1px solid #2a2a2a; padding: 8px;">
+      <div style="display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 9px 8px; font-size: 14px; color: #b4b4b4;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#b4b4b4" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Build
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; border-radius: 8px; background: #262626; padding: 9px 8px; font-size: 14px; color: #ececec;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#ececec" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings content -->
+  <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
+    <div style="display: flex; align-items: center; padding: 14px 24px; border-bottom: 1px solid #2a2a2a;">
+      <span style="font-size: 13px; color: #8a8a8a;">Settings</span>
+    </div>
+
+    <div style="flex: 1; min-height: 0; overflow: hidden; display: flex; justify-content: center; padding: 34px 24px;">
+      <div style="width: 100%; max-width: 660px; display: flex; flex-direction: column; gap: 26px;">
+
+        <!-- Header with panda peeking -->
+        <div class="rise" style="display: flex; align-items: center; gap: 14px;">
+          <svg class="peek" viewBox="0 0 200 170" style="width: 52px; height: 44px; flex-shrink: 0;">
+            <circle cx="58" cy="56" r="20" fill="#1a1a1a"/><circle cx="58" cy="56" r="9" fill="#4a4a4a"/>
+            <circle cx="142" cy="56" r="20" fill="#1a1a1a"/><circle cx="142" cy="56" r="9" fill="#4a4a4a"/>
+            <ellipse cx="100" cy="100" rx="57" ry="51" fill="#fafafa"/>
+            <ellipse cx="77" cy="95" rx="16" ry="20" fill="#1a1a1a" transform="rotate(-14 77 95)"/>
+            <ellipse cx="123" cy="95" rx="16" ry="20" fill="#1a1a1a" transform="rotate(14 123 95)"/>
+            <circle cx="79" cy="93" r="6" fill="#fafafa"/><circle cx="80" cy="94.5" r="3" fill="#1a1a1a"/>
+            <circle cx="123" cy="93" r="6" fill="#fafafa"/><circle cx="124" cy="94.5" r="3" fill="#1a1a1a"/>
+            <ellipse cx="100" cy="116" rx="8.5" ry="6" fill="#1a1a1a"/>
+            <path d="M89 128 Q100 138 111 128" stroke="#1a1a1a" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <h1 style="margin: 0 0 3px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Settings</h1>
+            <p style="margin: 0; font-size: 13px; color: #8a8a8a;">Everything here applies to every chat.</p>
+          </div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="rise r1" style="background: #171717; border: 1px solid #2a2a2a; border-radius: 18px; padding: 20px;">
+          <p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #8a8a8a;">Appearance</p>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+            <div style="border: 2px solid #ececec; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="height: 46px; border-radius: 9px; background: #0d0d0d; border: 1px solid #2a2a2a; display: flex; gap: 5px; padding: 8px;">
+                <div style="width: 16px; border-radius: 3px; background: #262626;"></div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="height: 5px; width: 70%; border-radius: 2px; background: #333333;"></div>
+                  <div style="height: 5px; width: 45%; border-radius: 2px; background: #262626;"></div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 14px; font-weight: 500;">Dark</span>
+                <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="#ececec" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              </div>
+            </div>
+            <div style="border: 1px solid #2a2a2a; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="height: 46px; border-radius: 9px; background: #ffffff; border: 1px solid #e5e5e5; display: flex; gap: 5px; padding: 8px;">
+                <div style="width: 16px; border-radius: 3px; background: #ececec;"></div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="height: 5px; width: 70%; border-radius: 2px; background: #d0d0d0;"></div>
+                  <div style="height: 5px; width: 45%; border-radius: 2px; background: #ececec;"></div>
+                </div>
+              </div>
+              <span style="font-size: 14px; color: #b4b4b4;">Light</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- About you -->
+        <div class="rise r2" style="background: #171717; border: 1px solid #2a2a2a; border-radius: 18px; padding: 20px;">
+          <p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #8a8a8a;">About you</p>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+            <div>
+              <label style="display: block; margin-bottom: 6px; font-size: 13px; color: #b4b4b4;">Name</label>
+              <div style="background: #262626; border: 1px solid #2a2a2a; border-radius: 11px; padding: 10px 13px; font-size: 14px;">Jaden</div>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 6px; font-size: 13px; color: #b4b4b4;">Nickname</label>
+              <div style="background: #262626; border: 1px solid #2a2a2a; border-radius: 11px; padding: 10px 13px; font-size: 14px;">J</div>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 6px; font-size: 13px; color: #b4b4b4;">Birthday</label>
+              <div style="background: #262626; border: 1px solid #2a2a2a; border-radius: 11px; padding: 10px 13px; font-size: 14px;">March 14</div>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 6px; font-size: 13px; color: #b4b4b4;">Grade</label>
+              <div style="background: #262626; border: 1px solid #2a2a2a; border-radius: 11px; padding: 10px 13px; font-size: 14px;">10th</div>
+            </div>
+          </div>
+          <div style="margin-top: 14px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 13px; color: #b4b4b4;">Things you&#39;re into</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 7px;">
+              <span style="border-radius: 999px; background: #262626; padding: 7px 13px; font-size: 13px;">Basketball</span>
+              <span style="border-radius: 999px; background: #262626; padding: 7px 13px; font-size: 13px;">Music production</span>
+              <span style="border-radius: 999px; border: 1px dashed #3d3d3d; padding: 7px 13px; font-size: 13px; color: #8a8a8a;">+ add</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modes -->
+        <div class="rise r3" style="background: #171717; border: 1px solid #2a2a2a; border-radius: 18px; padding: 20px;">
+          <p style="margin: 0 0 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #8a8a8a;">Modes</p>
+
+          <div style="display: flex; flex-direction: column;">
+
+            <div style="display: flex; align-items: flex-start; gap: 16px; padding: 15px 0; border-bottom: 1px solid #2a2a2a;">
+              <div style="flex: 1; min-width: 0;">
+                <p style="margin: 0 0 3px; font-size: 15px; font-weight: 500;">Homework Help</p>
+                <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #8a8a8a; text-wrap: pretty;">Walks you through problems with questions instead of handing over the answer.</p>
+              </div>
+              <span style="display: flex; align-items: center; width: 46px; height: 27px; border-radius: 999px; background: #ececec; padding: 3px; flex-shrink: 0; justify-content: flex-end;">
+                <span style="height: 21px; width: 21px; border-radius: 999px; background: #0d0d0d; display: block;"></span>
+              </span>
+            </div>
+
+            <div style="display: flex; align-items: flex-start; gap: 16px; padding: 15px 0; border-bottom: 1px solid #2a2a2a;">
+              <div style="flex: 1; min-width: 0;">
+                <p style="margin: 0 0 3px; font-size: 15px; font-weight: 500;">Explanation Mode</p>
+                <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #8a8a8a; text-wrap: pretty;">Builds every answer up from the basics, no assumed knowledge.</p>
+              </div>
+              <span style="display: flex; align-items: center; width: 46px; height: 27px; border-radius: 999px; background: #ececec; padding: 3px; flex-shrink: 0; justify-content: flex-end;">
+                <span style="height: 21px; width: 21px; border-radius: 999px; background: #0d0d0d; display: block;"></span>
+              </span>
+            </div>
+
+            <div style="display: flex; align-items: flex-start; gap: 16px; padding: 15px 0;">
+              <div style="flex: 1; min-width: 0;">
+                <p style="margin: 0 0 3px; font-size: 15px; font-weight: 500;">AI Homie</p>
+                <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #8a8a8a; text-wrap: pretty;">Drops the formal voice — casual, chill, talks to you like a friend.</p>
+              </div>
+              <span style="display: flex; align-items: center; width: 46px; height: 27px; border-radius: 999px; background: #333333; padding: 3px; flex-shrink: 0; justify-content: flex-start;">
+                <span style="height: 21px; width: 21px; border-radius: 999px; background: #8a8a8a; display: block;"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Memory -->
+        <div class="rise r4" style="display: flex; align-items: center; gap: 16px; background: #171717; border: 1px solid #2a2a2a; border-radius: 18px; padding: 18px 20px;">
+          <div style="flex: 1; min-width: 0;">
+            <p style="margin: 0 0 3px; font-size: 15px; font-weight: 500;">Memory</p>
+            <p style="margin: 0; font-size: 13px; color: #8a8a8a;">24 things remembered about you, shared across every chat.</p>
+          </div>
+          <span style="border: 1px solid #3d3d3d; border-radius: 11px; padding: 9px 15px; font-size: 13px; color: #b4b4b4; flex-shrink: 0;">Manage</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

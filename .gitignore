@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Generated design-canvas payload (rebuild from design/*.dc.html)
+design/pandai-app-flow.html

@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; font-family: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    a { color: #ececec; } a:hover { color: #ffffff; }
+
+    /* Panda idle: a slow breathing bob, ears that twitch every few cycles,
+       a blink on its own rhythm, and bamboo swaying in the paw. */
+    @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+    @keyframes earTwitch { 0%,88%,100% { transform: rotate(0deg) } 92% { transform: rotate(-7deg) } 96% { transform: rotate(5deg) } }
+    @keyframes blink { 0%,92%,100% { transform: scaleY(1) } 95% { transform: scaleY(0.08) } }
+    @keyframes sway { 0%,100% { transform: rotate(-3deg) } 50% { transform: rotate(4deg) } }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+
+    .panda { animation: bob 3.6s ease-in-out infinite; transform-origin: 100px 200px; }
+    .ear-l { animation: earTwitch 5.2s ease-in-out infinite; transform-origin: 58px 52px; }
+    .ear-r { animation: earTwitch 5.2s ease-in-out infinite 0.12s; transform-origin: 142px 52px; }
+    .eye { animation: blink 4.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+    .bamboo { animation: sway 4s ease-in-out infinite; transform-origin: 150px 200px; }
+    .rise { animation: rise .4s ease-out both; }
+    .r1 { animation-delay: .05s } .r2 { animation-delay: .13s } .r3 { animation-delay: .21s }
+  </style>
+</helmet>
+
+<div style="display: flex; height: 900px; width: 1440px; background: #0d0d0d; color: #ececec; overflow: hidden;">
+
+  <!-- Sidebar -->
+  <div style="display: flex; flex-direction: column; width: 260px; flex-shrink: 0; background: #171717; border-right: 1px solid #2a2a2a;">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 12px;">
+      <span style="display: flex; height: 28px; width: 28px; align-items: center; justify-content: center; border-radius: 8px; background: #fafafa; flex-shrink: 0;">
+        <svg viewBox="0 0 200 160" style="width: 20px; height: 20px;">
+          <circle cx="52" cy="46" r="20" fill="#1a1a1a"/>
+          <circle cx="148" cy="46" r="20" fill="#1a1a1a"/>
+          <ellipse cx="100" cy="86" rx="56" ry="50" fill="#0d0d0d"/>
+          <ellipse cx="76" cy="80" rx="15" ry="18" fill="#fafafa" transform="rotate(-12 76 80)"/>
+          <ellipse cx="124" cy="80" rx="15" ry="18" fill="#fafafa" transform="rotate(12 124 80)"/>
+          <circle cx="78" cy="80" r="6" fill="#1a1a1a"/>
+          <circle cx="122" cy="80" r="6" fill="#1a1a1a"/>
+          <ellipse cx="100" cy="104" rx="8" ry="6" fill="#fafafa"/>
+        </svg>
+      </span>
+      <span style="font-size: 14px; font-weight: 600; letter-spacing: -0.01em;">Pandai</span>
+    </div>
+
+    <div style="padding: 0 12px 8px;">
+      <div style="display: flex; align-items: center; gap: 8px; border: 1px solid #3d3d3d; border-radius: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#ececec" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        New chat
+      </div>
+    </div>
+
+    <div style="flex: 1; min-height: 0; overflow: hidden; padding: 8px;">
+      <p style="margin: 0 0 6px; padding: 0 8px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #8a8a8a;">Chats</p>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="border-radius: 8px; background: #262626; padding: 8px; font-size: 14px; color: #ececec;">Photosynthesis notes</div>
+        <div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Algebra 2 — quadratics</div>
+        <div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Essay hook ideas</div>
+        <div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Bio flashcards</div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 2px; border-top: 1px solid #2a2a2a; padding: 8px;">
+      <div style="display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 9px 8px; font-size: 14px; color: #b4b4b4;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#b4b4b4" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Build
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 9px 8px; font-size: 14px; color: #b4b4b4;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#b4b4b4" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 8px; margin-top: 4px;">
+        <span style="display: flex; height: 26px; width: 26px; align-items: center; justify-content: center; border-radius: 999px; background: #2f2f2f; font-size: 12px; font-weight: 600;">J</span>
+        <span style="font-size: 13px; color: #b4b4b4;">Jaden</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main column -->
+  <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid #2a2a2a;">
+      <span style="font-size: 13px; color: #8a8a8a;">New chat</span>
+      <div style="display: flex; align-items: center; gap: 6px; border: 1px solid #2a2a2a; border-radius: 999px; padding: 5px 11px; font-size: 12px; color: #b4b4b4;">
+        <span style="height: 6px; width: 6px; border-radius: 999px; background: #4ade80;"></span>
+        AI Homie
+      </div>
+    </div>
+
+    <!-- Centered welcome -->
+    <div style="display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 26px; padding: 0 24px;">
+
+      <svg class="panda rise" viewBox="0 0 200 250" style="width: 200px; height: 250px;">
+        <!-- bamboo, behind the paw -->
+        <g class="bamboo">
+          <rect x="150" y="120" width="11" height="86" rx="5" fill="#6aa84f"/>
+          <rect x="150" y="146" width="11" height="4" fill="#4e7d3a"/>
+          <rect x="150" y="176" width="11" height="4" fill="#4e7d3a"/>
+          <ellipse cx="176" cy="124" rx="19" ry="8" fill="#8fbc6b" transform="rotate(-24 176 124)"/>
+          <ellipse cx="136" cy="112" rx="17" ry="7" fill="#8fbc6b" transform="rotate(20 136 112)"/>
+        </g>
+
+        <!-- body -->
+        <ellipse cx="100" cy="196" rx="47" ry="43" fill="#fafafa"/>
+        <ellipse cx="59" cy="188" rx="13" ry="21" fill="#1a1a1a" transform="rotate(22 59 188)"/>
+        <ellipse cx="141" cy="188" rx="13" ry="21" fill="#1a1a1a" transform="rotate(-22 141 188)"/>
+        <ellipse cx="80" cy="232" rx="15" ry="10" fill="#1a1a1a"/>
+        <ellipse cx="120" cy="232" rx="15" ry="10" fill="#1a1a1a"/>
+
+        <!-- ears -->
+        <g class="ear-l"><circle cx="58" cy="52" r="21" fill="#1a1a1a"/><circle cx="58" cy="52" r="10" fill="#4a4a4a"/></g>
+        <g class="ear-r"><circle cx="142" cy="52" r="21" fill="#1a1a1a"/><circle cx="142" cy="52" r="10" fill="#4a4a4a"/></g>
+
+        <!-- head -->
+        <ellipse cx="100" cy="97" rx="59" ry="53" fill="#fafafa"/>
+        <ellipse cx="76" cy="92" rx="17" ry="21" fill="#1a1a1a" transform="rotate(-14 76 92)"/>
+        <ellipse cx="124" cy="92" rx="17" ry="21" fill="#1a1a1a" transform="rotate(14 124 92)"/>
+        <g class="eye"><circle cx="78" cy="90" r="6.5" fill="#fafafa"/><circle cx="79.5" cy="91.5" r="3.2" fill="#1a1a1a"/></g>
+        <g class="eye"><circle cx="122" cy="90" r="6.5" fill="#fafafa"/><circle cx="123.5" cy="91.5" r="3.2" fill="#1a1a1a"/></g>
+        <ellipse cx="59" cy="112" rx="9" ry="6" fill="#e88b8b" opacity="0.5"/>
+        <ellipse cx="141" cy="112" rx="9" ry="6" fill="#e88b8b" opacity="0.5"/>
+        <ellipse cx="100" cy="113" rx="9" ry="6.5" fill="#1a1a1a"/>
+        <path d="M100 119 L100 124" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+        <path d="M87 126 Q100 137 113 126" stroke="#1a1a1a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      </svg>
+
+      <h1 class="rise r1" style="margin: 0; font-size: 34px; font-weight: 600; letter-spacing: -0.02em; text-wrap: pretty;">What&#39;s up, Jaden</h1>
+
+      <div class="rise r2" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: 620px;">
+        <div style="border: 1px solid #2a2a2a; border-radius: 999px; padding: 9px 15px; font-size: 13px; color: #b4b4b4;">Help with my homework</div>
+        <div style="border: 1px solid #2a2a2a; border-radius: 999px; padding: 9px 15px; font-size: 13px; color: #b4b4b4;">Explain this like I&#39;m 15</div>
+        <div style="border: 1px solid #2a2a2a; border-radius: 999px; padding: 9px 15px; font-size: 13px; color: #b4b4b4;">Quiz me before my test</div>
+      </div>
+
+      <!-- Composer -->
+      <div class="rise r3" style="width: 100%; max-width: 720px;">
+        <div style="display: flex; align-items: center; gap: 10px; background: #1e1e1e; border: 1px solid #3d3d3d; border-radius: 26px; padding: 12px 12px 12px 18px;">
+          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          <span style="flex: 1; font-size: 15px; color: #8a8a8a;">Ask Pandai anything…</span>
+          <span style="display: flex; height: 34px; width: 34px; align-items: center; justify-content: center; border-radius: 999px; background: #ffffff; flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="#0d0d0d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </span>
+        </div>
+        <p style="margin: 10px 0 0; text-align: center; font-size: 11px; color: #8a8a8a;">Pandai remembers what you tell it across every chat.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

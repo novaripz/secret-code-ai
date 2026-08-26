@@ -1,0 +1,27 @@
+{
+  "artboards": [
+    { "file": "Onboarding.dc.html", "title": "1 · First run", "x": 0, "y": 0, "w": 1440, "h": 900 },
+    { "file": "Main.dc.html", "title": "2 · Chat home", "x": 1520, "y": 0, "w": 1440, "h": 900 },
+    { "file": "Thinking.dc.html", "title": "3 · Thinking + streaming", "x": 3040, "y": 0, "w": 1440, "h": 900 },
+    { "file": "ImageRead.dc.html", "title": "4 · Reading an image", "x": 0, "y": 1020, "w": 1440, "h": 900 },
+    { "file": "Settings.dc.html", "title": "5 · Settings", "x": 1520, "y": 1020, "w": 1440, "h": 900 },
+    { "file": "Build.dc.html", "title": "6 · Build", "x": 3040, "y": 1020, "w": 1440, "h": 900 }
+  ],
+  "annotations": [
+    {
+      "id": "panda-states",
+      "x": 0,
+      "y": -190,
+      "w": 480,
+      "text": "Pandai — full flow.\n\nThe panda has four states, each its own animation: idle (bobs, blinks, ears twitch, bamboo sways), thinking (head tilt + orbiting dot), rolling (tumbles along while the answer streams), and reading (monocle, eyes tracking down the page).\n\nColors are lifted straight from globals.css so these match the real app."
+    },
+    {
+      "id": "authenticity",
+      "x": 3040,
+      "y": -190,
+      "w": 480,
+      "text": "The thinking steps here are drawn as REAL states — each one should only appear when that work is actually happening. \"Reading your photo\" shows only on a real image, never as decoration on a plain text question."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

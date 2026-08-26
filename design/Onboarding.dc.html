@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; font-family: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    a { color: #ececec; } a:hover { color: #ffffff; }
+
+    /* First run: the panda arrives, waves once, then settles into its idle bob. */
+    @keyframes arrive { 0% { opacity: 0; transform: translateY(22px) scale(.86) } 60% { transform: translateY(-5px) scale(1.02) } 100% { opacity: 1; transform: none } }
+    @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+    @keyframes wave { 0%,60%,100% { transform: rotate(0deg) } 70% { transform: rotate(-26deg) } 80% { transform: rotate(-8deg) } 90% { transform: rotate(-22deg) } }
+    @keyframes blink { 0%,92%,100% { transform: scaleY(1) } 95% { transform: scaleY(.08) } }
+    @keyframes sway { 0%,100% { transform: rotate(-3deg) } 50% { transform: rotate(4deg) } }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+    @keyframes caret { 0%,49% { opacity: 1 } 50%,100% { opacity: 0 } }
+
+    .arrive { animation: arrive .62s cubic-bezier(.22,1,.36,1) both; }
+    .bob { animation: bob 3.6s ease-in-out infinite .7s; }
+    .wave-arm { animation: wave 3.8s ease-in-out infinite; transform-origin: 148px 172px; }
+    .eye { animation: blink 4.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+    .bamboo { animation: sway 4s ease-in-out infinite; transform-origin: 52px 196px; }
+    .rise { animation: rise .5s ease-out both; }
+    .r1 { animation-delay: .18s } .r2 { animation-delay: .3s } .r3 { animation-delay: .42s } .r4 { animation-delay: .54s }
+    .caret { animation: caret 1.05s step-end infinite; }
+  </style>
+</helmet>
+
+<div style="display: flex; height: 900px; width: 1440px; background: #0d0d0d; color: #ececec; align-items: center; justify-content: center; overflow: hidden;">
+
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 22px; width: 100%; max-width: 560px; padding: 0 24px;">
+
+    <div class="arrive">
+      <div class="bob">
+        <svg viewBox="0 0 200 250" style="width: 168px; height: 210px;">
+          <!-- bamboo in the left paw -->
+          <g class="bamboo">
+            <rect x="39" y="122" width="10" height="82" rx="5" fill="#6aa84f"/>
+            <rect x="39" y="148" width="10" height="4" fill="#4e7d3a"/>
+            <rect x="39" y="178" width="10" height="4" fill="#4e7d3a"/>
+            <ellipse cx="22" cy="126" rx="17" ry="7" fill="#8fbc6b" transform="rotate(22 22 126)"/>
+            <ellipse cx="62" cy="114" rx="15" ry="6" fill="#8fbc6b" transform="rotate(-20 62 114)"/>
+          </g>
+
+          <!-- body -->
+          <ellipse cx="100" cy="196" rx="47" ry="43" fill="#fafafa"/>
+          <ellipse cx="59" cy="188" rx="13" ry="21" fill="#1a1a1a" transform="rotate(22 59 188)"/>
+          <!-- waving arm -->
+          <ellipse class="wave-arm" cx="148" cy="180" rx="13" ry="22" fill="#1a1a1a" transform="rotate(-28 148 180)"/>
+          <ellipse cx="80" cy="232" rx="15" ry="10" fill="#1a1a1a"/>
+          <ellipse cx="120" cy="232" rx="15" ry="10" fill="#1a1a1a"/>
+
+          <!-- ears -->
+          <circle cx="58" cy="52" r="21" fill="#1a1a1a"/><circle cx="58" cy="52" r="10" fill="#4a4a4a"/>
+          <circle cx="142" cy="52" r="21" fill="#1a1a1a"/><circle cx="142" cy="52" r="10" fill="#4a4a4a"/>
+
+          <!-- head -->
+          <ellipse cx="100" cy="97" rx="59" ry="53" fill="#fafafa"/>
+          <ellipse cx="76" cy="92" rx="17" ry="21" fill="#1a1a1a" transform="rotate(-14 76 92)"/>
+          <ellipse cx="124" cy="92" rx="17" ry="21" fill="#1a1a1a" transform="rotate(14 124 92)"/>
+          <g class="eye"><circle cx="78" cy="90" r="6.5" fill="#fafafa"/><circle cx="79.5" cy="91.5" r="3.2" fill="#1a1a1a"/></g>
+          <g class="eye"><circle cx="122" cy="90" r="6.5" fill="#fafafa"/><circle cx="123.5" cy="91.5" r="3.2" fill="#1a1a1a"/></g>
+          <ellipse cx="59" cy="112" rx="9" ry="6" fill="#e88b8b" opacity=".5"/>
+          <ellipse cx="141" cy="112" rx="9" ry="6" fill="#e88b8b" opacity=".5"/>
+          <ellipse cx="100" cy="113" rx="9" ry="6.5" fill="#1a1a1a"/>
+          <path d="M100 119 L100 124" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+          <path d="M87 126 Q100 137 113 126" stroke="#1a1a1a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="rise r1" style="text-align: center;">
+      <h1 style="margin: 0 0 8px; font-size: 30px; font-weight: 600; letter-spacing: -0.02em;">Hey, I&#39;m Pandai</h1>
+      <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #b4b4b4; text-wrap: pretty;">Tell me a bit about you and I&#39;ll remember it in every chat from here on.</p>
+    </div>
+
+    <div class="rise r2" style="width: 100%; display: flex; flex-direction: column; gap: 18px; background: #171717; border: 1px solid #2a2a2a; border-radius: 20px; padding: 24px;">
+
+      <div>
+        <label style="display: block; margin-bottom: 7px; font-size: 13px; font-weight: 500;">What should I call you?</label>
+        <div style="display: flex; align-items: center; background: #262626; border: 1px solid #3d3d3d; border-radius: 12px; padding: 11px 14px; font-size: 15px;">
+          Jaden<span class="caret" style="display: inline-block; width: 2px; height: 18px; background: #ececec; margin-left: 2px;"></span>
+        </div>
+      </div>
+
+      <div>
+        <label style="display: block; margin-bottom: 7px; font-size: 13px; font-weight: 500;">Birthday</label>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+          <div style="background: #262626; border: 1px solid #2a2a2a; border-radius: 12px; padding: 11px 14px; font-size: 15px;">March</div>
+          <div style="background: #262626; border: 1px solid #2a2a2a; border-radius: 12px; padding: 11px 14px; font-size: 15px;">14</div>
+          <div style="background: #262626; border: 1px solid #2a2a2a; border-radius: 12px; padding: 11px 14px; font-size: 15px; color: #8a8a8a;">Year</div>
+        </div>
+        <p style="margin: 7px 0 0; font-size: 12px; color: #8a8a8a;">Year&#39;s optional — skip it if you&#39;d rather.</p>
+      </div>
+
+      <div>
+        <label style="display: block; margin-bottom: 9px; font-size: 13px; font-weight: 500;">What are you into?</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <span style="border-radius: 999px; background: #ececec; color: #0d0d0d; padding: 8px 14px; font-size: 13px; font-weight: 500;">Basketball</span>
+          <span style="border-radius: 999px; background: #ececec; color: #0d0d0d; padding: 8px 14px; font-size: 13px; font-weight: 500;">Music production</span>
+          <span style="border-radius: 999px; border: 1px solid #3d3d3d; padding: 8px 14px; font-size: 13px; color: #b4b4b4;">Gaming</span>
+          <span style="border-radius: 999px; border: 1px solid #3d3d3d; padding: 8px 14px; font-size: 13px; color: #b4b4b4;">Art</span>
+          <span style="border-radius: 999px; border: 1px solid #3d3d3d; padding: 8px 14px; font-size: 13px; color: #b4b4b4;">Coding</span>
+          <span style="border-radius: 999px; border: 1px solid #3d3d3d; padding: 8px 14px; font-size: 13px; color: #b4b4b4;">Anime</span>
+          <span style="border-radius: 999px; border: 1px dashed #3d3d3d; padding: 8px 14px; font-size: 13px; color: #8a8a8a;">+ add your own</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rise r3" style="width: 100%; display: flex; align-items: center; gap: 14px;">
+      <div style="flex: 1; height: 3px; border-radius: 999px; background: #262626; overflow: hidden;">
+        <div style="height: 100%; width: 66%; border-radius: 999px; background: #ececec;"></div>
+      </div>
+      <span style="font-size: 12px; color: #8a8a8a; flex-shrink: 0;">Step 2 of 3</span>
+    </div>
+
+    <div class="rise r4" style="width: 100%; display: flex; align-items: center; gap: 12px;">
+      <span style="flex: 1; text-align: center; border-radius: 14px; background: #ffffff; color: #0d0d0d; padding: 13px; font-size: 15px; font-weight: 600;">Continue</span>
+      <span style="border-radius: 14px; border: 1px solid #3d3d3d; padding: 13px 20px; font-size: 15px; color: #b4b4b4;">Skip</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
