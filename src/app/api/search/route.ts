@@ -51,7 +51,13 @@ export async function GET(req: NextRequest) {
     const data = await res.json();
 
     if (!res.ok) {
-      const message = data?.error?.message ?? "Search failed.";
+      const raw: string = data?.error?.message ?? "Search failed.";
+      // Google's own wording here ("does not have access to") sounds like a
+      // billing or permissions problem, when it just means the API has never
+      // been switched on for the project. Say the actual next step.
+      const message = /does not have (the )?access|has not been used|is disabled|API not enabled/i.test(raw)
+        ? "Search needs the Custom Search API switched on. Open console.cloud.google.com/apis/library/customsearch.googleapis.com, pick the project your key belongs to, and press Enable. It takes a couple of minutes to take effect."
+        : raw;
       return NextResponse.json({ error: message }, { status: res.status });
     }
 

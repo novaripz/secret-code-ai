@@ -27,9 +27,19 @@ function Player({ video }: { video: Video }) {
           className="h-full w-full"
         />
       </div>
-      <div>
-        <h1 className="text-lg font-semibold leading-snug tracking-tight text-[var(--text)]">{video.title}</h1>
-        <p className="mt-1 text-[13px] text-[var(--text-faint)]">{video.channel}</p>
+      <div className="flex items-start gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg font-semibold leading-snug tracking-tight text-[var(--text)]">{video.title}</h1>
+          <p className="mt-1 text-[13px] text-[var(--text-faint)]">{video.channel}</p>
+        </div>
+        <a
+          href={`https://www.youtube.com/watch?v=${video.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-[13px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+        >
+          Open on YouTube
+        </a>
       </div>
     </div>
   );
