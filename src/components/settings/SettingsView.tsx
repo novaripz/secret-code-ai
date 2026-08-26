@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useProfileStore } from "@/store/useProfileStore";
+import { AvatarPicker } from "./AvatarPicker";
 import { useDialog } from "@/components/ui/Dialog";
 import { BookIcon, BrainIcon, LightbulbIcon, MoonIcon, SparkleIcon, SunIcon, UserIcon, XIcon } from "@/components/icons";
 
@@ -72,6 +73,8 @@ function ProfileSection() {
 
   return (
     <div className="space-y-6">
+      <AvatarPicker />
+
       <Field label="Name" hint="What the AI calls you when it's being formal.">
         <Input value={profile.name} onChange={(v) => updateProfile({ name: v })} placeholder="Your name" />
       </Field>
@@ -217,19 +220,19 @@ function ModesSection() {
       key: "explainMode" as const,
       icon: LightbulbIcon,
       label: "Explanation mode",
-      hint: "Extra-simple, step-by-step answers that explain the why, not just the what.",
+      hint: "Adds the why behind an answer. Off means you just get the answer, nothing else.",
     },
     {
-      key: "homeworkHelp" as const,
+      key: "humanize" as const,
       icon: BookIcon,
-      label: "Homework help",
-      hint: "For schoolwork: the AI walks you toward the answer with hints and examples instead of just handing it over. It'll still check your work.",
+      label: "Humanize",
+      hint: "Plain, everyday writing for essays and emails. Simple words, no dashes, nothing that reads as polished.",
     },
     {
       key: "aiHomie" as const,
       icon: SparkleIcon,
       label: "AI homie",
-      hint: "Casual mode. Talks to you like a chill friend instead of a teacher — still accurate, just way less stiff.",
+      hint: "Talks to you like a friend in the group chat, not an assistant. Real reactions, real emotion, still accurate.",
     },
   ];
 

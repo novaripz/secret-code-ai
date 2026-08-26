@@ -21,7 +21,6 @@ interface RequestBody {
   explainMode?: boolean;
   explainDepth?: ExplainDepth;
   humanize?: boolean;
-  homeworkHelp?: boolean;
   aiHomie?: boolean;
   chatOnly?: boolean;
   projectMemory?: string;
@@ -87,7 +86,6 @@ export async function POST(req: NextRequest) {
     explainDepth:
       body.explainDepth && EXPLAIN_DEPTHS.has(body.explainDepth) ? body.explainDepth : "normal",
     humanize: body.humanize === true,
-    homeworkHelp: body.homeworkHelp === true,
     aiHomie: body.aiHomie === true,
     chatOnly: body.chatOnly === true,
     projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,

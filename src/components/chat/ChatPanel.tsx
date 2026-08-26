@@ -90,7 +90,6 @@ export function ChatPanel() {
           contextFiles,
           history,
           explainMode: modes.explainMode,
-          homeworkHelp: modes.homeworkHelp,
           aiHomie: modes.aiHomie,
           projectMemory: projectMemorySummary(),
           studentProfile: memoryBlock(),

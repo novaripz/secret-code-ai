@@ -37,6 +37,8 @@ export interface Profile {
   likes: string[];
   /** Anything else they want the AI to always know. */
   aboutMe: string;
+  /** Profile picture, stored as a data URL. Kept small on the way in. */
+  avatar?: string;
 }
 
 export interface Modes {
@@ -45,7 +47,6 @@ export interface Modes {
   /** Plain everyday writing for essays and emails. */
   humanize: boolean;
   /** Homework help: the AI coaches toward the answer instead of handing it over. */
-  homeworkHelp: boolean;
   /** Explanation mode: extra-simple, step-by-step explanations. */
   explainMode: boolean;
   /** AI homie: casual, Gen-Z, chill tone. */
@@ -94,7 +95,6 @@ const EMPTY_PROFILE: Profile = {
 const DEFAULT_MODES: Modes = {
   explainDepth: "normal",
   humanize: false,
-  homeworkHelp: false,
   explainMode: true,
   aiHomie: false,
 };

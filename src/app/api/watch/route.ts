@@ -47,7 +47,13 @@ export async function GET(req: NextRequest) {
     const data = await res.json();
 
     if (!res.ok) {
-      const message = data?.error?.message ?? "Video search failed.";
+      const raw: string = data?.error?.message ?? "Video search failed.";
+      // The Gemini key is scoped to the Generative Language API, so YouTube
+      // rejects it with a message about OAuth that sends people down the wrong
+      // path. Say what actually needs doing instead.
+      const message = /API keys are not supported|API key not valid|has not been used|is disabled/i.test(raw)
+        ? "This key can't use YouTube. In Google Cloud Console, enable \"YouTube Data API v3\" on your project, make an API key there, and set it as YOUTUBE_API_KEY."
+        : raw;
       return NextResponse.json({ error: message }, { status: res.status });
     }
 

@@ -28,8 +28,6 @@ export interface AgentRequest {
   explainDepth?: ExplainDepth;
   /** Plain, everyday writing for essays and emails. */
   humanize?: boolean;
-  /** When true, coach toward the answer instead of handing it over. */
-  homeworkHelp?: boolean;
   /** When true, answer in a casual, Gen-Z, friend-to-friend voice. */
   aiHomie?: boolean;
   /** Plain conversation with no project open: reply as text, never as file operations. */

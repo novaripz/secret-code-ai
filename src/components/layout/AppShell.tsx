@@ -119,6 +119,7 @@ function Sidebar({ onClose }: { onClose: () => void }) {
     useAssistantStore();
 
   const displayName = useProfileStore((s) => s.displayName);
+  const avatar = useProfileStore((s) => s.profile.avatar);
   const profileHydrated = useProfileStore((s) => s.hydrated);
 
   useEffect(() => {
@@ -248,8 +249,13 @@ function Sidebar({ onClose }: { onClose: () => void }) {
         href="/settings"
         className="m-2 flex items-center gap-2.5 rounded-xl px-2.5 py-2.5 transition-colors hover:bg-[var(--surface-2)]"
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--surface-3)]">
-          <UserIcon className="h-4 w-4 text-[var(--text-dim)]" />
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--surface-3)]">
+          {avatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avatar} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <UserIcon className="h-4 w-4 text-[var(--text-dim)]" />
+          )}
         </span>
         <span className="min-w-0">
           <span className="block truncate text-sm font-medium text-[var(--text)]">{name || "Your profile"}</span>

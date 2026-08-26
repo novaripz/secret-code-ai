@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import type { AgentResponse, FileOperation } from "@/types";
 import type { AgentRequest, AiProvider } from "./provider";
 import { buildSystemPrompt, CHAT_SYSTEM_PROMPT, SYSTEM_PROMPT } from "./systemPrompt";
@@ -88,13 +88,13 @@ function parseAgentResponse(raw: string): AgentResponse {
 }
 
 export class GeminiProvider implements AiProvider {
-  private client: GoogleGenerativeAI;
+  private client: GoogleGenAI;
 
   constructor(apiKey: string) {
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not configured on the server.");
     }
-    this.client = new GoogleGenerativeAI(apiKey);
+    this.client = new GoogleGenAI({ apiKey });
   }
 
   /** Everything both the buffered and streaming paths need to start a turn. */
@@ -102,42 +102,44 @@ export class GeminiProvider implements AiProvider {
     const systemInstruction = buildSystemPrompt(req.chatOnly ? CHAT_SYSTEM_PROMPT : SYSTEM_PROMPT, {
       explainMode: req.explainMode,
       explainDepth: req.explainDepth,
-      homeworkHelp: req.homeworkHelp,
       aiHomie: req.aiHomie,
       humanize: req.humanize,
     });
 
-    const model = this.client.getGenerativeModel({
+    // Chat turns disable thinking outright. These models reason before they
+    // answer by default, which on a short message like "hi" meant waiting
+    // many seconds for the first word — far longer than writing the answer
+    // took. Project turns keep a small budget, since planning file changes
+    // genuinely benefits from it.
+    const chat = this.client.chats.create({
       model: MODEL_NAME,
-      systemInstruction,
-      generationConfig: req.chatOnly
-        ? { temperature: req.aiHomie ? 0.9 : 0.7 }
-        : { responseMimeType: "application/json", temperature: 0.4 },
+      history: req.history.map((m) => ({
+        role: m.role === "assistant" ? ("model" as const) : ("user" as const),
+        parts: [{ text: m.content }],
+      })),
+      config: {
+        systemInstruction,
+        temperature: req.chatOnly ? (req.aiHomie ? 1.0 : 0.8) : 0.4,
+        thinkingConfig: { thinkingBudget: req.chatOnly ? 0 : 512 },
+        ...(req.chatOnly ? {} : { responseMimeType: "application/json" }),
+      },
     });
 
-    const history = req.history.map((m) => ({
-      role: m.role === "assistant" ? ("model" as const) : ("user" as const),
-      parts: [{ text: m.content }],
-    }));
-
-    const chat = model.startChat({ history });
-
     type MessagePart = { text: string } | { inlineData: { data: string; mimeType: string } };
-    const messageParts: MessagePart[] = [
+    const message: MessagePart[] = [
       { text: req.chatOnly ? buildChatTurnText(req) : buildUserTurnText(req) },
     ];
     for (const image of allImages(req)) {
-      messageParts.push({ inlineData: { data: image.data, mimeType: image.mimeType } });
+      message.push({ inlineData: { data: image.data, mimeType: image.mimeType } });
     }
 
-    return { chat, messageParts };
+    return { chat, message };
   }
 
   async generate(req: AgentRequest): Promise<AgentResponse> {
-    const { chat, messageParts } = this.startTurn(req);
-
-    const result = await chat.sendMessage(messageParts);
-    const text = result.response.text();
+    const { chat, message } = this.startTurn(req);
+    const result = await chat.sendMessage({ message });
+    const text = result.text ?? "";
 
     // In plain-chat mode the model answers in prose, so there's no JSON to parse.
     if (req.chatOnly) return { operations: [], message: text.trim() };
@@ -149,11 +151,10 @@ export class GeminiProvider implements AiProvider {
    * model emits — no buffering here, so nothing is held back from the UI.
    */
   async *generateStream(req: AgentRequest): AsyncIterable<string> {
-    const { chat, messageParts } = this.startTurn(req);
-
-    const result = await chat.sendMessageStream(messageParts);
-    for await (const chunk of result.stream) {
-      const text = chunk.text();
+    const { chat, message } = this.startTurn(req);
+    const stream = await chat.sendMessageStream({ message });
+    for await (const chunk of stream) {
+      const text = chunk.text;
       if (text) yield text;
     }
   }

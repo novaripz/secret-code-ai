@@ -6,7 +6,7 @@ import { useProfileStore } from "@/store/useProfileStore";
 import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
 import { Composer } from "./Composer";
 import { MessageText } from "./MessageText";
-import { ModeRail } from "./ModeRail";
+import { ModePills } from "./ModePills";
 import { PandaSitting } from "@/components/Panda";
 import { FileIcon } from "@/components/icons";
 
@@ -100,7 +100,6 @@ export function AssistantChat() {
           history,
           explainMode: modes.explainMode,
           explainDepth: modes.explainDepth,
-          homeworkHelp: modes.homeworkHelp,
           aiHomie: modes.aiHomie,
           humanize: modes.humanize,
           studentProfile: memoryBlock(),
@@ -171,8 +170,7 @@ export function AssistantChat() {
   const empty = messages.length === 0;
 
   return (
-    <div className="flex h-full">
-      <div className="flex min-w-0 flex-1 flex-col">
+    <div className="flex h-full flex-col">
       {empty ? (
         // Landing state: greeting and composer centered, like a fresh chat.
         <div className="flex flex-1 flex-col items-center justify-center px-4">
@@ -193,6 +191,7 @@ export function AssistantChat() {
               onSend={() => void send()}
               loading={loading}
               placeholder="Ask anything, or drop in a file or screenshot"
+              footer={<ModePills />}
             />
 
             <div className="mt-8 flex flex-wrap justify-center gap-2">
@@ -289,12 +288,6 @@ export function AssistantChat() {
           </div>
         </>
       )}
-      </div>
-
-      {/* Modes live beside the chat, out of the way but always visible.
-          Hidden on narrow screens, where the pills under the composer
-          would be the better home. */}
-      <ModeRail className="hidden lg:flex" />
     </div>
   );
 }
