@@ -12,7 +12,7 @@
     body { margin: 0; font-family: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif; }
     a { color: #ececec; } a:hover { color: #ffffff; }
 
-    /* Idle panda: breathing bob, ear twitch, blink, swaying bamboo. */
+    /* Humanize on: plain everyday writing. */
     @keyframes logoRoll { to { transform: rotate(360deg) } }
     .logo-roll { animation: logoRoll 9s linear infinite; }
 
@@ -28,6 +28,9 @@
     .bamboo { animation: sway 3.8s ease-in-out infinite; transform-origin: 155px 192px; }
     .rise { animation: rise .42s ease-out both; }
     .r1 { animation-delay: .06s } .r2 { animation-delay: .14s } .r3 { animation-delay: .22s } .r4 { animation-delay: .3s }
+
+    @keyframes wordIn { from { opacity: 0; filter: blur(3px) } to { opacity: 1; filter: blur(0) } }
+    .w { animation: wordIn .5s ease-out both; }
 
   </style>
 </helmet>
@@ -83,7 +86,7 @@
 
     <div style="flex: 1; min-height: 0; overflow: hidden; border-top: 1px solid #2a2a2a; padding: 10px 8px;">
       <p style="margin: 0 0 6px; padding: 0 8px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #8a8a8a;">Chats</p>
-      <div style="display: flex; flex-direction: column; gap: 2px;"><div style="background: #262626; border-radius: 8px; padding: 8px; font-size: 14px; color: #ececec;">Photosynthesis notes</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Algebra 2 — quadratics</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Essay hook ideas</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Bio flashcards</div></div>
+      <div style="display: flex; flex-direction: column; gap: 2px;"><div style="background: #262626; border-radius: 8px; padding: 8px; font-size: 14px; color: #ececec;">Email to Mr. Alvarez</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Algebra 2 — quadratics</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Essay hook ideas</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Bio flashcards</div></div>
     </div>
 
     <div style="display: flex; align-items: center; gap: 10px; border-top: 1px solid #2a2a2a; padding: 13px 12px;">
@@ -94,12 +97,19 @@
   <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
     
     <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid #2a2a2a;">
-      <span style="font-size: 13px; color: #8a8a8a;">New chat</span>
+      <span style="font-size: 13px; color: #8a8a8a;">Email to Mr. Alvarez</span>
       
     </div>
-    <div style="display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 0 24px;">
-      <div class="rise">
-        <svg class="panda" viewBox="0 0 200 250" style="width: 210px; height: 262px;">
+    <div style="flex: 1; min-height: 0; overflow: hidden; display: flex; justify-content: center; padding: 32px 24px;">
+      <div style="display: flex; flex-direction: column; gap: 26px; width: 100%; max-width: 700px;">
+        <div style="display: flex; justify-content: flex-end;">
+          <div style="max-width: 78%; background: #2f2f2f; border-radius: 20px 20px 6px 20px; padding: 12px 16px; font-size: 15px; line-height: 1.55;">
+            write an email to my chem teacher asking about the lab report
+          </div>
+        </div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;">
+          <div class="panda" style="flex-shrink: 0;">
+            <svg viewBox="0 0 200 250" style="width: 56px; height: 70px; margin-top: -8px;">
       <g class="bamboo">
         <rect x="150" y="112" width="11" height="80" rx="5" fill="#6aa84f"/>
         <rect x="150" y="136" width="11" height="4" fill="#4e7d3a"/>
@@ -111,8 +121,6 @@
       <!-- body, large; head overlaps it so there is no floating-head gap -->
       <ellipse cx="100" cy="180" rx="58" ry="60" fill="#fafafa"/>
       
-      <ellipse cx="52" cy="176" rx="14" ry="23" fill="#1a1a1a" transform="rotate(20 52 176)"/>
-      <ellipse cx="148" cy="176" rx="14" ry="23" fill="#1a1a1a" transform="rotate(-20 148 176)"/>
       <ellipse cx="76" cy="235" rx="17" ry="11" fill="#1a1a1a"/>
       <ellipse cx="124" cy="235" rx="17" ry="11" fill="#1a1a1a"/>
 
@@ -134,64 +142,51 @@
       <ellipse cx="100" cy="106" rx="7.5" ry="5.5" fill="#1a1a1a"/>
       <path d="M100 111 L100 115" stroke="#1a1a1a" stroke-width="2.6" stroke-linecap="round"/>
       <path d="M89 117 Q100 126 111 117" stroke="#1a1a1a" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: inline-flex; align-items: center; gap: 7px; border: 1px solid #4ade80; border-radius: 999px; padding: 4px 11px; margin-bottom: 13px;">
+              <span style="height: 5px; width: 5px; border-radius: 999px; background: #4ade80; display: block;"></span>
+              <span style="font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #4ade80;">Humanize</span>
+            </div>
+            <div style="font-size: 15px; line-height: 1.75; color: #ececec;"><span class="w" style="animation-delay: 0.08s">Hi </span><span class="w" style="animation-delay: 0.11s">Mr. </span><span class="w" style="animation-delay: 0.14s">Alvarez, </span><span class="w" style="animation-delay: 0.16s">I </span><span class="w" style="animation-delay: 0.19s">wanted </span><span class="w" style="animation-delay: 0.22s">to </span><span class="w" style="animation-delay: 0.25s">ask </span><span class="w" style="animation-delay: 0.28s">about </span><span class="w" style="animation-delay: 0.30s">the </span><span class="w" style="animation-delay: 0.33s">lab </span><span class="w" style="animation-delay: 0.36s">report </span><span class="w" style="animation-delay: 0.39s">that </span><span class="w" style="animation-delay: 0.42s">is </span><span class="w" style="animation-delay: 0.44s">due </span><span class="w" style="animation-delay: 0.47s">on </span><span class="w" style="animation-delay: 0.50s">Friday </span><span class="w" style="animation-delay: 0.53s">and </span><span class="w" style="animation-delay: 0.56s">whether </span><span class="w" style="animation-delay: 0.58s">we </span><span class="w" style="animation-delay: 0.61s">are </span><span class="w" style="animation-delay: 0.64s">supposed </span><span class="w" style="animation-delay: 0.67s">to </span><span class="w" style="animation-delay: 0.70s">include </span><span class="w" style="animation-delay: 0.72s">the </span><span class="w" style="animation-delay: 0.75s">second </span><span class="w" style="animation-delay: 0.78s">trial </span><span class="w" style="animation-delay: 0.81s">in </span><span class="w" style="animation-delay: 0.84s">it, </span><span class="w" style="animation-delay: 0.86s">because </span><span class="w" style="animation-delay: 0.89s">my </span><span class="w" style="animation-delay: 0.92s">group </span><span class="w" style="animation-delay: 0.95s">ran </span><span class="w" style="animation-delay: 0.98s">it </span><span class="w" style="animation-delay: 1.00s">twice </span><span class="w" style="animation-delay: 1.03s">and </span><span class="w" style="animation-delay: 1.06s">the </span><span class="w" style="animation-delay: 1.09s">numbers </span><span class="w" style="animation-delay: 1.12s">came </span><span class="w" style="animation-delay: 1.14s">out </span><span class="w" style="animation-delay: 1.17s">pretty </span><span class="w" style="animation-delay: 1.20s">different </span><span class="w" style="animation-delay: 1.23s">so </span><span class="w" style="animation-delay: 1.26s">I </span><span class="w" style="animation-delay: 1.28s">am </span><span class="w" style="animation-delay: 1.31s">not </span><span class="w" style="animation-delay: 1.34s">sure </span><span class="w" style="animation-delay: 1.37s">which </span><span class="w" style="animation-delay: 1.40s">set </span><span class="w" style="animation-delay: 1.42s">you </span><span class="w" style="animation-delay: 1.45s">want. </span><span class="w" style="animation-delay: 1.48s">Let </span><span class="w" style="animation-delay: 1.51s">me </span><span class="w" style="animation-delay: 1.54s">know </span><span class="w" style="animation-delay: 1.56s">when </span><span class="w" style="animation-delay: 1.59s">you </span><span class="w" style="animation-delay: 1.62s">get </span><span class="w" style="animation-delay: 1.65s">a </span><span class="w" style="animation-delay: 1.68s">chance. </span><span class="w" style="animation-delay: 1.70s">Thanks, </span><span class="w" style="animation-delay: 1.73s">Jaden </span></div>
+            <div style="display: flex; gap: 8px; margin-top: 18px;">
+              <span style="border: 1px solid #3d3d3d; border-radius: 10px; padding: 7px 13px; font-size: 12px; color: #b4b4b4;">Copy</span>
+              <span style="border: 1px solid #3d3d3d; border-radius: 10px; padding: 7px 13px; font-size: 12px; color: #b4b4b4;">Make it shorter</span>
+              <span style="border: 1px solid #3d3d3d; border-radius: 10px; padding: 7px 13px; font-size: 12px; color: #b4b4b4;">Try again</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <h1 class="rise r1" style="margin: 0; font-size: 34px; font-weight: 600; letter-spacing: -0.02em;">What&#39;s up, Jaden</h1>
-      <div class="rise r2" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: 620px;">
-        <div style="border: 1px solid #2a2a2a; border-radius: 999px; padding: 9px 15px; font-size: 13px; color: #b4b4b4;">Help with my homework</div>
-        <div style="border: 1px solid #2a2a2a; border-radius: 999px; padding: 9px 15px; font-size: 13px; color: #b4b4b4;">Write me an email</div>
-        <div style="border: 1px solid #2a2a2a; border-radius: 999px; padding: 9px 15px; font-size: 13px; color: #b4b4b4;">Quiz me before my test</div>
-      </div>
-      <div class="rise r3" style="width: 100%; max-width: 720px;">
-        
+    </div>
+    <div style="display: flex; justify-content: center; padding: 0 24px 26px;">
+      <div style="width: 100%; max-width: 700px;">
       <div style="display: flex; align-items: center; gap: 10px; background: #1e1e1e; border: 1px solid #3d3d3d; border-radius: 26px; padding: 12px 12px 12px 18px;">
         <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
         <span style="flex: 1; font-size: 15px; color: #8a8a8a;">Ask Pandai anything…</span>
         <span style="display: flex; height: 34px; width: 34px; align-items: center; justify-content: center; border-radius: 999px; background: #ffffff; flex-shrink: 0;">
           <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="#0d0d0d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </span>
-      </div>
-        <p style="margin: 10px 0 0; text-align: center; font-size: 11px; color: #8a8a8a;">Pandai remembers what you tell it across every chat.</p>
-      </div>
+      </div></div>
     </div>
   </div>
 
   <div style="display: flex; flex-direction: column; gap: 16px; width: 250px; flex-shrink: 0; background: #171717; border-left: 1px solid #2a2a2a; padding: 18px 16px;">
     <p style="margin: 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #8a8a8a;">Modes</p>
-    <div style="display: flex; flex-direction: column; gap: 13px;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #4ade80; border-radius: 12px; padding: 11px 14px;">
-          <span style="font-size: 14px; font-weight: 500; color: #4ade80;">Explain</span>
-          <span style="font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #4ade80;">On</span>
-        </div>
-        <div style="padding: 2px 2px 0;">
-          <p style="margin: 0 0 11px; font-size: 12px; color: #b4b4b4;">How much explaining</p>
-          <div style="position: relative; height: 4px; border-radius: 999px; background: #333333; margin: 0 4px 9px;">
-            <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 50.0%; border-radius: 999px; background: #4ade80;"></div>
-            <div style="position: absolute; left: 50.0%; top: 50%; height: 15px; width: 15px; margin: -7.5px 0 0 -7.5px; border-radius: 999px; background: #4ade80; box-shadow: 0 0 0 4px rgba(74,222,128,.16);"></div>
-          </div>
-          <div style="display: flex; gap: 2px;"><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
-            <span style="height: 7px; width: 7px; border-radius: 999px; background: #333333; display: block;"></span>
-            <span style="font-size: 10px; color: #8a8a8a; white-space: nowrap;">Minimal</span>
-          </div><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
-            <span style="height: 7px; width: 7px; border-radius: 999px; background: #333333; display: block;"></span>
-            <span style="font-size: 10px; color: #8a8a8a; white-space: nowrap;">Fair</span>
-          </div><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
-            <span style="height: 9px; width: 9px; border-radius: 999px; background: #4ade80; display: block;"></span>
-            <span style="font-size: 10px; color: #4ade80; white-space: nowrap;">Normal</span>
-          </div><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
-            <span style="height: 7px; width: 7px; border-radius: 999px; background: #333333; display: block;"></span>
-            <span style="font-size: 10px; color: #8a8a8a; white-space: nowrap;">Extra</span>
-          </div><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
-            <span style="height: 7px; width: 7px; border-radius: 999px; background: #333333; display: block;"></span>
-            <span style="font-size: 10px; color: #8a8a8a; white-space: nowrap;">Overload</span>
-          </div></div>
-        </div></div>
-    <div style="display: flex; flex-direction: column; gap: 9px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #3d3d3d; border-radius: 12px; padding: 11px 14px;">
-          <span style="font-size: 14px; font-weight: 500; color: #8a8a8a;">Humanize</span>
+    <div style="display: flex; flex-direction: column; gap: 13px;"><div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #3d3d3d; border-radius: 12px; padding: 11px 14px;">
+          <span style="font-size: 14px; font-weight: 500; color: #8a8a8a;">Explain</span>
           <span style="font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #8a8a8a;">Off</span>
+        </div><p style="margin: 0; padding: 2px; font-size: 12px; line-height: 1.55; color: #8a8a8a;">Off means the answer only. No workings, no build-up.</p></div>
+    <div style="display: flex; flex-direction: column; gap: 9px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #4ade80; border-radius: 12px; padding: 11px 14px;">
+          <span style="font-size: 14px; font-weight: 500; color: #4ade80;">Humanize</span>
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #4ade80;">On</span>
         </div>
       <p style="margin: 0; padding: 0 2px; font-size: 12px; line-height: 1.55; color: #8a8a8a;">Plain, everyday writing for essays and emails.</p>
     </div>
     
+      <div style="border-top: 1px solid #2a2a2a; padding-top: 16px;">
+        <p style="margin: 0; font-size: 12px; line-height: 1.6; color: #8a8a8a;">Plain words, no dashes, a few run on sentences. Reads like you wrote it in a hurry.</p>
+      </div>
   </div>
 </div>
 </x-dc>

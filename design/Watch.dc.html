@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; font-family: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    a { color: #ececec; } a:hover { color: #ffffff; }
+
+    /* Watch: search and playback in-app, no way out to the open web. */
+    @keyframes logoRoll { to { transform: rotate(360deg) } }
+    .logo-roll { animation: logoRoll 9s linear infinite; }
+
+    @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+    @keyframes earTwitch { 0%,86%,100% { transform: rotate(0deg) } 90% { transform: rotate(-9deg) } 95% { transform: rotate(6deg) } }
+    @keyframes blink { 0%,93%,100% { transform: scaleY(1) } 96% { transform: scaleY(.06) } }
+    @keyframes sway { 0%,100% { transform: rotate(-4deg) } 50% { transform: rotate(5deg) } }
+    @keyframes rise { from { opacity: 0; transform: translateY(9px) } to { opacity: 1; transform: none } }
+    .panda { animation: bob 3.2s ease-in-out infinite; }
+    .ear-l { animation: earTwitch 5s ease-in-out infinite; transform-origin: 64px 54px; }
+    .ear-r { animation: earTwitch 5s ease-in-out infinite .1s; transform-origin: 136px 54px; }
+    .eye { animation: blink 4.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+    .bamboo { animation: sway 3.8s ease-in-out infinite; transform-origin: 155px 192px; }
+    .rise { animation: rise .42s ease-out both; }
+    .r1 { animation-delay: .06s } .r2 { animation-delay: .14s } .r3 { animation-delay: .22s } .r4 { animation-delay: .3s }
+
+  </style>
+</helmet>
+
+<div style="display: flex; height: 900px; width: 1440px; background: #0d0d0d; color: #ececec; overflow: hidden;">
+
+  <div style="display: flex; flex-direction: column; width: 260px; flex-shrink: 0; background: #171717; border-right: 1px solid #2a2a2a;">
+    <div style="display: flex; align-items: center; gap: 9px; padding: 12px;">
+      <span style="display: flex; height: 28px; width: 28px; align-items: center; justify-content: center; border-radius: 9px; background: #262626; flex-shrink: 0;">
+        <svg class="logo-roll" viewBox="0 0 100 100" style="width: 21px; height: 21px;">
+      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
+      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
+      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
+      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
+      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
+      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
+      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
+      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg>
+      </span>
+      <span style="font-size: 14px; font-weight: 600; letter-spacing: -0.01em;">Pandai</span>
+    </div>
+
+    <div style="padding: 0 12px 10px;">
+      <div style="display: flex; align-items: center; gap: 8px; border: 1px solid #3d3d3d; border-radius: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#ececec" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        New chat
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 2px; padding: 0 8px 10px;">
+      <div style="display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 9px 8px; font-size: 14px; color: #b4b4b4;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#b4b4b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.9 9.9 0 0 1-2.8-.4L3 21l1.9-5.1A8.3 8.3 0 0 1 3.6 11.5 8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></svg>
+        Chat
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 9px 8px; font-size: 14px; color: #b4b4b4;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#b4b4b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.9-3.9"/></svg>
+        Search
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; background: #262626; border-radius: 8px; padding: 9px 8px; font-size: 14px; color: #ececec;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#ececec" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.2l5.5 2.8L10 14.8z"/></svg>
+        Watch
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 9px 8px; font-size: 14px; color: #b4b4b4;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#b4b4b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Build
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 9px 8px; font-size: 14px; color: #b4b4b4;">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="#b4b4b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div></div>
+
+    <div style="flex: 1; min-height: 0; overflow: hidden; border-top: 1px solid #2a2a2a; padding: 10px 8px;">
+      <p style="margin: 0 0 6px; padding: 0 8px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #8a8a8a;">Chats</p>
+      <div style="display: flex; flex-direction: column; gap: 2px;"><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Photosynthesis notes</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Algebra 2 — quadratics</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Essay hook ideas</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Bio flashcards</div></div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px; border-top: 1px solid #2a2a2a; padding: 13px 12px;">
+      <span style="display: flex; height: 26px; width: 26px; align-items: center; justify-content: center; border-radius: 999px; background: #2f2f2f; font-size: 12px; font-weight: 600;">J</span>
+      <span style="font-size: 13px; color: #b4b4b4;">Jaden</span>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
+    
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid #2a2a2a;">
+      <span style="font-size: 13px; color: #8a8a8a;">Watch</span>
+      <div style="display: flex; align-items: center; gap: 7px; border: 1px solid #2a2a2a; border-radius: 999px; padding: 5px 11px;">
+        <svg viewBox="0 0 24 24" style="width: 12px; height: 12px;" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <span style="font-size: 11px; color: #4ade80;">Locked to Pandai</span>
+      </div>
+    </div>
+    <div style="flex: 1; min-height: 0; overflow: hidden; display: flex; gap: 22px; padding: 24px;">
+
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 15px;">
+        <div style="position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 14px; background: #1e1e1e; border: 1px solid #2a2a2a; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <span style="display: flex; height: 58px; width: 58px; align-items: center; justify-content: center; border-radius: 999px; background: rgba(255,255,255,.1);">
+            <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; margin-left: 3px;" fill="#ececec"><path d="M8 5.5v13l11-6.5z"/></svg>
+          </span>
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #333333;">
+            <div style="height: 100%; width: 34%; background: #4ade80;"></div>
+          </div>
+        </div>
+        <div>
+          <h1 style="margin: 0 0 6px; font-size: 19px; font-weight: 600; letter-spacing: -0.01em;">Photosynthesis: Light Reactions</h1>
+          <p style="margin: 0; font-size: 13px; color: #8a8a8a;">Amoeba Sisters · 1.2M views</p>
+        </div>
+        <div style="display: flex; gap: 9px;">
+          <span style="display: flex; align-items: center; gap: 7px; border: 1px solid #3d3d3d; border-radius: 10px; padding: 8px 13px; font-size: 12px; color: #b4b4b4;">Ask Pandai about this video</span>
+          <span style="border: 1px solid #3d3d3d; border-radius: 10px; padding: 8px 13px; font-size: 12px; color: #b4b4b4;">Save</span>
+        </div>
+      </div>
+
+      <div style="width: 292px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px; background: #1e1e1e; border: 1px solid #3d3d3d; border-radius: 22px; padding: 10px 15px;">
+          <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; flex-shrink: 0;" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.9-3.9"/></svg>
+          <span style="flex: 1; font-size: 13px; color: #8a8a8a;">Search videos</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="rise r2" style="display: flex; gap: 11px;">
+              <div style="position: relative; width: 132px; height: 76px; border-radius: 10px; background: #262626; flex-shrink: 0; overflow: hidden;">
+                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+                  <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; opacity: .5;" fill="#8a8a8a"><path d="M8 5.5v13l11-6.5z"/></svg>
+                </div>
+                <span style="position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.78); border-radius: 4px; padding: 1px 5px; font-size: 10px;">11:05</span>
+              </div>
+              <div style="min-width: 0;">
+                <p style="margin: 0 0 4px; font-size: 13px; font-weight: 500; line-height: 1.4;">How Plants Make Food</p>
+                <p style="margin: 0; font-size: 12px; color: #8a8a8a;">Crash Course Biology</p>
+              </div>
+            </div>
+            <div class="rise r3" style="display: flex; gap: 11px;">
+              <div style="position: relative; width: 132px; height: 76px; border-radius: 10px; background: #262626; flex-shrink: 0; overflow: hidden;">
+                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+                  <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; opacity: .5;" fill="#8a8a8a"><path d="M8 5.5v13l11-6.5z"/></svg>
+                </div>
+                <span style="position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.78); border-radius: 4px; padding: 1px 5px; font-size: 10px;">6:18</span>
+              </div>
+              <div style="min-width: 0;">
+                <p style="margin: 0 0 4px; font-size: 13px; font-weight: 500; line-height: 1.4;">Chloroplast structure explained</p>
+                <p style="margin: 0; font-size: 12px; color: #8a8a8a;">Bozeman Science</p>
+              </div>
+            </div>
+            <div class="rise r4" style="display: flex; gap: 11px;">
+              <div style="position: relative; width: 132px; height: 76px; border-radius: 10px; background: #262626; flex-shrink: 0; overflow: hidden;">
+                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+                  <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; opacity: .5;" fill="#8a8a8a"><path d="M8 5.5v13l11-6.5z"/></svg>
+                </div>
+                <span style="position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.78); border-radius: 4px; padding: 1px 5px; font-size: 10px;">5:02</span>
+              </div>
+              <div style="min-width: 0;">
+                <p style="margin: 0 0 4px; font-size: 13px; font-weight: 500; line-height: 1.4;">ATP and NADPH in 5 minutes</p>
+                <p style="margin: 0; font-size: 12px; color: #8a8a8a;">Study Lab</p>
+              </div>
+            </div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

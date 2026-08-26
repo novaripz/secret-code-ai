@@ -1,27 +1,143 @@
 {
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "App flow"
+    },
+    {
+      "id": "page-2",
+      "name": "The panda"
+    }
+  ],
   "artboards": [
-    { "file": "Onboarding.dc.html", "title": "1 · First run", "x": 0, "y": 0, "w": 1440, "h": 900 },
-    { "file": "Main.dc.html", "title": "2 · Chat home", "x": 1520, "y": 0, "w": 1440, "h": 900 },
-    { "file": "Thinking.dc.html", "title": "3 · Thinking + streaming", "x": 3040, "y": 0, "w": 1440, "h": 900 },
-    { "file": "ImageRead.dc.html", "title": "4 · Reading an image", "x": 0, "y": 1020, "w": 1440, "h": 900 },
-    { "file": "Settings.dc.html", "title": "5 · Settings", "x": 1520, "y": 1020, "w": 1440, "h": 900 },
-    { "file": "Build.dc.html", "title": "6 · Build", "x": 3040, "y": 1020, "w": 1440, "h": 900 }
+    {
+      "file": "Onboarding.dc.html",
+      "page": "page-1",
+      "title": "1 \u00b7 First run",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Main.dc.html",
+      "page": "page-1",
+      "title": "2 \u00b7 Chat home",
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Streaming.dc.html",
+      "page": "page-1",
+      "title": "3 \u00b7 Rolling while it writes",
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "ExplainOff.dc.html",
+      "page": "page-1",
+      "title": "4 \u00b7 Explain off",
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Humanize.dc.html",
+      "page": "page-1",
+      "title": "5 \u00b7 Humanize on",
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "ImageRead.dc.html",
+      "page": "page-1",
+      "title": "6 \u00b7 Reading an image",
+      "x": 3040,
+      "y": 1020,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Search.dc.html",
+      "page": "page-1",
+      "title": "7 \u00b7 Search",
+      "x": 0,
+      "y": 2040,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Watch.dc.html",
+      "page": "page-1",
+      "title": "8 \u00b7 Watch",
+      "x": 1520,
+      "y": 2040,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Build.dc.html",
+      "page": "page-1",
+      "title": "9 \u00b7 Build",
+      "x": 3040,
+      "y": 2040,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Settings.dc.html",
+      "page": "page-1",
+      "title": "10 \u00b7 Settings",
+      "x": 0,
+      "y": 3060,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "PandaSheet.dc.html",
+      "page": "page-2",
+      "title": "Panda states",
+      "x": 0,
+      "y": 0,
+      "w": 1200,
+      "h": 640
+    }
   ],
   "annotations": [
     {
-      "id": "panda-states",
+      "id": "panda-notes",
+      "page": "page-2",
       "x": 0,
-      "y": -190,
-      "w": 480,
-      "text": "Pandai — full flow.\n\nThe panda has four states, each its own animation: idle (bobs, blinks, ears twitch, bamboo sways), thinking (head tilt + orbiting dot), rolling (tumbles along while the answer streams), and reading (monocle, eyes tracking down the page).\n\nColors are lifted straight from globals.css so these match the real app."
+      "y": -230,
+      "w": 520,
+      "text": "Panda rebuild.\n\nHead came down from rx 59 to rx 47 against a bigger body, and the two now overlap by about 16 units so it reads as one animal instead of a head balanced on a snowman.\n\nEyes are glossy black orbs on an almost-black patch. The white shine is what makes them read as eyes, so it does the work the old white sclera was doing, without the wide-eyed cartoon look."
     },
     {
-      "id": "authenticity",
+      "id": "roll-notes",
+      "page": "page-1",
       "x": 3040,
-      "y": -190,
-      "w": 480,
-      "text": "The thinking steps here are drawn as REAL states — each one should only appear when that work is actually happening. \"Reading your photo\" shows only on a real image, never as decoration on a plain text question."
+      "y": -230,
+      "w": 520,
+      "text": "Artboard 3 is the one to watch.\n\nEach word fades up out of a blur as it lands, and the panda rolls the full width of the line while that happens. When the last word arrives it stops, disappears, and the seated panda settles back into the avatar slot facing you. Then the loop restarts."
+    },
+    {
+      "id": "explain-notes",
+      "page": "page-1",
+      "x": 0,
+      "y": 3980,
+      "w": 520,
+      "text": "Explain lives in the right rail as an outline box, green when on. The depth slider only appears while it is on. Artboard 4 shows what off looks like: the answer alone, nothing else."
     }
   ],
-  "launch": { "view": "canvas" }
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
 }

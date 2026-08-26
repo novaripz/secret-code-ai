@@ -12,25 +12,44 @@
     body { margin: 0; font-family: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif; }
     a { color: #ececec; } a:hover { color: #ffffff; }
 
-    /* Reading an image: monocle, eyes tracking down the page. */
+    /* Streaming: words fade up out of blur while the panda rolls along. */
     @keyframes logoRoll { to { transform: rotate(360deg) } }
     .logo-roll { animation: logoRoll 9s linear infinite; }
 
-    @keyframes lean { 0%,100% { transform: rotate(-3deg) } 50% { transform: rotate(2deg) } }
-    @keyframes scanEye { 0%,100% { transform: translateX(-2px) } 50% { transform: translateX(3px) } }
-    @keyframes glint { 0%,72%,100% { opacity: 0 } 80% { opacity: .85 } 88% { opacity: 0 } }
-    @keyframes pageFlick { 0%,88%,100% { transform: rotateY(0deg) } 94% { transform: rotateY(-22deg) } }
-    @keyframes scanline { 0% { top: 0; opacity: 0 } 12% { opacity: 1 } 88% { opacity: 1 } 100% { top: 100%; opacity: 0 } }
-    @keyframes dot { 0%,80%,100% { opacity: .25 } 40% { opacity: 1 } }
+    @keyframes wordIn { 0% { opacity: 0; filter: blur(3px) } 6%,72% { opacity: 1; filter: blur(0) } 100% { opacity: 1; filter: blur(0) } }
+    @keyframes rollAcross {
+      0%   { transform: translateX(0) rotate(0deg); opacity: 1 }
+      68%  { transform: translateX(224px) rotate(1160deg); opacity: 1 }
+      72%  { transform: translateX(236px) rotate(1200deg); opacity: 0 }
+      100% { transform: translateX(236px) rotate(1200deg); opacity: 0 }
+    }
+    @keyframes settleIn {
+      0%,71% { opacity: 0; transform: translateY(6px) scale(.9) }
+      75% { opacity: 1; transform: translateY(0) scale(1) }
+      100% { opacity: 1; transform: none }
+    }
+    @keyframes trackHide { 0%,71% { opacity: 1 } 72%,100% { opacity: 0 } }
+    @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+    @keyframes blink { 0%,93%,100% { transform: scaleY(1) } 96% { transform: scaleY(.06) } }
+    @keyframes dot { 0%,80%,100% { opacity: .25; transform: translateY(0) } 40% { opacity: 1; transform: translateY(-3px) } }
+    @keyframes stepIn { from { opacity: 0; transform: translateX(-6px) } to { opacity: 1; transform: none } }
     @keyframes sweep { 0% { background-position: -200px 0 } 100% { background-position: 320px 0 } }
-    .lean { animation: lean 3.4s ease-in-out infinite; transform-origin: 50% 84%; }
-    .scan-eye { animation: scanEye 2.2s ease-in-out infinite; }
-    .glint { animation: glint 3.6s ease-in-out infinite; }
-    .page { animation: pageFlick 5s ease-in-out infinite; transform-origin: 100px 210px; }
-    .scanline { animation: scanline 2.4s ease-in-out infinite; }
+
+    /* Each word fades up out of a blur as it arrives, the way a real stream
+       lands a token at a time. The panda rolls the length of the line while
+       that happens, then stops and turns to face you when the text is done. */
+    .w { animation: wordIn 9.0s ease-out infinite both; }
+    .roller { animation: rollAcross 9.0s cubic-bezier(.42,0,.58,1) infinite both; }
+    .track { animation: trackHide 9.0s linear infinite both; }
+    .settled { animation: settleIn 9.0s ease-out infinite both; }
+    .settled-bob { animation: bob 3s ease-in-out infinite; }
+    .eye { animation: blink 4.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
     .d1 { animation: dot 1.3s ease-in-out infinite }
     .d2 { animation: dot 1.3s ease-in-out infinite .16s }
     .d3 { animation: dot 1.3s ease-in-out infinite .32s }
+    .s1 { animation: stepIn .35s ease-out both .05s }
+    .s2 { animation: stepIn .35s ease-out both .3s }
+    .s3 { animation: stepIn .35s ease-out both .55s }
     .shimmer {
       background: linear-gradient(90deg, #8a8a8a 0%, #ececec 45%, #8a8a8a 70%);
       background-size: 320px 100%;
@@ -92,7 +111,7 @@
 
     <div style="flex: 1; min-height: 0; overflow: hidden; border-top: 1px solid #2a2a2a; padding: 10px 8px;">
       <p style="margin: 0 0 6px; padding: 0 8px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #8a8a8a;">Chats</p>
-      <div style="display: flex; flex-direction: column; gap: 2px;"><div style="background: #262626; border-radius: 8px; padding: 8px; font-size: 14px; color: #ececec;">Chem worksheet pic</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Photosynthesis notes</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Algebra 2 — quadratics</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Essay hook ideas</div></div>
+      <div style="display: flex; flex-direction: column; gap: 2px;"><div style="background: #262626; border-radius: 8px; padding: 8px; font-size: 14px; color: #ececec;">Photosynthesis notes</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Algebra 2 — quadratics</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Essay hook ideas</div><div style="border-radius: 8px; padding: 8px; font-size: 14px; color: #b4b4b4;">Bio flashcards</div></div>
     </div>
 
     <div style="display: flex; align-items: center; gap: 10px; border-top: 1px solid #2a2a2a; padding: 13px 12px;">
@@ -103,84 +122,101 @@
   <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
     
     <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid #2a2a2a;">
-      <span style="font-size: 13px; color: #8a8a8a;">Chem worksheet pic</span>
+      <span style="font-size: 13px; color: #8a8a8a;">Photosynthesis notes</span>
       
     </div>
     <div style="flex: 1; min-height: 0; overflow: hidden; display: flex; justify-content: center; padding: 32px 24px;">
       <div style="display: flex; flex-direction: column; gap: 26px; width: 100%; max-width: 700px;">
 
-        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-          <div style="position: relative; width: 268px; border-radius: 16px; overflow: hidden; border: 1px solid #3d3d3d; background: #1e1e1e;">
-            <div style="height: 176px; background: #262626; padding: 18px 20px; display: flex; flex-direction: column; gap: 9px;">
-              <div style="height: 8px; width: 62%; border-radius: 3px; background: #3d3d3d;"></div>
-              <div style="height: 6px; width: 88%; border-radius: 3px; background: #333333;"></div><div style="height: 6px; width: 80%; border-radius: 3px; background: #333333;"></div><div style="height: 6px; width: 46%; border-radius: 3px; background: #333333;"></div><div style="height: 6px; width: 84%; border-radius: 3px; background: #333333;"></div><div style="height: 6px; width: 70%; border-radius: 3px; background: #333333;"></div><div style="height: 6px; width: 58%; border-radius: 3px; background: #333333;"></div>
-            </div>
-            <div class="scanline" style="position: absolute; left: 0; right: 0; height: 2px; background: #6aa84f; box-shadow: 0 0 14px 2px rgba(106,168,79,.65);"></div>
-          </div>
+        <div style="display: flex; justify-content: flex-end;">
           <div style="max-width: 78%; background: #2f2f2f; border-radius: 20px 20px 6px 20px; padding: 12px 16px; font-size: 15px; line-height: 1.55;">
-            can u do number 4
+            wait so why do plants even need light for this
           </div>
         </div>
 
         <div style="display: flex; gap: 14px; align-items: flex-start;">
-          <svg class="lean" viewBox="0 0 200 250" style="width: 76px; height: 95px; flex-shrink: 0; margin-top: -10px;">
-      <g class="page">
-        <path d="M44 206 L100 196 L100 232 L44 240 Z" fill="#e8e4da"/>
-        <path d="M156 206 L100 196 L100 232 L156 240 Z" fill="#d8d3c7"/>
-        <path d="M42 204 L100 194 L158 204 L158 210 L100 200 L42 210 Z" fill="#6aa84f"/>
-        <path d="M56 216 L88 211" stroke="#a9a396" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M56 224 L84 219" stroke="#a9a396" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M112 211 L144 216" stroke="#b7b2a5" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- avatar slot: rolls away while writing, settles back facing you -->
+          <div style="position: relative; width: 56px; height: 56px; flex-shrink: 0;">
+            <div class="settled settled-bob" style="position: absolute; inset: 0;">
+              <svg viewBox="0 0 200 250" style="width: 56px; height: 70px; margin-top: -8px;">
+      <g class="bamboo">
+        <rect x="150" y="112" width="11" height="80" rx="5" fill="#6aa84f"/>
+        <rect x="150" y="136" width="11" height="4" fill="#4e7d3a"/>
+        <rect x="150" y="164" width="11" height="4" fill="#4e7d3a"/>
+        <ellipse cx="176" cy="116" rx="18" ry="7" fill="#8fbc6b" transform="rotate(-24 176 116)"/>
+        <ellipse cx="137" cy="104" rx="16" ry="6" fill="#8fbc6b" transform="rotate(20 137 104)"/>
       </g>
 
-      <ellipse cx="100" cy="182" rx="56" ry="56" fill="#fafafa"/>
-      <ellipse cx="54" cy="200" rx="14" ry="10" fill="#1a1a1a" transform="rotate(-14 54 200)"/>
-      <ellipse cx="146" cy="200" rx="14" ry="10" fill="#1a1a1a" transform="rotate(14 146 200)"/>
+      <!-- body, large; head overlaps it so there is no floating-head gap -->
+      <ellipse cx="100" cy="180" rx="58" ry="60" fill="#fafafa"/>
+      
+      <ellipse cx="76" cy="235" rx="17" ry="11" fill="#1a1a1a"/>
+      <ellipse cx="124" cy="235" rx="17" ry="11" fill="#1a1a1a"/>
 
-      <circle cx="64" cy="56" r="17" fill="#1a1a1a"/><circle cx="64" cy="56" r="8" fill="#4a4a4a"/>
-      <circle cx="136" cy="56" r="17" fill="#1a1a1a"/><circle cx="136" cy="56" r="8" fill="#4a4a4a"/>
+      <g class="ear-l"><circle cx="64" cy="54" r="17" fill="#1a1a1a"/><circle cx="64" cy="54" r="8" fill="#4a4a4a"/></g>
+      <g class="ear-r"><circle cx="136" cy="54" r="17" fill="#1a1a1a"/><circle cx="136" cy="54" r="8" fill="#4a4a4a"/></g>
 
-      <ellipse cx="100" cy="94" rx="47" ry="44" fill="#fafafa"/>
-      <ellipse cx="82" cy="97" rx="14" ry="17" fill="#1c1c1c" transform="rotate(-14 82 97)"/>
-      <ellipse cx="118" cy="97" rx="14" ry="17" fill="#1c1c1c" transform="rotate(14 118 97)"/>
-      <g class="scan-eye">
-      <circle cx="82" cy="99" r="8.4" fill="#000000" stroke="#3d3d3d" stroke-width="1"/>
-      <circle cx="79.1" cy="96.0" r="2.7" fill="#ffffff" opacity=".92"/>
-      <circle cx="84.5" cy="101.9" r="1.2" fill="#ffffff" opacity=".45"/>
-      <circle cx="118" cy="99" r="8.4" fill="#000000" stroke="#3d3d3d" stroke-width="1"/>
-      <circle cx="115.1" cy="96.0" r="2.7" fill="#ffffff" opacity=".92"/>
-      <circle cx="120.5" cy="101.9" r="1.2" fill="#ffffff" opacity=".45"/></g>
-      <ellipse cx="100" cy="115" rx="7.5" ry="5.5" fill="#1a1a1a"/>
-      <path d="M91 126 Q100 131 109 126" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="100" cy="88" rx="47" ry="44" fill="#fafafa"/>
+      
+      <ellipse cx="82" cy="86" rx="14" ry="17" fill="#1c1c1c" transform="rotate(-14 82 86)"/>
+      <ellipse cx="118" cy="86" rx="14" ry="17" fill="#1c1c1c" transform="rotate(14 118 86)"/>
+      <g class="eye">
+      <circle cx="82" cy="86" r="8.4" fill="#000000" stroke="#3d3d3d" stroke-width="1"/>
+      <circle cx="79.1" cy="83.0" r="2.7" fill="#ffffff" opacity=".92"/>
+      <circle cx="84.5" cy="88.9" r="1.2" fill="#ffffff" opacity=".45"/></g>
+      <g class="eye">
+      <circle cx="118" cy="86" r="8.4" fill="#000000" stroke="#3d3d3d" stroke-width="1"/>
+      <circle cx="115.1" cy="83.0" r="2.7" fill="#ffffff" opacity=".92"/>
+      <circle cx="120.5" cy="88.9" r="1.2" fill="#ffffff" opacity=".45"/></g>
+      <ellipse cx="100" cy="106" rx="7.5" ry="5.5" fill="#1a1a1a"/>
+      <path d="M100 111 L100 115" stroke="#1a1a1a" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M89 117 Q100 126 111 117" stroke="#1a1a1a" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg>
+            </div>
+          </div>
 
-      <circle cx="118" cy="98" r="24" fill="#6aa84f" opacity=".07"/>
-      <circle cx="118" cy="98" r="24" fill="none" stroke="#d4b872" stroke-width="4"/>
-      <circle cx="118" cy="98" r="28" fill="none" stroke="#b39a58" stroke-width="1.5"/>
-      <path class="glint" d="M107 89 L114 83" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
-      <path d="M140 110 Q154 130 147 150" stroke="#d4b872" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
           <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px;">
+
             <div style="border: 1px solid #2a2a2a; border-radius: 14px; background: #171717; padding: 14px 16px;">
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                <span class="shimmer" style="font-size: 13px; font-weight: 500;">Reading your photo</span>
+                <span class="shimmer" style="font-size: 13px; font-weight: 500;">Thinking</span>
                 <span style="display: flex; gap: 3px; align-items: center;">
                   <span class="d1" style="height: 4px; width: 4px; border-radius: 999px; background: #ececec; display: block;"></span>
                   <span class="d2" style="height: 4px; width: 4px; border-radius: 999px; background: #ececec; display: block;"></span>
                   <span class="d3" style="height: 4px; width: 4px; border-radius: 999px; background: #ececec; display: block;"></span>
                 </span>
+                <span style="margin-left: auto; font-size: 11px; color: #8a8a8a;">4.2s</span>
               </div>
               <div style="display: flex; flex-direction: column; gap: 9px;">
-                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div class="s1" style="display: flex; gap: 10px; align-items: flex-start;">
                   <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px;" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                  <span style="font-size: 13px; color: #b4b4b4; line-height: 1.5;">Found 6 questions on the sheet</span>
+                  <span style="font-size: 13px; color: #b4b4b4; line-height: 1.5;">Checked what you already know, you covered chloroplasts last week</span>
                 </div>
-                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div class="s2" style="display: flex; gap: 10px; align-items: flex-start;">
                   <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px;" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                  <span style="font-size: 13px; color: #b4b4b4; line-height: 1.5;">Pulled out #4, balancing a combustion equation</span>
+                  <span style="font-size: 13px; color: #b4b4b4; line-height: 1.5;">Explain is set to Normal, so a middle amount of build-up</span>
+                </div>
+                <div class="s3" style="display: flex; gap: 10px; align-items: flex-start;">
+                  <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px;" fill="none" stroke="#8a8a8a" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                  <span style="font-size: 13px; color: #8a8a8a; line-height: 1.5;">Writing the answer…</span>
                 </div>
               </div>
             </div>
-            <div style="font-size: 15px; line-height: 1.7; color: #ececec;">
-              Got it, #4 is the combustion one. Before I say anything, what do you get when you count the oxygens on the left side?
+
+            <div style="font-size: 15px; line-height: 1.75; color: #ececec;"><span class="w" style="animation-delay: 0.00s">Okay </span><span class="w" style="animation-delay: 0.17s">so </span><span class="w" style="animation-delay: 0.33s">light </span><span class="w" style="animation-delay: 0.50s">isn&#39;t </span><span class="w" style="animation-delay: 0.66s">the </span><span class="w" style="animation-delay: 0.83s">ingredient, </span><span class="w" style="animation-delay: 1.00s">it&#39;s </span><span class="w" style="animation-delay: 1.16s">the </span><span class="w" style="animation-delay: 1.33s"><strong>energy</strong>. </span><span class="w" style="animation-delay: 1.50s">The </span><span class="w" style="animation-delay: 1.66s">plant </span><span class="w" style="animation-delay: 1.83s">already </span><span class="w" style="animation-delay: 1.99s">has </span><span class="w" style="animation-delay: 2.16s">what </span><span class="w" style="animation-delay: 2.33s">it </span><span class="w" style="animation-delay: 2.49s">needs </span><span class="w" style="animation-delay: 2.66s">sitting </span><span class="w" style="animation-delay: 2.82s">there: </span><span class="w" style="animation-delay: 2.99s">water </span><span class="w" style="animation-delay: 3.16s">from </span><span class="w" style="animation-delay: 3.32s">the </span><span class="w" style="animation-delay: 3.49s">roots, </span><span class="w" style="animation-delay: 3.66s">CO&#8322; </span><span class="w" style="animation-delay: 3.82s">from </span><span class="w" style="animation-delay: 3.99s">the </span><span class="w" style="animation-delay: 4.15s">air. </span><span class="w" style="animation-delay: 4.32s">What </span><span class="w" style="animation-delay: 4.49s">it </span><span class="w" style="animation-delay: 4.65s">doesn&#39;t </span><span class="w" style="animation-delay: 4.82s">have </span><span class="w" style="animation-delay: 4.98s">is </span><span class="w" style="animation-delay: 5.15s">a </span><span class="w" style="animation-delay: 5.32s">way </span><span class="w" style="animation-delay: 5.48s">to </span><span class="w" style="animation-delay: 5.65s">force </span><span class="w" style="animation-delay: 5.82s">those </span><span class="w" style="animation-delay: 5.98s">two </span><span class="w" style="animation-delay: 6.15s">to </span><span class="w" style="animation-delay: 6.31s">react. </span></div>
+
+            <!-- the panda literally rolls the width of the text as it lands -->
+            <div class="track" style="position: relative; height: 30px;">
+              <svg class="roller" viewBox="0 0 100 100" style="width: 28px; height: 28px; position: absolute; left: 0; top: 0;">
+      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
+      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
+      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
+      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
+      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
+      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
+      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
+      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg>
             </div>
           </div>
         </div>
@@ -188,11 +224,10 @@
     </div>
     <div style="display: flex; justify-content: center; padding: 0 24px 26px;">
       <div style="width: 100%; max-width: 700px;">
-      <div style="display: flex; align-items: center; gap: 10px; background: #1e1e1e; border: 1px solid #3d3d3d; border-radius: 26px; padding: 12px 12px 12px 18px;">
-        <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-        <span style="flex: 1; font-size: 15px; color: #8a8a8a;">Ask Pandai anything…</span>
-        <span style="display: flex; height: 34px; width: 34px; align-items: center; justify-content: center; border-radius: 999px; background: #ffffff; flex-shrink: 0;">
-          <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="#0d0d0d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      <div style="display: flex; align-items: center; gap: 10px; background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 26px; padding: 12px 12px 12px 18px;">
+        <span style="flex: 1; font-size: 15px; color: #8a8a8a;">Pandai is answering…</span>
+        <span style="display: flex; height: 34px; width: 34px; align-items: center; justify-content: center; border-radius: 999px; background: #333333; flex-shrink: 0;">
+          <span style="height: 11px; width: 11px; border-radius: 2px; background: #ececec; display: block;"></span>
         </span>
       </div></div>
     </div>
@@ -207,18 +242,18 @@
         <div style="padding: 2px 2px 0;">
           <p style="margin: 0 0 11px; font-size: 12px; color: #b4b4b4;">How much explaining</p>
           <div style="position: relative; height: 4px; border-radius: 999px; background: #333333; margin: 0 4px 9px;">
-            <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 25.0%; border-radius: 999px; background: #4ade80;"></div>
-            <div style="position: absolute; left: 25.0%; top: 50%; height: 15px; width: 15px; margin: -7.5px 0 0 -7.5px; border-radius: 999px; background: #4ade80; box-shadow: 0 0 0 4px rgba(74,222,128,.16);"></div>
+            <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 50.0%; border-radius: 999px; background: #4ade80;"></div>
+            <div style="position: absolute; left: 50.0%; top: 50%; height: 15px; width: 15px; margin: -7.5px 0 0 -7.5px; border-radius: 999px; background: #4ade80; box-shadow: 0 0 0 4px rgba(74,222,128,.16);"></div>
           </div>
           <div style="display: flex; gap: 2px;"><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
             <span style="height: 7px; width: 7px; border-radius: 999px; background: #333333; display: block;"></span>
             <span style="font-size: 10px; color: #8a8a8a; white-space: nowrap;">Minimal</span>
           </div><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
-            <span style="height: 9px; width: 9px; border-radius: 999px; background: #4ade80; display: block;"></span>
-            <span style="font-size: 10px; color: #4ade80; white-space: nowrap;">Fair</span>
-          </div><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
             <span style="height: 7px; width: 7px; border-radius: 999px; background: #333333; display: block;"></span>
-            <span style="font-size: 10px; color: #8a8a8a; white-space: nowrap;">Normal</span>
+            <span style="font-size: 10px; color: #8a8a8a; white-space: nowrap;">Fair</span>
+          </div><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
+            <span style="height: 9px; width: 9px; border-radius: 999px; background: #4ade80; display: block;"></span>
+            <span style="font-size: 10px; color: #4ade80; white-space: nowrap;">Normal</span>
           </div><div style="display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1;">
             <span style="height: 7px; width: 7px; border-radius: 999px; background: #333333; display: block;"></span>
             <span style="font-size: 10px; color: #8a8a8a; white-space: nowrap;">Extra</span>

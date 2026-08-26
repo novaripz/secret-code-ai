@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; font-family: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    a { color: #ececec; } a:hover { color: #ffffff; }
+
+    /* Panda reference sheet. */
+    @keyframes logoRoll { to { transform: rotate(360deg) } }
+    .logo-roll { animation: logoRoll 9s linear infinite; }
+
+    @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+    @keyframes earTwitch { 0%,86%,100% { transform: rotate(0deg) } 90% { transform: rotate(-9deg) } 95% { transform: rotate(6deg) } }
+    @keyframes blink { 0%,93%,100% { transform: scaleY(1) } 96% { transform: scaleY(.06) } }
+    @keyframes sway { 0%,100% { transform: rotate(-4deg) } 50% { transform: rotate(5deg) } }
+    @keyframes rise { from { opacity: 0; transform: translateY(9px) } to { opacity: 1; transform: none } }
+    .panda { animation: bob 3.2s ease-in-out infinite; }
+    .ear-l { animation: earTwitch 5s ease-in-out infinite; transform-origin: 64px 54px; }
+    .ear-r { animation: earTwitch 5s ease-in-out infinite .1s; transform-origin: 136px 54px; }
+    .eye { animation: blink 4.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+    .bamboo { animation: sway 3.8s ease-in-out infinite; transform-origin: 155px 192px; }
+    .rise { animation: rise .42s ease-out both; }
+    .r1 { animation-delay: .06s } .r2 { animation-delay: .14s } .r3 { animation-delay: .22s } .r4 { animation-delay: .3s }
+
+    @keyframes rollLoop { to { transform: rotate(360deg) } }
+    .roll-demo { animation: rollLoop 2.4s linear infinite; }
+
+  </style>
+</helmet>
+
+<div style="width: 1200px; height: 640px; background: #0d0d0d; color: #ececec; padding: 34px; overflow: hidden;">
+      <div style="margin-bottom: 24px;">
+        <h1 style="margin: 0 0 5px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">The panda</h1>
+        <p style="margin: 0; font-size: 13px; color: #8a8a8a;">Smaller head, joined to the body. Glossy black boba eyes with one bright shine.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;">
+        
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; background: #171717; border: 1px solid #2a2a2a; border-radius: 18px; padding: 26px 20px;">
+          <div style="height: 150px; display: flex; align-items: center; justify-content: center;"><svg class="panda" viewBox="0 0 200 250" style="width: 118px; height: 148px;">
+      <g class="bamboo">
+        <rect x="150" y="112" width="11" height="80" rx="5" fill="#6aa84f"/>
+        <rect x="150" y="136" width="11" height="4" fill="#4e7d3a"/>
+        <rect x="150" y="164" width="11" height="4" fill="#4e7d3a"/>
+        <ellipse cx="176" cy="116" rx="18" ry="7" fill="#8fbc6b" transform="rotate(-24 176 116)"/>
+        <ellipse cx="137" cy="104" rx="16" ry="6" fill="#8fbc6b" transform="rotate(20 137 104)"/>
+      </g>
+
+      <!-- body, large; head overlaps it so there is no floating-head gap -->
+      <ellipse cx="100" cy="180" rx="58" ry="60" fill="#fafafa"/>
+      
+      <ellipse cx="52" cy="176" rx="14" ry="23" fill="#1a1a1a" transform="rotate(20 52 176)"/>
+      <ellipse cx="148" cy="176" rx="14" ry="23" fill="#1a1a1a" transform="rotate(-20 148 176)"/>
+      <ellipse cx="76" cy="235" rx="17" ry="11" fill="#1a1a1a"/>
+      <ellipse cx="124" cy="235" rx="17" ry="11" fill="#1a1a1a"/>
+
+      <g class="ear-l"><circle cx="64" cy="54" r="17" fill="#1a1a1a"/><circle cx="64" cy="54" r="8" fill="#4a4a4a"/></g>
+      <g class="ear-r"><circle cx="136" cy="54" r="17" fill="#1a1a1a"/><circle cx="136" cy="54" r="8" fill="#4a4a4a"/></g>
+
+      <ellipse cx="100" cy="88" rx="47" ry="44" fill="#fafafa"/>
+      
+      <ellipse cx="82" cy="86" rx="14" ry="17" fill="#1c1c1c" transform="rotate(-14 82 86)"/>
+      <ellipse cx="118" cy="86" rx="14" ry="17" fill="#1c1c1c" transform="rotate(14 118 86)"/>
+      <g class="eye">
+      <circle cx="82" cy="86" r="8.4" fill="#000000" stroke="#3d3d3d" stroke-width="1"/>
+      <circle cx="79.1" cy="83.0" r="2.7" fill="#ffffff" opacity=".92"/>
+      <circle cx="84.5" cy="88.9" r="1.2" fill="#ffffff" opacity=".45"/></g>
+      <g class="eye">
+      <circle cx="118" cy="86" r="8.4" fill="#000000" stroke="#3d3d3d" stroke-width="1"/>
+      <circle cx="115.1" cy="83.0" r="2.7" fill="#ffffff" opacity=".92"/>
+      <circle cx="120.5" cy="88.9" r="1.2" fill="#ffffff" opacity=".45"/></g>
+      <ellipse cx="100" cy="106" rx="7.5" ry="5.5" fill="#1a1a1a"/>
+      <path d="M100 111 L100 115" stroke="#1a1a1a" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M89 117 Q100 126 111 117" stroke="#1a1a1a" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg></div>
+          <div style="text-align: center;">
+            <p style="margin: 0 0 4px; font-size: 14px; font-weight: 600;">Idle</p>
+            <p style="margin: 0; font-size: 12px; line-height: 1.55; color: #8a8a8a;">Bobs, blinks, ears twitch, bamboo sways.</p>
+          </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; background: #171717; border: 1px solid #2a2a2a; border-radius: 18px; padding: 26px 20px;">
+          <div style="height: 150px; display: flex; align-items: center; justify-content: center;"><svg class="roll-demo" viewBox="0 0 100 100" style="width: 108px; height: 108px;">
+      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
+      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
+      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
+      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
+      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
+      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
+      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
+      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></div>
+          <div style="text-align: center;">
+            <p style="margin: 0 0 4px; font-size: 14px; font-weight: 600;">Rolling</p>
+            <p style="margin: 0; font-size: 12px; line-height: 1.55; color: #8a8a8a;">Eyes shut. Rolls while the answer writes.</p>
+          </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; background: #171717; border: 1px solid #2a2a2a; border-radius: 18px; padding: 26px 20px;">
+          <div style="height: 150px; display: flex; align-items: center; justify-content: center;"><span style="display: flex; height: 84px; width: 84px; align-items: center; justify-content: center; border-radius: 24px; background: #262626;"><svg class="logo-roll" viewBox="0 0 100 100" style="width: 62px; height: 62px;">
+      <circle cx="50" cy="50" r="46" fill="#fafafa"/>
+      <circle cx="26" cy="24" r="13" fill="#1a1a1a"/><circle cx="26" cy="24" r="6" fill="#4a4a4a"/>
+      <circle cx="74" cy="24" r="13" fill="#1a1a1a"/><circle cx="74" cy="24" r="6" fill="#4a4a4a"/>
+      <ellipse cx="35" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
+      <ellipse cx="65" cy="50" rx="12" ry="14" fill="#1c1c1c"/>
+      <path d="M27 50 Q35 56 43 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M57 50 Q65 56 73 50" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="68" rx="6" ry="4.5" fill="#1a1a1a"/>
+      <path d="M43 76 Q50 82 57 76" stroke="#1a1a1a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="22" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(-24 22 72)"/>
+      <ellipse cx="78" cy="72" rx="11" ry="9" fill="#1a1a1a" transform="rotate(24 78 72)"/></svg></span></div>
+          <div style="text-align: center;">
+            <p style="margin: 0 0 4px; font-size: 14px; font-weight: 600;">Logo</p>
+            <p style="margin: 0; font-size: 12px; line-height: 1.55; color: #8a8a8a;">Same ball, turning slowly, top left.</p>
+          </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; background: #171717; border: 1px solid #2a2a2a; border-radius: 18px; padding: 26px 20px;">
+          <div style="height: 150px; display: flex; align-items: center; justify-content: center;"><svg viewBox="0 0 120 120" style="width: 116px; height: 116px;"><ellipse cx="60" cy="60" rx="40" ry="48" fill="#1c1c1c"/>
+      <circle cx="60" cy="60" r="26" fill="#000000" stroke="#3d3d3d" stroke-width="1"/>
+      <circle cx="51.2" cy="50.6" r="8.3" fill="#ffffff" opacity=".92"/>
+      <circle cx="67.8" cy="68.8" r="3.6" fill="#ffffff" opacity=".45"/></svg></div>
+          <div style="text-align: center;">
+            <p style="margin: 0 0 4px; font-size: 14px; font-weight: 600;">Eye</p>
+            <p style="margin: 0; font-size: 12px; line-height: 1.55; color: #8a8a8a;">Black and glossy. One big shine, one small.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+</x-dc>
+</body>
+</html>
