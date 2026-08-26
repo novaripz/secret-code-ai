@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Checkered AI — chat, build, and ship",
+  title: "Pandai — chat, build, and ship",
   description: "Chat with an AI that knows you, drop in files and screenshots, and build real projects in your browser.",
 };
 
