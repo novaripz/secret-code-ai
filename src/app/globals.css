@@ -106,7 +106,7 @@ body {
   .chunk-in { animation: none; }
 }
 
-/* Pandai's mascot. The idle set runs forever but stays slow and small, so it
+/* Pand-AI's mascot. The idle set runs forever but stays slow and small, so it
    reads as the thing being alive rather than as an animation demanding
    attention. */
 @keyframes panda-roll { to { transform: rotate(360deg); } }
@@ -174,3 +174,39 @@ body {
 }
 .depth-range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--focus); outline-offset: 2px; }
 .depth-range:focus-visible::-moz-range-thumb { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* The wordmark. "AI" carries the weight and a soft white glow, so the name
+   reads as Pand-AI rather than a word that happens to end in those letters. */
+.wordmark {
+  font-family: var(--font-wordmark), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.wordmark-ai {
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.55),
+    0 0 18px rgba(255, 255, 255, 0.3);
+}
+/* On a light background a white glow is invisible, so the emphasis has to
+   come from weight and ink instead. */
+:root[data-theme="light"] .wordmark-ai {
+  color: #0d0d0d;
+  text-shadow: 0 0 10px rgba(13, 13, 13, 0.18);
+}
+
+/* Appearance: chat text scale and whether the mascot moves. Both are set as
+   attributes on <html> by the profile store, so they apply before paint. */
+:root[data-text-size="small"]  { --chat-text: 14px; }
+:root                          { --chat-text: 15px; }
+:root[data-text-size="large"]  { --chat-text: 17px; }
+
+:root[data-panda-motion="off"] .panda-idle,
+:root[data-panda-motion="off"] .panda-ear-l,
+:root[data-panda-motion="off"] .panda-ear-r,
+:root[data-panda-motion="off"] .panda-eye,
+:root[data-panda-motion="off"] .panda-bamboo,
+:root[data-panda-motion="off"] .panda-roll {
+  animation: none;
+}

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useAssistantStore } from "@/store/useAssistantStore";
 import { useProfileStore } from "@/store/useProfileStore";
 import { useDialog } from "@/components/ui/Dialog";
-import { PandaMark } from "@/components/Panda";
+import { Wordmark } from "@/components/Wordmark";
 import {
   ChatIcon,
   HammerIcon,
@@ -41,7 +41,7 @@ const NAV = [
 /** What to call the page currently open, for the header. */
 function here(pathname: string) {
   const match = NAV.find((n) => (n.href === "/" ? pathname === "/" : pathname.startsWith(n.href)));
-  return match?.label ?? "Pandai";
+  return match?.label ?? "Pand-AI";
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -151,11 +151,8 @@ function Sidebar({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2 px-3 py-3">
-        <Link href="/" className="flex min-w-0 items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--surface-2)]">
-            <PandaMark className="h-[22px] w-[22px]" />
-          </span>
-          <span className="truncate text-sm font-semibold">Pandai</span>
+        <Link href="/" className="min-w-0">
+          <Wordmark />
         </Link>
         <button
           onClick={onClose}

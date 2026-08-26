@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Web search that stays inside Pandai.
+// Web search that stays inside Pand-AI.
 //
 // Google and Bing both refuse to be put in an iframe, so framing them is not
 // an option. Google Programmable Search is the supported way to run a real

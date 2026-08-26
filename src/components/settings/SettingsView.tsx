@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { useProfileStore } from "@/store/useProfileStore";
 import { AvatarPicker } from "./AvatarPicker";
+import { AccountSection } from "./AccountSection";
 import { useDialog } from "@/components/ui/Dialog";
-import { BookIcon, BrainIcon, LightbulbIcon, MoonIcon, SparkleIcon, SunIcon, UserIcon, XIcon } from "@/components/icons";
+import { BrainIcon, MoonIcon, SparkleIcon, SunIcon, UserIcon, XIcon } from "@/components/icons";
 
 const SECTIONS = [
   { key: "profile", label: "Profile", icon: UserIcon },
   { key: "appearance", label: "Appearance", icon: MoonIcon },
-  { key: "modes", label: "Modes", icon: SparkleIcon },
   { key: "memory", label: "Memory", icon: BrainIcon },
 ] as const;
 
@@ -51,7 +51,6 @@ export function SettingsView() {
         <div key={section} className="animate-rise py-6">
           {section === "profile" && <ProfileSection />}
           {section === "appearance" && <AppearanceSection />}
-          {section === "modes" && <ModesSection />}
           {section === "memory" && <MemorySection />}
         </div>
       </div>
@@ -73,6 +72,7 @@ function ProfileSection() {
 
   return (
     <div className="space-y-6">
+      <AccountSection />
       <AvatarPicker />
 
       <Field label="Name" hint="What the AI calls you when it's being formal.">
@@ -180,77 +180,85 @@ function ProfileSection() {
 function AppearanceSection() {
   const theme = useProfileStore((s) => s.theme);
   const setTheme = useProfileStore((s) => s.setTheme);
+  const appearance = useProfileStore((s) => s.appearance);
+  const setAppearance = useProfileStore((s) => s.setAppearance);
 
-  const options = [
+  const themes = [
     { key: "dark" as const, label: "Dark", hint: "The default. Easier on your eyes at night.", icon: MoonIcon },
-    { key: "light" as const, label: "Light", hint: "Bright and high-contrast.", icon: SunIcon },
+    { key: "light" as const, label: "Light", hint: "Bright and high contrast.", icon: SunIcon },
+    { key: "system" as const, label: "System", hint: "Follows whatever your device is set to.", icon: SparkleIcon },
+  ];
+
+  const sizes = [
+    { key: "small" as const, label: "Small" },
+    { key: "normal" as const, label: "Normal" },
+    { key: "large" as const, label: "Large" },
   ];
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {options.map(({ key, label, hint, icon: Icon }) => {
-        const active = theme === key;
-        return (
-          <button
-            key={key}
-            onClick={() => setTheme(key)}
-            className={`rounded-2xl border p-4 text-left transition-colors ${
-              active ? "border-[var(--text)] bg-[var(--surface-2)]" : "border-[var(--line)] hover:bg-[var(--surface-2)]"
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <Icon className="h-4.5 w-4.5 text-[var(--text)]" />
-              <span className="font-medium text-[var(--text)]">{label}</span>
-              {active && <span className="ml-auto text-xs text-[var(--text-faint)]">Active</span>}
-            </span>
-            <span className="mt-1.5 block text-sm text-[var(--text-faint)]">{hint}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function ModesSection() {
-  const modes = useProfileStore((s) => s.modes);
-  const setModes = useProfileStore((s) => s.setModes);
-
-  const items = [
-    {
-      key: "explainMode" as const,
-      icon: LightbulbIcon,
-      label: "Explanation mode",
-      hint: "Adds the why behind an answer. Off means you just get the answer, nothing else.",
-    },
-    {
-      key: "humanize" as const,
-      icon: BookIcon,
-      label: "Humanize",
-      hint: "Plain, everyday writing for essays and emails. Simple words, no dashes, nothing that reads as polished.",
-    },
-    {
-      key: "aiHomie" as const,
-      icon: SparkleIcon,
-      label: "AI homie",
-      hint: "Talks to you like a friend in the group chat, not an assistant. Real reactions, real emotion, still accurate.",
-    },
-  ];
-
-  return (
-    <div className="space-y-3">
-      {items.map(({ key, icon: Icon, label, hint }) => (
-        <div
-          key={key}
-          className="flex items-start gap-3 rounded-2xl border border-[var(--line)] p-4"
-        >
-          <Icon className="mt-0.5 h-5 w-5 shrink-0 text-[var(--text-dim)]" />
-          <div className="min-w-0 flex-1">
-            <p className="font-medium text-[var(--text)]">{label}</p>
-            <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">{hint}</p>
-          </div>
-          <Toggle on={modes[key]} onChange={(on) => setModes({ [key]: on })} label={label} />
+    <div className="space-y-8">
+      <div>
+        <p className="mb-3 text-sm font-medium text-[var(--text)]">Theme</p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {themes.map(({ key, label, hint, icon: Icon }) => {
+            const active = theme === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setTheme(key)}
+                className={`rounded-2xl border p-4 text-left transition-colors ${
+                  active
+                    ? "border-[var(--text)] bg-[var(--surface-2)]"
+                    : "border-[var(--line)] hover:bg-[var(--surface-2)]"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Icon className="h-4 w-4 text-[var(--text)]" />
+                  <span className="font-medium text-[var(--text)]">{label}</span>
+                </span>
+                <span className="mt-1.5 block text-sm text-[var(--text-faint)]">{hint}</span>
+              </button>
+            );
+          })}
         </div>
-      ))}
+      </div>
+
+      <div>
+        <p className="mb-1 text-sm font-medium text-[var(--text)]">Text size</p>
+        <p className="mb-3 text-sm text-[var(--text-faint)]">How big replies are in the chat.</p>
+        <div className="flex gap-2">
+          {sizes.map(({ key, label }) => {
+            const active = appearance.textSize === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setAppearance({ textSize: key })}
+                className={`rounded-xl border px-4 py-2.5 text-sm transition-colors ${
+                  active
+                    ? "border-[var(--text)] bg-[var(--surface-2)] font-medium text-[var(--text)]"
+                    : "border-[var(--line)] text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3 rounded-2xl border border-[var(--line)] p-4">
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-[var(--text)]">Panda movement</p>
+          <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">
+            The mascot bobs, blinks and twitches its ears. Turn it off to keep it still.
+          </p>
+        </div>
+        <Toggle
+          on={appearance.pandaMotion}
+          onChange={(on) => setAppearance({ pandaMotion: on })}
+          label="Panda movement"
+        />
+      </div>
     </div>
   );
 }

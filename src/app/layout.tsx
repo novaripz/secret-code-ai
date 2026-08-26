@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import { AppProviders } from "@/components/AppProviders";
 import "./globals.css";
 
@@ -13,8 +13,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// The wordmark only. Geist is the interface face; the logo wants something
+// with more character standing next to it.
+const wordmark = Space_Grotesk({
+  variable: "--font-wordmark",
+  weight: ["500", "700"],
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "Pandai — chat, build, and ship",
+  title: "Pand-AI — chat, build, and ship",
   description: "Chat with an AI that knows you, drop in files and screenshots, and build real projects in your browser.",
 };
 
@@ -24,7 +32,7 @@ const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("sca:profile:v1
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-theme="dark" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" data-theme="dark" className={`${geistSans.variable} ${geistMono.variable} ${wordmark.variable} h-full antialiased`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

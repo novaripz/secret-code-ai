@@ -5,7 +5,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { LockIcon, SearchIcon } from "@/components/icons";
 import type { Video } from "@/app/api/watch/route";
 
-// Watch: find and play videos without leaving Pandai.
+// Watch: find and play videos without leaving Pand-AI.
 //
 // youtube.com refuses to be framed, and framing it would hand over the whole
 // site to wander around in anyway. So we search with the Data API and play
@@ -79,7 +79,7 @@ export default function WatchPage() {
           <span className="text-[13px] text-[var(--text-faint)]">Watch</span>
           <span className="flex items-center gap-1.5 rounded-full border border-[var(--line)] px-2.5 py-1 text-[11px] text-[var(--success)]">
             <LockIcon className="h-3 w-3" />
-            Locked to Pandai
+            Locked to Pand-AI
           </span>
         </div>
 

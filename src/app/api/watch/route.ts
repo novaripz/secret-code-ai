@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 // youtube.com itself cannot be framed, and framing it would also hand over the
 // whole site to roam around in. Instead we search with the YouTube Data API and
 // play results through the embedded player, so a student can find and watch a
-// video without ever leaving Pandai.
+// video without ever leaving Pand-AI.
 //
 // Uses YOUTUBE_API_KEY, falling back to GEMINI_API_KEY — an AI Studio key often
 // works here already, as long as "YouTube Data API v3" is enabled on the

@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { accountScope } from "./useAuthStore";
 import type { ExplainDepth } from "@/lib/ai/systemPrompt";
 
 // The user's identity, preferences, modes, and long-term memory. This is the
@@ -8,9 +9,28 @@ import type { ExplainDepth } from "@/lib/ai/systemPrompt";
 // settings — so it lives in localStorage (small, synchronous, no first-paint
 // flash for the theme) rather than IndexedDB.
 
-const STORAGE_KEY = "sca:profile:v1";
+const STORAGE_KEY_BASE = "sca:profile:v1";
 
-export type ThemeName = "dark" | "light";
+/**
+ * Storage key for whoever is signed in. Signed out keeps the original key, so
+ * anyone who never signs in keeps everything they already had.
+ */
+function storageKey() {
+  return STORAGE_KEY_BASE + accountScope();
+}
+
+export type ThemeName = "dark" | "light" | "system";
+
+/** Body text scale for the chat, for anyone who wants it bigger or tighter. */
+export type TextSize = "small" | "normal" | "large";
+
+export interface Appearance {
+  textSize: TextSize;
+  /** The mascot's idle movement. Off leaves it perfectly still. */
+  pandaMotion: boolean;
+}
+
+const DEFAULT_APPEARANCE: Appearance = { textSize: "normal", pandaMotion: true };
 
 export interface Birthday {
   /** 1-12 */
@@ -57,12 +77,14 @@ export interface ProfileState {
   hydrated: boolean;
   onboarded: boolean;
   theme: ThemeName;
+  appearance: Appearance;
   profile: Profile;
   modes: Modes;
   memory: MemoryFact[];
 
   hydrate: () => void;
   setTheme: (theme: ThemeName) => void;
+  setAppearance: (patch: Partial<Appearance>) => void;
   toggleTheme: () => void;
   updateProfile: (patch: Partial<Profile>) => void;
   setModes: (patch: Partial<Modes>) => void;
@@ -102,6 +124,7 @@ const DEFAULT_MODES: Modes = {
 interface Persisted {
   onboarded: boolean;
   theme: ThemeName;
+  appearance: Appearance;
   profile: Profile;
   modes: Modes;
   memory: MemoryFact[];
@@ -110,7 +133,7 @@ interface Persisted {
 function readPersisted(): Partial<Persisted> {
   if (typeof window === "undefined") return {};
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(storageKey());
     if (!raw) return {};
     const parsed = JSON.parse(raw) as Partial<Persisted>;
     return typeof parsed === "object" && parsed !== null ? parsed : {};
@@ -124,20 +147,34 @@ function writePersisted(state: ProfileState) {
   const payload: Persisted = {
     onboarded: state.onboarded,
     theme: state.theme,
+    appearance: state.appearance,
     profile: state.profile,
     modes: state.modes,
     memory: state.memory,
   };
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    window.localStorage.setItem(storageKey(), JSON.stringify(payload));
   } catch {
     // Storage full or blocked (private mode) — the app still works, it just forgets.
   }
 }
 
+/** "system" has no stored colour of its own; it follows the OS setting. */
+function resolveTheme(theme: ThemeName): "dark" | "light" {
+  if (theme !== "system") return theme;
+  if (typeof window === "undefined") return "dark";
+  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
+
+function applyAppearance(a: Appearance) {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset.textSize = a.textSize;
+  document.documentElement.dataset.pandaMotion = a.pandaMotion ? "on" : "off";
+}
+
 function applyTheme(theme: ThemeName) {
   if (typeof document === "undefined") return;
-  document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.theme = resolveTheme(theme);
 }
 
 function newId() {
@@ -155,6 +192,7 @@ export const useProfileStore = create<ProfileState>((set, get) => {
     hydrated: false,
     onboarded: false,
     theme: "dark",
+    appearance: DEFAULT_APPEARANCE,
     profile: EMPTY_PROFILE,
     modes: DEFAULT_MODES,
     memory: [],
@@ -162,12 +200,16 @@ export const useProfileStore = create<ProfileState>((set, get) => {
     hydrate: () => {
       if (get().hydrated) return;
       const saved = readPersisted();
-      const theme = saved.theme === "light" ? "light" : "dark";
+      const theme: ThemeName =
+        saved.theme === "light" || saved.theme === "system" ? saved.theme : "dark";
+      const appearance = { ...DEFAULT_APPEARANCE, ...(saved.appearance ?? {}) };
       applyTheme(theme);
+      applyAppearance(appearance);
       set({
         hydrated: true,
         onboarded: saved.onboarded === true,
         theme,
+        appearance,
         profile: { ...EMPTY_PROFILE, ...(saved.profile ?? {}), birthday: { ...EMPTY_PROFILE.birthday, ...(saved.profile?.birthday ?? {}) } },
         modes: { ...DEFAULT_MODES, ...(saved.modes ?? {}) },
         memory: Array.isArray(saved.memory) ? saved.memory : [],
@@ -179,7 +221,13 @@ export const useProfileStore = create<ProfileState>((set, get) => {
       commit({ theme });
     },
 
-    toggleTheme: () => get().setTheme(get().theme === "dark" ? "light" : "dark"),
+    toggleTheme: () => get().setTheme(resolveTheme(get().theme) === "dark" ? "light" : "dark"),
+
+    setAppearance: (patch) => {
+      const appearance = { ...get().appearance, ...patch };
+      applyAppearance(appearance);
+      commit({ appearance });
+    },
 
     updateProfile: (patch) => commit({ profile: { ...get().profile, ...patch } }),
 

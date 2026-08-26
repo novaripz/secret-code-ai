@@ -3,13 +3,19 @@
 import { create } from "zustand";
 import localforage from "localforage";
 import { nanoid } from "nanoid";
+import { accountScope } from "./useAuthStore";
 import type { Attachment } from "@/lib/attachments";
 
 // The main chat: threads that live outside any single project, so the
 // conversation (and everything the AI remembers from it) follows the user
 // across the whole app.
 
-const threadStore = localforage.createInstance({ name: "ai-code-studio", storeName: "threads" });
+// One thread store per account, so a shared browser keeps conversations
+// apart. Signed out uses the original store, so existing chats stay put.
+const threadStore = localforage.createInstance({
+  name: "ai-code-studio",
+  storeName: `threads${accountScope().replace(/[^a-zA-Z0-9]/g, "_")}`,
+});
 
 const INDEX_KEY = "__thread_index__";
 const MAX_THREADS = 100;

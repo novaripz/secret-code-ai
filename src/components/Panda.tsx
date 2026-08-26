@@ -1,7 +1,8 @@
-// The Pandai mascot.
+// The Pand-AI mascot.
 //
-// Two forms, both plain inline SVG so they scale and recolor with no assets:
-//   PandaMark    — tucked into a ball, eyes shut, turning slowly. The logo.
+// Three forms, all plain inline SVG so they scale and recolor with no assets:
+//   PandaMark    — a face, front on and still. The logo.
+//   PandaBall    — tucked into a ball, eyes shut. The thinking/streaming shape.
 //   PandaSitting — seated, holding bamboo, idling. The greeting and avatar.
 //
 // Proportions matter here: the head is deliberately small against the body
@@ -28,8 +29,34 @@ function Eye({ cx, cy, r = 8.4 }: { cx: number; cy: number; r?: number }) {
   );
 }
 
-/** Rolling ball, eyes shut. Used as the app mark. */
-export function PandaMark({ className = "", spin = true }: { className?: string; spin?: boolean }) {
+/**
+ * The app mark: a panda face, front on and still.
+ *
+ * Deliberately not the rolling ball — that shape belongs to the streaming
+ * state, and a logo that spins forever reads as a loading spinner. Drawn
+ * tighter than the seated panda so it survives being 20px wide.
+ */
+export function PandaMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+      <circle cx="24" cy="26" r="15" fill={INK} />
+      <circle cx="24" cy="26" r="7" fill={EAR_IN} />
+      <circle cx="76" cy="26" r="15" fill={INK} />
+      <circle cx="76" cy="26" r="7" fill={EAR_IN} />
+      <ellipse cx="50" cy="55" rx="40" ry="37" fill={FUR} />
+      <ellipse cx="34" cy="52" rx="12" ry="14" fill={PATCH} transform="rotate(-14 34 52)" />
+      <ellipse cx="66" cy="52" rx="12" ry="14" fill={PATCH} transform="rotate(14 66 52)" />
+      <Eye cx={34} cy={52} r={7} />
+      <Eye cx={66} cy={52} r={7} />
+      <ellipse cx="50" cy="70" rx="6.5" ry="4.8" fill={INK} />
+      <path d="M50 74 L50 77" stroke={INK} strokeWidth={2.2} strokeLinecap="round" />
+      <path d="M41 79 Q50 87 59 79" stroke={INK} strokeWidth={2.8} fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** The tucked ball, eyes shut. This is the streaming/thinking shape. */
+export function PandaBall({ className = "", spin = false }: { className?: string; spin?: boolean }) {
   return (
     <svg viewBox="0 0 100 100" className={`${className} ${spin ? "panda-roll" : ""}`} aria-hidden="true">
       <circle cx="50" cy="50" r="46" fill={FUR} />
