@@ -370,58 +370,89 @@ WRITE_END = 0.72     # fraction of the loop spent writing
 
 
 def build_streaming():
+    """The write head.
+
+    Each word gets a panda placed immediately after it in the text flow.
+    Only the panda sitting at the current write position is visible, so as
+    words land the panda appears to roll forward into each new one. Because
+    the pandas are inline the head follows line wraps on its own, with no
+    pixel maths, and it keeps spinning the whole way across.
+    """
     n = len(STREAM_TEXT)
-    words = []
-    for i, w in enumerate(STREAM_TEXT):
-        delay = (i / n) * CYCLE * WRITE_END
-        words.append(f'<span class="w" style="animation-delay: {delay:.2f}s">{w} </span>')
-
+    step = CYCLE * WRITE_END / n           # seconds per word
+    slot = (step / CYCLE) * 100            # that slot as a % of the loop
     roll_pct = WRITE_END * 100
-    styles = f'''
-    @keyframes wordIn {{ 0% {{ opacity: 0; filter: blur(3px) }} 6%,{roll_pct:.0f}% {{ opacity: 1; filter: blur(0) }} 100% {{ opacity: 1; filter: blur(0) }} }}
-    @keyframes rollAcross {{
-      0%   {{ transform: translateX(0) rotate(0deg); opacity: 1 }}
-      {roll_pct - 4:.0f}%  {{ transform: translateX(224px) rotate(1160deg); opacity: 1 }}
-      {roll_pct:.0f}%  {{ transform: translateX(236px) rotate(1200deg); opacity: 0 }}
-      100% {{ transform: translateX(236px) rotate(1200deg); opacity: 0 }}
-    }}
-    @keyframes settleIn {{
-      0%,{roll_pct - 1:.0f}% {{ opacity: 0; transform: translateY(6px) scale(.9) }}
-      {roll_pct + 3:.0f}% {{ opacity: 1; transform: translateY(0) scale(1) }}
-      100% {{ opacity: 1; transform: none }}
-    }}
-    @keyframes trackHide {{ 0%,{roll_pct - 1:.0f}% {{ opacity: 1 }} {roll_pct:.0f}%,100% {{ opacity: 0 }} }}
-    @keyframes bob {{ 0%,100% {{ transform: translateY(0) }} 50% {{ transform: translateY(-5px) }} }}
-    @keyframes blink {{ 0%,93%,100% {{ transform: scaleY(1) }} 96% {{ transform: scaleY(.06) }} }}
-    @keyframes dot {{ 0%,80%,100% {{ opacity: .25; transform: translateY(0) }} 40% {{ opacity: 1; transform: translateY(-3px) }} }}
-    @keyframes stepIn {{ from {{ opacity: 0; transform: translateX(-6px) }} to {{ opacity: 1; transform: none }} }}
-    @keyframes sweep {{ 0% {{ background-position: -200px 0 }} 100% {{ background-position: 320px 0 }} }}
 
-    /* Each word fades up out of a blur as it arrives, the way a real stream
-       lands a token at a time. The panda rolls the length of the line while
-       that happens, then stops and turns to face you when the text is done. */
-    .w {{ animation: wordIn {CYCLE}s ease-out infinite both; }}
-    .roller {{ animation: rollAcross {CYCLE}s cubic-bezier(.42,0,.58,1) infinite both; }}
-    .track {{ animation: trackHide {CYCLE}s linear infinite both; }}
-    .settled {{ animation: settleIn {CYCLE}s ease-out infinite both; }}
-    .settled-bob {{ animation: bob 3s ease-in-out infinite; }}
-    .eye {{ animation: blink 4.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }}
-    .d1 {{ animation: dot 1.3s ease-in-out infinite }}
-    .d2 {{ animation: dot 1.3s ease-in-out infinite .16s }}
-    .d3 {{ animation: dot 1.3s ease-in-out infinite .32s }}
-    .s1 {{ animation: stepIn .35s ease-out both .05s }}
-    .s2 {{ animation: stepIn .35s ease-out both .3s }}
-    .s3 {{ animation: stepIn .35s ease-out both .55s }}
-    .shimmer {{
-      background: linear-gradient(90deg, {FAINT} 0%, {TEXT} 45%, {FAINT} 70%);
-      background-size: 320px 100%;
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      animation: sweep 2.1s linear infinite;
-    }}
-'''
+    head = f'<svg class="head" viewBox="0 0 100 100">{panda_ball()}</svg>'
 
-    body = shell(
-        sidebar("chat") + f'''
+    out = []
+    for i, w in enumerate(STREAM_TEXT):
+        d = i * step
+        out.append(f'<span class="w" style="animation-delay: {d:.2f}s">{w} </span>')
+        out.append(f'<span class="head-slot" style="animation-delay: {d:.2f}s">{head}</span>')
+    words = "".join(out)
+
+    styles = (
+        "\n    /* A word fades up out of a blur as it lands, the way a real stream\n"
+        "       delivers one token at a time. */\n"
+        "    @keyframes wordIn {\n"
+        "      0% { opacity: 0; filter: blur(4px) }\n"
+        f"      {slot*1.6:.2f}% {{ opacity: 1; filter: blur(0) }}\n"
+        "      100% { opacity: 1; filter: blur(0) }\n"
+        "    }\n"
+        "    /* Each head shows for exactly its own word slot, so the visible one\n"
+        "       hands off to the next and the panda reads as rolling forward. */\n"
+        "    @keyframes headShow {\n"
+        "      0% { opacity: 0; transform: translateX(-7px) scale(.8) }\n"
+        f"      {slot*0.22:.2f}% {{ opacity: 1; transform: translateX(0) scale(1) }}\n"
+        f"      {slot*0.78:.2f}% {{ opacity: 1; transform: translateX(0) scale(1) }}\n"
+        f"      {slot:.2f}% {{ opacity: 0; transform: translateX(6px) scale(.88) }}\n"
+        "      100% { opacity: 0; transform: translateX(6px) scale(.88) }\n"
+        "    }\n"
+        "    @keyframes headSpin { to { transform: rotate(360deg) } }\n"
+        "    /* Last word down: the head is gone and the seated panda settles\n"
+        "       back into the avatar slot, facing you. */\n"
+        "    @keyframes settleIn {\n"
+        f"      0%,{roll_pct - 1:.0f}% {{ opacity: 0; transform: translateY(7px) scale(.88) }}\n"
+        f"      {roll_pct + 3:.0f}% {{ opacity: 1; transform: translateY(0) scale(1) }}\n"
+        "      100% { opacity: 1; transform: none }\n"
+        "    }\n"
+        "    @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }\n"
+        "    @keyframes blink { 0%,93%,100% { transform: scaleY(1) } 96% { transform: scaleY(.06) } }\n"
+        "    @keyframes dot { 0%,80%,100% { opacity: .25; transform: translateY(0) } 40% { opacity: 1; transform: translateY(-3px) } }\n"
+        "    @keyframes stepIn { from { opacity: 0; transform: translateX(-6px) } to { opacity: 1; transform: none } }\n"
+        "    @keyframes sweep { 0% { background-position: -200px 0 } 100% { background-position: 320px 0 } }\n"
+        "\n"
+        f"    .w {{ animation: wordIn {CYCLE}s ease-out infinite both; }}\n"
+        "    /* Zero width, so an invisible head never spaces out the text.\n"
+        "       The svg overflows the slot and renders at the write head. */\n"
+        "    .head-slot {\n"
+        "      display: inline-block; position: relative; width: 0; height: 1em;\n"
+        "      vertical-align: baseline; overflow: visible;\n"
+        f"      animation: headShow {CYCLE}s linear infinite both;\n"
+        "    }\n"
+        "    .head {\n"
+        "      position: absolute; left: 1px; top: 50%; margin-top: -11px;\n"
+        "      width: 20px; height: 20px; animation: headSpin .6s linear infinite;\n"
+        "    }\n"
+        f"    .settled {{ animation: settleIn {CYCLE}s ease-out infinite both; }}\n"
+        "    .settled-bob { animation: bob 3s ease-in-out infinite; }\n"
+        "    .eye { animation: blink 4.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }\n"
+        "    .d1 { animation: dot 1.3s ease-in-out infinite }\n"
+        "    .d2 { animation: dot 1.3s ease-in-out infinite .16s }\n"
+        "    .d3 { animation: dot 1.3s ease-in-out infinite .32s }\n"
+        "    .s1 { animation: stepIn .35s ease-out both .05s }\n"
+        "    .s2 { animation: stepIn .35s ease-out both .3s }\n"
+        "    .s3 { animation: stepIn .35s ease-out both .55s }\n"
+        "    .shimmer {\n"
+        f"      background: linear-gradient(90deg, {FAINT} 0%, {TEXT} 45%, {FAINT} 70%);\n"
+        "      background-size: 320px 100%;\n"
+        "      -webkit-background-clip: text; background-clip: text; color: transparent;\n"
+        "      animation: sweep 2.1s linear infinite;\n"
+        "    }\n"
+    )
+
+    convo = f'''
   <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
     {topbar("Photosynthesis notes")}
     <div style="flex: 1; min-height: 0; overflow: hidden; display: flex; justify-content: center; padding: 32px 24px;">
@@ -434,7 +465,6 @@ def build_streaming():
         </div>
 
         <div style="display: flex; gap: 14px; align-items: flex-start;">
-          <!-- avatar slot: rolls away while writing, settles back facing you -->
           <div style="position: relative; width: 56px; height: 56px; flex-shrink: 0;">
             <div class="settled settled-bob" style="position: absolute; inset: 0;">
               <svg viewBox="0 0 200 250" style="width: 56px; height: 70px; margin-top: -8px;">{panda_facing(arms="none")}</svg>
@@ -469,12 +499,7 @@ def build_streaming():
               </div>
             </div>
 
-            <div style="font-size: 15px; line-height: 1.75; color: {TEXT};">{''.join(words)}</div>
-
-            <!-- the panda literally rolls the width of the text as it lands -->
-            <div class="track" style="position: relative; height: 30px;">
-              <svg class="roller" viewBox="0 0 100 100" style="width: 28px; height: 28px; position: absolute; left: 0; top: 0;">{panda_ball()}</svg>
-            </div>
+            <div style="font-size: 15px; line-height: 1.85; color: {TEXT};">{words}</div>
           </div>
         </div>
       </div>
@@ -482,10 +507,11 @@ def build_streaming():
     <div style="display: flex; justify-content: center; padding: 0 24px 26px;">
       <div style="width: 100%; max-width: 700px;">{composer(busy=True)}</div>
     </div>
-  </div>''',
-        rail=right_rail(explain_on=True, depth=2, humanize_on=False))
-    return page("Streaming: words fade up out of blur while the panda rolls along.", styles, body)
+  </div>'''
 
+    body = shell(sidebar("chat") + convo,
+                 rail=right_rail(explain_on=True, depth=2, humanize_on=False))
+    return page("Streaming: the panda rolls at the write head as each word lands.", styles, body)
 
 # ------------------------------------------------------- 3. Explain is off
 def build_explainoff():
