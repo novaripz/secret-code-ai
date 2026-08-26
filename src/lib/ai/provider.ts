@@ -1,4 +1,5 @@
 import type { AgentResponse } from "@/types";
+import type { ExplainDepth } from "./systemPrompt";
 
 /** A single message in the conversation sent to the model. */
 export interface AiMessage {
@@ -23,6 +24,10 @@ export interface AgentRequest {
   history: AiMessage[];
   /** When true, the model should explain things in very simple, beginner-friendly terms. */
   explainMode?: boolean;
+  /** How much explaining to do when explainMode is on. */
+  explainDepth?: ExplainDepth;
+  /** Plain, everyday writing for essays and emails. */
+  humanize?: boolean;
   /** When true, coach toward the answer instead of handing it over. */
   homeworkHelp?: boolean;
   /** When true, answer in a casual, Gen-Z, friend-to-friend voice. */

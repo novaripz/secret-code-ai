@@ -101,8 +101,10 @@ export class GeminiProvider implements AiProvider {
   private startTurn(req: AgentRequest) {
     const systemInstruction = buildSystemPrompt(req.chatOnly ? CHAT_SYSTEM_PROMPT : SYSTEM_PROMPT, {
       explainMode: req.explainMode,
+      explainDepth: req.explainDepth,
       homeworkHelp: req.homeworkHelp,
       aiHomie: req.aiHomie,
+      humanize: req.humanize,
     });
 
     const model = this.client.getGenerativeModel({

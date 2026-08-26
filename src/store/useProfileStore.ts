@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import type { ExplainDepth } from "@/lib/ai/systemPrompt";
 
 // The user's identity, preferences, modes, and long-term memory. This is the
 // one piece of state that follows them everywhere — chat, the build studio,
@@ -39,6 +40,10 @@ export interface Profile {
 }
 
 export interface Modes {
+  /** How much explaining, when Explain is on. */
+  explainDepth: ExplainDepth;
+  /** Plain everyday writing for essays and emails. */
+  humanize: boolean;
   /** Homework help: the AI coaches toward the answer instead of handing it over. */
   homeworkHelp: boolean;
   /** Explanation mode: extra-simple, step-by-step explanations. */
@@ -87,6 +92,8 @@ const EMPTY_PROFILE: Profile = {
 };
 
 const DEFAULT_MODES: Modes = {
+  explainDepth: "normal",
+  humanize: false,
   homeworkHelp: false,
   explainMode: true,
   aiHomie: false,

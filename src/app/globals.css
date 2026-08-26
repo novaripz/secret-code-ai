@@ -105,3 +105,72 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .chunk-in { animation: none; }
 }
+
+/* Pandai's mascot. The idle set runs forever but stays slow and small, so it
+   reads as the thing being alive rather than as an animation demanding
+   attention. */
+@keyframes panda-roll { to { transform: rotate(360deg); } }
+@keyframes panda-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes panda-ear {
+  0%, 86%, 100% { transform: rotate(0deg); }
+  90%           { transform: rotate(-9deg); }
+  95%           { transform: rotate(6deg); }
+}
+@keyframes panda-blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96%           { transform: scaleY(0.06); }
+}
+@keyframes panda-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(5deg); }
+}
+
+.panda-roll   { animation: panda-roll 9s linear infinite; }
+.panda-idle   { animation: panda-bob 3.2s ease-in-out infinite; }
+.panda-ear-l  { animation: panda-ear 5s ease-in-out infinite; transform-origin: 64px 54px; }
+.panda-ear-r  { animation: panda-ear 5s ease-in-out infinite 0.1s; transform-origin: 136px 54px; }
+.panda-eye    { animation: panda-blink 4.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.panda-bamboo { animation: panda-sway 3.8s ease-in-out infinite; transform-origin: 155px 192px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .panda-roll, .panda-idle, .panda-ear-l, .panda-ear-r, .panda-eye, .panda-bamboo {
+    animation: none;
+  }
+}
+
+/* The Explain depth slider. Styled by hand because the native track and thumb
+   ignore the theme in both engines. */
+.depth-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  outline: none;
+  cursor: pointer;
+}
+.depth-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 15px;
+  width: 15px;
+  border: none;
+  border-radius: 999px;
+  background: var(--success);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 18%, transparent);
+  cursor: pointer;
+}
+.depth-range::-moz-range-thumb {
+  height: 15px;
+  width: 15px;
+  border: none;
+  border-radius: 999px;
+  background: var(--success);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 18%, transparent);
+  cursor: pointer;
+}
+.depth-range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--focus); outline-offset: 2px; }
+.depth-range:focus-visible::-moz-range-thumb { outline: 2px solid var(--focus); outline-offset: 2px; }

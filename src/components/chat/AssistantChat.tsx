@@ -5,8 +5,9 @@ import { useAssistantStore } from "@/store/useAssistantStore";
 import { useProfileStore } from "@/store/useProfileStore";
 import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
 import { Composer } from "./Composer";
-import { ModePills } from "./ModePills";
 import { MessageText } from "./MessageText";
+import { ModeRail } from "./ModeRail";
+import { PandaSitting } from "@/components/Panda";
 import { FileIcon } from "@/components/icons";
 
 const STARTERS = [
@@ -98,8 +99,10 @@ export function AssistantChat() {
           contextFiles: {},
           history,
           explainMode: modes.explainMode,
+          explainDepth: modes.explainDepth,
           homeworkHelp: modes.homeworkHelp,
           aiHomie: modes.aiHomie,
+          humanize: modes.humanize,
           studentProfile: memoryBlock(),
           images: outgoing
             .filter((a) => a.kind === "image" && a.base64 && a.mimeType)
@@ -168,11 +171,15 @@ export function AssistantChat() {
   const empty = messages.length === 0;
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full">
+      <div className="flex min-w-0 flex-1 flex-col">
       {empty ? (
         // Landing state: greeting and composer centered, like a fresh chat.
         <div className="flex flex-1 flex-col items-center justify-center px-4">
           <div className="w-full max-w-2xl animate-rise">
+            <div className="mb-5 flex justify-center">
+              <PandaSitting className="h-[190px] w-[152px]" />
+            </div>
             <h1 className="mb-8 text-center text-3xl font-semibold tracking-tight text-[var(--text)] sm:text-4xl">
               {greeting(name)}
             </h1>
@@ -186,7 +193,6 @@ export function AssistantChat() {
               onSend={() => void send()}
               loading={loading}
               placeholder="Ask anything, or drop in a file or screenshot"
-              footer={<ModePills className="justify-center" />}
             />
 
             <div className="mt-8 flex flex-wrap justify-center gap-2">
@@ -208,7 +214,14 @@ export function AssistantChat() {
             <div className="mx-auto max-w-3xl space-y-6 px-4 py-8">
               {messages.map((m) => (
                 <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
-                  <div className={m.role === "user" ? "max-w-[85%]" : "w-full"}>
+                  {m.role === "assistant" && (
+                    <PandaSitting
+                      className="mr-3 h-[46px] w-[37px] shrink-0"
+                      bamboo={false}
+                      idle={m.streaming !== true}
+                    />
+                  )}
+                  <div className={m.role === "user" ? "max-w-[85%]" : "min-w-0 flex-1"}>
                     {m.attachments && m.attachments.length > 0 && (
                       <div className="mb-2 flex flex-wrap justify-end gap-2">
                         {m.attachments.map((a) =>
@@ -271,12 +284,17 @@ export function AssistantChat() {
                 onAttachmentsChange={setAttachments}
                 onSend={() => void send()}
                 loading={loading}
-                footer={<ModePills className="justify-center" />}
-              />
+                />
             </div>
           </div>
         </>
       )}
+      </div>
+
+      {/* Modes live beside the chat, out of the way but always visible.
+          Hidden on narrow screens, where the pills under the composer
+          would be the better home. */}
+      <ModeRail className="hidden lg:flex" />
     </div>
   );
 }

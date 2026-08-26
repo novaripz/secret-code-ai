@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAiProvider } from "@/lib/ai";
 import { validateOperations } from "@/lib/ai/validateOperations";
 import type { AiMessage, ImageAttachment } from "@/lib/ai/provider";
+import type { ExplainDepth } from "@/lib/ai/systemPrompt";
+
+const EXPLAIN_DEPTHS = new Set<ExplainDepth>(["minimal", "fair", "normal", "extra", "overload"]);
 
 export const runtime = "nodejs";
 
@@ -16,6 +19,8 @@ interface RequestBody {
   contextFiles: Record<string, string>;
   history?: AiMessage[];
   explainMode?: boolean;
+  explainDepth?: ExplainDepth;
+  humanize?: boolean;
   homeworkHelp?: boolean;
   aiHomie?: boolean;
   chatOnly?: boolean;
@@ -79,6 +84,9 @@ export async function POST(req: NextRequest) {
     contextFiles: body.contextFiles ?? {},
     history: Array.isArray(body.history) ? body.history.slice(-20) : [],
     explainMode: body.explainMode === true,
+    explainDepth:
+      body.explainDepth && EXPLAIN_DEPTHS.has(body.explainDepth) ? body.explainDepth : "normal",
+    humanize: body.humanize === true,
     homeworkHelp: body.homeworkHelp === true,
     aiHomie: body.aiHomie === true,
     chatOnly: body.chatOnly === true,

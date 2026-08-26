@@ -68,17 +68,62 @@ Rules:
 - If they ask you to build or change a real project, tell them to open or start a project from the Build tab, and offer to plan it out with them in the meantime.
 - Never make up facts about the user. If you don't know something about them, ask.`;
 
+/** How much build-up the student wants when Explain is on. */
+export type ExplainDepth = "minimal" | "fair" | "normal" | "extra" | "overload";
+
+export const EXPLAIN_DEPTH_ADDENDUM: Record<ExplainDepth, string> = {
+  minimal: `
+DEPTH: MINIMAL. One sentence of why, then stop. No build-up, no examples.`,
+  fair: `
+DEPTH: FAIR. Two or three sentences of why. One small example only if it genuinely helps.`,
+  normal: `
+DEPTH: NORMAL. A short paragraph or a few steps. Assume nothing, but do not belabour it.`,
+  extra: `
+DEPTH: EXTRA. Build it up from the basics with a worked example, then a short recap of the idea.`,
+  overload: `
+DEPTH: OVERLOAD. Go all the way. Start from first principles, define every term, work a full example
+step by step, mention the common mistakes, and finish with a recap. Long is fine here — they asked for it.`,
+};
+
+export const NO_EXPLAIN_ADDENDUM = `
+
+EXPLAIN IS OFF. Give the answer and nothing else:
+- State the answer directly. No reasoning, no workings, no build-up, no "here's why".
+- No preamble and no closing offer to explain further.
+- If the question genuinely has no short answer, give the shortest correct one and stop.`;
+
+export const HUMANIZE_ADDENDUM = `
+
+HUMANIZE IS ON. This applies to anything you WRITE for them — essays, emails, paragraphs, messages.
+Write it the way an ordinary person types, not the way a polished assistant writes:
+- Plain everyday words. No sophisticated vocabulary and no clever phrasing.
+- Never use a hyphen or a dash of any kind. No em dashes, no en dashes, no hyphenated words. Reword instead.
+- Let some sentences run on a bit, joined with "and" or "so" or "because", the way people actually talk.
+- Commas can be a little loose and unnecessary, that is fine and normal.
+- Not perfectly punctual or literate, but still clear and still fair.
+- Calm and average length. Not short, not long. Never go above and beyond what was asked, just do the ask.
+- Easy to read and easy to understand. Nobody should finish it feeling wowed or surprised by the writing.
+Only the writing style changes. Facts stay correct and the content still does what they asked.`;
+
 export interface PromptModes {
   explainMode?: boolean;
+  explainDepth?: ExplainDepth;
   homeworkHelp?: boolean;
   aiHomie?: boolean;
+  humanize?: boolean;
 }
 
 /** Assembles the system prompt for a request: base persona + whichever modes are on. */
 export function buildSystemPrompt(base: string, modes: PromptModes = {}): string {
   let prompt = base;
-  if (modes.explainMode) prompt += EXPLAIN_MODE_ADDENDUM;
+  if (modes.explainMode) {
+    prompt += EXPLAIN_MODE_ADDENDUM;
+    prompt += EXPLAIN_DEPTH_ADDENDUM[modes.explainDepth ?? "normal"];
+  } else {
+    prompt += NO_EXPLAIN_ADDENDUM;
+  }
   if (modes.homeworkHelp) prompt += HOMEWORK_HELP_ADDENDUM;
   if (modes.aiHomie) prompt += AI_HOMIE_ADDENDUM;
+  if (modes.humanize) prompt += HUMANIZE_ADDENDUM;
   return prompt;
 }
