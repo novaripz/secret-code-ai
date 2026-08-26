@@ -57,53 +57,52 @@ export function GoogleSignIn({ onDone }: { onDone?: () => void }) {
   const busy = useAuthStore((s) => s.busy);
 
   const holder = useRef<HTMLDivElement>(null);
-  // Whether the client id exists is knowable at first render, so it is initial
-  // state rather than something an effect discovers.
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-  const [status, setStatus] = useState<"loading" | "ready" | "unconfigured" | "blocked">(
-    clientId ? "loading" : "unconfigured",
-  );
+  const [status, setStatus] = useState<"loading" | "ready" | "unconfigured" | "blocked">("loading");
 
   useEffect(() => {
-    if (!clientId) return;
-
     let cancelled = false;
 
-    loadScript()
-      .then(() => {
-        if (cancelled || !holder.current || !window.google) return;
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: async (res) => {
-            if (res.credential && (await signIn(res.credential))) onDone?.();
-          },
-        });
-        window.google.accounts.id.renderButton(holder.current, {
-          theme: "filled_black",
-          size: "large",
-          shape: "pill",
-          text: "signin_with",
-          width: 260,
-        });
-        setStatus("ready");
-      })
-      .catch(() => {
-        if (!cancelled) setStatus("blocked");
+    // The client id comes from the server at runtime, so the whole setup is
+    // one variable rather than a public copy and a private one.
+    (async () => {
+      const res = await fetch("/api/auth/config");
+      const { clientId } = (await res.json()) as { clientId: string | null };
+      if (cancelled) return;
+      if (!clientId) {
+        setStatus("unconfigured");
+        return;
+      }
+
+      await loadScript();
+      if (cancelled || !holder.current || !window.google) return;
+
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: async (res) => {
+          if (res.credential && (await signIn(res.credential))) onDone?.();
+        },
       });
+      window.google.accounts.id.renderButton(holder.current, {
+        theme: "filled_black",
+        size: "large",
+        shape: "pill",
+        text: "signin_with",
+        width: 260,
+      });
+      setStatus("ready");
+    })().catch(() => {
+      if (!cancelled) setStatus("blocked");
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [signIn, onDone, clientId]);
+  }, [signIn, onDone]);
 
   if (status === "unconfigured") {
     return (
       <p className="text-sm leading-relaxed text-[var(--text-faint)]">
         Google sign-in isn&apos;t set up yet. Create an OAuth client ID in Google Cloud Console and set{" "}
-        <code className="rounded bg-[var(--surface-2)] px-1 py-0.5 font-mono text-xs">
-          NEXT_PUBLIC_GOOGLE_CLIENT_ID
-        </code>{" "}
-        and{" "}
         <code className="rounded bg-[var(--surface-2)] px-1 py-0.5 font-mono text-xs">GOOGLE_CLIENT_ID</code>.
       </p>
     );
