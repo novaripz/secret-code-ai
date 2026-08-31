@@ -35,6 +35,7 @@ function imageNote(req: AgentRequest): string {
 function buildChatTurnText(req: AgentRequest): string {
   const parts = [
     req.studentProfile ? `WHAT YOU KNOW ABOUT THE USER:\n${req.studentProfile}` : "",
+    req.assignmentContext ? `THE ASSIGNMENT THEY ARE WORKING ON:\n${req.assignmentContext}` : "",
     imageNote(req),
     `USER:\n${req.prompt}`,
   ].filter(Boolean);
@@ -112,6 +113,7 @@ export class GeminiProvider implements AiProvider {
       explainDepth: req.explainDepth,
       learningMode: req.learningMode,
       simplify: req.simplify,
+      hasAssignmentContext: Boolean(req.assignmentContext),
       replyLanguage: req.replyLanguage,
       aiHomie: req.aiHomie,
       humanize: req.humanize,

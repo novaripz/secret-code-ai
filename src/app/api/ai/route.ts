@@ -25,6 +25,7 @@ interface RequestBody {
   learningMode?: LearningMode;
   simplify?: boolean;
   replyLanguage?: string;
+  assignmentContext?: string;
   humanize?: boolean;
   aiHomie?: boolean;
   chatOnly?: boolean;
@@ -98,6 +99,10 @@ export async function POST(req: NextRequest) {
     simplify: body.simplify === true,
     replyLanguage:
       typeof body.replyLanguage === "string" ? body.replyLanguage.slice(0, 40) : undefined,
+    // Only a class chat sends this. Personal Panda has no assignment context
+    // to send, which is the boundary the product depends on.
+    assignmentContext:
+      typeof body.assignmentContext === "string" ? body.assignmentContext.slice(0, 8000) : undefined,
     aiHomie: body.aiHomie === true,
     chatOnly: body.chatOnly === true,
     projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,

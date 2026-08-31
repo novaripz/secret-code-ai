@@ -32,6 +32,13 @@ export interface AgentRequest {
   simplify?: boolean;
   /** Language Panda should answer in. */
   replyLanguage?: string;
+  /**
+   * The assignment being worked on, and the teacher's rules for it.
+   *
+   * Present only for a class chat. Personal Panda never carries this, which is
+   * what keeps assignment contents out of the general planner.
+   */
+  assignmentContext?: string;
   /** Plain, everyday writing for essays and emails. */
   humanize?: boolean;
   /** When true, answer in a casual, Gen-Z, friend-to-friend voice. */

@@ -9,7 +9,9 @@ import { useProfileStore } from "@/store/useProfileStore";
 import { useDialog } from "@/components/ui/Dialog";
 import { Wordmark } from "@/components/Wordmark";
 import {
+  BookIcon,
   ChatIcon,
+  CheckIcon,
   HammerIcon,
   SearchIcon,
   VideoIcon,
@@ -32,6 +34,8 @@ import {
 // never have to leave for a browser tab that has the rest of the internet in it.
 const NAV = [
   { href: "/", label: "Chat", icon: ChatIcon },
+  { href: "/classes", label: "Classes", icon: BookIcon },
+  { href: "/plan", label: "Plan", icon: CheckIcon },
   { href: "/search", label: "Search", icon: SearchIcon },
   { href: "/watch", label: "Watch", icon: VideoIcon },
   { href: "/build", label: "Build", icon: HammerIcon },

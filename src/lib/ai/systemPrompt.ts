@@ -176,11 +176,30 @@ same explanation further.
 
 Keep it short. A wall of simpler text is still a wall.`;
 
+
+export const NO_ASSIGNMENT_ACCESS = `
+
+WHAT YOU CAN AND CANNOT SEE RIGHT NOW.
+
+This is the general chat. You do NOT have the student's assignment text,
+teacher instructions, or class materials in front of you. You may know that a
+class or an assignment exists, and when it is due, but not what it says.
+
+If they ask what an assignment wants them to do, say so plainly and point them
+at the right place. Something like: "I can't see that assignment from here.
+Open it in your class and ask me there — I'll have it in front of me."
+
+Never guess at what an assignment says. Never reconstruct it from the title. A
+confident wrong answer about their homework is worse than saying you can't see
+it.`;
+
 export interface PromptModes {
   /** How freely answers may be given. Defaults to coaching. */
   learningMode?: LearningMode;
   /** Set when the student pressed "I don't understand". */
   simplify?: boolean;
+  /** True only for a class chat that was actually given the assignment. */
+  hasAssignmentContext?: boolean;
   /** The language Panda should answer in, when it differs from the default. */
   replyLanguage?: string;
   explainMode?: boolean;
@@ -195,6 +214,9 @@ export function buildSystemPrompt(base: string, modes: PromptModes = {}): string
   // The teaching policy comes before the tone modes, so voice never overrides
   // whether an answer may be handed over.
   prompt += TEACHING_POLICY;
+  // Personal Panda is told what it cannot see, so it declines cleanly instead
+  // of inventing an assignment from its title.
+  if (modes.hasAssignmentContext !== true) prompt += NO_ASSIGNMENT_ACCESS;
   prompt += MODE_ADDENDUM[modes.learningMode ?? "coaching"];
   if (modes.simplify) prompt += NOT_UNDERSTOOD;
   if (modes.replyLanguage) {
