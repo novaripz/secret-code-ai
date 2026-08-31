@@ -210,3 +210,46 @@ body {
 :root[data-panda-motion="off"] .panda-roll {
   animation: none;
 }
+
+/* Focus visibility. The default ring disappears against dark surfaces, and a
+   keyboard user who cannot see where they are cannot use the app at all. */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Pointer users do not need the ring; keyboard users do. */
+:focus:not(:focus-visible) { outline: none; }
+
+/* Skip link, for anyone tabbing past the sidebar on every page. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* Honour the OS setting, and the in-app one, everywhere rather than per
+   animation. Motion that cannot be turned off is a barrier, not a flourish. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root[data-reduce-motion="on"] *,
+:root[data-reduce-motion="on"] *::before,
+:root[data-reduce-motion="on"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

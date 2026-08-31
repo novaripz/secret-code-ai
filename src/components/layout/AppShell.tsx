@@ -64,7 +64,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         />
       )}
 
+      <a href="#main" className="skip-link">Skip to content</a>
+
       <aside
+        aria-label="Sidebar"
         className={`fixed inset-y-0 left-0 z-40 w-64 shrink-0 border-r border-[var(--line)] bg-[var(--surface-0)] transition-transform md:static md:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
@@ -94,7 +97,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
+        <main id="main" className="min-h-0 flex-1 overflow-hidden">{children}</main>
       </div>
     </div>
   );

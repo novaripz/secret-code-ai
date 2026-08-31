@@ -253,6 +253,21 @@ function AppearanceSection() {
 
       <div className="flex items-start gap-3 rounded-2xl border border-[var(--line)] p-4">
         <div className="min-w-0 flex-1">
+          <p className="font-medium text-[var(--text)]">Reduce motion</p>
+          <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">
+            Turns off animations across the app. Your device setting is already respected; this
+            turns them off even when it isn&apos;t set.
+          </p>
+        </div>
+        <Toggle
+          on={appearance.reduceMotion}
+          onChange={(on) => setAppearance({ reduceMotion: on })}
+          label="Reduce motion"
+        />
+      </div>
+
+      <div className="flex items-start gap-3 rounded-2xl border border-[var(--line)] p-4">
+        <div className="min-w-0 flex-1">
           <p className="font-medium text-[var(--text)]">Panda movement</p>
           <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">
             The mascot bobs, blinks and twitches its ears. Turn it off to keep it still.

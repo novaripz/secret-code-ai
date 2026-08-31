@@ -40,11 +40,13 @@ const DEFAULT_LANGUAGES: Languages = { interface: DEFAULT_LOCALE, reply: "auto" 
 
 export interface Appearance {
   textSize: TextSize;
+  /** Honours the OS setting by default; this turns it on regardless. */
+  reduceMotion: boolean;
   /** The mascot's idle movement. Off leaves it perfectly still. */
   pandaMotion: boolean;
 }
 
-const DEFAULT_APPEARANCE: Appearance = { textSize: "normal", pandaMotion: true };
+const DEFAULT_APPEARANCE: Appearance = { textSize: "normal", pandaMotion: true, reduceMotion: false };
 
 export interface Birthday {
   /** 1-12 */
@@ -188,6 +190,7 @@ function applyAppearance(a: Appearance) {
   if (typeof document === "undefined") return;
   document.documentElement.dataset.textSize = a.textSize;
   document.documentElement.dataset.pandaMotion = a.pandaMotion ? "on" : "off";
+  document.documentElement.dataset.reduceMotion = a.reduceMotion ? "on" : "off";
 }
 
 function applyTheme(theme: ThemeName) {

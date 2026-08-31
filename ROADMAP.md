@@ -1,77 +1,83 @@
-# Panda — roadmap
+# Panda
 
-The product brief describes a full education platform. This is the honest
-mapping of that brief onto what exists, what is missing, and what order the
-missing parts should be built in.
+A learning tool for students: chat that teaches instead of answering, classes
+and assignments in one place, and a planner that can show its working.
 
-## What is actually built today
+## Setup
 
-- Google sign-in (verified server side), guest mode, per-account data scoping
-- Real token streaming from Gemini, rendered as it arrives
-- Streaming-aware markdown (partial fences and half-typed bold do not flicker)
-- Chat with memory, image attachments, Explain / Humanize / AI Homie modes
-- Search and Watch tabs, Build tab with in-browser projects
-- Profile, appearance settings, dark and light themes, panda mascot
+Copy `.env.example` and fill in what you need. Only `GEMINI_API_KEY` is
+required; every other feature says plainly that it is not configured rather
+than pretending to work.
 
-## The gap
+## What is built
 
-Everything above is a **single-player chat app**. The brief describes a
-**multi-tenant school platform**. The distance between those is not polish, it
-is a missing backend.
+**Chat.** Real token streaming — text renders as the model produces it, and
+nothing that has not arrived exists in the page. Markdown parses while partial,
+so an unclosed code fence or a half-typed `**bold` never flickers. Stop
+generation cancels mid-stream and keeps what arrived.
 
-Three things block almost everything else in the brief:
+**Teaching.** Answers are not handed over on request. A six-rung ladder runs
+from a nudge to the worked answer, and there are four ways to reach the top:
+demonstrated understanding, genuine repeated attempts, an authorised mode, or
+reviewing finished work. Judged from the conversation, never from a hint
+counter.
 
-### 1. A database
+**Language.** Sixteen languages offered, ten with translated interface strings,
+English underneath as a fallback. The device language is suggested and never
+applied on its own. Interface language and reply language are set separately,
+because a student learning English often wants the buttons in Spanish and the
+answers in English.
 
-All data currently lives in the browser (`localStorage` and IndexedDB). That
-makes these impossible, not merely unbuilt:
+**Chat actions.** I don't understand, translate, hint, explain another way,
+check my work. Simplifying eases the wording while holding the concept where it
+was, and changes strategy rather than rewording itself.
 
-- classes, assignments, submissions
-- teachers seeing student work
-- anything shared between two people
-- sync between a phone and a laptop
-- server-enforced permissions
+**Classes and assignments.** Created locally or imported from Canvas. Each
+assignment carries teacher rules — answer policy, translation, simplification —
+which are applied in the UI, not merely described to the model.
 
-No amount of frontend work substitutes for this. Postgres via Supabase or Neon
-is the smallest step that unlocks the rest.
+**The permission boundary.** A class chat receives the assignment text. The
+general chat never does, and is told so, so it declines cleanly instead of
+inventing an assignment from its title.
 
-### 2. Roles
+**Planner.** Arithmetic over real due dates and point values, not generation.
+Overdue first, then soonest, then worth the most, and every line carries the
+reason it sits where it does. Focus mode is a timer and one goal.
 
-There is one kind of user. Teacher and student are different products sharing a
-shell, and every screen in the brief depends on knowing which one is asking.
+**Accounts.** Google sign-in verified server-side, or continue as a guest.
+Signing in namespaces profile, chats, classes and assignments by account, which
+is what makes a shared school laptop safe.
 
-### 3. Server-side permission enforcement
+**Canvas.** Real OAuth2 with a state check, server-side secret, and a token the
+page never sees. Syncing updates what Canvas owns and never touches whether the
+student marked something done. A failed sync changes nothing.
 
-The brief is explicit that personal Panda must not see assignment contents, and
-that hiding things in the client is not sufficient. That check has to live next
-to the data, which means it depends on (1).
+**Accessibility.** Visible focus rings, a skip link, semantic landmarks, and
+motion that respects both the OS setting and an in-app switch.
 
-## Build order
+## What is not built
 
-Each step is usable on its own, and each unlocks the next.
+**A database.** Everything persists to the browser. That means no sync between
+devices, no teacher seeing student work, and no genuinely multi-user anything.
+The data model is already shaped for it — stable ids, foreign keys, an
+`externalId` on the entities an LMS owns — so this is a repository swap, not a
+rewrite. Postgres via Supabase or Neon is the smallest step.
 
-1. **Database + roles.** Users, classes, enrollments, assignments,
-   submissions. Move profile and threads off the browser. Nothing below works
-   without this.
-2. **Classes and assignments.** Teacher creates a class, students join, teacher
-   posts an assignment. The first genuinely multi-user moment.
-3. **Class Panda vs personal Panda.** Two contexts with different data access,
-   enforced server side. This is where the permission boundary becomes real.
-4. **The answer policy.** Progressive hints, understanding checks, teacher
-   overrides. Mostly prompt and state design, but it needs assignments to exist
-   first.
-5. **"I don't understand" and translate.** Chat actions that re-explain rather
-   than restate. Cheap once the chat has assignment context.
-6. **Interface translation.** Every string through a translation layer with a
-   language picker in onboarding. Mechanical but wide.
-7. **Canvas OAuth and sync.** Biggest single integration. Needs the assignment
-   schema from step 1 to import into.
-8. **Planner, focus mode, study mode.** These read the data the earlier steps
-   create. Fun to build, worthless before then.
-9. **Teacher analytics.** Aggregate only. Last because it summarises everything
-   above.
+**Teacher accounts.** There is a `role` field and assignment rules exist, but
+there is no teacher UI and no way for a teacher to reach a student's class.
+Both need the database first.
 
-## Why the name is "Panda"
+**Class analytics.** Aggregating across students requires students to share a
+backend.
 
-School filters block on the letters "ai" in a hostname. The app and the domain
-both avoid them. A product students cannot open is not a product.
+**Notifications.** No scheduler.
+
+## Build order from here
+
+1. Database and roles. Move profile, chats, classes and assignments off the
+   browser. Nothing multi-user works before this.
+2. Teacher UI: create a class, post an assignment, set its rules.
+3. Server-side permission checks against real rows, replacing the client-side
+   boundary.
+4. Class analytics, aggregate only.
+5. Notifications.
