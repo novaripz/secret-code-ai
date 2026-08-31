@@ -106,7 +106,7 @@ body {
   .chunk-in { animation: none; }
 }
 
-/* Pand-AI's mascot. The idle set runs forever but stays slow and small, so it
+/* Panda's mascot. The idle set runs forever but stays slow and small, so it
    reads as the thing being alive rather than as an animation demanding
    attention. */
 @keyframes panda-roll { to { transform: rotate(360deg); } }
@@ -176,7 +176,7 @@ body {
 .depth-range:focus-visible::-moz-range-thumb { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 /* The wordmark. "AI" carries the weight and a soft white glow, so the name
-   reads as Pand-AI rather than a word that happens to end in those letters. */
+   reads as Panda rather than a word that happens to end in those letters. */
 .wordmark {
   font-family: var(--font-wordmark), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   font-weight: 500;

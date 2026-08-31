@@ -41,7 +41,7 @@ const NAV = [
 /** What to call the page currently open, for the header. */
 function here(pathname: string) {
   const match = NAV.find((n) => (n.href === "/" ? pathname === "/" : pathname.startsWith(n.href)));
-  return match?.label ?? "Pand-AI";
+  return match?.label ?? "Panda";
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {

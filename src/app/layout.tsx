@@ -22,7 +22,7 @@ const wordmark = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Pand-AI — chat, build, and ship",
+  title: "Panda — chat, build, and ship",
   description: "Chat with an AI that knows you, drop in files and screenshots, and build real projects in your browser.",
 };
 

@@ -1,7 +1,7 @@
 import { PandaMark } from "./Panda";
 
 /**
- * The name, set as Pand-AI: the "AI" is heavier and carries a soft white
+ * The name, set as Panda: the "AI" is heavier and carries a soft white
  * glow, so the pun reads at a glance instead of looking like a typo.
  */
 export function Wordmark({
@@ -25,7 +25,7 @@ export function Wordmark({
         </span>
       )}
       <span className={`wordmark ${text} leading-none text-[var(--text)]`}>
-        Pand<span className="wordmark-ai">-AI</span>
+        Pand<span className="wordmark-ai">a</span>
       </span>
     </span>
   );

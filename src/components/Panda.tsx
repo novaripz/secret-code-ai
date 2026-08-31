@@ -1,4 +1,4 @@
-// The Pand-AI mascot.
+// The Panda mascot.
 //
 // Three forms, all plain inline SVG so they scale and recolor with no assets:
 //   PandaMark    — a face, front on and still. The logo.

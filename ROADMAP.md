@@ -1,42 +1,77 @@
-# Roadmap
+# Panda — roadmap
 
-Things we've agreed to build, roughly in order. Notes to pick back up from.
+The product brief describes a full education platform. This is the honest
+mapping of that brief onto what exists, what is missing, and what order the
+missing parts should be built in.
 
-## 1. Streaming + real "thinking" UI
+## What is actually built today
 
-Right now a response appears all at once after a wait. Make it live:
+- Google sign-in (verified server side), guest mode, per-account data scoping
+- Real token streaming from Gemini, rendered as it arrives
+- Streaming-aware markdown (partial fences and half-typed bold do not flicker)
+- Chat with memory, image attachments, Explain / Humanize / AI Homie modes
+- Search and Watch tabs, Build tab with in-browser projects
+- Profile, appearance settings, dark and light themes, panda mascot
 
-- Stream tokens from Gemini as they generate, so text types itself out.
-- Show genuine status while work is happening — reading a file, looking at an
-  image, writing a file. These must reflect real work actually in progress.
-  Do NOT animate fake steps or invent stages that aren't happening; a fake
-  progress theater is worse than a plain spinner.
-- Gemini supports streaming (`generateContentStream`) and the API route can
-  forward it as a stream to the client.
+## The gap
 
-## 2. Google Sign-In + accounts
+Everything above is a **single-player chat app**. The brief describes a
+**multi-tenant school platform**. The distance between those is not polish, it
+is a missing backend.
 
-Goal: friends can use it at school, each with their own private data.
+Three things block almost everything else in the brief:
 
-- Google Sign-In itself is free at this scale (Firebase Auth / Google Identity).
-- The real work is moving data off `localStorage` and into a server-side
-  database, so a profile follows the account instead of the browser.
-  Supabase or Firebase; both have usable free tiers.
-- What moves server-side: profile (name, nickname, birthday, likes), mode
-  settings, memory facts, chat threads, projects and their files.
+### 1. A database
 
-### Cost guardrails — decide BEFORE handing this to other people
+All data currently lives in the browser (`localStorage` and IndexedDB). That
+makes these impossible, not merely unbuilt:
 
-Every request runs on the owner's Gemini API key.
+- classes, assignments, submissions
+- teachers seeing student work
+- anything shared between two people
+- sync between a phone and a laptop
+- server-enforced permissions
 
-- Free-tier key: no charges, but hard rate limits. Several simultaneous users
-  will hit them and everyone sees errors.
-- Billing-enabled key: limits lift and every request costs the key owner,
-  including anything anyone spams.
-- Therefore: add per-account usage caps and basic abuse protection as part of
-  this step, not after.
+No amount of frontend work substitutes for this. Postgres via Supabase or Neon
+is the smallest step that unlocks the rest.
 
-## 3. Paid subscription tier
+### 2. Roles
 
-Not designed yet — deferred by request. Revisit once accounts exist, since
-subscriptions need accounts to attach to. Discuss scope before building.
+There is one kind of user. Teacher and student are different products sharing a
+shell, and every screen in the brief depends on knowing which one is asking.
+
+### 3. Server-side permission enforcement
+
+The brief is explicit that personal Panda must not see assignment contents, and
+that hiding things in the client is not sufficient. That check has to live next
+to the data, which means it depends on (1).
+
+## Build order
+
+Each step is usable on its own, and each unlocks the next.
+
+1. **Database + roles.** Users, classes, enrollments, assignments,
+   submissions. Move profile and threads off the browser. Nothing below works
+   without this.
+2. **Classes and assignments.** Teacher creates a class, students join, teacher
+   posts an assignment. The first genuinely multi-user moment.
+3. **Class Panda vs personal Panda.** Two contexts with different data access,
+   enforced server side. This is where the permission boundary becomes real.
+4. **The answer policy.** Progressive hints, understanding checks, teacher
+   overrides. Mostly prompt and state design, but it needs assignments to exist
+   first.
+5. **"I don't understand" and translate.** Chat actions that re-explain rather
+   than restate. Cheap once the chat has assignment context.
+6. **Interface translation.** Every string through a translation layer with a
+   language picker in onboarding. Mechanical but wide.
+7. **Canvas OAuth and sync.** Biggest single integration. Needs the assignment
+   schema from step 1 to import into.
+8. **Planner, focus mode, study mode.** These read the data the earlier steps
+   create. Fun to build, worthless before then.
+9. **Teacher analytics.** Aggregate only. Last because it summarises everything
+   above.
+
+## Why the name is "Panda"
+
+School filters block on the letters "ai" in a hostname. The app and the domain
+both avoid them. A product students cannot open is not a product.

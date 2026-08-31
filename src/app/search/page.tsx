@@ -5,7 +5,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { SearchIcon } from "@/components/icons";
 import type { SearchResult } from "@/app/api/search/route";
 
-// Search that stays inside Pand-AI: results render here and open in a reader
+// Search that stays inside Panda: results render here and open in a reader
 // pane rather than sending the student out to the open web.
 
 export default function SearchPage() {
@@ -59,7 +59,7 @@ export default function SearchPage() {
           </form>
           {results === null && !loading && (
             <p className="mt-3 text-center text-xs text-[var(--text-faint)]">
-              Results open here in Pand-AI.
+              Results open here in Panda.
             </p>
           )}
         </div>
