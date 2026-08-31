@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useProfileStore } from "@/store/useProfileStore";
-import { SparkleIcon } from "@/components/icons";
+import { LanguagePicker } from "./LanguagePicker";
+import { Wordmark } from "@/components/Wordmark";
+import { detectLocale, translate } from "@/lib/i18n";
 
 // First-run setup. We ask for the few things that make everything after this
 // feel personal: what to call them, when their birthday is (year optional),
@@ -28,12 +30,20 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-type Step = 0 | 1 | 2 | 3;
+type Step = 0 | 1 | 2 | 3 | 4;
 
 export function Onboarding() {
   const completeOnboarding = useProfileStore((s) => s.completeOnboarding);
+  const languages = useProfileStore((s) => s.languages);
+  const setLanguages = useProfileStore((s) => s.setLanguages);
 
   const [step, setStep] = useState<Step>(0);
+  // Offered, never applied on its own: a school laptop set to English says
+  // nothing about what the student actually reads.
+  const [detected] = useState(() => detectLocale());
+  const lang = languages.interface;
+  const t = (key: Parameters<typeof translate>[1], vars?: Record<string, string | number>) =>
+    translate(lang, key, vars);
   const [name, setName] = useState("");
   const [nickname, setNickname] = useState("");
   const [month, setMonth] = useState<string>("");
@@ -70,35 +80,43 @@ export function Onboarding() {
     });
   }
 
-  const canContinue = step === 0 ? name.trim().length > 0 : true;
+  const canContinue = step === 1 ? name.trim().length > 0 : true;
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-[var(--bg)] p-4">
       <div className="w-full max-w-md">
-        <div className="mb-8 flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--surface-2)]">
-            <SparkleIcon className="h-4.5 w-4.5 text-[var(--text)]" />
-          </span>
-          <span className="text-sm font-semibold tracking-tight text-[var(--text)]">Set up your space</span>
+        <div className="mb-8">
+          <Wordmark />
         </div>
 
         <div key={step} className="animate-rise">
           {step === 0 && (
-            <Step title="First things first — what's your name?" hint="This is just so the app knows what to call you.">
-              <TextField value={name} onChange={setName} placeholder="Your name" autoFocus onEnter={() => canContinue && setStep(1)} />
+            <Step title={t("onboarding.languageTitle")} hint={t("onboarding.languageHint")}>
+              <LanguagePicker
+                selected={lang}
+                detected={detected}
+                onSelect={(code) => setLanguages({ interface: code })}
+                autoFocus
+              />
             </Step>
           )}
 
           {step === 1 && (
-            <Step
-              title={`Nice to meet you${name.trim() ? `, ${name.trim().split(/\s+/)[0]}` : ""}. Got a nickname?`}
-              hint="What your friends call you. Skip it and we'll use your name."
-            >
-              <TextField value={nickname} onChange={setNickname} placeholder="Nickname (optional)" autoFocus onEnter={() => setStep(2)} />
+            <Step title={t("onboarding.nameTitle")} hint="This is just so the app knows what to call you.">
+              <TextField value={name} onChange={setName} placeholder={t("onboarding.namePlaceholder")} autoFocus onEnter={() => canContinue && setStep(2)} />
             </Step>
           )}
 
           {step === 2 && (
+            <Step
+              title={`Nice to meet you${name.trim() ? `, ${name.trim().split(/\s+/)[0]}` : ""}. Got a nickname?`}
+              hint="What your friends call you. Skip it and we'll use your name."
+            >
+              <TextField value={nickname} onChange={setNickname} placeholder="Nickname (optional)" autoFocus onEnter={() => setStep(3)} />
+            </Step>
+          )}
+
+          {step === 4 && (
             <Step title="When's your birthday?" hint="The year is optional — leave it blank if you'd rather not say.">
               <div className="flex gap-2">
                 <select
@@ -199,11 +217,11 @@ export function Onboarding() {
               </button>
             )}
             <button
-              onClick={() => (step === 3 ? finish() : setStep((s) => (s + 1) as Step))}
+              onClick={() => (step === 4 ? finish() : setStep((s) => (s + 1) as Step))}
               disabled={!canContinue}
               className="rounded-full bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-30"
             >
-              {step === 3 ? `Let's go${firstName ? `, ${firstName}` : ""}` : "Continue"}
+              {step === 4 ? `Let's go${firstName ? `, ${firstName}` : ""}` : t("action.continue")}
             </button>
           </div>
         </div>

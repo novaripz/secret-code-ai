@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAiProvider } from "@/lib/ai";
 import { validateOperations } from "@/lib/ai/validateOperations";
 import type { AiMessage, ImageAttachment } from "@/lib/ai/provider";
-import type { ExplainDepth } from "@/lib/ai/systemPrompt";
+import type { ExplainDepth, LearningMode } from "@/lib/ai/systemPrompt";
+
+const LEARNING_MODES = new Set<LearningMode>(["coaching", "study", "review", "answers"]);
 
 const EXPLAIN_DEPTHS = new Set<ExplainDepth>(["minimal", "fair", "normal", "extra", "overload"]);
 
@@ -20,6 +22,9 @@ interface RequestBody {
   history?: AiMessage[];
   explainMode?: boolean;
   explainDepth?: ExplainDepth;
+  learningMode?: LearningMode;
+  simplify?: boolean;
+  replyLanguage?: string;
   humanize?: boolean;
   aiHomie?: boolean;
   chatOnly?: boolean;
@@ -86,6 +91,13 @@ export async function POST(req: NextRequest) {
     explainDepth:
       body.explainDepth && EXPLAIN_DEPTHS.has(body.explainDepth) ? body.explainDepth : "normal",
     humanize: body.humanize === true,
+    // Coaching is the floor. An unrecognised mode from the client can only
+    // ever fall back to the most restrictive one, never to "answers".
+    learningMode:
+      body.learningMode && LEARNING_MODES.has(body.learningMode) ? body.learningMode : "coaching",
+    simplify: body.simplify === true,
+    replyLanguage:
+      typeof body.replyLanguage === "string" ? body.replyLanguage.slice(0, 40) : undefined,
     aiHomie: body.aiHomie === true,
     chatOnly: body.chatOnly === true,
     projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,

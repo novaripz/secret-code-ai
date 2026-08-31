@@ -8,6 +8,9 @@ import { Composer } from "./Composer";
 import { MessageText } from "./MessageText";
 import { ModePills } from "./ModePills";
 import { PandaSitting } from "@/components/Panda";
+import { MessageActions, actionPrompt, type MessageAction } from "./MessageActions";
+import { useI18n } from "@/lib/i18n";
+import { findLocale } from "@/lib/i18n/locales";
 import { FileIcon } from "@/components/icons";
 
 const STARTERS = [
@@ -36,6 +39,11 @@ export function AssistantChat() {
   } = useAssistantStore();
 
   const modes = useProfileStore((s) => s.modes);
+  const languages = useProfileStore((s) => s.languages);
+  const { t } = useI18n();
+  // "auto" means answer in whatever the interface is set to.
+  const replyLocale = languages.reply === "auto" ? languages.interface : languages.reply;
+  const replyLanguage = findLocale(replyLocale)?.englishName ?? "English";
   const memoryBlock = useProfileStore((s) => s.memoryBlock);
   const displayName = useProfileStore((s) => s.displayName);
   const profileHydrated = useProfileStore((s) => s.hydrated);
@@ -44,6 +52,8 @@ export function AssistantChat() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const stickToBottom = useRef(true);
+  // Held so the student can stop a reply that is going the wrong way.
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (!hydrated) void hydrate();
@@ -69,7 +79,12 @@ export function AssistantChat() {
     el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
   }, [streamedLength, messages.length, loading]);
 
-  async function send(promptOverride?: string) {
+  function stop() {
+    abortRef.current?.abort();
+    abortRef.current = null;
+  }
+
+  async function send(promptOverride?: string, opts?: { simplify?: boolean }) {
     const typed = (promptOverride ?? input).trim();
     const outgoing = attachments;
     if ((!typed && outgoing.length === 0) || loading) return;
@@ -88,8 +103,12 @@ export function AssistantChat() {
         .slice(-20, -1)
         .map((m) => ({ role: m.role, content: m.content }));
 
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       const res = await fetch("/api/ai", {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: prompt || "(the user sent attachments with no message)",
@@ -100,6 +119,9 @@ export function AssistantChat() {
           history,
           explainMode: modes.explainMode,
           explainDepth: modes.explainDepth,
+          learningMode: "coaching",
+          simplify: opts?.simplify === true,
+          replyLanguage,
           aiHomie: modes.aiHomie,
           humanize: modes.humanize,
           studentProfile: memoryBlock(),
@@ -160,14 +182,21 @@ export function AssistantChat() {
         finishAssistantMessage(id, received ? undefined : "The reply came back empty.");
       }
     } catch (err) {
-      addErrorMessage(err instanceof Error ? err.message : "Network error — check your connection.");
+      // Stopping on purpose is not an error; the partial reply stays as it is.
+      if (!(err instanceof DOMException && err.name === "AbortError")) {
+        addErrorMessage(err instanceof Error ? err.message : t("error.chatFailed"));
+      }
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   }
 
   const name = profileHydrated ? displayName() : "";
   const empty = messages.length === 0;
+  // Actions belong on the newest reply only; older ones are history.
+  const lastAssistantId = [...messages].reverse().find((m) => m.role === "assistant" && !m.error)?.id;
+  const streaming = messages.some((m) => m.streaming);
 
   return (
     <div className="flex h-full flex-col">
@@ -258,17 +287,40 @@ export function AssistantChat() {
                         }
                       >
                         <MessageText content={m.content} streaming={m.streaming} />
+                        {m.role === "assistant" && !m.streaming && m.id === lastAssistantId && (
+                          <MessageActions
+                            replyLocale={replyLocale}
+                            showTranslate={replyLocale !== "en"}
+                            showHint={messages.length > 1}
+                            disabled={loading}
+                            onAction={(action: MessageAction) =>
+                              void send(actionPrompt(action, findLocale(replyLocale)?.englishName ?? "English"), {
+                                simplify: action === "simplify" || action === "different",
+                              })
+                            }
+                          />
+                        )}
                       </div>
                     ) : null}
                   </div>
                 </div>
               ))}
 
-              {loading && (
-                <div className="flex items-center gap-1.5 text-[var(--text-faint)]">
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-current" />
+              {(loading || streaming) && (
+                <div className="flex items-center gap-3">
+                  {loading && (
+                    <div className="flex items-center gap-1.5 text-[var(--text-faint)]">
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-current" />
+                    </div>
+                  )}
+                  <button
+                    onClick={stop}
+                    className="rounded-full border border-[var(--line-strong)] px-3 py-1.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                  >
+                    {t("chat.stop")}
+                  </button>
                 </div>
               )}
             </div>

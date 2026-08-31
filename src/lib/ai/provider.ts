@@ -1,5 +1,5 @@
 import type { AgentResponse } from "@/types";
-import type { ExplainDepth } from "./systemPrompt";
+import type { ExplainDepth, LearningMode } from "./systemPrompt";
 
 /** A single message in the conversation sent to the model. */
 export interface AiMessage {
@@ -26,6 +26,12 @@ export interface AgentRequest {
   explainMode?: boolean;
   /** How much explaining to do when explainMode is on. */
   explainDepth?: ExplainDepth;
+  /** How freely answers may be handed over. */
+  learningMode?: LearningMode;
+  /** The student pressed "I don't understand": re-explain, don't restate. */
+  simplify?: boolean;
+  /** Language Panda should answer in. */
+  replyLanguage?: string;
   /** Plain, everyday writing for essays and emails. */
   humanize?: boolean;
   /** When true, answer in a casual, Gen-Z, friend-to-friend voice. */

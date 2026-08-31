@@ -110,6 +110,9 @@ export class GeminiProvider implements AiProvider {
     const systemInstruction = buildSystemPrompt(req.chatOnly ? CHAT_SYSTEM_PROMPT : SYSTEM_PROMPT, {
       explainMode: req.explainMode,
       explainDepth: req.explainDepth,
+      learningMode: req.learningMode,
+      simplify: req.simplify,
+      replyLanguage: req.replyLanguage,
       aiHomie: req.aiHomie,
       humanize: req.humanize,
     });

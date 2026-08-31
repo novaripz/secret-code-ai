@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { accountScope } from "./useAuthStore";
 import type { ExplainDepth } from "@/lib/ai/systemPrompt";
+import { DEFAULT_LOCALE } from "@/lib/i18n/locales";
 
 // The user's identity, preferences, modes, and long-term memory. This is the
 // one piece of state that follows them everywhere — chat, the build studio,
@@ -23,6 +24,19 @@ export type ThemeName = "dark" | "light" | "system";
 
 /** Body text scale for the chat, for anyone who wants it bigger or tighter. */
 export type TextSize = "small" | "normal" | "large";
+
+export interface Languages {
+  /** The language the interface is drawn in. */
+  interface: string;
+  /**
+   * The language Panda answers in. "auto" follows the interface, which is what
+   * most people want; setting it separately is for someone who wants the app in
+   * Spanish but answers in English, or the reverse while learning.
+   */
+  reply: string | "auto";
+}
+
+const DEFAULT_LANGUAGES: Languages = { interface: DEFAULT_LOCALE, reply: "auto" };
 
 export interface Appearance {
   textSize: TextSize;
@@ -78,11 +92,13 @@ export interface ProfileState {
   onboarded: boolean;
   theme: ThemeName;
   appearance: Appearance;
+  languages: Languages;
   profile: Profile;
   modes: Modes;
   memory: MemoryFact[];
 
   hydrate: () => void;
+  setLanguages: (patch: Partial<Languages>) => void;
   setTheme: (theme: ThemeName) => void;
   setAppearance: (patch: Partial<Appearance>) => void;
   toggleTheme: () => void;
@@ -125,6 +141,7 @@ interface Persisted {
   onboarded: boolean;
   theme: ThemeName;
   appearance: Appearance;
+  languages: Languages;
   profile: Profile;
   modes: Modes;
   memory: MemoryFact[];
@@ -148,6 +165,7 @@ function writePersisted(state: ProfileState) {
     onboarded: state.onboarded,
     theme: state.theme,
     appearance: state.appearance,
+    languages: state.languages,
     profile: state.profile,
     modes: state.modes,
     memory: state.memory,
@@ -193,6 +211,7 @@ export const useProfileStore = create<ProfileState>((set, get) => {
     onboarded: false,
     theme: "dark",
     appearance: DEFAULT_APPEARANCE,
+    languages: DEFAULT_LANGUAGES,
     profile: EMPTY_PROFILE,
     modes: DEFAULT_MODES,
     memory: [],
@@ -210,6 +229,7 @@ export const useProfileStore = create<ProfileState>((set, get) => {
         onboarded: saved.onboarded === true,
         theme,
         appearance,
+        languages: { ...DEFAULT_LANGUAGES, ...(saved.languages ?? {}) },
         profile: { ...EMPTY_PROFILE, ...(saved.profile ?? {}), birthday: { ...EMPTY_PROFILE.birthday, ...(saved.profile?.birthday ?? {}) } },
         modes: { ...DEFAULT_MODES, ...(saved.modes ?? {}) },
         memory: Array.isArray(saved.memory) ? saved.memory : [],
@@ -222,6 +242,8 @@ export const useProfileStore = create<ProfileState>((set, get) => {
     },
 
     toggleTheme: () => get().setTheme(resolveTheme(get().theme) === "dark" ? "light" : "dark"),
+
+    setLanguages: (patch) => commit({ languages: { ...get().languages, ...patch } }),
 
     setAppearance: (patch) => {
       const appearance = { ...get().appearance, ...patch };
