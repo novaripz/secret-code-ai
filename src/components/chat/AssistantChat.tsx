@@ -10,6 +10,7 @@ import { ModePills } from "./ModePills";
 import { PandaSitting } from "@/components/Panda";
 import { MessageActions, actionPrompt, type MessageAction } from "./MessageActions";
 import { useI18n } from "@/lib/i18n";
+import { Priorities } from "@/components/home/Priorities";
 import { findLocale } from "@/lib/i18n/locales";
 import { FileIcon } from "@/components/icons";
 
@@ -20,9 +21,6 @@ const STARTERS = [
   "Check my work — I'll paste it in",
 ];
 
-function greeting(name: string) {
-  return name ? `What's up, ${name}` : "What's up";
-}
 
 export function AssistantChat() {
   const {
@@ -208,7 +206,7 @@ export function AssistantChat() {
               <PandaSitting className="h-[190px] w-[152px]" />
             </div>
             <h1 className="mb-8 text-center text-3xl font-semibold tracking-tight text-[var(--text)] sm:text-4xl">
-              {greeting(name)}
+              {name ? t("chat.greeting", { name }) : t("chat.greetingNoName")}
             </h1>
 
             <Composer
@@ -219,9 +217,11 @@ export function AssistantChat() {
               onAttachmentsChange={setAttachments}
               onSend={() => void send()}
               loading={loading}
-              placeholder="Ask anything, or drop in a file or screenshot"
+              placeholder={t("chat.placeholder")}
               footer={<ModePills />}
             />
+
+            <Priorities />
 
             <div className="mt-8 flex flex-wrap justify-center gap-2">
               {STARTERS.map((s) => (

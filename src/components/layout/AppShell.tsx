@@ -8,6 +8,7 @@ import { useAssistantStore } from "@/store/useAssistantStore";
 import { useProfileStore } from "@/store/useProfileStore";
 import { useDialog } from "@/components/ui/Dialog";
 import { Wordmark } from "@/components/Wordmark";
+import { ReportDialog } from "@/components/ReportDialog";
 import {
   BookIcon,
   ChatIcon,
@@ -118,6 +119,7 @@ function ThemeToggle() {
 
 function Sidebar({ onClose }: { onClose: () => void }) {
   const pathname = usePathname();
+  const [reporting, setReporting] = useState(false);
   const dialog = useDialog();
   const { threads, activeThread, hydrated, hydrate, newThread, openThread, deleteThread, renameThread } =
     useAssistantStore();
@@ -245,6 +247,14 @@ function Sidebar({ onClose }: { onClose: () => void }) {
           </>
         )}
       </div>
+
+      <button
+        onClick={() => setReporting(true)}
+        className="mx-2 rounded-lg px-2.5 py-1.5 text-left text-[11px] text-[var(--text-faint)] transition-colors hover:text-[var(--text-dim)]"
+      >
+        Report a problem
+      </button>
+      {reporting && <ReportDialog onClose={() => setReporting(false)} />}
 
       <Link
         href="/settings"

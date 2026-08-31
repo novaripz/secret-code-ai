@@ -4,11 +4,14 @@ import { useState } from "react";
 import { useProfileStore } from "@/store/useProfileStore";
 import { AvatarPicker } from "./AvatarPicker";
 import { AccountSection } from "./AccountSection";
+import { LanguageSection } from "./LanguageSection";
+import { CanvasSection } from "./CanvasSection";
 import { useDialog } from "@/components/ui/Dialog";
 import { BrainIcon, MoonIcon, SparkleIcon, SunIcon, UserIcon, XIcon } from "@/components/icons";
 
 const SECTIONS = [
   { key: "profile", label: "Profile", icon: UserIcon },
+  { key: "language", label: "Language", icon: SparkleIcon },
   { key: "appearance", label: "Appearance", icon: MoonIcon },
   { key: "memory", label: "Memory", icon: BrainIcon },
 ] as const;
@@ -50,6 +53,7 @@ export function SettingsView() {
 
         <div key={section} className="animate-rise py-6">
           {section === "profile" && <ProfileSection />}
+          {section === "language" && <LanguageSection />}
           {section === "appearance" && <AppearanceSection />}
           {section === "memory" && <MemorySection />}
         </div>
@@ -73,6 +77,7 @@ function ProfileSection() {
   return (
     <div className="space-y-6">
       <AccountSection />
+      <CanvasSection />
       <AvatarPicker />
 
       <Field label="Name" hint="What the AI calls you when it's being formal.">
