@@ -13,7 +13,10 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const url = process.env.SUPABASE_URL;
-  const anonKey = process.env.SUPABASE_ANON_KEY;
+  // Supabase renamed the anon key to the "publishable key" and the dashboard
+  // now shows only the new name, so accept either rather than making anyone
+  // work out that the two are the same string.
+  const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.SUPABASE_PUBLISHABLE_KEY;
 
   return NextResponse.json(
     {
