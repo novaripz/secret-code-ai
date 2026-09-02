@@ -23,7 +23,7 @@ const wordmark = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Panda — chat, build, and ship",
-  description: "Chat with an AI that knows you, drop in files and screenshots, and build real projects in your browser.",
+  description: "Chat with Panda, who knows you, drop in files and screenshots, and build real projects in your browser.",
 };
 
 // Applies the saved theme before first paint so a light-mode user never sees a

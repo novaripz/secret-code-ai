@@ -80,7 +80,7 @@ function ProfileSection() {
       <CanvasSection />
       <AvatarPicker />
 
-      <Field label="Name" hint="What the AI calls you when it's being formal.">
+      <Field label="Name" hint="What Panda calls you when it's being formal.">
         <Input value={profile.name} onChange={(v) => updateProfile({ name: v })} placeholder="Your name" />
       </Field>
 
@@ -93,7 +93,7 @@ function ProfileSection() {
         hint={
           age !== null
             ? `We work out your age from this — you're ${age}. Clear the year to keep it private.`
-            : "The year is optional. Add it and the AI knows your age; leave it blank and it won't."
+            : "The year is optional. Add it and Panda knows your age; leave it blank and it won't."
         }
       >
         <div className="flex gap-2">
@@ -126,7 +126,7 @@ function ProfileSection() {
         </div>
       </Field>
 
-      <Field label="Stuff you're into" hint="The AI uses these to make examples sound like you.">
+      <Field label="Stuff you're into" hint="Panda uses these to make examples sound like you.">
         <div className="flex flex-wrap gap-2">
           {profile.likes.map((like) => (
             <span
@@ -169,7 +169,7 @@ function ProfileSection() {
         </div>
       </Field>
 
-      <Field label="Anything else" hint="Free-form. Whatever you want the AI to always keep in mind.">
+      <Field label="Anything else" hint="Free-form. Whatever you want Panda to always keep in mind.">
         <textarea
           value={profile.aboutMe}
           onChange={(e) => updateProfile({ aboutMe: e.target.value })}
@@ -306,7 +306,7 @@ function MemorySection() {
     <div className="space-y-6">
       <div>
         <p className="text-sm leading-relaxed text-[var(--text-dim)]">
-          Things the AI keeps in mind no matter which chat or project you&apos;re in. Add anything you find
+          Things Panda keeps in mind no matter which chat or project you&apos;re in. Add anything you find
           yourself repeating.
         </p>
         <div className="mt-3 flex gap-2">

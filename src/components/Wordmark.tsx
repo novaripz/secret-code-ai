@@ -1,8 +1,8 @@
 import { PandaMark } from "./Panda";
 
 /**
- * The name, set as Panda: the "AI" is heavier and carries a soft white
- * glow, so the pun reads at a glance instead of looking like a typo.
+ * The name. The last letter is heavier and carries a soft white glow, which
+ * gives the wordmark a focal point without a second colour.
  */
 export function Wordmark({
   className = "",
@@ -25,7 +25,7 @@ export function Wordmark({
         </span>
       )}
       <span className={`wordmark ${text} leading-none text-[var(--text)]`}>
-        Pand<span className="wordmark-ai">a</span>
+        Pand<span className="wordmark-accent">a</span>
       </span>
     </span>
   );

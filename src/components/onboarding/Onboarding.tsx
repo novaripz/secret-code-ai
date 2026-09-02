@@ -150,7 +150,7 @@ export function Onboarding() {
           )}
 
           {step === 3 && (
-            <Step title="What are you into?" hint="Pick whatever fits. The AI uses this to make examples that actually sound like you.">
+            <Step title="What are you into?" hint="Pick whatever fits. Panda uses this to make examples that actually sound like you.">
               <div className="flex flex-wrap gap-2">
                 {[...LIKE_SUGGESTIONS, ...likes.filter((l) => !LIKE_SUGGESTIONS.includes(l))].map((like) => {
                   const on = likes.includes(like);
@@ -190,7 +190,7 @@ export function Onboarding() {
                 value={aboutMe}
                 onChange={(e) => setAboutMe(e.target.value)}
                 rows={3}
-                placeholder="Anything else the AI should always know about you? (optional)"
+                placeholder="Anything else Panda should always know about you? (optional)"
                 className="mt-3 w-full resize-none rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-2.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--focus)]"
               />
             </Step>

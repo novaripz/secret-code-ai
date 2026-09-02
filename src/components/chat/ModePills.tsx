@@ -28,7 +28,7 @@ const MODES = [
   },
   {
     key: "aiHomie",
-    label: "AI Homie",
+    label: "Homie",
     title: "Talks to you like a friend, not an assistant",
   },
 ] as const;

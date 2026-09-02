@@ -89,6 +89,6 @@ function fallbackDocument(): string {
 </style></head>
 <body><div>
   <p style="font-size:14px;">No <code>index.html</code> found yet.</p>
-  <p style="font-size:12px;opacity:.7;">Create one, or ask the AI to build a web page, to see a live preview here.</p>
+  <p style="font-size:12px;opacity:.7;">Create one, or ask Panda to build a web page, to see a live preview here.</p>
 </div></body></html>`;
 }
