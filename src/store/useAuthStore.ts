@@ -76,6 +76,35 @@ export function accountScope(): string {
   return account ? `:${account.id}` : "";
 }
 
+/**
+ * A failed Google sign-in comes back as a redirect carrying the reason in the
+ * URL rather than as a thrown error, so without this the student lands on the
+ * sign-in screen again with no explanation at all. Reads both shapes Supabase
+ * uses — query string and fragment — and tidies the address bar afterwards.
+ */
+let readOauthError = false;
+let oauthErrorValue: string | null = null;
+
+function oauthError(): string | null {
+  if (typeof window === "undefined") return null;
+
+  // Reading it clears it from the address bar, so a second call — React runs
+  // effects twice in development — would find nothing and wipe the message
+  // that the first call found. Answer from the first read instead.
+  if (readOauthError) return oauthErrorValue;
+  readOauthError = true;
+
+  const query = new URLSearchParams(window.location.search);
+  const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const description = query.get("error_description") ?? fragment.get("error_description");
+  const code = query.get("error") ?? fragment.get("error");
+  if (!description && !code) return null;
+
+  window.history.replaceState({}, "", window.location.pathname);
+  oauthErrorValue = description ?? "That sign-in didn't complete.";
+  return oauthErrorValue;
+}
+
 /** A Supabase user, flattened into the shape the rest of the app already uses. */
 function toAccount(user: User): Account {
   const meta = user.user_metadata ?? {};
@@ -115,7 +144,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Show whatever this browser already had straight away, so a signed-in
     // student never sees the sign-in screen flash while we check with Supabase.
     const cached = read();
-    set({ account: cached, hydrated: true });
+    set({ account: cached, hydrated: true, error: oauthError() });
 
     void (async () => {
       const supabase = await getSupabase();
