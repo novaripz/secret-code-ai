@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
+import type { Account } from "@/lib/auth/types";
 
 // Verifies a Google sign-in.
 //
@@ -13,13 +14,6 @@ import { OAuth2Client } from "google-auth-library";
 // GOOGLE_CLIENT_ID. The browser gets that id from /api/auth/config at runtime.
 
 export const runtime = "nodejs";
-
-export interface Account {
-  id: string;
-  name: string;
-  email: string;
-  picture?: string;
-}
 
 export async function POST(req: NextRequest) {
   const clientId = process.env.GOOGLE_CLIENT_ID;

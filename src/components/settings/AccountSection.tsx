@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { GoogleSignIn } from "@/components/auth/GoogleSignIn";
+import { SignInPanel } from "@/components/auth/SignInPanel";
 
 // Sign in, sign out, and an honest note about what an account currently buys
 // you: separate data on a shared device, not sync between devices.
@@ -47,12 +47,12 @@ export function AccountSection() {
 
   return (
     <div className="rounded-2xl border border-[var(--line)] p-4">
-      <p className="font-medium text-[var(--text)]">Sign in with Google</p>
+      <p className="font-medium text-[var(--text)]">Sign in</p>
       <p className="mt-1 mb-4 text-sm leading-relaxed text-[var(--text-faint)]">
         Keeps your profile, chats and memory separate from anyone else using this browser. It does not sync
         between devices yet, so your history stays on whichever computer you made it on.
       </p>
-      <GoogleSignIn />
+      <SignInPanel />
     </div>
   );
 }

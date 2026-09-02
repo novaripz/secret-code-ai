@@ -44,9 +44,14 @@ inventing an assignment from its title.
 Overdue first, then soonest, then worth the most, and every line carries the
 reason it sits where it does. Focus mode is a timer and one goal.
 
-**Accounts.** Google sign-in verified server-side, or continue as a guest.
-Signing in namespaces profile, chats, classes and assignments by account, which
-is what makes a shared school laptop safe.
+**Accounts.** Supabase email sign-in, or continue as a guest. Email leads
+deliberately: the browser only ever talks to your own Supabase subdomain, so it
+works on a school network that blocks accounts.google.com. Google is offered
+underneath and labelled honestly, since signing in with Google means a trip to
+Google's domain whichever way it is wired. Google Identity Services remains as
+a fallback for deployments with no Supabase project. Signing in namespaces
+profile, chats, classes and assignments by account, which is what makes a
+shared school laptop safe.
 
 **Canvas.** Real OAuth2 with a state check, server-side secret, and a token the
 page never sees. Syncing updates what Canvas owns and never touches whether the
@@ -59,9 +64,10 @@ motion that respects both the OS setting and an in-app switch.
 
 **A database.** Everything persists to the browser. That means no sync between
 devices, no teacher seeing student work, and no genuinely multi-user anything.
-The data model is already shaped for it — stable ids, foreign keys, an
-`externalId` on the entities an LMS owns — so this is a repository swap, not a
-rewrite. Postgres via Supabase or Neon is the smallest step.
+Supabase is now connected for sign-in, so the project and its Postgres already
+exist — what is left is moving the stores onto tables. The data model is already
+shaped for it: stable ids, foreign keys, and an `externalId` on the entities an
+LMS owns, so this is a repository swap rather than a rewrite.
 
 **Teacher accounts.** There is a `role` field and assignment rules exist, but
 there is no teacher UI and no way for a teacher to reach a student's class.
@@ -75,7 +81,8 @@ backend.
 ## Build order from here
 
 1. Database and roles. Move profile, chats, classes and assignments off the
-   browser. Nothing multi-user works before this.
+   browser and into the Supabase project sign-in already uses, behind row-level
+   security keyed on the signed-in user. Nothing multi-user works before this.
 2. Teacher UI: create a class, post an assignment, set its rules.
 3. Server-side permission checks against real rows, replacing the client-side
    boundary.

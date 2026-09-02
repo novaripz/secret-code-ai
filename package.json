@@ -12,6 +12,7 @@
     "@google/genai": "^2.19.0",
     "@google/generative-ai": "^0.24.1",
     "@monaco-editor/react": "^4.7.0",
+    "@supabase/supabase-js": "^2.112.4",
     "firebase": "^12.18.0",
     "firebase-admin": "^14.3.0",
     "google-auth-library": "^11.0.2",

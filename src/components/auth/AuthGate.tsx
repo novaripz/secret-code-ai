@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { GoogleSignIn } from "./GoogleSignIn";
+import { SignInPanel } from "./SignInPanel";
 import { Wordmark } from "@/components/Wordmark";
 
-// The first screen anyone sees: sign in with Google, or continue as a guest.
-// Guests aren't blocked — this just offers the choice up front instead of
-// burying sign-in in Settings.
+// The first screen anyone sees: sign in, or continue as a guest. Guests aren't
+// blocked — this just offers the choice up front instead of burying sign-in in
+// Settings.
 
 const GUEST_KEY = "sca:guest:v1";
 
@@ -30,13 +30,13 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       <div className="flex h-screen flex-col items-center justify-center gap-8 bg-[var(--bg)] px-4">
         <Wordmark size="lg" />
 
-        <div className="w-full max-w-xs animate-rise text-center">
+        <div className="w-full max-w-[19rem] animate-rise text-center">
           <p className="mb-6 text-sm leading-relaxed text-[var(--text-faint)]">
             Sign in to keep your chats separate from anyone else using this device.
           </p>
 
           <div className="flex flex-col items-center gap-3">
-            <GoogleSignIn />
+            <SignInPanel />
 
             <button
               onClick={() => {

@@ -1,18 +1,27 @@
 "use client";
 
 import { create } from "zustand";
-import type { Account } from "@/app/api/auth/google/route";
+import type { User } from "@supabase/supabase-js";
+import { getSupabase } from "@/lib/supabase/browser";
+import type { Account } from "@/lib/auth/types";
 
 // Who is signed in.
 //
-// Signing in does two things today: it gives the app a name and picture, and
-// it namespaces everything stored on this device by account id. That last part
-// is what makes a shared laptop safe — two friends on the same browser get
+// Sign-in does two things today: it gives the app a name and picture, and it
+// namespaces everything stored on this device by account id. That last part is
+// what makes a shared laptop safe — two friends in the same browser get
 // separate profiles, chats and memory instead of walking into each other's.
 //
-// What it does NOT do yet is sync between devices. That needs the data to live
-// on a server rather than in the browser, which is a separate piece of work.
-// Signing in on your phone gives you your name, not your chat history.
+// There are two ways in, and the order matters. Supabase is first because it
+// works on a filtered school network: the browser only ever talks to your own
+// Supabase subdomain, so an email and password get through where Google's
+// script does not. Google Identity Services stays as a fallback for
+// deployments that never set Supabase up, and it needs accounts.google.com to
+// be reachable.
+//
+// What none of this does yet is sync between devices. The data still lives in
+// this browser, so signing in on your phone gives you your name, not your chat
+// history. Supabase being here is the first half of fixing that.
 
 const KEY = "sca:account:v1";
 
@@ -21,8 +30,14 @@ interface AuthState {
   hydrated: boolean;
   error: string | null;
   busy: boolean;
+  /** Whether Supabase is configured, so the UI knows which form to offer. */
+  supabaseReady: boolean;
 
   hydrate: () => void;
+  signInWithPassword: (email: string, password: string) => Promise<boolean>;
+  signUpWithPassword: (email: string, password: string, name: string) => Promise<string | null>;
+  signInWithGoogle: () => Promise<void>;
+  /** Google Identity Services fallback: a verified ID token from the button. */
   signIn: (credential: string) => Promise<boolean>;
   signOut: () => void;
   clearError: () => void;
@@ -61,13 +76,147 @@ export function accountScope(): string {
   return account ? `:${account.id}` : "";
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+/** A Supabase user, flattened into the shape the rest of the app already uses. */
+function toAccount(user: User): Account {
+  const meta = user.user_metadata ?? {};
+  const name =
+    (typeof meta.full_name === "string" && meta.full_name) ||
+    (typeof meta.name === "string" && meta.name) ||
+    "";
+  const picture =
+    (typeof meta.avatar_url === "string" && meta.avatar_url) ||
+    (typeof meta.picture === "string" && meta.picture) ||
+    undefined;
+
+  return { id: user.id, name, email: user.email ?? "", picture };
+}
+
+/**
+ * Every store picks its storage key once, at module load, so swapping accounts
+ * mid-session would leave half the app pointed at the previous scope. Reloading
+ * is the honest fix — but only when the scope actually changed, or a session
+ * restored on page load would reload forever.
+ */
+function adopt(account: Account | null) {
+  const before = read()?.id ?? null;
+  const after = account?.id ?? null;
+  write(account);
+  if (before !== after) window.location.reload();
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
   account: null,
   hydrated: false,
   error: null,
   busy: false,
+  supabaseReady: false,
 
-  hydrate: () => set({ account: read(), hydrated: true }),
+  hydrate: () => {
+    // Show whatever this browser already had straight away, so a signed-in
+    // student never sees the sign-in screen flash while we check with Supabase.
+    const cached = read();
+    set({ account: cached, hydrated: true });
+
+    void (async () => {
+      const supabase = await getSupabase();
+      if (!supabase) return;
+      set({ supabaseReady: true });
+
+      // getUser() asks Supabase rather than trusting the stored JWT, so an
+      // expired or revoked session is caught here instead of being believed.
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error || !data.user) {
+        // Only clear an account Supabase is responsible for. A Google Identity
+        // sign-in from before Supabase existed isn't its to invalidate, and a
+        // network blip shouldn't sign anyone out either.
+        const { data: local } = await supabase.auth.getSession();
+        if (local.session === null && cached && cached.id.includes("-")) {
+          // Supabase ids are UUIDs; Google's are numeric strings.
+          adopt(null);
+        }
+        return;
+      }
+
+      const account = toAccount(data.user);
+      set({ account });
+      adopt(account);
+    })();
+  },
+
+  signInWithPassword: async (email, password) => {
+    set({ busy: true, error: null });
+    const supabase = await getSupabase();
+    if (!supabase) {
+      set({ error: "Sign-in isn't set up yet.", busy: false });
+      return false;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+
+    if (error || !data.user) {
+      set({ error: error?.message ?? "That email and password didn't match.", busy: false });
+      return false;
+    }
+
+    const account = toAccount(data.user);
+    set({ account, busy: false });
+    adopt(account);
+    return true;
+  },
+
+  signUpWithPassword: async (email, password, name) => {
+    set({ busy: true, error: null });
+    const supabase = await getSupabase();
+    if (!supabase) {
+      set({ error: "Sign-in isn't set up yet.", busy: false });
+      return null;
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: { data: { full_name: name.trim() } },
+    });
+
+    if (error) {
+      set({ error: error.message, busy: false });
+      return null;
+    }
+
+    // With email confirmation switched on, Supabase creates the user but hands
+    // back no session until they click the link. Saying so is better than
+    // dropping them on a screen that looks like nothing happened.
+    if (!data.session || !data.user) {
+      set({ busy: false });
+      return "Check your email for a confirmation link, then sign in.";
+    }
+
+    const account = toAccount(data.user);
+    set({ account, busy: false });
+    adopt(account);
+    return null;
+  },
+
+  signInWithGoogle: async () => {
+    set({ busy: true, error: null });
+    const supabase = await getSupabase();
+    if (!supabase) {
+      set({ error: "Sign-in isn't set up yet.", busy: false });
+      return;
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+
+    if (error) set({ error: error.message, busy: false });
+    // On success the browser is already navigating away.
+  },
 
   signIn: async (credential) => {
     set({ busy: true, error: null });
@@ -84,12 +233,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         return false;
       }
 
-      write(data.account);
       set({ account: data.account, busy: false });
-      // Every store picks its storage key once, at module load. Reloading is
-      // the honest way to swap the whole app onto the new account's data
-      // rather than leaving half of it pointed at the previous scope.
-      window.location.reload();
+      adopt(data.account);
       return true;
     } catch {
       set({ error: "Couldn't reach the server.", busy: false });
@@ -98,9 +243,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signOut: () => {
-    write(null);
-    set({ account: null });
-    window.location.reload();
+    void (async () => {
+      if (get().supabaseReady) {
+        const supabase = await getSupabase();
+        await supabase?.auth.signOut();
+      }
+      set({ account: null });
+      adopt(null);
+      // adopt() only reloads when the scope changed, which it has unless there
+      // was nothing to sign out of.
+      window.location.reload();
+    })();
   },
 
   clearError: () => set({ error: null }),
