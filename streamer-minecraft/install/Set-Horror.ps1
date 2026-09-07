@@ -29,7 +29,7 @@ foreach ($file in @('world_behavior_packs.json', 'world_resource_packs.json')) {
     $kind = if ($file -like '*behavior*') { 'behavior' } else { 'resource' }
 
     if ($State -eq 'off') {
-        $horrorIds = @($installed | Where-Object { $k = $_; @($horror | Where-Object { $k.name -like "*$_*" }).Count -gt 0 } | ForEach-Object { $_.uuid })
+        $horrorIds = @($installed | Where-Object { $k = $_; @($horror | Where-Object { (Get-MatchKey $k.name).Contains((Get-MatchKey $_)) }).Count -gt 0 } | ForEach-Object { $_.uuid })
         $kept = @($current | Where-Object { $horrorIds -notcontains $_.pack_id })
         $packs = @()
         foreach ($e in $kept) {
@@ -38,7 +38,7 @@ foreach ($file in @('world_behavior_packs.json', 'world_resource_packs.json')) {
         }
         Write-WorldPackList -WorldPath $world.Path -FileName $file -Packs $packs
     } else {
-        $add = @($installed | Where-Object { $k = $_; $k.kind -eq $kind -and (@($horror | Where-Object { $k.name -like "*$_*" }).Count -gt 0) })
+        $add = @($installed | Where-Object { $k = $_; $k.kind -eq $kind -and (@($horror | Where-Object { (Get-MatchKey $k.name).Contains((Get-MatchKey $_)) }).Count -gt 0) })
         $packs = @()
         foreach ($e in $current) {
             $match = @($installed | Where-Object { $_.uuid -eq $e.pack_id })

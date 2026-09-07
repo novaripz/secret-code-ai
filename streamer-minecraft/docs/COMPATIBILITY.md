@@ -31,6 +31,8 @@ Each system has exactly one owner:
 | Block textures | Bare Bones | any second full texture pack |
 | Extra dimension | Ethercraft | any second dimension addon |
 | Dynamic light | System Dynamic Light | any second dynamic-light addon |
+| Storage | Better Backpacks | any second backpack addon |
+| Vehicles | Nuckem Vehicles | any second car addon |
 | Horror | Null, then Verity | Twixxel's Stalkers only when Null is off |
 
 ## Never combine
@@ -44,8 +46,11 @@ Each system has exactly one owner:
 
 ## Experimental features and achievements
 
-Verity requires **Beta APIs**. The mode scripts switch that experiment on automatically in the
-chosen world (`level.dat` edit, backup first, file re-verified after). Consequences, stated once:
+Two addons need experiments: Verity needs **Beta APIs** (`gametest`), and Nuckem Vehicles needs
+Beta APIs plus **Upcoming Creator Features** (`upcoming_creator_features`). The mode scripts
+switch both on automatically in the chosen world (`level.dat` edit, backup first, file
+re-verified after). Since Verity already forces Beta APIs, the cars add no further cost.
+Consequences, stated once:
 
 - Achievements are **off** in that world, permanently. No Bedrock world can have both.
 - The world shows as *Experimental* on the world list. Normal.
@@ -60,7 +65,8 @@ flagged, so use a fresh world for that.
 | Pack | Newest tagged version | Note |
 |---|---|---|
 | Nature's Touch, Nico's Cave, Alex's Mobs, Purrfect, Ore Boost, Higher Discount, Ethercraft, Verity, Unbound Visuals, System Dynamic Light, Origin Animation | 26.40 | current |
-| Nautilus Expansion | 26.30 | one drop behind, mobs only — low risk |
+| Better Backpacks | 26.40 | current |
+| Nautilus Expansion, Nuckem Vehicles | 26.30 | one drop behind |
 | Structure Mayhem | 26.20 | structures only, no scripts — low risk |
 | Bare Bones | 1.21.132 | textures only — no scripts to break |
 | **Null** | **26.20** | script pack — the real risk. Test it with `8-HORROR-TEST-WORLD.cmd` first. |

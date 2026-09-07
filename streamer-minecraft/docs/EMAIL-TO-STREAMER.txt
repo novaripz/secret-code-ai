@@ -103,6 +103,11 @@ WHAT ELSE YOU'RE GETTING
   Ore Boost              +50% diamond, iron, gold, copper
   Higher Discount        better trades from cured villagers
 
+  Nuckem Vehicles        actual drivable cars - gears, drifting, fuel pumps,
+                         and passenger seats your friends can ride in
+  Better Backpacks       wearable backpacks, 27 or 54 slots, dyeable, and you
+                         can hand one to a mate with the stuff still inside
+
 
 THE BUTTONS YOU'LL ACTUALLY USE
 -------------------------------
@@ -134,6 +139,8 @@ Step 3 opens all of these for you. This list is only here in case a tab gets los
   https://www.curseforge.com/minecraft-bedrock/addons/purrfect-companions
   https://www.curseforge.com/minecraft-bedrock/addons/ore-boost
   https://www.curseforge.com/minecraft-bedrock/addons/higher-discount-from-cured-villagers
+  https://www.curseforge.com/minecraft-bedrock/addons/better-backpacks
+  https://www.curseforge.com/minecraft-bedrock/addons/nuckem-vehicles
   https://www.curseforge.com/minecraft-bedrock/addons/verity-bedrock-edition
   https://www.curseforge.com/minecraft-bedrock/addons/null-undefined-code
 

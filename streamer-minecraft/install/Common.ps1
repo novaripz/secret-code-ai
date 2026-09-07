@@ -241,13 +241,21 @@ function New-WorldBackup {
     return $zip
 }
 
+function Get-MatchKey {
+    # Pack names in manifests vary in punctuation - "Nature's Touch", "Natures Touch",
+    # "Nature’s Touch" are all the same pack. Compare on letters and digits only.
+    param([string]$Text)
+    return (($Text -replace "[^\p{L}\p{N}]", '').ToLowerInvariant())
+}
+
 function Resolve-ProfilePacks {
     param($Matchers, $Installed, [string]$Kind)
     # Matchers are plain-English name fragments so the profiles stay human-editable.
     $resolved = @()
     $missing  = @()
     foreach ($m in $Matchers) {
-        $hit = @($Installed | Where-Object { $_.kind -eq $Kind -and $_.name -like "*$m*" })
+        $key = Get-MatchKey $m
+        $hit = @($Installed | Where-Object { $_.kind -eq $Kind -and (Get-MatchKey $_.name).Contains($key) })
         if ($hit.Count -eq 0) { $missing += $m; continue }
         foreach ($h in $hit) {
             if ($resolved | Where-Object { $_.uuid -eq $h.uuid }) { continue }

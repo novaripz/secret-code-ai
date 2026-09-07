@@ -25,9 +25,11 @@ Target line: **26.40**.
 | 10 | Purrfect Companions | https://www.curseforge.com/minecraft-bedrock/addons/purrfect-companions | 3.52.0 (7 Sep 2026) | 26.40 | BP + RP. Six tameable/rideable cats. Adds entities, doesn't replace vanilla cats. |
 | 11 | Ore Boost | https://www.curseforge.com/minecraft-bedrock/addons/ore-boost | V1.3 (6 Sep 2026) | 26.40 → older | BP. +50% diamond/copper/iron/gold. No experimental mode. |
 | 12 | Higher Discount From Cured Villagers | https://www.curseforge.com/minecraft-bedrock/addons/higher-discount-from-cured-villagers | V3 (2 Sep 2026) | 26.40 → 26.12 | BP. Bigger cured-villager discounts. No experimental mode. |
-| 13 | Ethercraft: Dream Dimension | https://www.curseforge.com/minecraft-bedrock/addons/ethercraft-dream-dimension | 1.12 (26.40+) (24 Aug 2026) | 26.40+ | BP + RP. A whole extra dimension via a quartz portal in the Nether, 127 blocks, a two-phase boss. Friends can come through. |
-| 14 | **Verity** | https://www.curseforge.com/minecraft-bedrock/addons/verity-bedrock-edition | ThatMob's Verity 4.0.0 — V26.40 (20 Aug 2026) | 26.10+, latest file 26.40 | BP + RP. Talking helper entity. **Requires Beta APIs** — the scripts turn that on for you. |
-| 15 | **Null — Undefined Code** | https://www.curseforge.com/minecraft-bedrock/addons/null-undefined-code | 1.0.1 (25 May 2026) | **26.20** | BP + RP. Horror stalker that shows up on its own. Its newest file is behind the current game — see below. |
+| 13 | Better Backpacks | https://www.curseforge.com/minecraft-bedrock/addons/better-backpacks | v1.9.0 (3 Sep 2026) | **26.40** | BP + RP. Craftable 27/54-slot backpacks you wear, dye and hand to friends with the contents intact. No experiments, achievements-friendly, works in multiplayer. |
+| 14 | Nuckem Vehicles | https://www.curseforge.com/minecraft-bedrock/addons/nuckem-vehicles | Nuckem Pack.mcaddon (27 Jul 2026) | 26.30 | BP + RP. Drivable cars with gears, drifting, visual damage, fuel pumps and passenger seats friends can ride in. **Needs Beta APIs + Upcoming Creator Features** — the mode scripts set both. |
+| 15 | Ethercraft: Dream Dimension | https://www.curseforge.com/minecraft-bedrock/addons/ethercraft-dream-dimension | 1.12 (26.40+) (24 Aug 2026) | 26.40+ | BP + RP. A whole extra dimension via a quartz portal in the Nether, 127 blocks, a two-phase boss. Friends can come through. |
+| 16 | **Verity** | https://www.curseforge.com/minecraft-bedrock/addons/verity-bedrock-edition | ThatMob's Verity 4.0.0 — V26.40 (20 Aug 2026) | 26.10+, latest file 26.40 | BP + RP. Talking helper entity. **Requires Beta APIs** — the scripts turn that on for you. |
+| 17 | **Null — Undefined Code** | https://www.curseforge.com/minecraft-bedrock/addons/null-undefined-code | 1.0.1 (25 May 2026) | **26.20** | BP + RP. Horror stalker that shows up on its own. Its newest file is behind the current game — see below. |
 
 ## Optional
 
@@ -66,4 +68,6 @@ throwaway world. If Null shows up there, it will show up in the main world. If i
 | **Better Foliage** | Last file Nov 2025, tagged 1.21.120 and below. |
 | **Bedrock Reimagined** | Big and well loved, but it does its own custom biome generation — conflicts with Nature's Touch. |
 | **Animals nature** | Duplicate ambient-spawn system against Alex's Mobs. |
+| **CMDBlocc's Vehicles / MineCars / Better Vehicles** | The other vehicle addons are all stale — newest files are Jan 2024 to May 2025, tagged 1.20.x–1.21.8x. Nuckem is the only one still being built for the 26.x line. |
+| **Backpack Plus** | 1.3M downloads, but its newest file is tagged 26.30 and it does not state achievement safety. Better Backpacks is newer, 26.40, and explicitly achievements-friendly. |
 | **Tonalli** | Author states it "is not yet 100% playable". |

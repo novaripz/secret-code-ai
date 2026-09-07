@@ -1,7 +1,10 @@
 {
   "name": "Performance Mode",
   "notes": "Same worlds, same addons, heavy atmosphere pack removed. Bare Bones and the animations stay - they are nearly free and keep the look distinctive.",
-  "experiments": ["gametest"],
+  "experiments": [
+    "gametest",
+    "upcoming_creator_features"
+  ],
   "resource_packs": [
     "System Dynamic Light",
     "Origin Animation",
@@ -12,6 +15,8 @@
     "Alex",
     "Purrfect",
     "Ethercraft",
+    "Backpack",
+    "Nuckem",
     "Verity",
     "Null"
   ],
@@ -26,12 +31,15 @@
     "Ore Boost",
     "Higher Discount",
     "Ethercraft",
+    "Backpack",
+    "Nuckem",
     "Verity",
     "Null"
   ],
   "reminders": [
     "Settings > Video > Graphics Mode: back to Fancy (not Vibrant Visuals).",
     "Render distance 8-10 chunks.",
-    "Still stuttering? Drop Structure Mayhem and Nautilus from profiles\\performance.json and run this again."
+    "Still stuttering? Drop Structure Mayhem and Nautilus from profiles\\performance.json and run this again.",
+    "Cars need fuel - build a fuel pump. Friends can ride in the passenger seats."
   ]
 }

@@ -1,7 +1,10 @@
 {
   "name": "Beautiful Mode",
   "notes": "Everything on. Resource pack order matters - the first entry sits on top of the stack.",
-  "experiments": ["gametest"],
+  "experiments": [
+    "gametest",
+    "upcoming_creator_features"
+  ],
   "resource_packs": [
     "System Dynamic Light",
     "Unbound Visuals",
@@ -13,6 +16,8 @@
     "Alex",
     "Purrfect",
     "Ethercraft",
+    "Backpack",
+    "Nuckem",
     "Verity",
     "Null"
   ],
@@ -27,6 +32,8 @@
     "Ore Boost",
     "Higher Discount",
     "Ethercraft",
+    "Backpack",
+    "Nuckem",
     "Verity",
     "Null"
   ],
@@ -34,6 +41,7 @@
     "Settings > Video > Graphics Mode: Vibrant Visuals.",
     "Render distance 12-16 chunks.",
     "Beta APIs is on in this world (Verity and Null need it) - achievements are off here. That is expected.",
-    "If a stream goes sideways, 9-HORROR-OFF.cmd removes Null, Stalkers and Verity in one click."
+    "If a stream goes sideways, 9-HORROR-OFF.cmd removes Null, Stalkers and Verity in one click.",
+    "Cars need fuel - build a fuel pump. Friends can ride in the passenger seats."
   ]
 }
