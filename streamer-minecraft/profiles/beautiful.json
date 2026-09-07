@@ -1,0 +1,21 @@
+{
+  "name": "Beautiful Mode",
+  "notes": "Full atmosphere. Unbound Visuals needs Vibrant Visuals turned on in Minecraft's video settings.",
+  "resource_packs": [
+    "System Dynamic Light",
+    "Unbound Visuals"
+  ],
+  "behavior_packs": [
+    "System Dynamic Light",
+    "Alex",
+    "Purrfect",
+    "Ore Boost",
+    "Higher Discount",
+    "Ethercraft"
+  ],
+  "reminders": [
+    "Settings > Video > Graphics Mode: choose Vibrant Visuals.",
+    "Render distance 12-16 chunks, Fancy leaves/water on.",
+    "If the sky looks vanilla, Unbound Visuals is not applying - check Vibrant Visuals is really on."
+  ]
+}

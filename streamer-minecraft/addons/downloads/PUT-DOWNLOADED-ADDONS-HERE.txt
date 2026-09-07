@@ -1,0 +1,6 @@
+Drop the .mcpack and .mcaddon files you downloaded from CurseForge into this folder,
+then double-click 2-INSTALL-ADDONS.cmd in the main folder.
+
+The list of what to download (with links) is in docs\DOWNLOAD-LIST.md.
+
+Do not unzip or rename the files.

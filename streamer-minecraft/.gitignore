@@ -1,0 +1,12 @@
+# Never commit addon files (they belong to their creators) or personal world data.
+addons/downloads/*
+!addons/downloads/PUT-DOWNLOADED-ADDONS-HERE.txt
+addons/resource-packs/*
+!addons/resource-packs/README.txt
+addons/behavior-packs/*
+!addons/behavior-packs/README.txt
+backups/*
+!backups/README.txt
+world/*
+!world/README.txt
+install/state/*

@@ -1,0 +1,16 @@
+{
+  "name": "Horror Test World (throwaway world only)",
+  "notes": "NEVER point this at the main survival world. Null and Stalkers change time, blocks, sounds and inventory.",
+  "resource_packs": [
+    "System Dynamic Light"
+  ],
+  "behavior_packs": [
+    "System Dynamic Light",
+    "Null"
+  ],
+  "reminders": [
+    "This must be run on a brand new throwaway world, not the survival world.",
+    "Run Null on its own first. Only add Twixxel's Stalkers afterwards, one at a time.",
+    "Null's published files target an older game version - expect breakage and treat it as an experiment."
+  ]
+}
