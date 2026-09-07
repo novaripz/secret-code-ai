@@ -1,13 +1,9 @@
-Subject: Minecraft setup - 6 steps, start to finish
-
-NOTE FOR YOU, NOT THE STREAMER: this version deliberately does not describe
-Verity or Null - they stay a surprise. Their download links are still in the list
-(they have to be, or the packs never get installed) but nothing says what they do.
-Delete this note before sending.
+Subject: Minecraft setup - 6 steps, works on your existing world
 
 
 Here's the whole thing. Six steps, about 20 minutes, most of it just waiting on
-downloads. You quit the game once, at step 2. That's it.
+downloads. It works on the world you already play - you don't have to start over.
+You quit the game once, at step 2.
 
 You need Minecraft for Windows (Bedrock Edition) - the one you already play with
 your friends.
@@ -22,9 +18,10 @@ THE STEPS
    Right-click the ZIP > Extract All. Open the "streamer-minecraft" folder inside.
    Keep it on your Desktop.
 
-2. Open Minecraft and make the world you want to play in.
-   In the world settings turn on "Multiplayer Game" and "Require players to
-   accept resource packs".
+2. Open Minecraft, load the world you want to use, and check two settings.
+   In world settings turn on "Multiplayer Game" and "Require players to accept
+   resource packs". This can be your existing survival world - nothing gets wiped
+   and a full backup is taken automatically before anything is touched.
    Then quit Minecraft completely.
 
 3. Double-click START-HERE.cmd
@@ -35,8 +32,8 @@ THE STEPS
    don't move them.
 
 5. Go back to the setup window and press Enter.
-   It installs everything, switches it all on in your world, and opens Minecraft
-   for you.
+   It shows you a list of your worlds - pick the one from step 2. It installs
+   everything, switches it on in that world, and opens Minecraft for you.
 
 6. In Minecraft: Settings > Video > Graphics Mode > Vibrant Visuals.
    Open your world. Play.
@@ -45,8 +42,50 @@ Your friends join from Play > Friends while your world is open and tap accept on
 the download prompt. They install nothing.
 
 
-WHAT YOU'RE GETTING
--------------------
+ONE THING ABOUT USING AN OLD WORLD
+----------------------------------
+
+The new biomes, caves and structures only appear in land you haven't explored yet.
+Your base and everything around it stays exactly as it is - walk a few thousand
+blocks in any direction and the new stuff starts showing up. Everything else (the
+visuals, the animals, the cats, the ore boost, the extra dimension) works
+everywhere immediately, old chunks included.
+
+
+THE TWO HORROR ADDONS - KEEP THEM OR BIN THEM
+---------------------------------------------
+
+Two of the downloads are horror. They're installed but they're entirely your call:
+
+  VERITY - an entity you can actually talk to. Put it on the ground and type in
+  chat, or keep it in your inventory and say "Hey Verity". It answers.
+
+  NULL - you don't summon it. It turns up in your world on its own after a while,
+  and messes with things: sounds, signs, the time of day, animals going missing.
+
+To keep both: do nothing, they're already on.
+
+  9a-REMOVE-NULL-ONLY.cmd     removes Null, keeps Verity
+  9b-REMOVE-VERITY-ONLY.cmd   removes Verity, keeps Null
+  9-HORROR-OFF.cmd            removes both
+  10-HORROR-ON.cmd            puts them back
+
+Two honest notes on them:
+
+* Achievements are off in this world because of Verity - it needs Minecraft's
+  "Beta APIs" setting, and no world can have that and achievements at the same
+  time. Removing Verity later does NOT bring them back; once a world has had that
+  setting on, it's flagged forever. So if achievements matter to you, run
+  9b-REMOVE-VERITY-ONLY.cmd before you play, or use a different world.
+
+* Null's last update was built for an older version of Minecraft, so it might
+  simply not do anything on the current one. Everything else in the pack is
+  current. If nothing has happened after a long session, that's why - remove it
+  with 9a and you've lost nothing.
+
+
+WHAT ELSE YOU'RE GETTING
+------------------------
 
   Unbound Visuals        aurora, shooting stars, god rays, real fog
   Bare Bones             clean trailer-style textures
@@ -64,19 +103,15 @@ WHAT YOU'RE GETTING
   Ore Boost              +50% diamond, iron, gold, copper
   Higher Discount        better trades from cured villagers
 
-  ...and a couple of things I'm not spoiling.
 
-Achievements are off in this world - one of the addons needs a world setting that
-switches them off. Everything else works normally.
-
-
-THE FOUR BUTTONS YOU'LL USE
----------------------------
+THE BUTTONS YOU'LL ACTUALLY USE
+-------------------------------
 
   3-BEAUTIFUL-MODE.cmd    full atmosphere
   4-PERFORMANCE-MODE.cmd  same addons, better FPS
   11-OPTIMIZE-STREAM.cmd  tunes the game for a steady 60 while live
   5-BACKUP-WORLD.cmd      saves a copy of your world right now
+  6-RESTORE-BACKUP.cmd    puts an old copy back if anything ever goes wrong
 
 Close Minecraft before running any of them, open it again after. Each one takes a
 backup first, so nothing is permanent.

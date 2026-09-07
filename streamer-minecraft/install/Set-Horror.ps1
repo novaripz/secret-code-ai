@@ -2,12 +2,18 @@
    without touching anything else - for when a stream needs to calm down fast. #>
 param(
     [ValidateSet('off', 'on')][string]$State = 'off',
+    [ValidateSet('all', 'null', 'verity', 'stalkers')][string]$Which = 'all',
     [string]$WorldName,
     [switch]$Quiet
 )
 . "$PSScriptRoot\Common.ps1"
 
-$horror = @('Null', 'Stalker', 'Verity')
+$horror = switch ($Which) {
+    'null'     { @('Null') }
+    'verity'   { @('Verity') }
+    'stalkers' { @('Stalker') }
+    default    { @('Null', 'Stalker', 'Verity') }
+}
 $comMojang = Get-ComMojang
 Assert-MinecraftClosed
 $world = Select-World -ComMojang $comMojang -WorldName $WorldName
@@ -43,7 +49,11 @@ foreach ($file in @('world_behavior_packs.json', 'world_resource_packs.json')) {
     }
 }
 
-if ($State -eq 'off') { Write-Ok "Null, Stalkers and Verity are switched off in '$($world.Name)'." }
-else { Write-Ok "Horror addons switched back on in '$($world.Name)'." }
+$names = ($horror -join ', ')
+if ($State -eq 'off') { Write-Ok "$names switched off in '$($world.Name)'." }
+else { Write-Ok "$names switched back on in '$($world.Name)'." }
+if ($State -eq 'off' -and $horror -contains 'Verity') {
+    Write-Host "Note: achievements stay off in a world that has ever had Beta APIs on - removing Verity does not bring them back." -ForegroundColor Yellow
+}
 Write-Host "The world keeps everything else. Restart Minecraft for it to take effect." -ForegroundColor Cyan
 if (-not $Quiet) { Read-Host "Press Enter to close" | Out-Null }
