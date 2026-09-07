@@ -151,3 +151,35 @@ function Set-NbtByte {
 function New-NbtCompound {
     return [pscustomobject]@{ NbtCompound = $true; Tags = (New-Object System.Collections.ArrayList) }
 }
+
+function Set-SimulationDistance {
+    # serverChunkTickRange = the world's simulation distance. Restores the
+    # original level.dat and returns Ok=$false if anything goes wrong.
+    param([string]$WorldPath, [int]$Chunks)
+
+    $levelDat = Join-Path $WorldPath 'level.dat'
+    if (-not (Test-Path $levelDat)) { return [pscustomobject]@{ Ok = $false; Reason = 'level.dat not found'; From = $null } }
+    $bak = Join-Path $WorldPath 'level.dat.optimize.bak'
+    Copy-Item -LiteralPath $levelDat -Destination $bak -Force
+    try {
+        $level = Read-LevelDat -Path $levelDat
+        $tag = Get-NbtChild -Compound $level.Root -Name 'serverChunkTickRange'
+        $from = if ($tag) { [int]$tag.Value } else { $null }
+        if ($tag) {
+            if ($tag.Type -ne 3) { throw 'serverChunkTickRange is not an int tag' }
+            $tag.Value = [int]$Chunks
+        } else {
+            [void]$level.Root.Tags.Add([pscustomobject]@{ Type = [byte]3; Name = 'serverChunkTickRange'; Value = [int]$Chunks })
+        }
+        Write-LevelDat -Path $levelDat -Level $level
+
+        $check = Read-LevelDat -Path $levelDat
+        $ct = Get-NbtChild -Compound $check.Root -Name 'serverChunkTickRange'
+        if (-not $ct -or [int]$ct.Value -ne [int]$Chunks) { throw 'verification failed' }
+        if ($check.Root.Tags.Count -lt $level.Root.Tags.Count) { throw 'verification failed: tags lost' }
+        return [pscustomobject]@{ Ok = $true; Reason = ''; From = $from }
+    } catch {
+        Copy-Item -LiteralPath $bak -Destination $levelDat -Force
+        return [pscustomobject]@{ Ok = $false; Reason = $_.Exception.Message; From = $null }
+    }
+}

@@ -44,6 +44,10 @@ EVERY DAY
    5-BACKUP-WORLD.cmd       save a copy of the world now
    6-RESTORE-BACKUP.cmd     put an old copy back (undoable - backs up first)
    7-EXPORT-MCWORLD.cmd     make a .mcworld copy to send someone
+   11-OPTIMIZE-STREAM.cmd   tune Minecraft for a steady 60 while live
+   12-OPTIMIZE-MAX-FPS.cmd  rescue setting when the PC is struggling
+   13-OPTIMIZE-QUALITY.cmd  push visuals on a strong PC
+
    1-CHECK-SETUP.cmd        what's installed, what's on, where everything is
    0-OPEN-DOWNLOAD-PAGES.cmd  re-open all the download pages
    2-INSTALL-ADDONS.cmd     re-install after downloading updates
@@ -117,6 +121,8 @@ Nine times out of ten it's one of these:
    - Minecraft was open while a script ran  -> close it, run the script again
    - Wrong world picked from the list       -> run it again, pick the right one
    - Vibrant Visuals off                    -> Settings -> Video -> Graphics Mode
+
+Running slow? Run 11-OPTIMIZE-STREAM.cmd, then read docs\OPTIMIZATION.md.
 
 Full addon list, links and versions:      docs\DOWNLOAD-LIST.md
 What must never be combined, load order:  docs\COMPATIBILITY.md

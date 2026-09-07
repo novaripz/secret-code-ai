@@ -330,3 +330,39 @@ function Open-SourcePages {
 function Start-Minecraft {
     try { Start-Process 'minecraft://' | Out-Null; return $true } catch { return $false }
 }
+
+function Set-OptionsFile {
+    # Rewrites only keys that already exist in Minecraft's options.txt, then reads
+    # the file back and reports what actually landed. Never invents keys.
+    param([string]$Path, [hashtable]$Values)
+
+    $lines   = @(Get-Content -LiteralPath $Path)
+    $changed = @()
+    $absent  = @()
+    $same    = @()
+
+    foreach ($key in $Values.Keys) {
+        $want  = $Values[$key]
+        $index = -1
+        for ($i = 0; $i -lt $lines.Count; $i++) {
+            if ($lines[$i] -match ("^{0}:" -f [regex]::Escape($key))) { $index = $i; break }
+        }
+        if ($index -lt 0) { $absent += $key; continue }
+
+        $old = ($lines[$index] -split ':', 2)[1]
+        if ("$old" -eq "$want") { $same += $key; continue }
+        $lines[$index] = "{0}:{1}" -f $key, $want
+        $changed += [pscustomobject]@{ Key = $key; From = $old; To = $want; Landed = $false }
+    }
+
+    if ($changed.Count -gt 0) {
+        Set-Content -LiteralPath $Path -Value $lines -Encoding UTF8
+        $verify = @(Get-Content -LiteralPath $Path)
+        foreach ($c in $changed) {
+            $hit = @($verify | Where-Object { $_ -match ("^{0}:" -f [regex]::Escape($c.Key)) })
+            $c.Landed = [bool]($hit.Count -and (($hit[0] -split ':', 2)[1] -eq "$($c.To)"))
+        }
+    }
+
+    return [pscustomobject]@{ Changed = $changed; Absent = $absent; Unchanged = $same }
+}
