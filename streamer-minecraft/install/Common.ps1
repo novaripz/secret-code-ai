@@ -91,12 +91,25 @@ function Read-Manifest {
     if ($types -contains 'data' -or $types -contains 'script' -or $types -contains 'javascript') { $kind = 'behavior' }
     elseif ($types -contains 'world_template') { $kind = 'world_template' }
 
+    # Script-API packs declare a @minecraft/server dependency. A "-beta" version
+    # means the pack only runs with the Beta APIs experiment switched on.
+    $scriptDeps = @()
+    if ($json.dependencies) {
+        foreach ($d in $json.dependencies) {
+            if ($d.module_name -and ([string]$d.module_name).StartsWith('@minecraft')) {
+                $scriptDeps += ("{0}@{1}" -f $d.module_name, $d.version)
+            }
+        }
+    }
+
     return [pscustomobject]@{
-        Name    = [string]$json.header.name
-        Uuid    = [string]$json.header.uuid
-        Version = ConvertTo-VersionArray $json.header.version
-        Kind    = $kind
-        Path    = (Split-Path -Parent $ManifestPath)
+        Name        = [string]$json.header.name
+        Uuid        = [string]$json.header.uuid
+        Version     = ConvertTo-VersionArray $json.header.version
+        Kind        = $kind
+        ScriptDeps  = $scriptDeps
+        NeedsBeta   = [bool](@($scriptDeps | Where-Object { $_ -match 'beta' }).Count)
+        Path        = (Split-Path -Parent $ManifestPath)
     }
 }
 
@@ -270,4 +283,50 @@ function Assert-MinecraftClosed {
         Write-Warn2 "Minecraft is running. Close it completely, then press Enter."
         Read-Host "Press Enter once Minecraft is closed" | Out-Null
     }
+}
+
+function Import-FromDownloads {
+    # Plug and play: pick addon files straight out of the Windows Downloads
+    # folder so nothing has to be dragged around by hand.
+    $target = Join-Path (Get-PackRoot) 'addons\downloads'
+    New-Item -ItemType Directory -Path $target -Force | Out-Null
+
+    $sources = @()
+    foreach ($d in @(
+        (Join-Path $env:USERPROFILE 'Downloads'),
+        (Join-Path $env:USERPROFILE 'OneDrive\Downloads'),
+        (Join-Path $env:USERPROFILE 'Desktop')
+    )) { if ($d -and (Test-Path $d)) { $sources += $d } }
+
+    $copied = @()
+    foreach ($dir in $sources) {
+        $found = @(Get-ChildItem $dir -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -in '.mcpack', '.mcaddon' })
+        foreach ($f in $found) {
+            $dest = Join-Path $target $f.Name
+            if ((Test-Path $dest) -and ((Get-Item $dest).Length -eq $f.Length)) { continue }
+            Copy-Item -LiteralPath $f.FullName -Destination $dest -Force
+            $copied += $f.Name
+        }
+    }
+    return $copied
+}
+
+function Get-Sources {
+    $p = Join-Path (Get-PackRoot) 'addons\sources.json'
+    if (-not (Test-Path $p)) { return @() }
+    return @(Get-Content -LiteralPath $p -Raw | ConvertFrom-Json)
+}
+
+function Open-SourcePages {
+    param([switch]$OptionalToo)
+    $list = @(Get-Sources | Where-Object { $OptionalToo -or -not $_.optional })
+    foreach ($s in $list) {
+        Start-Process $s.url | Out-Null
+        Start-Sleep -Milliseconds 400
+    }
+    return $list.Count
+}
+
+function Start-Minecraft {
+    try { Start-Process 'minecraft://' | Out-Null; return $true } catch { return $false }
 }

@@ -23,6 +23,14 @@ $gameRp = Join-Path $comMojang 'resource_packs'
 $gameBp = Join-Path $comMojang 'behavior_packs'
 New-Item -ItemType Directory -Path $gameRp, $gameBp, $stageRp, $stageBp, $downloads -Force | Out-Null
 
+Write-Step "Checking your Downloads folder for new addon files"
+$picked = @(Import-FromDownloads)
+if ($picked.Count -gt 0) {
+    foreach ($p in $picked) { Write-Ok "picked up $p" }
+} else {
+    Write-Host "    nothing new"
+}
+
 Write-Step "Looking for addon files in addons\downloads"
 $files = @(Get-ChildItem $downloads -File -Include *.mcpack, *.mcaddon, *.zip -Recurse -ErrorAction SilentlyContinue)
 if ($files.Count -eq 0) {
@@ -70,14 +78,17 @@ foreach ($f in $files) {
         }
 
         $installed += [pscustomobject]@{
-            name    = $info.Name
-            uuid    = $info.Uuid
-            version = $info.Version
-            kind    = $info.Kind
-            folder  = $folder
-            source  = $f.Name
+            name       = $info.Name
+            uuid       = $info.Uuid
+            version    = $info.Version
+            kind       = $info.Kind
+            folder     = $folder
+            source     = $f.Name
+            needs_beta = $info.NeedsBeta
+            scripts    = $info.ScriptDeps
         }
-        Write-Ok ("{0}  [{1} pack]" -f $info.Name, $info.Kind)
+        $betaNote = if ($info.NeedsBeta) { '  (needs Beta APIs - the mode script turns that on for you)' } else { '' }
+        Write-Ok ("{0}  [{1} pack]{2}" -f $info.Name, $info.Kind, $betaNote)
     }
     Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue
 }

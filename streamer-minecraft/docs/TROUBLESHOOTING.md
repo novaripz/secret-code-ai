@@ -1,59 +1,62 @@
 # Troubleshooting
 
-Run `1-CHECK-SETUP.cmd` first — it prints where Minecraft lives, which worlds exist, how many
-packs each one has enabled, and what's installed. Most answers are in there.
+`1-CHECK-SETUP.cmd` first — it prints where Minecraft lives, your worlds, how many packs each
+has on, and everything installed.
 
-### The scripts say "Could not find Minecraft's com.mojang folder"
-Launch Minecraft for Windows once, create or open any world, quit, then run the script again.
-The folder only exists after the game has run. (Minecraft moved this folder in recent versions —
-the scripts check both the new `%APPDATA%\Minecraft Bedrock\Users\...` and the old
-`Packages\Microsoft.MinecraftUWP...` locations.)
+### "Could not find Minecraft's com.mojang folder"
+Launch Minecraft once, open any world, quit, retry. (The scripts check both the current
+`%APPDATA%\Minecraft Bedrock\Users\...` path and the old `Packages\Microsoft.MinecraftUWP...` one.)
 
-### Windows blocked the .cmd file / "running scripts is disabled"
-Right-click the `.cmd` → Properties → tick **Unblock** → OK. The launchers already pass
-`-ExecutionPolicy Bypass`, so nothing else needs changing.
+### Windows blocked the .cmd
+Right-click → Properties → **Unblock** → OK.
 
-### The addons don't appear in the world
-- Did you run `2-INSTALL-ADDONS.cmd` *and then* `3-BEAUTIFUL-MODE.cmd`? Installing only copies
-  the files; the mode script is what switches them on in the world.
-- Was Minecraft closed while the script ran? The game rewrites the world folder on exit and
-  will overwrite the change. Close the game, re-run the mode script, then start the game.
-- Did you pick the right world in the list?
+### The installer says it found nothing
+The files must be `.mcpack` or `.mcaddon`. It looks in your Downloads, OneDrive\Downloads,
+Desktop and `addons\downloads`. If your browser saved them somewhere else, drag them into
+`addons\downloads` and run `2-INSTALL-ADDONS.cmd`.
 
-### Everything looks vanilla — no aurora, no shooting stars
-Settings → Video → **Graphics Mode → Vibrant Visuals**. Unbound Visuals needs it. If Vibrant
-Visuals is greyed out, the GPU doesn't support it (Windows needs DirectX 12 feature level 12_1);
-use Mystica Shader from `docs/DOWNLOAD-LIST.md` instead — swap the words
-`Unbound Visuals` for `Mystica` in `profiles\beautiful.json` and re-run Beautiful Mode.
+### Addons don't show up in the world
+Minecraft must be **closed** when a mode script runs — the game rewrites the world folder on
+exit and will undo the change. Close it, re-run, then start the game.
 
-### Torches don't light up caves
-System Dynamic Light needs **both** of its packs — the BP and the RP. Re-run
-`1-CHECK-SETUP.cmd`; if only one shows up, re-download and re-install. In game, use the
-Dynamic Light Book to check the settings are on.
+### No aurora / no shooting stars
+Settings → Video → Graphics Mode → **Vibrant Visuals**. If it's greyed out your GPU can't run it
+(Windows needs DirectX 12 feature level 12_1): download Mystica Shader instead, then replace
+`"Unbound Visuals"` with `"Mystica"` in `profiles\beautiful.json` and re-run Beautiful Mode.
 
-### The world says "Experimental" / achievements are off
-An addon asked for an experimental toggle. Nothing in the core set should. Turn packs on one
-at a time (edit `profiles\beautiful.json`, re-run the mode script) until the label appears —
-that's the culprit. Once a world has been marked experimental, it stays that way; restore a
-backup from before that point with `6-RESTORE-BACKUP.cmd`.
+### Verity doesn't respond / Null never appears
+1. `1-CHECK-SETUP.cmd` — is the pack listed?
+2. Is the world marked *Experimental* in the world list? If not, Beta APIs didn't get set.
+   Set it by hand: world → Edit → Settings → **Experiments → Beta APIs → ON**.
+3. Verity: place it on the ground and talk in chat, or say "Hey Verity" with it in inventory.
+4. Null: it arrives on its own, on its own schedule — give it a real session, not two minutes.
+5. Still nothing from Null after a long test-world session? Its 26.20 scripts don't run on your
+   game version. `9-HORROR-OFF.cmd`, and check its CurseForge page for an update later.
 
-### FPS tanked / the stream is stuttering
-`4-PERFORMANCE-MODE.cmd`, then Video settings → Graphics Mode back to Fancy, render distance
-8–10. Gameplay addons stay on; only the atmosphere pack goes away. Switch back any time.
+### Null wrecked something in the survival world
+`9-HORROR-OFF.cmd` (removes Null, Stalkers and Verity, keeps everything else), then
+`6-RESTORE-BACKUP.cmd` and pick the newest backup from before it happened.
 
-### Weird mobs stopped spawning / far too few animals
-Too many mob-adding addons at once. The core set has exactly one big animal addon
-(Alex's Mobs) plus cats on purpose. Don't add a second one.
+### Achievements are gone
+Expected — Verity requires Beta APIs. See `docs/COMPATIBILITY.md`.
+
+### FPS tanked
+`4-PERFORMANCE-MODE.cmd`, Graphics Mode back to Fancy, render distance 8–10. Still bad? Drop
+Structure Mayhem, then Nautilus, from `profiles\performance.json`.
+
+### Trees/biomes look wrong, or chunk borders are visible
+Two world-gen addons are fighting, or Nature's Touch was added to an already-explored world —
+new biomes only appear in newly generated chunks, so old areas stay vanilla. That's normal;
+walk somewhere new.
+
+### A cave mob or block behaves oddly
+Nico's page lists known issues (enchant glints on custom gear, some non-solid custom blocks).
+Not a conflict, just the addon.
 
 ### A friend sees different textures
 World settings → *Require players to accept resource packs* → ON, then have them rejoin and
-accept the download prompt.
+accept the download.
 
-### Something in the world got corrupted / Null escaped into the survival world
-`6-RESTORE-BACKUP.cmd` → pick the newest backup from before it happened. The current state is
-backed up first, so a wrong pick is undoable.
-
-### After a Minecraft update everything broke
-Check the CurseForge pages for the new game version number and update the addon files
-(drop the new files in `addons\downloads`, run `2-INSTALL-ADDONS.cmd`, then a mode script).
-Until then, `6-RESTORE-BACKUP.cmd` gets you back to a working world.
+### After a Minecraft update everything breaks
+Re-download the updated addon files, run `2-INSTALL-ADDONS.cmd`, then a mode script. Meanwhile
+`6-RESTORE-BACKUP.cmd` gets you back to a world that works.

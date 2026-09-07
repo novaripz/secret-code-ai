@@ -1,0 +1,19 @@
+[
+  { "name": "System Dynamic Light",      "url": "https://www.curseforge.com/minecraft-bedrock/addons/system-dynamic-lights",            "kind": "behavior + resource", "optional": false },
+  { "name": "Unbound Visuals",           "url": "https://www.curseforge.com/minecraft-bedrock/texture-packs/unbound-visuals",             "kind": "resource",            "optional": false },
+  { "name": "Bare Bones",                "url": "https://www.curseforge.com/minecraft-bedrock/texture-packs/bare-bones-be",               "kind": "resource",            "optional": false },
+  { "name": "Origin Animation",          "url": "https://www.curseforge.com/minecraft-bedrock/texture-packs/origin-animation",            "kind": "resource",            "optional": false },
+  { "name": "Nature's Touch",            "url": "https://www.curseforge.com/minecraft-bedrock/addons/nature-s-touch-nature-update-add-on","kind": "behavior + resource", "optional": false },
+  { "name": "Nico's Cave Expansion",     "url": "https://www.curseforge.com/minecraft-bedrock/addons/nicos-cave-expansion",               "kind": "behavior + resource", "optional": false },
+  { "name": "Structure Mayhem",          "url": "https://www.curseforge.com/minecraft-bedrock/addons/structure-mayhem-180-new-structures","kind": "behavior",            "optional": false },
+  { "name": "Nautilus Expansion",        "url": "https://www.curseforge.com/minecraft-bedrock/addons/nautilus-expansion",                 "kind": "behavior + resource", "optional": false },
+  { "name": "Alex's Mobs",               "url": "https://www.curseforge.com/minecraft-bedrock/addons/alex-mobs",                          "kind": "behavior + resource", "optional": false },
+  { "name": "Purrfect Companions",       "url": "https://www.curseforge.com/minecraft-bedrock/addons/purrfect-companions",                "kind": "behavior + resource", "optional": false },
+  { "name": "Ore Boost",                 "url": "https://www.curseforge.com/minecraft-bedrock/addons/ore-boost",                          "kind": "behavior",            "optional": false },
+  { "name": "Higher Discount",           "url": "https://www.curseforge.com/minecraft-bedrock/addons/higher-discount-from-cured-villagers","kind": "behavior",           "optional": false },
+  { "name": "Ethercraft: Dream Dimension","url": "https://www.curseforge.com/minecraft-bedrock/addons/ethercraft-dream-dimension",         "kind": "behavior + resource", "optional": false },
+  { "name": "Verity",                    "url": "https://www.curseforge.com/minecraft-bedrock/addons/verity-bedrock-edition",             "kind": "behavior + resource", "optional": false },
+  { "name": "Null - Undefined Code",     "url": "https://www.curseforge.com/minecraft-bedrock/addons/null-undefined-code",                "kind": "behavior + resource", "optional": false },
+  { "name": "Twixxel's Stalkers",        "url": "https://www.curseforge.com/minecraft-bedrock/addons/twixxels-stalkers-bedrock-edition",  "kind": "behavior + resource", "optional": true },
+  { "name": "Mystica Shader (only if Vibrant Visuals won't run)", "url": "https://www.curseforge.com/minecraft-bedrock/texture-packs/mystica-shaders", "kind": "resource", "optional": true }
+]

@@ -1,16 +1,19 @@
 {
   "name": "Horror Test World (throwaway world only)",
-  "notes": "NEVER point this at the main survival world. Null and Stalkers change time, blocks, sounds and inventory.",
+  "notes": "For proving Null and Stalkers actually run on your game version before they go anywhere near the survival world.",
+  "experiments": ["gametest"],
   "resource_packs": [
-    "System Dynamic Light"
+    "System Dynamic Light",
+    "Null"
   ],
   "behavior_packs": [
     "System Dynamic Light",
     "Null"
   ],
   "reminders": [
-    "This must be run on a brand new throwaway world, not the survival world.",
-    "Run Null on its own first. Only add Twixxel's Stalkers afterwards, one at a time.",
-    "Null's published files target an older game version - expect breakage and treat it as an experiment."
+    "Run this on a brand new throwaway world, never the survival world.",
+    "Null's newest published file targets 26.20, so this is the test that tells you whether it still runs on your game.",
+    "Working? Null appears on its own after a while - do not use commands.",
+    "Nothing happening after ~20 minutes? Its scripts do not run on your version; leave it out of the main world."
   ]
 }

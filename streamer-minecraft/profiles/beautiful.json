@@ -1,21 +1,39 @@
 {
   "name": "Beautiful Mode",
-  "notes": "Full atmosphere. Unbound Visuals needs Vibrant Visuals turned on in Minecraft's video settings.",
+  "notes": "Everything on. Resource pack order matters - the first entry sits on top of the stack.",
+  "experiments": ["gametest"],
   "resource_packs": [
     "System Dynamic Light",
-    "Unbound Visuals"
+    "Unbound Visuals",
+    "Origin Animation",
+    "Bare Bones",
+    "Nature's Touch",
+    "Nico",
+    "Nautilus",
+    "Alex",
+    "Purrfect",
+    "Ethercraft",
+    "Verity",
+    "Null"
   ],
   "behavior_packs": [
     "System Dynamic Light",
+    "Nature's Touch",
+    "Nico",
+    "Structure Mayhem",
+    "Nautilus",
     "Alex",
     "Purrfect",
     "Ore Boost",
     "Higher Discount",
-    "Ethercraft"
+    "Ethercraft",
+    "Verity",
+    "Null"
   ],
   "reminders": [
-    "Settings > Video > Graphics Mode: choose Vibrant Visuals.",
-    "Render distance 12-16 chunks, Fancy leaves/water on.",
-    "If the sky looks vanilla, Unbound Visuals is not applying - check Vibrant Visuals is really on."
+    "Settings > Video > Graphics Mode: Vibrant Visuals.",
+    "Render distance 12-16 chunks.",
+    "Beta APIs is on in this world (Verity and Null need it) - achievements are off here. That is expected.",
+    "If a stream goes sideways, 9-HORROR-OFF.cmd removes Null, Stalkers and Verity in one click."
   ]
 }

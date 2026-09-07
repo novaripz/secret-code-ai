@@ -1,20 +1,37 @@
 {
   "name": "Performance Mode",
-  "notes": "Same gameplay addons, atmosphere pack removed. Nothing is lost - switching back re-adds it.",
+  "notes": "Same worlds, same addons, heavy atmosphere pack removed. Bare Bones and the animations stay - they are nearly free and keep the look distinctive.",
+  "experiments": ["gametest"],
   "resource_packs": [
-    "System Dynamic Light"
+    "System Dynamic Light",
+    "Origin Animation",
+    "Bare Bones",
+    "Nature's Touch",
+    "Nico",
+    "Nautilus",
+    "Alex",
+    "Purrfect",
+    "Ethercraft",
+    "Verity",
+    "Null"
   ],
   "behavior_packs": [
     "System Dynamic Light",
+    "Nature's Touch",
+    "Nico",
+    "Structure Mayhem",
+    "Nautilus",
     "Alex",
     "Purrfect",
     "Ore Boost",
     "Higher Discount",
-    "Ethercraft"
+    "Ethercraft",
+    "Verity",
+    "Null"
   ],
   "reminders": [
-    "Settings > Video > Graphics Mode: switch back to Fancy (or Simple) - NOT Vibrant Visuals.",
+    "Settings > Video > Graphics Mode: back to Fancy (not Vibrant Visuals).",
     "Render distance 8-10 chunks.",
-    "Turn off System Dynamic Light's entity lighting in the in-game Dynamic Light Book if you still need frames."
+    "Still stuttering? Drop Structure Mayhem and Nautilus from profiles\\performance.json and run this again."
   ]
 }

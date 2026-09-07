@@ -10,6 +10,7 @@ param(
 )
 
 . "$PSScriptRoot\Common.ps1"
+. "$PSScriptRoot\Enable-Experiments.ps1"
 
 $root    = Get-PackRoot
 $profilePath = Join-Path $root ("profiles\{0}.json" -f $Mode)
@@ -48,6 +49,28 @@ foreach ($p in $rp.Packs) { Write-Host ("    - {0}" -f $p.name) }
 Write-Host "  Behaviour packs:" -ForegroundColor Cyan
 if ($bp.Packs.Count -eq 0) { Write-Host "    (none)" }
 foreach ($p in $bp.Packs) { Write-Host ("    - {0}" -f $p.name) }
+
+# Anything script-driven that asks for a beta module (Verity, Null) needs the
+# Beta APIs experiment. Turn it on in level.dat rather than making the streamer
+# hunt through world settings.
+$needBeta = @(($rp.Packs + $bp.Packs) | Where-Object { $_.needs_beta })
+$toggles  = @()
+if ($cfg.experiments) { $toggles += @($cfg.experiments) }
+if ($needBeta.Count -gt 0 -and $toggles -notcontains 'gametest') { $toggles += 'gametest' }
+
+if ($toggles.Count -gt 0) {
+    Write-Step ("Turning on world experiments: {0}" -f ($toggles -join ', '))
+    if ($needBeta.Count -gt 0) {
+        Write-Host ("    required by: {0}" -f (($needBeta | ForEach-Object { $_.name }) -join ', '))
+    }
+    $res = Enable-WorldExperiments -WorldPath $world.Path -Toggles $toggles
+    if ($res.Ok) {
+        Write-Ok "done automatically - achievements are off in this world from now on"
+    } else {
+        Write-Warn2 ("Could not set it automatically ({0})." -f $res.Reason)
+        Write-Host  "      Do it by hand: Minecraft > your world > Edit > Settings > Experiments > Beta APIs > ON."
+    }
+}
 
 $missing = @($rp.Missing + $bp.Missing)
 if ($missing.Count -gt 0) {

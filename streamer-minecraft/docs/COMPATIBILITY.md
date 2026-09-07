@@ -1,70 +1,82 @@
-# Compatibility notes
+# Compatibility
 
-Verified against the CurseForge project pages on 7 September 2026.
+Verified from the CurseForge project pages on 7 September 2026. Latest released Bedrock: 26.45.
 
-## Version target
+## Load order (this is what the scripts write)
 
-Latest released Bedrock version: **26.45** (28 Aug 2026); the 26.50 game drop is next.
-Every pack in the core set publishes a **26.40**-line build, which is what the pack targets.
-Bedrock is generally forward-tolerant within a game-drop line, but the rule of thumb stands:
-**after a big Minecraft update, wait for the addon pages to say the new number before updating
-the game**, or turn off auto-updates for Minecraft in the Microsoft Store while a series is running.
+Resource packs — **first entry sits on top and wins** any file both packs contain:
 
-## What each thing actually is
+1. System Dynamic Light RP — its own item/attachable definitions and settings book
+2. Unbound Visuals — sky, fog, aurora, water (Beautiful Mode only)
+3. Origin Animation — player and mob animations
+4. Bare Bones — block/item textures
+5. addon RPs (Nature's Touch, Nico's, Nautilus, Alex's, Purrfect, Ethercraft, Verity, Null)
 
-| Pack | Behaviour pack | Resource pack | Experimental toggles | Achievements |
-|------|----------------|---------------|----------------------|--------------|
-| System Dynamic Light | yes (required) | yes (required) | none | safe |
-| Unbound Visuals | no | yes | none (needs Vibrant Visuals graphics mode) | safe |
-| Alex's Mobs | yes | yes (inside the .mcaddon) | not stated — verify on import | verify |
-| Purrfect Companions | yes | yes (inside the .mcaddon) | not stated — verify on import | verify |
-| Ore Boost | yes (data) | no | none, stated | stated friendly |
-| Higher Discount | yes (data) | no | none, stated | stated friendly |
-| Ethercraft | yes (data, custom dimension) | yes | none since v1.10, stated | stated friendly |
-| Null *(optional)* | yes | likely | not stated | assume unsafe |
-| Twixxel's Stalkers *(optional)* | yes | likely | not stated | assume unsafe |
+Rationale: atmosphere above textures, textures above the addons' own art, and the dynamic-light
+definitions above everything so they can't be overwritten. Prefer Bare Bones' own sky over
+Unbound Visuals? Move `"Bare Bones"` above `"Unbound Visuals"` in `profiles\beautiful.json`.
 
-"Verify on import" = when you first load the world, if Minecraft shows the world as
-*Experimental*, an addon asked for a toggle. Check which one by enabling them one at a time.
+## Domain split (why this set doesn't collide)
 
-## Do not combine
+Each system has exactly one owner:
 
-1. **Unbound Visuals + Mystica Shader** — both rewrite fog, sky and lighting colour for every
-   biome. One at a time, always.
-2. **Unbound Visuals (or any VV pack) + Newb x Daydream / any loader shader** — different
-   rendering paths entirely; the loader one also needs a patched game client. Never both.
-3. **Alex's Mobs + Animals nature** — duplicate ambient-animal spawn systems competing for the
-   same mob cap. Pick one.
-4. **Null + Twixxel's Stalkers** — two script-driven horror systems both hijacking ambience,
-   sound and player state. Test each separately; never both at once.
-5. **Null (or Stalkers) + the main survival world** — Null edits blocks, time and item names
-   and can kick players. Throwaway world only.
-6. **Verity + achievements/no-experimental rule** — Verity needs Beta APIs, which flags the
-   world experimental permanently.
-7. Two packs that both replace the same vanilla mob. Nothing in the core set does this
-   (Purrfect Companions adds new cats, it does not overwrite vanilla cats) — but it is the
-   thing to check before adding any new animal addon later.
+| System | Owner | Everything else must stay out |
+|---|---|---|
+| Surface biomes / trees / plants | Nature's Touch | Better Trees, Expansive Biomes, Bedrock Reimagined, NatureCraft |
+| Caves | Nico's Cave Expansion | Beyond The Underground, Cavern Calamity, Caves+ |
+| Structures | Structure Mayhem | Ruins, Legacy Stone, Structures Arises |
+| Oceans | Nautilus Expansion (mobs) | Aqueous Depths, Gigantic Oceans (both world-gen) |
+| Land animals | Alex's Mobs (+ Purrfect cats, which only add) | Animals nature, More Pets |
+| Sky / fog / lighting look | Unbound Visuals | Mystica, Newb, any second shader pack |
+| Block textures | Bare Bones | any second full texture pack |
+| Extra dimension | Ethercraft | any second dimension addon |
+| Dynamic light | System Dynamic Light | any second dynamic-light addon |
+| Horror | Null, then Verity | Twixxel's Stalkers only when Null is off |
 
-## System Dynamic Light vs. the atmosphere pack
+## Never combine
 
-These are the two visual things that could collide, so this is the specific pairing to test
-first (world → Beautiful Mode → walk into a cave with a torch, then look at the night sky):
+1. Unbound Visuals **+** Mystica Shader — one atmosphere pack at a time.
+2. Unbound Visuals **+** Aqueous Depths — Aqueous Depths states Vibrant Visuals is not compatible.
+3. Nature's Touch **+** any other biome/tree world-gen addon.
+4. Null **+** Twixxel's Stalkers — two script horror systems fighting over ambience and player state.
+5. Any loader shader (Newb x Daydream et al) **+** anything — it needs a patched client.
+6. Two texture packs both replacing all blocks.
 
-- System Dynamic Light does its work in a **behaviour pack** (scripts placing light sources);
-  its resource pack only carries its own item/attachable definitions and its settings book.
-- Unbound Visuals only touches sky, fog, water and lighting **appearance**.
-- They therefore stack rather than overwrite — but the pack order still matters. The scripts
-  put System Dynamic Light **first** in `world_resource_packs.json`, i.e. at the top of the
-  stack, so its definitions win if the two ever touch the same file.
-- What to look for if it *is* wrong: torches that light up the world but with the wrong glow
-  colour, or a missing Dynamic Light settings book. Fix = Performance Mode (drops the
-  atmosphere pack) and report which one broke.
+## Experimental features and achievements
+
+Verity requires **Beta APIs**. The mode scripts switch that experiment on automatically in the
+chosen world (`level.dat` edit, backup first, file re-verified after). Consequences, stated once:
+
+- Achievements are **off** in that world, permanently. No Bedrock world can have both.
+- The world shows as *Experimental* on the world list. Normal.
+- Null benefits from the same toggle — beta script modules only resolve when it's on.
+
+Want achievements back? Run a second world with `9-HORROR-OFF.cmd` applied and Verity/Null
+removed from `profiles\beautiful.json` — but a world that has ever had Beta APIs on stays
+flagged, so use a fresh world for that.
+
+## Version reality check
+
+| Pack | Newest tagged version | Note |
+|---|---|---|
+| Nature's Touch, Nico's Cave, Alex's Mobs, Purrfect, Ore Boost, Higher Discount, Ethercraft, Verity, Unbound Visuals, System Dynamic Light, Origin Animation | 26.40 | current |
+| Nautilus Expansion | 26.30 | one drop behind, mobs only — low risk |
+| Structure Mayhem | 26.20 | structures only, no scripts — low risk |
+| Bare Bones | 1.21.132 | textures only — no scripts to break |
+| **Null** | **26.20** | script pack — the real risk. Test it with `8-HORROR-TEST-WORLD.cmd` first. |
+| Twixxel's Stalkers | 26.30 | optional, untested on 26.40 |
+
+Rule of thumb: after a big Minecraft update, check the pages before updating the game, or pause
+Minecraft's auto-update in the Microsoft Store while a series is running.
 
 ## Multiplayer
 
-- Only the host installs anything. When friends join the host's world, Bedrock offers them
-  the world's packs automatically; they accept once and play.
-- Turn on *Require players to accept resource packs* in world settings so everyone sees the
-  same thing on stream.
-- Vibrant Visuals is a **per-player device setting**, not a world setting. Friends on weak
-  PCs can leave it off and still play in the same world; they just won't see the aurora.
+Only the host installs anything — Bedrock sends the world's packs to joining players. Turn on
+*Require players to accept resource packs*. Vibrant Visuals is a per-player device setting, so a
+friend on a weaker PC can leave it off and still play in the same world.
+
+## Performance
+
+This is a heavy set (five content addons plus an atmosphere pack). If the stream stutters:
+Performance Mode first, then drop, in this order, from `profiles\performance.json`:
+Structure Mayhem → Nautilus → Nico's Cave → Nature's Touch.
