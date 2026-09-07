@@ -1,0 +1,159 @@
+Subject: Your Minecraft setup - do these in order
+
+
+Hey! Everything's ready. Takes about 20 minutes, most of it waiting on downloads.
+You never have to touch a Minecraft folder - it's all double-click stuff.
+
+This is Bedrock Edition (Minecraft for Windows), not Java.
+
+The prettier version of these instructions, with every download link as a button:
+https://claude.ai/code/artifact/500c7e63-506c-4eea-afc0-2c7308b9400c
+
+
+DO THIS IN ORDER
+----------------
+
+1. Download the pack folder:
+   https://github.com/novaripz/secret-code-ai/archive/refs/heads/claude/bedrock-streamer-pack-bs2c1j.zip
+   Right-click the ZIP > Extract All. Open the "streamer-minecraft" folder inside.
+   Put it somewhere you'll find again (Desktop is fine).
+
+2. Open Minecraft once, open any world for a few seconds, then quit all the way out.
+   (This creates the folders the setup writes into.)
+
+3. Make the survival world you actually want to play in.
+   In world settings turn ON: Multiplayer Game, and "Require players to accept
+   resource packs". Then QUIT MINECRAFT COMPLETELY - this part matters, the game
+   undoes the next step if it's still open.
+
+4. Double-click START-HERE.cmd
+
+5. It opens a bunch of download pages in your browser. Click the green Download
+   button on each one. Leave every file in your Downloads folder - don't rename
+   them, don't unzip them, don't move them.
+
+6. Go back to the setup window and press Enter.
+   It finds the files by itself, installs everything, switches it all on in your
+   world, and offers to launch Minecraft. Say yes.
+
+7. In game: Settings > Video > Graphics Mode > Vibrant Visuals
+   That's the aurora, shooting stars and god rays. Only setting you change by hand.
+   (If it's greyed out your GPU can't do it - not a problem, everything else works.)
+
+8. Make a second junk world and run 8-HORROR-TEST-WORLD.cmd on it. Play a normal
+   session. The Null horror addon shows up on its own - no commands. See below.
+
+9. Friends join from Play > Friends while your world is open, and accept the
+   download prompt. They install nothing - Minecraft sends them the addons.
+
+
+TWO THINGS TO KNOW
+------------------
+
+* Achievements are OFF in this world. Verity needs Minecraft's "Beta APIs"
+  setting, and no world can have that and achievements at once. That's Minecraft's
+  rule, not something the pack chose. Tell me if you'd rather have achievements
+  and I'll pull Verity out.
+
+* Null is the one addon that might not work - its last release was built for an
+  older Minecraft version. That's why step 8 tests it on a junk world first.
+  If it's a dud, 9-HORROR-OFF.cmd removes it in one double-click and nothing
+  else changes.
+
+
+AFTER SETUP, THESE ARE THE ONLY BUTTONS
+---------------------------------------
+
+  3-BEAUTIFUL-MODE.cmd    full atmosphere
+  4-PERFORMANCE-MODE.cmd  same addons, better FPS
+  11-OPTIMIZE-STREAM.cmd  tunes the game for a steady 60 while live
+  9-HORROR-OFF.cmd        panic button - removes Null, Verity, Stalkers
+  5-BACKUP-WORLD.cmd      save a copy of the world right now
+  6-RESTORE-BACKUP.cmd    put an old copy back
+  1-CHECK-SETUP.cmd       shows what's installed and what's switched on
+
+Close Minecraft before running any of them, start it again after. Every one takes
+a backup first, so nothing you do is permanent.
+
+
+WHAT'S IN IT
+------------
+
+  LOOK
+   Unbound Visuals        aurora, shooting stars, god rays, fog
+   Bare Bones             clean trailer-style textures
+   Origin Animation       smooth player and mob animations
+   System Dynamic Light   torches light up caves as you carry them
+
+  WORLD
+   Nature's Touch         20+ new biomes, much better forests
+   Nico's Cave Expansion  new caves, cave mobs, ores, gear
+   Structure Mayhem       ~180 structures to find
+   Nautilus Expansion     ocean life
+   Ethercraft             an entire extra dimension
+
+  CREATURES & GAMEPLAY
+   Alex's Mobs            40+ animals
+   Purrfect Companions    six tameable cats
+   Ore Boost              +50% diamond / iron / gold / copper
+   Higher Discount        better cured-villager trades
+
+  HORROR
+   Verity                 a talking entity that answers you
+   Null                   shows up on its own (test it first)
+
+
+DOWNLOAD LINKS
+--------------
+START-HERE.cmd opens all of these for you. This list is just the backup.
+
+System Dynamic Light (grab BOTH files)
+  https://www.curseforge.com/minecraft-bedrock/addons/system-dynamic-lights
+Unbound Visuals
+  https://www.curseforge.com/minecraft-bedrock/texture-packs/unbound-visuals
+Bare Bones
+  https://www.curseforge.com/minecraft-bedrock/texture-packs/bare-bones-be
+Origin Animation
+  https://www.curseforge.com/minecraft-bedrock/texture-packs/origin-animation
+Nature's Touch
+  https://www.curseforge.com/minecraft-bedrock/addons/nature-s-touch-nature-update-add-on
+Nico's Cave Expansion
+  https://www.curseforge.com/minecraft-bedrock/addons/nicos-cave-expansion
+Structure Mayhem
+  https://www.curseforge.com/minecraft-bedrock/addons/structure-mayhem-180-new-structures
+Nautilus Expansion
+  https://www.curseforge.com/minecraft-bedrock/addons/nautilus-expansion
+Ethercraft: Dream Dimension
+  https://www.curseforge.com/minecraft-bedrock/addons/ethercraft-dream-dimension
+Alex's Mobs
+  https://www.curseforge.com/minecraft-bedrock/addons/alex-mobs
+Purrfect Companions
+  https://www.curseforge.com/minecraft-bedrock/addons/purrfect-companions
+Ore Boost
+  https://www.curseforge.com/minecraft-bedrock/addons/ore-boost
+Higher Discount From Cured Villagers
+  https://www.curseforge.com/minecraft-bedrock/addons/higher-discount-from-cured-villagers
+Verity
+  https://www.curseforge.com/minecraft-bedrock/addons/verity-bedrock-edition
+Null - Undefined Code
+  https://www.curseforge.com/minecraft-bedrock/addons/null-undefined-code
+
+Optional:
+Twixxel's Stalkers (never at the same time as Null)
+  https://www.curseforge.com/minecraft-bedrock/addons/twixxels-stalkers-bedrock-edition
+Mystica Shader (only if Vibrant Visuals is greyed out on your PC)
+  https://www.curseforge.com/minecraft-bedrock/texture-packs/mystica-shaders
+
+
+IF SOMETHING LOOKS WRONG
+------------------------
+Run 1-CHECK-SETUP.cmd first. Nine times out of ten it's one of these:
+  - Minecraft was open while a script ran  -> close it, run the script again
+  - Wrong world picked from the list       -> run it again, pick the right one
+  - Vibrant Visuals off                    -> Settings > Video > Graphics Mode
+
+The docs folder has the full troubleshooting page, the compatibility notes and
+the optimization guide.
+
+All addon versions checked on CurseForge 7 September 2026. Everything downloads
+from the creators' own pages - nothing is bundled or re-hosted.
