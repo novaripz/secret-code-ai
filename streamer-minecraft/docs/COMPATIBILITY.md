@@ -33,7 +33,7 @@ Each system has exactly one owner:
 | Dynamic light | System Dynamic Light | any second dynamic-light addon |
 | Storage | Better Backpacks | any second backpack addon |
 | Vehicles | Nuckem Vehicles | any second car addon |
-| Horror | Null, then Verity | Twixxel's Stalkers only when Null is off |
+| Horror / stalker | Null, then Verity | Twixxel's Stalkers **and Herobrine Lurking** — one stalker per world |
 
 ## Never combine
 
