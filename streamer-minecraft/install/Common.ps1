@@ -190,7 +190,23 @@ function Get-Worlds {
 function Select-World {
     param([string]$ComMojang, [string]$WorldName)
     $worlds = @(Get-Worlds -ComMojang $ComMojang)
-    if ($worlds.Count -eq 0) { throw "No worlds found in $ComMojang\minecraftWorlds. Create the world in Minecraft first." }
+    if ($worlds.Count -eq 0) {
+        # Say what was checked - Minecraft keeps worlds per signed-in account, and
+        # an empty folder usually means the world was never actually created.
+        $lines = @("No worlds found.", "", "Checked:")
+        foreach ($c in @(Get-ComMojangCandidates)) {
+            $wdir = Join-Path $c 'minecraftWorlds'
+            $n = if (Test-Path $wdir) { @(Get-ChildItem $wdir -Directory -ErrorAction SilentlyContinue).Count } else { 'no folder' }
+            $lines += ("  {0}  -> {1} world(s)" -f $c, $n)
+        }
+        $lines += @(
+            "",
+            "In Minecraft, create the world (or open the one you play) and let it load fully,",
+            "then quit the game and run this again. Turning on Beta APIs on the create screen",
+            "does not create the world - you have to press Create and load in."
+        )
+        throw ($lines -join [Environment]::NewLine)
+    }
 
     if ($WorldName) {
         $match = @($worlds | Where-Object { $_.Name -eq $WorldName })
