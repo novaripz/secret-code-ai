@@ -38,6 +38,10 @@ EVERY DAY
    In Performance Mode also set Graphics Mode back to Fancy.
 
    9-HORROR-OFF.cmd         panic button - removes Null, Stalkers and Verity
+   14-NULL-REPORT.cmd       shows what's inside the Null addon (changes nothing)
+   15-NULL-AMBIENT.cmd      Null stays, but stops chasing you and stops the
+                            particle effects - just there in the background
+   16-NULL-FULL-STRENGTH.cmd  undoes that, Null back to normal
    10-HORROR-ON.cmd         puts them back
    8-HORROR-TEST-WORLD.cmd  test Null on a throwaway world (do this first!)
 

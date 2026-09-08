@@ -33,6 +33,16 @@ Settings → Video → Graphics Mode → **Vibrant Visuals**. If it's greyed out
 5. Still nothing from Null after a long test-world session? Its 26.20 scripts don't run on your
    game version. `9-HORROR-OFF.cmd`, and check its CurseForge page for an update later.
 
+### Null is too much - the chasing and the particle storm
+`15-NULL-AMBIENT.cmd`. It takes a full copy of the addon first, then strips the
+chase/attack behaviours out of its entity files and mutes the particle bursts in its
+scripts. It keeps the arrivals, the join message, the crosses and the sounds - Null is
+still there, just in the background. `16-NULL-FULL-STRENGTH.cmd` puts it back exactly
+as downloaded. `14-NULL-REPORT.cmd` prints what the addon actually contains without
+changing anything - run that first if you want to see what will be touched.
+
+These edits are to your own downloaded copy on your own PC. Nothing is redistributed.
+
 ### Null wrecked something in the survival world
 `9-HORROR-OFF.cmd` (removes Null, Stalkers and Verity, keeps everything else), then
 `6-RESTORE-BACKUP.cmd` and pick the newest backup from before it happened.
