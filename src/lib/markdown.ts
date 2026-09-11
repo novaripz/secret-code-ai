@@ -1,13 +1,17 @@
 // A small markdown parser built for streaming.
 //
-// Two things make it different from a normal one:
+// Three things make it different from a normal one:
 //
 //  1. It accepts partial input. A code fence with no closing fence yet is a
 //     code block that is still open, not a syntax error, and an unfinished
 //     `**bold` renders as literal text until its closing marker arrives, so
 //     nothing flickers as the model types through a marker.
 //
-//  2. Everything carries the character offset it started at. Offsets are
+//  2. Math plays by the same rule. `$x^2 +` is prose until the `$` that
+//     closes it lands, which is the only way a half-typed expression can be
+//     shown to a student without it flashing through a broken state first.
+//
+//  3. Everything carries the character offset it started at. Offsets are
 //     stable while text only ever gets appended, which lets the renderer key
 //     words by offset and animate only the ones that just showed up.
 
@@ -15,7 +19,8 @@ export type Inline =
   | { kind: "text"; text: string; offset: number }
   | { kind: "bold"; text: string; offset: number }
   | { kind: "italic"; text: string; offset: number }
-  | { kind: "code"; text: string; offset: number };
+  | { kind: "code"; text: string; offset: number }
+  | { kind: "math"; tex: string; display: boolean; offset: number };
 
 export interface ListItem {
   inlines: Inline[];
@@ -28,10 +33,18 @@ export type Block =
   | { type: "ul"; items: ListItem[]; offset: number }
   | { type: "ol"; items: ListItem[]; offset: number }
   | { type: "code"; code: string; language?: string; open: boolean; offset: number }
+  | { type: "math"; tex: string; offset: number }
   | { type: "hr"; offset: number };
 
-/** Matches only *closed* spans, so a half-written marker stays literal text. */
-const INLINE = /(`[^`\n]+`)|(\*\*[^*\n]+\*\*)|(\*[^*\n]+\*)|(_[^_\n]+_)/;
+// Matches only *closed* spans, so a half-written marker stays literal text.
+//
+// The dollar rules are what keep prose out of math: a `$` opens an expression
+// only when a non-space follows it, only a `$` with a non-space before it can
+// close it, and that closing `$` may not be followed by a digit. Without those
+// three, "it costs $5" and "$5 to $10" typeset as equations — and students
+// write about money far more often than they write TeX.
+const INLINE =
+  /(`[^`\n]+`)|(\$\$[^\n]+?\$\$|\\\[[^\n]+?\\\])|(\$(?![\s$])(?:[^$\n]*?[^\s$])?\$(?!\d)|\\\([^\n]+?\\\))|(\*\*[^*\n]+\*\*)|(\*[^*\n]+\*)|(_[^_\n]+_)/;
 
 export function parseInline(text: string, offset: number): Inline[] {
   const out: Inline[] = [];
@@ -50,6 +63,12 @@ export function parseInline(text: string, offset: number): Inline[] {
     const token = m[0];
     if (token.startsWith("`")) {
       out.push({ kind: "code", text: token.slice(1, -1), offset: pos });
+    } else if (m[2] !== undefined) {
+      out.push({ kind: "math", tex: token.slice(2, -2), display: true, offset: pos });
+    } else if (m[3] !== undefined) {
+      // `$…$` wraps in one character each side, `\(…\)` in two.
+      const delim = token.startsWith("$") ? 1 : 2;
+      out.push({ kind: "math", tex: token.slice(delim, -delim), display: false, offset: pos });
     } else if (token.startsWith("**")) {
       out.push({ kind: "bold", text: token.slice(2, -2), offset: pos });
     } else {
@@ -69,6 +88,7 @@ const NUMBERED = /^\s*\d+[.)]\s+(.*)$/;
 const HEADING = /^(#{1,3})\s+(.*)$/;
 const HR = /^\s*(?:---+|\*\*\*+|___+)\s*$/;
 const FENCE = /^\s*```\s*([a-zA-Z0-9+#-]*)\s*$/;
+const DISPLAY = /^\s*(\$\$|\\\[)/;
 
 export function parseMarkdown(content: string): Block[] {
   const blocks: Block[] = [];
@@ -110,6 +130,32 @@ export function parseMarkdown(content: string): Block[] {
       }
       blocks.push({ type: "code", code: body.join("\n"), language, open: !closed, offset });
       continue;
+    }
+
+    // Display math that starts a line, which is how a worked step arrives.
+    // A fence has already eaten its own lines above, so code wins over math.
+    // Nothing becomes a math block before its closing delimiter has arrived:
+    // until then these lines fall through and stay the literal text the
+    // student is watching appear.
+    const display = DISPLAY.exec(line);
+    if (display) {
+      const opener = display[1];
+      const closer = opener === "$$" ? "$$" : "\\]";
+      const texStart = offset + line.indexOf(opener) + opener.length;
+      const texEnd = content.indexOf(closer, texStart);
+      const tex = texEnd === -1 ? "" : content.slice(texStart, texEnd);
+      if (tex.trim() !== "") {
+        // The closer has to end its line. If prose follows it on the same
+        // line this is a sentence with math in it, and the inline pass reads
+        // that better than a block would.
+        let last = i;
+        while (last + 1 < lines.length && lineOffsets[last + 1] <= texEnd) last++;
+        if (lines[last].slice(texEnd + closer.length - lineOffsets[last]).trim() === "") {
+          blocks.push({ type: "math", tex, offset });
+          i = last + 1;
+          continue;
+        }
+      }
     }
 
     if (HR.test(line)) {
@@ -154,7 +200,12 @@ export function parseMarkdown(content: string): Block[] {
         HR.test(l) ||
         HEADING.test(l) ||
         BULLET.test(l) ||
-        NUMBERED.test(l)
+        NUMBERED.test(l) ||
+        // A display delimiter ends the paragraph so the math can own its own
+        // block. Guarded on paraLines because an opener whose closer has not
+        // arrived yet fell through to here on purpose: without the guard this
+        // paragraph would be empty and the outer loop would never advance.
+        (paraLines.length > 0 && DISPLAY.test(l))
       ) {
         break;
       }

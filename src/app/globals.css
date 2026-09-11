@@ -253,3 +253,29 @@ body {
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
+
+/* Math, typeset by KaTeX. Its own stylesheet is imported by the message
+   renderer and carries the fonts and the layout; everything here is the part
+   KaTeX leaves to the app. It draws in the inherited colour, so the theme is
+   one token, and it holds in both grounds because --text is the same ink the
+   surrounding sentence is already using. */
+.math {
+  color: var(--text);
+  /* Paragraphs are pre-wrap so the model's own line breaks survive. KaTeX
+     positions its pieces itself and the source newlines inside an expression
+     are not meant to be seen, so this opts back out for the math only. */
+  white-space: normal;
+}
+
+/* A worked step is often wider than a phone. Scrolling the equation is the
+   only option that neither shrinks it below reading size nor pushes the whole
+   thread sideways. */
+.math-display {
+  display: block;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 2px;
+}
+.math-display .katex-display {
+  margin: 0.4em 0;
+}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAiProvider } from "@/lib/ai";
+import { getProviderChain } from "@/lib/ai/chain";
 import { validateOperations } from "@/lib/ai/validateOperations";
 import type { AiMessage, ImageAttachment } from "@/lib/ai/provider";
 import type { ExplainDepth, LearningMode } from "@/lib/ai/systemPrompt";
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
   // early and it stays on the buffered path.
   if (body.stream === true && request.chatOnly) {
     try {
-      const provider = getAiProvider();
+      const provider = getProviderChain();
       const chunks = provider.generateStream(request);
       const encoder = new TextEncoder();
 
@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const provider = getAiProvider();
+    const provider = getProviderChain();
     const response = await provider.generate(request);
 
     // Validate/sanitize operations server-side too, so a malformed model
