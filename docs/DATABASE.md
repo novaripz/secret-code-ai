@@ -372,3 +372,22 @@ update public.teacher_codes set revoked = true where code = 'the-code';
 unchanged — a role change is refused while anyone is signed in. Redeeming is the
 one exception, and it only opens for a code you deliberately created. Treat a
 code like a password: it is the whole authorisation.
+
+---
+
+## Step 7 — apply `0003_revoke_anon.sql`
+
+Paste and Run, same as the others. Two lines of what it does, because a teacher
+or a district may ask you:
+
+Signed-out visitors had a leftover table privilege on the new tables. Nothing
+leaked — row-level security refused every row, which is why an anonymous read
+came back empty instead of full. This takes the privilege away too, so a
+stranger is stopped twice rather than once.
+
+It changes nothing for students or teachers.
+
+**How to check it worked.** From any browser, with your publishable key, reading
+a table should now say `permission denied` rather than returning `[]`. "There is
+nothing here for you" and "this is not yours to ask about" are different
+answers, and the second is the one you want a stranger to get.
