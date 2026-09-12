@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { guardRequest } from "@/lib/security/apiGuard";
+import { MAX_SMALL_BODY_BYTES, readJsonBody } from "@/lib/security/requestLimits";
 
 // The Watch tab's only way out to YouTube.
 //
@@ -22,6 +24,16 @@ import { NextRequest, NextResponse } from "next/server";
 // not to be a real cache.
 
 export const runtime = "nodejs";
+
+// Watch spends YouTube quota (100 units a search against a daily 10,000), so
+// it is worth rate limiting for exactly the reason /api/ai is: a loop here
+// costs the owner the Watch tab for the rest of the day. The in-process cache
+// below already absorbs repeat terms; these limits cover the case where the
+// terms keep changing. Guests are held tighter because a guest is anonymous.
+const WATCH_USER_RULE = { limit: 30, windowMs: 60_000 };
+const WATCH_GUEST_RULE = { limit: 10, windowMs: 60_000 };
+const WATCH_BUSY =
+  "You're searching faster than Panda can keep up. Wait a few seconds and try again.";
 
 export interface Video {
   id: string;
@@ -256,7 +268,17 @@ const FALLBACK_SEEDS: Seed[] = [
 
 /** Search: exactly what was typed, no reasoning attached. */
 export async function GET(req: NextRequest) {
-  const q = req.nextUrl.searchParams.get("q")?.trim();
+  const guard = await guardRequest(req, {
+    route: "watch",
+    user: WATCH_USER_RULE,
+    guest: WATCH_GUEST_RULE,
+    busyMessage: WATCH_BUSY,
+  });
+  if (!guard.ok) return guard.response;
+
+  // A query longer than this is not a search, it is someone probing. Trimming
+  // rather than rejecting keeps a long paste working.
+  const q = req.nextUrl.searchParams.get("q")?.trim().slice(0, 200);
   if (!q) return NextResponse.json({ videos: [] });
 
   const key = apiKey();
@@ -271,12 +293,24 @@ export async function GET(req: NextRequest) {
 
 /** The feed: run the terms the browser derived from what the student saved. */
 export async function POST(req: NextRequest) {
+  const guard = await guardRequest(req, {
+    route: "watch",
+    user: WATCH_USER_RULE,
+    guest: WATCH_GUEST_RULE,
+    busyMessage: WATCH_BUSY,
+  });
+  if (!guard.ok) return guard.response;
+
   const key = apiKey();
   if (!key) return problemResponse("missing-key", 503, NOT_SET_UP);
 
   let seeds = FALLBACK_SEEDS;
-  try {
-    const body = await req.json();
+  {
+    // A feed body is a handful of short strings; anything larger is refused
+    // outright rather than silently truncated, so the caller learns why.
+    const read = await readJsonBody(req, MAX_SMALL_BODY_BYTES, true);
+    if (!read.ok) return read.response;
+    const body = read.body as { seeds?: unknown } | null | undefined;
     const sent: unknown[] = Array.isArray(body?.seeds) ? body.seeds : [];
     const clean = sent
       .filter((s): s is Seed => typeof (s as Seed)?.term === "string" && Boolean((s as Seed).term.trim()))
@@ -286,8 +320,6 @@ export async function POST(req: NextRequest) {
         because: String(s.because ?? "").slice(0, 160),
       }));
     if (clean.length) seeds = clean;
-  } catch {
-    // No body, or not JSON. The fallback seed still gives them a feed.
   }
 
   try {

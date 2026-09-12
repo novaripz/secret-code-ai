@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { guardRequest } from "@/lib/security/apiGuard";
+import { MAX_SMALL_BODY_BYTES, readJsonBody } from "@/lib/security/requestLimits";
 
 // Student reports.
 //
@@ -14,18 +16,31 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
+// Reporting is rare by nature — a student files one when something went wrong,
+// not several a minute — so the limit is low. It is still worth having: the
+// route writes to the server log, and an unbounded writer is a way to fill a
+// log budget and bury real reports under noise. The message is deliberately
+// gentle; someone hitting this may already be upset.
+const REPORT_USER_RULE = { limit: 10, windowMs: 5 * 60_000 };
+const REPORT_GUEST_RULE = { limit: 5, windowMs: 5 * 60_000 };
+
 const CATEGORIES = new Set([
   "wrongInfo", "disrespectful", "assignmentWrong", "unexpected",
   "languageMissing", "unfair", "other",
 ]);
 
 export async function POST(req: NextRequest) {
-  let body: { category?: unknown; details?: unknown };
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
-  }
+  const guard = await guardRequest(req, {
+    route: "report",
+    user: REPORT_USER_RULE,
+    guest: REPORT_GUEST_RULE,
+    busyMessage: "Panda already has your reports. Give it a few minutes before sending more.",
+  });
+  if (!guard.ok) return guard.response;
+
+  const read = await readJsonBody(req, MAX_SMALL_BODY_BYTES);
+  if (!read.ok) return read.response;
+  const body = (read.body ?? {}) as { category?: unknown; details?: unknown };
 
   const category = typeof body.category === "string" && CATEGORIES.has(body.category)
     ? body.category

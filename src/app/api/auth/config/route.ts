@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { guardRequest } from "@/lib/security/apiGuard";
 
 // Hands the browser what it needs to start a sign-in, at runtime.
 //
@@ -11,7 +12,25 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+// Public by design — see above — so there is no auth here and there must not
+// be: the sign-in screen fetches this before anyone has a token. It is still
+// rate limited per IP, because "public" and "free to hammer" are different
+// things and every call reads env and allocates a response. The ceiling is
+// high enough that a page reload storm never notices it.
+const CONFIG_RULE = { limit: 60, windowMs: 60_000 };
+
+export async function GET(req: NextRequest) {
+  const guard = await guardRequest(req, {
+    route: "auth-config",
+    user: CONFIG_RULE,
+    guest: CONFIG_RULE,
+    busyMessage: "Panda is being asked for this too often right now. Reload in a moment.",
+    // Never look at the Authorization header: this is what you call *before*
+    // you have a token, and verifying one here would be pure latency.
+    authenticate: false,
+  });
+  if (!guard.ok) return guard.response;
+
   const url = process.env.SUPABASE_URL;
   // Supabase renamed the anon key to the "publishable key" and the dashboard
   // now shows only the new name, so accept either rather than making anyone

@@ -3,6 +3,29 @@ import { getProviderChain } from "@/lib/ai/chain";
 import { validateOperations } from "@/lib/ai/validateOperations";
 import type { AiMessage, ImageAttachment } from "@/lib/ai/provider";
 import type { ExplainDepth, LearningMode } from "@/lib/ai/systemPrompt";
+import { guardRequest } from "@/lib/security/apiGuard";
+import {
+  MAX_AI_BODY_BYTES,
+  MAX_AI_CONTEXT_CHARS,
+  MAX_AI_CONTEXT_FILES,
+  MAX_AI_HISTORY_CHARS,
+  MAX_AI_HISTORY_MESSAGES,
+  MAX_AI_PROMPT_CHARS,
+  readJsonBody,
+  tooLarge,
+  totalChars,
+} from "@/lib/security/requestLimits";
+
+// This route is the expensive one: every call spends real quota on one of four
+// AI providers, and until now anyone who found the URL could spend all of it.
+// The limits below are per minute, and a signed-in student gets roughly three
+// times what a guest gets — a guest is anonymous, so it is the abuse path, and
+// the numbers are set so that ordinary use (a question, read the answer, ask
+// again) never touches them while a script loop hits the wall in seconds.
+const USER_RULE = { limit: 20, windowMs: 60_000 };
+const GUEST_RULE = { limit: 6, windowMs: 60_000 };
+const BUSY_MESSAGE =
+  "You're sending messages faster than Panda can answer. Try again in a few seconds.";
 
 const LEARNING_MODES = new Set<LearningMode>(["coaching", "study", "review", "answers"]);
 
@@ -64,12 +87,17 @@ function sanitizeImage(image: unknown): ImageAttachment | undefined {
 }
 
 export async function POST(req: NextRequest) {
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
-  }
+  const guard = await guardRequest(req, {
+    route: "ai",
+    user: USER_RULE,
+    guest: GUEST_RULE,
+    busyMessage: BUSY_MESSAGE,
+  });
+  if (!guard.ok) return guard.response;
+
+  const read = await readJsonBody(req, MAX_AI_BODY_BYTES);
+  if (!read.ok) return read.response;
+  const body: unknown = read.body;
 
   if (!isRequestBody(body)) {
     return NextResponse.json({ error: "Missing required fields: prompt, fileTree." }, { status: 400 });
@@ -79,15 +107,38 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Prompt must not be empty." }, { status: 400 });
   }
   // Generous, because attached text/code files are folded into the prompt.
-  if (body.prompt.length > 400_000) {
-    return NextResponse.json({ error: "That's too much text to send at once." }, { status: 400 });
+  if (body.prompt.length > MAX_AI_PROMPT_CHARS) {
+    return tooLarge("That's too much text to send at once. Try asking about one part of it.");
+  }
+
+  // History and context files are the other two ways a body gets huge, and
+  // both are entirely client-supplied. The history slice below already trims
+  // to the last 20 turns, but a caller can make those twenty turns enormous,
+  // so the character total is checked as well.
+  const history = Array.isArray(body.history) ? body.history.slice(-MAX_AI_HISTORY_MESSAGES) : [];
+  if (
+    totalChars(
+      history.map((m) => (m && typeof m.content === "string" ? m.content : "")),
+    ) > MAX_AI_HISTORY_CHARS
+  ) {
+    return tooLarge("This conversation has got too long for Panda to carry. Start a new chat.");
+  }
+
+  const contextFiles =
+    body.contextFiles && typeof body.contextFiles === "object" ? body.contextFiles : {};
+  const contextEntries = Object.entries(contextFiles);
+  if (contextEntries.length > MAX_AI_CONTEXT_FILES) {
+    return tooLarge("That's too many files to send at once. Pick the ones that matter.");
+  }
+  if (totalChars(contextEntries.map(([, v]) => (typeof v === "string" ? v : ""))) > MAX_AI_CONTEXT_CHARS) {
+    return tooLarge("Those files add up to more than Panda can read at once. Send fewer.");
   }
 
   const request = {
     prompt: body.prompt,
     fileTree: body.fileTree ?? "",
-    contextFiles: body.contextFiles ?? {},
-    history: Array.isArray(body.history) ? body.history.slice(-20) : [],
+    contextFiles,
+    history,
     explainMode: body.explainMode === true,
     explainDepth:
       body.explainDepth && EXPLAIN_DEPTHS.has(body.explainDepth) ? body.explainDepth : "normal",
