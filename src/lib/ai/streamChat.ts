@@ -21,6 +21,12 @@ export interface StreamRequest {
   replyLanguage?: string;
   /** Assignment context, only sent from a class chat. */
   assignmentContext?: string;
+  /**
+   * Pre-rendered prompt text from the insights engine, or "" when the evidence
+   * is too thin to say anything. Built on the client because the signals live
+   * on the client; the server still bounds it like every other client field.
+   */
+  adaptation?: string;
 }
 
 export interface StreamHandlers {

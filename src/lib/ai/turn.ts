@@ -19,6 +19,7 @@ export function systemInstructionFor(req: AgentRequest): string {
     replyLanguage: req.replyLanguage,
     aiHomie: req.aiHomie,
     humanize: req.humanize,
+    adaptation: req.adaptation,
   });
 }
 

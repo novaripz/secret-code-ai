@@ -14,6 +14,8 @@ import { PandaSitting } from "@/components/Panda";
 import { dueLabel } from "../../page";
 import { isOverdue, type AssignmentRules } from "@/lib/school/types";
 import { LockIcon, SendIcon } from "@/components/icons";
+import { useInsightsStore } from "@/store/useInsightsStore";
+import { signalFromAction, signalFromText, topicForAssignment } from "@/lib/insights";
 
 // One assignment, with a Panda that can actually see it.
 //
@@ -74,17 +76,29 @@ export default function AssignmentPage({
   const memoryBlock = useProfileStore((s) => s.memoryBlock);
   const languages = useProfileStore((s) => s.languages);
   const { t } = useI18n();
+  const insightsHydrated = useInsightsStore((s) => s.hydrated);
+  const hydrateInsights = useInsightsStore((s) => s.hydrate);
 
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const streamRef = useRef<StreamHandle | null>(null);
+  // One chat session per visit to this page. Repetition inside one sitting is
+  // much weaker evidence than the same trouble coming back another day, and the
+  // aggregator can only tell those apart if we give it a session id.
+  const sessionId = useRef(crypto.randomUUID());
   const scrollRef = useRef<HTMLDivElement>(null);
   const stick = useRef(true);
 
   useEffect(() => {
     if (!hydrated) hydrate();
   }, [hydrated, hydrate]);
+
+  // Ahead of the first message, so the adaptation is readable from memory when
+  // one is sent rather than awaited on the way out.
+  useEffect(() => {
+    if (!insightsHydrated) void hydrateInsights();
+  }, [insightsHydrated, hydrateInsights]);
 
   const cls = classes.find((c) => c.id === id);
   const assignment = assignments.find((a) => a.id === assignmentId);
@@ -104,11 +118,21 @@ export default function AssignmentPage({
     if (el && stick.current) el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
   }, [total, messages.length]);
 
-  function send(text: string, opts?: { simplify?: boolean }) {
+  function send(text: string, opts?: { simplify?: boolean; fromAction?: MessageAction }) {
     const prompt = text.trim();
     if (!prompt || busy || !assignment || !cls) return;
 
     setInput("");
+
+    const insights = useInsightsStore.getState();
+    // Here we have a topic a teacher would recognise: the assignment they set,
+    // with its own title, rather than a subject guessed out of the chat.
+    const topic = topicForAssignment(assignment, cls);
+    if (!opts?.fromAction) {
+      insights.noteWriting(prompt);
+      insights.record(signalFromText(prompt, { topic, sessionId: sessionId.current }));
+    }
+
     const userMsg: Msg = { id: crypto.randomUUID(), role: "user", content: prompt };
     const replyId = crypto.randomUUID();
     setMessages((prev) => [...prev, userMsg, { id: replyId, role: "assistant", content: "", streaming: true }]);
@@ -133,6 +157,9 @@ export default function AssignmentPage({
         learningMode: rule.answers === "allowed" ? "answers" : "coaching",
         simplify: rule.simplification === "disabled" ? false : opts?.simplify === true,
         replyLanguage,
+        // Computed synchronously from signals already in state. Nothing on this
+        // path awaits storage; time-to-first-token stays where it is.
+        adaptation: insights.adaptation(),
         assignmentContext: buildContext(
           assignment.title,
           cls.name,
@@ -264,11 +291,15 @@ export default function AssignmentPage({
                           showTranslate={rule.translation === "allowed" && replyLocale !== "en"}
                           showHint
                           disabled={busy}
-                          onAction={(action: MessageAction) =>
+                          onAction={(action: MessageAction) => {
+                            useInsightsStore.getState().record(
+                              signalFromAction(action, { topic: topicForAssignment(assignment, cls), sessionId: sessionId.current }),
+                            );
                             send(actionPrompt(action, replyLanguage), {
                               simplify: action === "simplify" || action === "different",
-                            })
-                          }
+                              fromAction: action,
+                            });
+                          }}
                         />
                       )}
                     </div>

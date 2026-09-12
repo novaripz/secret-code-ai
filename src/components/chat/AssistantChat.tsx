@@ -11,6 +11,8 @@ import { ModePills } from "./ModePills";
 import { PandaSitting } from "@/components/Panda";
 import { MessageActions, actionPrompt, type MessageAction } from "./MessageActions";
 import { useI18n, type StringKey } from "@/lib/i18n";
+import { useInsightsStore } from "@/store/useInsightsStore";
+import { NEUTRAL_ACTIONS, signalFromAction, type Topic } from "@/lib/insights";
 import { Priorities } from "@/components/home/Priorities";
 import { findLocale } from "@/lib/i18n/locales";
 import { FileIcon } from "@/components/icons";
@@ -22,6 +24,22 @@ const STARTERS: StringKey[] = [
   "chat.starterCheckWork",
 ];
 
+
+/**
+ * Personal Panda has no assignment and no class, so it has no honest topic.
+ *
+ * We still record the neutral buttons here — "translate" in particular, which
+ * is the clearest statement a student can make that the English was the
+ * obstacle, and which `estimateEnglishLevel` reads straight off the signals.
+ * Neutral actions score zero points in the aggregator, so this topic can never
+ * become a finding a teacher reads as "struggling with General chat".
+ *
+ * The struggle buttons (simplify, hint, different, example) are deliberately
+ * NOT captured here. Pressing them in a chat about nothing in particular is
+ * real, but we cannot say what it was about, and a finding labelled after the
+ * surface the student happened to be on would be a topic we invented.
+ */
+const GENERAL_TOPIC: Topic = { id: "general", label: "General chat" };
 
 export function AssistantChat() {
   const {
@@ -47,6 +65,9 @@ export function AssistantChat() {
   const displayName = useProfileStore((s) => s.displayName);
   const profileHydrated = useProfileStore((s) => s.hydrated);
 
+  const insightsHydrated = useInsightsStore((s) => s.hydrated);
+  const hydrateInsights = useInsightsStore((s) => s.hydrate);
+
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -57,6 +78,12 @@ export function AssistantChat() {
   useEffect(() => {
     if (!hydrated) void hydrate();
   }, [hydrated, hydrate]);
+
+  // Loaded once, well before the first send, so the adaptation string can be
+  // computed synchronously from memory when a message actually goes out.
+  useEffect(() => {
+    if (!insightsHydrated) void hydrateInsights();
+  }, [insightsHydrated, hydrateInsights]);
 
   const messages = activeThread?.messages ?? [];
 
@@ -93,6 +120,11 @@ export function AssistantChat() {
     addUserMessage(typed, outgoing);
     setLoading(true);
 
+    const insights = useInsightsStore.getState();
+    // Only what the student typed themselves. A button's canned prompt is our
+    // sentence, not theirs, and counting it would flatter the English estimate.
+    if (!promptOverride && typed) insights.noteWriting(typed);
+
     try {
       const attachedText = attachmentsToPromptText(outgoing);
       const prompt = [typed, attachedText].filter(Boolean).join("\n\n");
@@ -124,6 +156,9 @@ export function AssistantChat() {
           aiHomie: modes.aiHomie,
           humanize: modes.humanize,
           studentProfile: memoryBlock(),
+          // Pure arithmetic over signals already in memory — no await, so this
+          // adds nothing measurable before the request leaves.
+          adaptation: insights.adaptation(),
           images: outgoing
             .filter((a) => a.kind === "image" && a.base64 && a.mimeType)
             .map((a) => ({ data: a.base64!, mimeType: a.mimeType! })),
@@ -294,11 +329,19 @@ export function AssistantChat() {
                             showTranslate={replyLocale !== "en"}
                             showHint={messages.length > 1}
                             disabled={loading}
-                            onAction={(action: MessageAction) =>
+                            onAction={(action: MessageAction) => {
+                              if (NEUTRAL_ACTIONS.includes(action)) {
+                                useInsightsStore.getState().record(
+                                  signalFromAction(action, {
+                                    topic: GENERAL_TOPIC,
+                                    sessionId: activeThread?.id,
+                                  }),
+                                );
+                              }
                               void send(actionPrompt(action, findLocale(replyLocale)?.englishName ?? "English"), {
                                 simplify: action === "simplify" || action === "different",
-                              })
-                            }
+                              });
+                            }}
                           />
                         )}
                       </div>

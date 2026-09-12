@@ -707,9 +707,9 @@ export function useTeacherRole(): { role: Role | null; state: LoadState } {
 // store state.
 //
 // It is also still example data, and that is not an oversight. Struggle signals
-// are produced in the student's own browser (src/lib/insights is pure, and
-// useWatchStore-style capture never leaves the device), and the schema has
-// nowhere to put them. Until a signals table exists there is genuinely nothing
+// are now genuinely captured (useInsightsStore, from the chat surfaces), but
+// they are written to IndexedDB in the student's own browser and the schema has
+// nowhere to put them — there is no signals table and no sync. Until a signals table exists there is genuinely nothing
 // for a teacher to read, so these two functions keep returning the fixture and
 // the screens that use them keep their DataSourceNote.
 

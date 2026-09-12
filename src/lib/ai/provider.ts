@@ -39,6 +39,12 @@ export interface AgentRequest {
    * what keeps assignment contents out of the general planner.
    */
   assignmentContext?: string;
+  /**
+   * What the student has been struggling with, already rendered as prompt text
+   * by `buildAdaptiveAddendum`. Empty or absent when the evidence is thin —
+   * which is the normal case for a new student and must stay silent.
+   */
+  adaptation?: string;
   /** Plain, everyday writing for essays and emails. */
   humanize?: boolean;
   /** When true, answer in a casual, Gen-Z, friend-to-friend voice. */

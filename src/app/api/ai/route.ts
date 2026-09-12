@@ -49,6 +49,7 @@ interface RequestBody {
   simplify?: boolean;
   replyLanguage?: string;
   assignmentContext?: string;
+  adaptation?: string;
   humanize?: boolean;
   aiHomie?: boolean;
   chatOnly?: boolean;
@@ -154,6 +155,17 @@ export async function POST(req: NextRequest) {
     // to send, which is the boundary the product depends on.
     assignmentContext:
       typeof body.assignmentContext === "string" ? body.assignmentContext.slice(0, 8000) : undefined,
+    // What the insights engine noticed about this student, already turned into
+    // prompt text on the client. Same discipline as the other client-supplied
+    // strings: it is bounded, never trusted for length, and an absent or
+    // non-string value simply means "no adaptation" rather than an error. The
+    // cap is generous next to the addendum's real size (a few hundred
+    // characters for three findings) and small enough that nobody can use this
+    // field to smuggle a second system prompt in.
+    adaptation:
+      typeof body.adaptation === "string" && body.adaptation.trim().length > 0
+        ? body.adaptation.slice(0, 2000)
+        : undefined,
     aiHomie: body.aiHomie === true,
     chatOnly: body.chatOnly === true,
     projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,
