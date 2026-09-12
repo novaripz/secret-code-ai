@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useStudioStore } from "@/store/useStudioStore";
 import { loadProject } from "@/lib/storage";
-import { StudioLayout } from "@/components/layout/StudioLayout";
+import { Workspace } from "@/components/build/Workspace";
 
 export default function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -48,5 +48,5 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   }
 
   if (!project) return null;
-  return <StudioLayout />;
+  return <Workspace />;
 }

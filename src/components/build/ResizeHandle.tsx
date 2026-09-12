@@ -103,13 +103,13 @@ export function ResizeHandle({
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
       onKeyDown={keyDown}
-      className={`group relative z-10 shrink-0 touch-none bg-[var(--bg)] ${
+      className={`group relative z-10 shrink-0 touch-none bg-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
         vertical ? "w-1.5 cursor-col-resize" : "h-1.5 cursor-row-resize"
       }`}
     >
       <span
         aria-hidden
-        className={`pointer-events-none absolute transition-colors ${
+        className={`pointer-events-none absolute transition-colors motion-reduce:transition-none ${
           vertical ? "inset-y-0 left-1/2 w-px -translate-x-1/2" : "inset-x-0 top-1/2 h-px -translate-y-1/2"
         } ${dragging ? "bg-[var(--accent)]" : "bg-[var(--line)] group-hover:bg-[var(--line-strong)]"}`}
       />

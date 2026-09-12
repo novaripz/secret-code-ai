@@ -33,7 +33,7 @@ export function Pane({
           onClick={onClose}
           aria-label={closeLabel}
           title={closeLabel}
-          className="shrink-0 rounded p-1 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+          className="shrink-0 rounded p-1 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
         >
           <XIcon className="h-3.5 w-3.5" />
         </button>
