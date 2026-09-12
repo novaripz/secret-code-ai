@@ -46,7 +46,7 @@ export default function WatchPage() {
   const [results, setResults] = useState<Video[] | null>(null);
   const [searched, setSearched] = useState<string | null>(null);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [trouble, setTrouble] = useState<{ problem: WatchProblem; message: string } | null>(null);
 
   // Saves live in the store, but the card needs a synchronous yes/no per
@@ -61,14 +61,23 @@ export default function WatchPage() {
   }, [saved]);
 
   // Read the seeds out of a ref inside the loader, so loading the feed doesn't
-  // become a dependency of every save the student makes.
+  // become a dependency of every save the student makes. Synced after commit,
+  // never during render: a render that React discards would otherwise leave
+  // this describing a tree that never existed.
   const seedsRef = useRef(seeds);
-  seedsRef.current = seeds;
+  useEffect(() => {
+    seedsRef.current = seeds;
+  }, [seeds]);
 
-  const loadFeed = useCallback(async () => {
+  // `spinner` is false for the load that happens on arrival, because the page
+  // already starts in the loading state and flipping it again inside an effect
+  // is a render the student pays for and never sees.
+  const loadFeed = useCallback(async (spinner = true) => {
     const using = seedsRef.current;
-    setLoading(true);
-    setTrouble(null);
+    if (spinner) {
+      setLoading(true);
+      setTrouble(null);
+    }
     try {
       const res = await fetch("/api/watch", {
         method: "POST",
@@ -102,9 +111,12 @@ export default function WatchPage() {
   // Wait for the store before the first feed: asking YouTube for the starter
   // seeds and then immediately asking again for the real ones would spend
   // six searches to show one grid.
+  const started = useRef(false);
   useEffect(() => {
-    if (hydrated && feed === null && !loading) void loadFeed();
-  }, [hydrated, feed, loading, loadFeed]);
+    if (!hydrated || started.current) return;
+    started.current = true;
+    void loadFeed(false);
+  }, [hydrated, loadFeed]);
 
   async function runSearch(q: string) {
     setLoading(true);
