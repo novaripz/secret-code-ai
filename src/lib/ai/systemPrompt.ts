@@ -206,6 +206,15 @@ export interface PromptModes {
   explainDepth?: ExplainDepth;
   aiHomie?: boolean;
   humanize?: boolean;
+  /**
+   * What the insights engine noticed, already turned into prompt text by
+   * `buildAdaptiveAddendum` in src/lib/insights/prompt.ts.
+   *
+   * It arrives pre-rendered rather than as a summary object on purpose: this
+   * module stays a pure string assembler with no idea what a struggle signal
+   * is, and the rules for what counts as evidence live in one place.
+   */
+  adaptation?: string;
 }
 
 /** Assembles the system prompt for a request: base persona + whichever modes are on. */
@@ -231,5 +240,9 @@ export function buildSystemPrompt(base: string, modes: PromptModes = {}): string
   }
   if (modes.aiHomie) prompt += AI_HOMIE_ADDENDUM;
   if (modes.humanize) prompt += HUMANIZE_ADDENDUM;
+  // Last, and after the tone modes, so what we know about this student survives
+  // a voice setting. AI Homie may change how it sounds; it may not change how
+  // much time gets spent on the thing they cannot do yet.
+  if (modes.adaptation) prompt += modes.adaptation;
   return prompt;
 }
