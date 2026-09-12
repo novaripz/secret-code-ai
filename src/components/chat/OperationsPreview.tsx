@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import type { FileOperation } from "@/types";
 import { CheckIcon, XIcon, FileIcon } from "@/components/icons";
 
@@ -64,6 +65,8 @@ export function OperationsPreview({
   onApply: () => void;
   onReject: () => void;
 }) {
+  const { t } = useI18n();
+
   return (
     <div className="mt-2 space-y-1.5">
       {operations.map((op, i) => (
@@ -75,18 +78,18 @@ export function OperationsPreview({
             onClick={onApply}
             className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--success-soft)] text-[var(--success)] hover:brightness-95 font-medium"
           >
-            <CheckIcon className="w-3.5 h-3.5" /> Yes, make this change
+            <CheckIcon className="w-3.5 h-3.5" /> {t("studio.applyChange")}
           </button>
           <button
             onClick={onReject}
             className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--surface-2)] text-[var(--text-dim)] hover:bg-[var(--surface-3)]"
           >
-            <XIcon className="w-3.5 h-3.5" /> No thanks
+            <XIcon className="w-3.5 h-3.5" /> {t("studio.rejectChange")}
           </button>
         </div>
       )}
-      {applied && <div className="text-[11px] text-[var(--success)] pt-0.5">✓ Done — this is now in your project</div>}
-      {rejected && <div className="text-[11px] text-[var(--text-faint)] pt-0.5">Skipped</div>}
+      {applied && <div className="text-[11px] text-[var(--success)] pt-0.5">{t("studio.changeApplied")}</div>}
+      {rejected && <div className="text-[11px] text-[var(--text-faint)] pt-0.5">{t("studio.skipped")}</div>}
     </div>
   );
 }

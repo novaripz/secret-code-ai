@@ -7,6 +7,7 @@ import {
   screenshotAttachment,
   type Attachment,
 } from "@/lib/attachments";
+import { useI18n } from "@/lib/i18n";
 import { CameraIcon, FileIcon, PaperclipIcon, SendIcon, XIcon } from "@/components/icons";
 
 // The input the whole app shares. Handles typing, drag-and-drop, paste,
@@ -35,10 +36,11 @@ export function Composer({
   onSend,
   disabled,
   loading,
-  placeholder = "Ask anything…",
+  placeholder,
   footer,
   autoFocus,
 }: ComposerProps) {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -67,7 +69,7 @@ export function Composer({
       onAttachmentsChange([...attachments, await screenshotAttachment()]);
     } catch (err) {
       // A user closing the share picker isn't an error worth shouting about.
-      const message = err instanceof Error ? err.message : "Couldn't take that screenshot.";
+      const message = err instanceof Error ? err.message : t("composer.screenshotFailed");
       setError(/permission|denied|abort/i.test(message) ? null : message);
     } finally {
       setBusy(false);
@@ -126,14 +128,14 @@ export function Composer({
           />
 
           <IconButton
-            label="Attach a file or image"
+            label={t("composer.attach")}
             disabled={busy}
             onClick={() => fileInputRef.current?.click()}
           >
             <PaperclipIcon className="h-5 w-5" />
           </IconButton>
 
-          <IconButton label="Show me your screen" disabled={busy} onClick={handleScreenshot}>
+          <IconButton label={t("composer.screenshot")} disabled={busy} onClick={handleScreenshot}>
             <CameraIcon className="h-5 w-5" />
           </IconButton>
 
@@ -143,7 +145,7 @@ export function Composer({
             value={value}
             rows={1}
             disabled={disabled}
-            placeholder={dragging ? "Drop it here…" : placeholder}
+            placeholder={dragging ? t("composer.dropHere") : (placeholder ?? t("composer.placeholder"))}
             onChange={(e) => {
               onChange(e.target.value);
               autoGrow(e.target);
@@ -173,7 +175,7 @@ export function Composer({
               if (textareaRef.current) textareaRef.current.style.height = "auto";
             }}
             disabled={!canSend}
-            aria-label="Send"
+            aria-label={t("composer.send")}
             className="mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] transition-opacity hover:opacity-90 disabled:opacity-25"
           >
             {loading ? (
@@ -217,6 +219,8 @@ function IconButton({
 }
 
 function AttachmentChip({ attachment, onRemove }: { attachment: Attachment; onRemove: () => void }) {
+  const { t } = useI18n();
+
   return (
     <div className="group relative flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-1.5 pr-7">
       {attachment.kind === "image" && attachment.dataUrl ? (
@@ -233,7 +237,7 @@ function AttachmentChip({ attachment, onRemove }: { attachment: Attachment; onRe
       </div>
       <button
         onClick={onRemove}
-        aria-label={`Remove ${attachment.name}`}
+        aria-label={t("composer.removeAttachment", { name: attachment.name })}
         className="absolute right-1 top-1 rounded-full p-1 text-[var(--text-faint)] hover:bg-[var(--surface-3)] hover:text-[var(--text)]"
       >
         <XIcon className="h-3 w-3" />

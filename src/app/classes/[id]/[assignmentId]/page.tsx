@@ -204,9 +204,9 @@ export default function AssignmentPage({
               <p className="mt-3 flex items-start gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-0)] px-3 py-2 text-xs leading-relaxed text-[var(--text-faint)]">
                 <LockIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>
-                  {rule.answers === "guided" && "Panda will guide you rather than hand over the answer. "}
-                  {rule.translation === "disabled" && "Translation is off for this one. "}
-                  {rule.simplification === "disabled" && "The wording can't be simplified here. "}
+                  {rule.answers === "guided" && `${t("rules.guided")} `}
+                  {rule.translation === "disabled" && `${t("rules.translationOff")} `}
+                  {rule.simplification === "disabled" && `${t("rules.noSimplify")} `}
                   {rule.restrictionReason}
                 </span>
               </p>
@@ -307,7 +307,7 @@ export default function AssignmentPage({
               <button
                 type="submit"
                 disabled={!input.trim() || busy}
-                aria-label="Send"
+                aria-label={t("composer.send")}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] disabled:opacity-30"
               >
                 <SendIcon className="h-4 w-4" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { useProfileStore } from "@/store/useProfileStore";
 import { PandaSitting } from "@/components/Panda";
 
@@ -32,6 +33,7 @@ async function downscale(file: File): Promise<string> {
 }
 
 export function AvatarPicker() {
+  const { t } = useI18n();
   const profile = useProfileStore((s) => s.profile);
   const updateProfile = useProfileStore((s) => s.updateProfile);
   const input = useRef<HTMLInputElement>(null);
@@ -41,13 +43,13 @@ export function AvatarPicker() {
     if (!file) return;
     setError(null);
     if (!file.type.startsWith("image/")) {
-      setError("That file isn't an image.");
+      setError(t("settings.avatarNotImage"));
       return;
     }
     try {
       updateProfile({ avatar: await downscale(file) });
     } catch {
-      setError("Couldn't use that image. Try a different one.");
+      setError(t("settings.avatarFailed"));
     }
   }
 
@@ -63,9 +65,9 @@ export function AvatarPicker() {
       </span>
 
       <div className="min-w-0 flex-1">
-        <p className="font-medium text-[var(--text)]">Profile picture</p>
+        <p className="font-medium text-[var(--text)]">{t("settings.profilePicture")}</p>
         <p className="mt-1 text-sm text-[var(--text-faint)]">
-          {error ?? "Shows next to your name. Stays on this device."}
+          {error ?? t("settings.avatarHint")}
         </p>
       </div>
 
@@ -74,14 +76,14 @@ export function AvatarPicker() {
           onClick={() => input.current?.click()}
           className="rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
         >
-          {profile.avatar ? "Change" : "Upload"}
+          {t(profile.avatar ? "settings.change" : "settings.upload")}
         </button>
         {profile.avatar && (
           <button
             onClick={() => updateProfile({ avatar: undefined })}
             className="rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
           >
-            Remove
+            {t("settings.remove")}
           </button>
         )}
       </div>

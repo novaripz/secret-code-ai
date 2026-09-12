@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import type { FileNode, Project } from "@/types";
 import { getChildren, joinPath } from "@/lib/fileSystem";
 import { useStudioStore } from "@/store/useStudioStore";
@@ -26,6 +27,7 @@ function TreeNode({
   depth: number;
   activePath: string | null;
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(depth < 1);
   const [renaming, setRenaming] = useState(false);
   const [draftName, setDraftName] = useState(node.name);
@@ -41,7 +43,7 @@ function TreeNode({
 
   async function reportError(err: unknown) {
     await dialog.alert({
-      title: "That didn't work",
+      title: t("studio.didntWork"),
       description: err instanceof Error ? err.message : String(err),
     });
   }
@@ -61,10 +63,10 @@ function TreeNode({
   async function handleNewFile(e: React.MouseEvent) {
     e.stopPropagation();
     const name = await dialog.prompt({
-      title: "New file",
-      description: `It'll go inside "${node.name}".`,
+      title: t("studio.newFile"),
+      description: t("studio.insideFolder", { name: node.name }),
       placeholder: "helpers.js",
-      confirmLabel: "Create",
+      confirmLabel: t("studio.create"),
     });
     if (!name) return;
     try {
@@ -78,10 +80,10 @@ function TreeNode({
   async function handleNewFolder(e: React.MouseEvent) {
     e.stopPropagation();
     const name = await dialog.prompt({
-      title: "New folder",
-      description: `It'll go inside "${node.name}".`,
+      title: t("studio.newFolder"),
+      description: t("studio.insideFolder", { name: node.name }),
       placeholder: "components",
-      confirmLabel: "Create",
+      confirmLabel: t("studio.create"),
     });
     if (!name) return;
     try {
@@ -95,9 +97,9 @@ function TreeNode({
   async function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
     const ok = await dialog.confirm({
-      title: `Delete "${node.name}"?`,
-      description: node.kind === "folder" ? "Everything inside it goes too. You can't undo this." : "You can't undo this.",
-      confirmLabel: "Delete",
+      title: t("studio.deleteNode", { name: node.name }),
+      description: t(node.kind === "folder" ? "studio.deleteFolderBody" : "studio.deleteFileBody"),
+      confirmLabel: t("action.delete"),
       danger: true,
     });
     if (ok) removeNode(node.path);
@@ -184,7 +186,7 @@ function TreeNode({
         </span>
       )}
       <button
-        title="Delete"
+        title={t("action.delete")}
         onClick={handleDelete}
         className="hidden group-hover:block p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)] shrink-0"
       >
@@ -195,6 +197,7 @@ function TreeNode({
 }
 
 export function FileExplorer({ project, activePath }: { project: Project; activePath: string | null }) {
+  const { t } = useI18n();
   const addFile = useStudioStore((s) => s.addFile);
   const addFolder = useStudioStore((s) => s.addFolder);
   const dialog = useDialog();
@@ -203,10 +206,10 @@ export function FileExplorer({ project, activePath }: { project: Project; active
   /** Creates a file or folder at the project root, asking for a name in-app. */
   async function createAtRoot(kind: "file" | "folder") {
     const name = await dialog.prompt({
-      title: kind === "file" ? "New file" : "New folder",
-      description: "It'll go at the top level of your project.",
+      title: t(kind === "file" ? "studio.newFile" : "studio.newFolder"),
+      description: t("studio.atTopLevel"),
       placeholder: kind === "file" ? "index.html" : "images",
-      confirmLabel: "Create",
+      confirmLabel: t("studio.create"),
     });
     if (!name) return;
     try {
@@ -214,7 +217,7 @@ export function FileExplorer({ project, activePath }: { project: Project; active
       else addFolder(name);
     } catch (err) {
       await dialog.alert({
-        title: "That didn't work",
+        title: t("studio.didntWork"),
         description: err instanceof Error ? err.message : String(err),
       });
     }
@@ -223,17 +226,17 @@ export function FileExplorer({ project, activePath }: { project: Project; active
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-3 py-2.5 border-b border-[var(--line)]">
-        <span className="text-xs font-semibold tracking-wide text-[var(--text-faint)] uppercase">Your Files</span>
+        <span className="text-xs font-semibold tracking-wide text-[var(--text-faint)] uppercase">{t("studio.yourFiles")}</span>
         <div className="flex items-center gap-1">
           <button
-            title="New file"
+            title={t("studio.newFile")}
             onClick={() => void createAtRoot("file")}
             className="p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
           >
             <PlusFileIcon className="w-4 h-4" />
           </button>
           <button
-            title="New folder"
+            title={t("studio.newFolder")}
             onClick={() => void createAtRoot("folder")}
             className="p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
           >
@@ -244,7 +247,7 @@ export function FileExplorer({ project, activePath }: { project: Project; active
       <div className="flex-1 overflow-y-auto py-1 px-1">
         {rootChildren.length === 0 ? (
           <div className="px-3 py-6 text-center text-xs text-[var(--text-faint)] leading-relaxed">
-            No files yet. Make one, bring in a .zip, or just ask for help and I&apos;ll build the first files for you.
+            {t("studio.noFiles")}
           </div>
         ) : (
           rootChildren.map((child) => (

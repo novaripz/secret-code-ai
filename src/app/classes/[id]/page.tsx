@@ -51,28 +51,28 @@ function AddAssignment({ classId, onDone }: { classId: string; onDone: () => voi
 
       <div className="flex flex-col gap-3">
         <input autoFocus value={title} onChange={(e) => setTitle(e.target.value)}
-          placeholder="What is it?" aria-label="Assignment title" className={field} />
+          placeholder={t("assignments.titlePlaceholder")} aria-label={t("assignments.titleLabel")} className={field} />
 
         <div className="grid gap-3 sm:grid-cols-3">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs text-[var(--text-faint)]">Due</span>
+            <span className="text-xs text-[var(--text-faint)]">{t("assignments.due")}</span>
             <input type="date" value={due} onChange={(e) => setDue(e.target.value)} className={field} />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs text-[var(--text-faint)]">Points</span>
+            <span className="text-xs text-[var(--text-faint)]">{t("assignments.pointsLabel")}</span>
             <input type="number" min={0} value={points} onChange={(e) => setPoints(e.target.value)}
               placeholder="100" className={field} />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs text-[var(--text-faint)]">Minutes</span>
+            <span className="text-xs text-[var(--text-faint)]">{t("assignments.minutes")}</span>
             <input type="number" min={0} step={5} value={minutes} onChange={(e) => setMinutes(e.target.value)}
               placeholder="45" className={field} />
           </label>
         </div>
 
         <textarea value={instructions} onChange={(e) => setInstructions(e.target.value)}
-          placeholder="Paste the instructions here so Panda knows what it asks for (optional)"
-          aria-label="Instructions" rows={3} className={`${field} resize-y`} />
+          placeholder={t("classes.instructionsPlaceholder")}
+          aria-label={t("assignments.instructions")} rows={3} className={`${field} resize-y`} />
 
         <button type="submit" disabled={!title.trim()}
           className="self-end rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-40">

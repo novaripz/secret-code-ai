@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n, type StringKey } from "@/lib/i18n";
 import { useProfileStore } from "@/store/useProfileStore";
 import { AvatarPicker } from "./AvatarPicker";
 import { AccountSection } from "./AccountSection";
@@ -10,29 +11,29 @@ import { useDialog } from "@/components/ui/Dialog";
 import { BrainIcon, MoonIcon, SparkleIcon, SunIcon, UserIcon, XIcon } from "@/components/icons";
 
 const SECTIONS = [
-  { key: "profile", label: "Profile", icon: UserIcon },
-  { key: "language", label: "Language", icon: SparkleIcon },
-  { key: "appearance", label: "Appearance", icon: MoonIcon },
-  { key: "memory", label: "Memory", icon: BrainIcon },
-] as const;
+  { key: "profile", label: "settings.profile", icon: UserIcon },
+  { key: "language", label: "settings.language", icon: SparkleIcon },
+  { key: "appearance", label: "settings.appearance", icon: MoonIcon },
+  { key: "memory", label: "settings.memory", icon: BrainIcon },
+] as const satisfies readonly { key: string; label: StringKey; icon: unknown }[];
 
 type SectionKey = (typeof SECTIONS)[number]["key"];
 
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
+/** Month names in the student's own language, so the picker reads to them. */
+function monthNames(locale: string): string[] {
+  const format = new Intl.DateTimeFormat(locale, { month: "long" });
+  return Array.from({ length: 12 }, (_, i) => format.format(new Date(Date.UTC(2000, i, 1))));
+}
 
 export function SettingsView() {
+  const { t } = useI18n();
   const [section, setSection] = useState<SectionKey>("profile");
 
   return (
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="mt-1 text-sm text-[var(--text-faint)]">
-          Everything here follows you across every chat and project.
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight">{t("settings.title")}</h1>
+        <p className="mt-1 text-sm text-[var(--text-faint)]">{t("settings.subtitle")}</p>
 
         <div className="mt-6 flex flex-wrap gap-1.5 border-b border-[var(--line)] pb-3">
           {SECTIONS.map(({ key, label, icon: Icon }) => (
@@ -46,7 +47,7 @@ export function SettingsView() {
               }`}
             >
               <Icon className="h-4 w-4" />
-              {label}
+              {t(label)}
             </button>
           ))}
         </div>
@@ -63,12 +64,14 @@ export function SettingsView() {
 }
 
 function ProfileSection() {
+  const { t, locale } = useI18n();
   const profile = useProfileStore((s) => s.profile);
   const updateProfile = useProfileStore((s) => s.updateProfile);
   const addLike = useProfileStore((s) => s.addLike);
   const removeLike = useProfileStore((s) => s.removeLike);
   const age = useProfileStore((s) => s.age)();
   const [newLike, setNewLike] = useState("");
+  const months = monthNames(locale);
 
   function setBirthday(patch: Partial<typeof profile.birthday>) {
     updateProfile({ birthday: { ...profile.birthday, ...patch } });
@@ -80,21 +83,25 @@ function ProfileSection() {
       <CanvasSection />
       <AvatarPicker />
 
-      <Field label="Name" hint="What Panda calls you when it's being formal.">
-        <Input value={profile.name} onChange={(v) => updateProfile({ name: v })} placeholder="Your name" />
+      <Field label={t("settings.name")} hint={t("settings.nameHint")}>
+        <Input
+          value={profile.name}
+          onChange={(v) => updateProfile({ name: v })}
+          placeholder={t("settings.namePlaceholder")}
+        />
       </Field>
 
-      <Field label="Nickname" hint="What it calls you the rest of the time.">
-        <Input value={profile.nickname} onChange={(v) => updateProfile({ nickname: v })} placeholder="Nickname" />
+      <Field label={t("settings.nickname")} hint={t("settings.nicknameHint")}>
+        <Input
+          value={profile.nickname}
+          onChange={(v) => updateProfile({ nickname: v })}
+          placeholder={t("settings.nickname")}
+        />
       </Field>
 
       <Field
-        label="Birthday"
-        hint={
-          age !== null
-            ? `We work out your age from this — you're ${age}. Clear the year to keep it private.`
-            : "The year is optional. Add it and Panda knows your age; leave it blank and it won't."
-        }
+        label={t("settings.birthday")}
+        hint={age !== null ? t("settings.birthdayHintAge", { age }) : t("settings.birthdayHint")}
       >
         <div className="flex gap-2">
           <select
@@ -102,8 +109,8 @@ function ProfileSection() {
             onChange={(e) => setBirthday({ month: e.target.value ? Number(e.target.value) : null })}
             className="flex-1 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--focus)]"
           >
-            <option value="">Month</option>
-            {MONTHS.map((m, i) => (
+            <option value="">{t("date.month")}</option>
+            {months.map((m, i) => (
               <option key={m} value={i + 1}>
                 {m}
               </option>
@@ -112,21 +119,21 @@ function ProfileSection() {
           <NumberInput
             value={profile.birthday.day}
             onChange={(v) => setBirthday({ day: v })}
-            placeholder="Day"
+            placeholder={t("date.day")}
             maxLength={2}
             className="w-20"
           />
           <NumberInput
             value={profile.birthday.year}
             onChange={(v) => setBirthday({ year: v })}
-            placeholder="Year"
+            placeholder={t("date.year")}
             maxLength={4}
             className="w-24"
           />
         </div>
       </Field>
 
-      <Field label="Stuff you're into" hint="Panda uses these to make examples sound like you.">
+      <Field label={t("settings.likes")} hint={t("settings.likesHint")}>
         <div className="flex flex-wrap gap-2">
           {profile.likes.map((like) => (
             <span
@@ -136,7 +143,7 @@ function ProfileSection() {
               {like}
               <button
                 onClick={() => removeLike(like)}
-                aria-label={`Remove ${like}`}
+                aria-label={t("settings.removeLike", { like })}
                 className="rounded-full p-0.5 text-[var(--text-faint)] hover:text-[var(--text)]"
               >
                 <XIcon className="h-3 w-3" />
@@ -144,14 +151,14 @@ function ProfileSection() {
             </span>
           ))}
           {profile.likes.length === 0 && (
-            <p className="text-sm text-[var(--text-faint)]">Nothing added yet.</p>
+            <p className="text-sm text-[var(--text-faint)]">{t("settings.likesNone")}</p>
           )}
         </div>
         <div className="mt-3 flex gap-2">
           <Input
             value={newLike}
             onChange={setNewLike}
-            placeholder="Add something you like…"
+            placeholder={t("settings.likesPlaceholder")}
             onEnter={() => {
               addLike(newLike);
               setNewLike("");
@@ -164,17 +171,17 @@ function ProfileSection() {
             }}
             className="shrink-0 rounded-xl border border-[var(--line-strong)] px-4 text-sm text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
           >
-            Add
+            {t("action.add")}
           </button>
         </div>
       </Field>
 
-      <Field label="Anything else" hint="Free-form. Whatever you want Panda to always keep in mind.">
+      <Field label={t("settings.aboutMe")} hint={t("settings.aboutMeHint")}>
         <textarea
           value={profile.aboutMe}
           onChange={(e) => updateProfile({ aboutMe: e.target.value })}
           rows={4}
-          placeholder="e.g. I'm in 8th grade, I learn best with examples, I get bored by long explanations…"
+          placeholder={t("settings.aboutMePlaceholder")}
           className="w-full resize-none rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--focus)]"
         />
       </Field>
@@ -183,27 +190,28 @@ function ProfileSection() {
 }
 
 function AppearanceSection() {
+  const { t } = useI18n();
   const theme = useProfileStore((s) => s.theme);
   const setTheme = useProfileStore((s) => s.setTheme);
   const appearance = useProfileStore((s) => s.appearance);
   const setAppearance = useProfileStore((s) => s.setAppearance);
 
   const themes = [
-    { key: "dark" as const, label: "Dark", hint: "The default. Easier on your eyes at night.", icon: MoonIcon },
-    { key: "light" as const, label: "Light", hint: "Bright and high contrast.", icon: SunIcon },
-    { key: "system" as const, label: "System", hint: "Follows whatever your device is set to.", icon: SparkleIcon },
+    { key: "dark" as const, label: t("settings.themeDark"), hint: t("settings.themeDarkHint"), icon: MoonIcon },
+    { key: "light" as const, label: t("settings.themeLight"), hint: t("settings.themeLightHint"), icon: SunIcon },
+    { key: "system" as const, label: t("settings.themeSystem"), hint: t("settings.themeSystemHint"), icon: SparkleIcon },
   ];
 
   const sizes = [
-    { key: "small" as const, label: "Small" },
-    { key: "normal" as const, label: "Normal" },
-    { key: "large" as const, label: "Large" },
+    { key: "small" as const, label: t("settings.textSmall") },
+    { key: "normal" as const, label: t("settings.textNormal") },
+    { key: "large" as const, label: t("settings.textLarge") },
   ];
 
   return (
     <div className="space-y-8">
       <div>
-        <p className="mb-3 text-sm font-medium text-[var(--text)]">Theme</p>
+        <p className="mb-3 text-sm font-medium text-[var(--text)]">{t("settings.theme")}</p>
         <div className="grid gap-3 sm:grid-cols-3">
           {themes.map(({ key, label, hint, icon: Icon }) => {
             const active = theme === key;
@@ -229,8 +237,8 @@ function AppearanceSection() {
       </div>
 
       <div>
-        <p className="mb-1 text-sm font-medium text-[var(--text)]">Text size</p>
-        <p className="mb-3 text-sm text-[var(--text-faint)]">How big replies are in the chat.</p>
+        <p className="mb-1 text-sm font-medium text-[var(--text)]">{t("settings.textSize")}</p>
+        <p className="mb-3 text-sm text-[var(--text-faint)]">{t("settings.textSizeHint")}</p>
         <div className="flex gap-2">
           {sizes.map(({ key, label }) => {
             const active = appearance.textSize === key;
@@ -253,30 +261,25 @@ function AppearanceSection() {
 
       <div className="flex items-start gap-3 rounded-2xl border border-[var(--line)] p-4">
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-[var(--text)]">Reduce motion</p>
-          <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">
-            Turns off animations across the app. Your device setting is already respected; this
-            turns them off even when it isn&apos;t set.
-          </p>
+          <p className="font-medium text-[var(--text)]">{t("settings.reduceMotion")}</p>
+          <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">{t("settings.reduceMotionHint")}</p>
         </div>
         <Toggle
           on={appearance.reduceMotion}
           onChange={(on) => setAppearance({ reduceMotion: on })}
-          label="Reduce motion"
+          label={t("settings.reduceMotion")}
         />
       </div>
 
       <div className="flex items-start gap-3 rounded-2xl border border-[var(--line)] p-4">
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-[var(--text)]">Panda movement</p>
-          <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">
-            The mascot bobs, blinks and twitches its ears. Turn it off to keep it still.
-          </p>
+          <p className="font-medium text-[var(--text)]">{t("settings.pandaMotion")}</p>
+          <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">{t("settings.pandaMotionHint")}</p>
         </div>
         <Toggle
           on={appearance.pandaMotion}
           onChange={(on) => setAppearance({ pandaMotion: on })}
-          label="Panda movement"
+          label={t("settings.pandaMotion")}
         />
       </div>
     </div>
@@ -284,6 +287,7 @@ function AppearanceSection() {
 }
 
 function MemorySection() {
+  const { t } = useI18n();
   const memory = useProfileStore((s) => s.memory);
   const addMemory = useProfileStore((s) => s.addMemory);
   const removeMemory = useProfileStore((s) => s.removeMemory);
@@ -294,9 +298,9 @@ function MemorySection() {
 
   async function handleClear() {
     const ok = await dialog.confirm({
-      title: "Forget everything?",
-      description: "This clears the saved memories below. Your profile and chats stay.",
-      confirmLabel: "Forget it all",
+      title: t("settings.forgetAllTitle"),
+      description: t("settings.forgetAllBody"),
+      confirmLabel: t("settings.forgetAllConfirm"),
       danger: true,
     });
     if (ok) clearMemory();
@@ -305,15 +309,12 @@ function MemorySection() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm leading-relaxed text-[var(--text-dim)]">
-          Things Panda keeps in mind no matter which chat or project you&apos;re in. Add anything you find
-          yourself repeating.
-        </p>
+        <p className="text-sm leading-relaxed text-[var(--text-dim)]">{t("settings.memoryIntro")}</p>
         <div className="mt-3 flex gap-2">
           <Input
             value={draft}
             onChange={setDraft}
-            placeholder="e.g. I prefer short answers"
+            placeholder={t("settings.memoryPlaceholder")}
             onEnter={() => {
               addMemory(draft);
               setDraft("");
@@ -326,14 +327,14 @@ function MemorySection() {
             }}
             className="shrink-0 rounded-xl border border-[var(--line-strong)] px-4 text-sm text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
           >
-            Remember
+            {t("settings.remember")}
           </button>
         </div>
       </div>
 
       <div className="space-y-2">
         {memory.length === 0 ? (
-          <p className="text-sm text-[var(--text-faint)]">Nothing saved yet.</p>
+          <p className="text-sm text-[var(--text-faint)]">{t("settings.memoryNone")}</p>
         ) : (
           memory.map((fact) => (
             <div
@@ -343,7 +344,7 @@ function MemorySection() {
               <p className="min-w-0 flex-1 text-sm text-[var(--text)]">{fact.text}</p>
               <button
                 onClick={() => removeMemory(fact.id)}
-                aria-label="Forget this"
+                aria-label={t("settings.forgetThis")}
                 className="rounded p-1 text-[var(--text-faint)] hover:text-[var(--danger)]"
               >
                 <XIcon className="h-3.5 w-3.5" />
@@ -359,13 +360,13 @@ function MemorySection() {
           disabled={memory.length === 0}
           className="rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--danger)] hover:bg-[var(--surface-2)] disabled:opacity-30"
         >
-          Clear all memories
+          {t("settings.clearMemories")}
         </button>
         <button
           onClick={resetOnboarding}
           className="rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
         >
-          Redo the setup questions
+          {t("settings.redoSetup")}
         </button>
       </div>
     </div>

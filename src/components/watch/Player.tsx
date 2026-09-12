@@ -1,6 +1,7 @@
 "use client";
 
 import type { Video } from "@/app/api/watch/route";
+import { useI18n } from "@/lib/i18n";
 import { XIcon } from "@/components/icons";
 import { BookmarkFilledIcon, BookmarkIcon } from "./icons";
 import { age, duration, views } from "./format";
@@ -25,13 +26,14 @@ interface PlayerProps {
 }
 
 export function Player({ video, saved, onSave, onRemove, onClose }: PlayerProps) {
+  const { t } = useI18n();
   const length = duration(video.seconds);
   const watched = views(video.viewCount);
   const old = video.publishedAt ? age(video.publishedAt) : null;
   const meta = [video.channel, watched, old, length].filter(Boolean).join(" · ");
 
   return (
-    <section className="animate-rise mb-8" aria-label="Now playing">
+    <section className="animate-rise mb-8" aria-label={t("watch.nowPlaying")}>
       <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[var(--line)] bg-black">
         <iframe
           key={video.id}
@@ -63,12 +65,12 @@ export function Player({ video, saved, onSave, onRemove, onClose }: PlayerProps)
             }`}
           >
             {saved ? <BookmarkFilledIcon className="h-3.5 w-3.5" /> : <BookmarkIcon className="h-3.5 w-3.5" />}
-            {saved ? "Saved" : "Save"}
+            {t(saved ? "watch.savedState" : "watch.save")}
           </button>
           <button
             onClick={onClose}
-            aria-label="Close the player"
-            title="Close the player"
+            aria-label={t("watch.closePlayer")}
+            title={t("watch.closePlayer")}
             className="rounded-xl border border-[var(--line-strong)] p-2 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
           >
             <XIcon className="h-4 w-4" />

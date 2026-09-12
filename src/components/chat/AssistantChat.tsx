@@ -9,16 +9,16 @@ import { MessageText } from "./MessageText";
 import { ModePills } from "./ModePills";
 import { PandaSitting } from "@/components/Panda";
 import { MessageActions, actionPrompt, type MessageAction } from "./MessageActions";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, type StringKey } from "@/lib/i18n";
 import { Priorities } from "@/components/home/Priorities";
 import { findLocale } from "@/lib/i18n/locales";
 import { FileIcon } from "@/components/icons";
 
-const STARTERS = [
-  "How do I take a screenshot on my computer?",
-  "Explain what an API is like I'm new to this",
-  "Help me plan a website about something I like",
-  "Check my work — I'll paste it in",
+const STARTERS: StringKey[] = [
+  "chat.starterScreenshot",
+  "chat.starterApi",
+  "chat.starterPlanSite",
+  "chat.starterCheckWork",
 ];
 
 
@@ -132,12 +132,12 @@ export function AssistantChat() {
       if (!res.ok) {
         // A failure before the stream opens still comes back as JSON.
         const data = await res.json().catch(() => ({}));
-        addErrorMessage(data.error ?? "That request didn't go through.");
+        addErrorMessage(data.error ?? t("error.chatFailed"));
         return;
       }
 
       if (!res.body) {
-        addErrorMessage("The reply came back empty.");
+        addErrorMessage(t("error.emptyReply"));
         return;
       }
 
@@ -177,7 +177,7 @@ export function AssistantChat() {
         if (frame) cancelAnimationFrame(frame);
         flush();
         appendToAssistantMessage(id, decoder.decode());
-        finishAssistantMessage(id, received ? undefined : "The reply came back empty.");
+        finishAssistantMessage(id, received ? undefined : t("error.emptyReply"));
       }
     } catch (err) {
       // Stopping on purpose is not an error; the partial reply stays as it is.
@@ -224,13 +224,13 @@ export function AssistantChat() {
             <Priorities />
 
             <div className="mt-8 flex flex-wrap justify-center gap-2">
-              {STARTERS.map((s) => (
+              {STARTERS.map((key) => (
                 <button
-                  key={s}
-                  onClick={() => void send(s)}
+                  key={key}
+                  onClick={() => void send(t(key))}
                   className="rounded-full border border-[var(--line)] px-3.5 py-2 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
                 >
-                  {s}
+                  {t(key)}
                 </button>
               ))}
             </div>

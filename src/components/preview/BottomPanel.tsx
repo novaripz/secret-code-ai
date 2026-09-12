@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useMemoryStore } from "@/store/useMemoryStore";
 import { buildPreviewDocument } from "@/lib/buildPreviewDocument";
@@ -9,6 +10,7 @@ import { PlayIcon, RefreshIcon, BookIcon } from "@/components/icons";
 type Tab = "preview" | "console" | "problems" | "log";
 
 export function BottomPanel() {
+  const { t } = useI18n();
   const project = useStudioStore((s) => s.project);
   const consoleEntries = useStudioStore((s) => s.consoleEntries);
   const pushConsoleEntry = useStudioStore((s) => s.pushConsoleEntry);
@@ -49,10 +51,10 @@ export function BottomPanel() {
   const errorCount = consoleEntries.filter((e) => e.level === "error").length;
 
   const TABS: { key: Tab; label: string }[] = [
-    { key: "preview", label: "See It Run" },
-    { key: "console", label: "Messages" },
-    { key: "problems", label: "Problems" },
-    { key: "log", label: "What We Built" },
+    { key: "preview", label: t("studio.tabPreview") },
+    { key: "console", label: t("studio.tabConsole") },
+    { key: "problems", label: t("studio.tabProblems") },
+    { key: "log", label: t("studio.tabLog") },
   ];
 
   return (
@@ -83,11 +85,11 @@ export function BottomPanel() {
             onClick={run}
             className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--success-soft)] text-[var(--success)] hover:brightness-95 font-medium"
           >
-            <PlayIcon className="w-3.5 h-3.5" /> Run
+            <PlayIcon className="w-3.5 h-3.5" /> {t("studio.run")}
           </button>
           <button
             onClick={refresh}
-            title="Refresh"
+            title={t("studio.refresh")}
             className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-faint)]"
           >
             <RefreshIcon className="w-3.5 h-3.5" />
@@ -100,14 +102,13 @@ export function BottomPanel() {
           <div className="h-full bg-white">
             {!running && !entryFound ? (
               <div className="h-full flex items-center justify-center text-[var(--text-faint)] text-sm text-center px-6 bg-[var(--surface-0)]">
-                Click <span className="mx-1 font-medium text-[var(--text)]">Run</span> to see your project come to
-                life.
+                {t("studio.runHint")}
               </div>
             ) : (
               <iframe
                 ref={iframeRef}
                 key={nonce}
-                title="Preview"
+                title={t("studio.preview")}
                 srcDoc={html}
                 sandbox="allow-scripts allow-forms allow-modals"
                 className="w-full h-full border-0 bg-white"

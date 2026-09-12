@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
+import { useI18n } from "@/lib/i18n";
 import { LockIcon, SearchIcon, SparkleIcon, XIcon } from "@/components/icons";
 import { Player } from "@/components/watch/Player";
 import { VideoGrid, VideoGridSkeleton } from "@/components/watch/VideoGrid";
@@ -31,6 +32,7 @@ function seedKey(seeds: Seed[]): string {
 }
 
 export default function WatchPage() {
+  const { t } = useI18n();
   const { saved, hydrated, hydrate, save, remove } = useWatchStore();
 
   const [tab, setTab] = useState<Tab>("feed");
@@ -150,18 +152,18 @@ export default function WatchPage() {
     <AppShell>
       <div className="flex h-full flex-col">
         <div className="flex flex-wrap items-center gap-2 border-b border-[var(--line)] px-4 py-2.5 sm:px-5">
-          <div role="tablist" aria-label="Watch" className="flex items-center gap-1">
+          <div role="tablist" aria-label={t("nav.watch")} className="flex items-center gap-1">
             <TabButton current={tab} value="feed" onSelect={openTab}>
-              Feed
+              {t("watch.feed")}
             </TabButton>
             <TabButton current={tab} value="saved" onSelect={openTab}>
-              Saved{saved.length > 0 && <span className="ml-1 tabular-nums opacity-60">{saved.length}</span>}
+              {t("watch.saved")}{saved.length > 0 && <span className="ml-1 tabular-nums opacity-60">{saved.length}</span>}
             </TabButton>
           </div>
 
           <span className="ml-auto flex items-center gap-1.5 rounded-full border border-[var(--line)] px-2.5 py-1 text-[11px] text-[var(--success)]">
             <LockIcon className="h-3 w-3" />
-            Locked to Panda
+            {t("watch.lockedToPanda")}
           </span>
         </div>
 
@@ -191,16 +193,16 @@ export default function WatchPage() {
                   <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    aria-label="Search videos"
-                    placeholder="Search videos"
+                    aria-label={t("watch.searchVideos")}
+                    placeholder={t("watch.searchVideos")}
                     className="min-w-0 flex-1 bg-transparent text-[13px] text-[var(--text)] outline-none placeholder:text-[var(--text-faint)]"
                   />
                   {searched && (
                     <button
                       type="button"
                       onClick={clearSearch}
-                      aria-label="Clear the search and go back to the feed"
-                      title="Back to the feed"
+                      aria-label={t("watch.clearSearch")}
+                      title={t("watch.backToFeed")}
                       className="shrink-0 rounded-full p-1 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
                     >
                       <XIcon className="h-3.5 w-3.5" />
@@ -213,7 +215,7 @@ export default function WatchPage() {
             {tab === "feed" && !trouble && (
               searched ? (
                 <p className="mb-4 text-[13px] text-[var(--text-dim)]">
-                  Results for <span className="text-[var(--text)]">“{searched}”</span>
+                  {t("watch.resultsFor", { query: searched })}
                 </p>
               ) : (
                 <Reasoning seeds={feedSeeds} personal={saved.length > 0} stale={stale} onRefresh={() => void loadFeed()} />
@@ -299,6 +301,8 @@ function Reasoning({
   stale: boolean;
   onRefresh: () => void;
 }) {
+  const { t } = useI18n();
+
   if (!seeds?.length) return null;
 
   return (
@@ -306,9 +310,7 @@ function Reasoning({
       <p className="flex items-start gap-1.5 text-[12px] leading-relaxed text-[var(--text-dim)]">
         <SparkleIcon className="mt-[2px] h-3.5 w-3.5 shrink-0 text-[var(--text-faint)]" />
         <span>
-          {personal
-            ? "Built by searching YouTube for the channels and words that come up in what you've saved. It's keyword matching, not a model of your taste."
-            : "Nothing saved yet, so this is a plain search for study videos. Save something and the feed starts following it."}
+          {t(personal ? "watch.feedPersonal" : "watch.feedGeneric")}
         </span>
       </p>
 
@@ -328,7 +330,7 @@ function Reasoning({
           onClick={onRefresh}
           className="mt-3 rounded-lg border border-[var(--line-strong)] px-3 py-1.5 text-[12px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
         >
-          What you save has changed — rebuild the feed
+          {t("watch.rebuildFeed")}
         </button>
       )}
     </div>
@@ -357,18 +359,20 @@ function Trouble({
   onRetry: () => void;
   onOpenSaved: () => void;
 }) {
+  const { t } = useI18n();
+
   const headline: Record<WatchProblem, string> = {
-    "missing-key": "Watch isn't switched on yet",
-    quota: "YouTube is done answering for today",
-    "wrong-key": "YouTube won't accept the key this copy is using",
-    failed: "Couldn't reach YouTube",
+    "missing-key": t("watch.troubleMissingKey"),
+    quota: t("watch.troubleQuota"),
+    "wrong-key": t("watch.troubleWrongKey"),
+    failed: t("watch.troubleFailed"),
   };
 
   const fallback: Record<WatchProblem, string> = {
-    "missing-key": "Someone needs to add a YOUTUBE_API_KEY to this copy of Panda.",
-    quota: "The daily limit resets at midnight Pacific time.",
-    "wrong-key": "The key needs YouTube Data API v3 enabled on its project.",
-    failed: "It might be the connection, or YouTube having a moment. Nothing is broken on your side.",
+    "missing-key": t("watch.troubleMissingKeyHint"),
+    quota: t("watch.troubleQuotaHint"),
+    "wrong-key": t("watch.troubleWrongKeyHint"),
+    failed: t("watch.troubleFailedHint"),
   };
 
   // Quota and a dropped connection both come back on their own; a missing or
@@ -387,7 +391,7 @@ function Trouble({
             onClick={onRetry}
             className="rounded-lg border border-[var(--line-strong)] px-3 py-1.5 text-[12px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
           >
-            Try again
+            {t("action.retry")}
           </button>
         )}
         {savedCount > 0 && (
@@ -395,7 +399,9 @@ function Trouble({
             onClick={onOpenSaved}
             className="rounded-lg border border-[var(--line-strong)] px-3 py-1.5 text-[12px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
           >
-            {savedCount === 1 ? "Your 1 saved video still plays" : `Your ${savedCount} saved videos still play`}
+            {savedCount === 1
+              ? t("watch.savedStillPlayOne")
+              : t("watch.savedStillPlay", { count: savedCount })}
           </button>
         )}
       </div>
@@ -415,18 +421,20 @@ function Empty({
   trouble: boolean;
   hydrated: boolean;
 }) {
+  const { t } = useI18n();
+
   if (tab === "saved" && !hydrated) {
-    return <p className="py-10 text-center text-[13px] text-[var(--text-faint)]">Looking up what you saved…</p>;
+    return <p className="py-10 text-center text-[13px] text-[var(--text-faint)]">{t("watch.loadingSaved")}</p>;
   }
 
   const line =
     tab === "saved"
-      ? "Nothing saved yet. The Save button on any video puts it here, and it stays on this laptop."
+      ? t("watch.emptySaved")
       : trouble
-        ? "Saved videos still play while this is sorted out."
+        ? t("watch.emptyTrouble")
         : searched
-          ? `Nothing came back for “${searched}”. Fewer words usually finds more.`
-          : "Nothing to show yet.";
+          ? t("watch.emptySearch", { query: searched })
+          : t("watch.emptyNothing");
 
   return (
     <div className="rounded-2xl border border-dashed border-[var(--line-strong)] px-6 py-12 text-center">

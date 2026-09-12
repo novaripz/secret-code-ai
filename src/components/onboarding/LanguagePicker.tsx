@@ -102,7 +102,7 @@ export function LanguagePicker({
 
         {results.length === 0 && (
           <p className="px-4 py-6 text-center text-sm text-[var(--text-faint)]">
-            No languages match “{query}”.
+            {translate(selected, "onboarding.noLanguageMatch", { query })}
           </p>
         )}
       </div>

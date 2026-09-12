@@ -1,6 +1,7 @@
 "use client";
 
 import type { Video } from "@/app/api/watch/route";
+import { useI18n } from "@/lib/i18n";
 import { SparkleIcon, XIcon } from "@/components/icons";
 import { BookmarkFilledIcon, BookmarkIcon } from "./icons";
 import { age, duration, views } from "./format";
@@ -136,16 +137,18 @@ function SaveButton({
   onSave: () => void;
   onRemove: () => void;
 }) {
+  const { t } = useI18n();
+
   if (action === "remove") {
     return (
       <button
         onClick={onRemove}
-        aria-label={`Remove ${title} from saved`}
-        title="Remove from saved"
+        aria-label={t("watch.removeLabel", { title })}
+        title={t("watch.removeFromSaved")}
         className="flex shrink-0 items-center gap-1 rounded-lg border border-[var(--line)] px-2 py-1 text-[11px] text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
       >
         <XIcon className="h-3 w-3" />
-        Remove
+        {t("watch.remove")}
       </button>
     );
   }
@@ -154,8 +157,8 @@ function SaveButton({
     <button
       onClick={saved ? onRemove : onSave}
       aria-pressed={saved}
-      aria-label={saved ? `Remove ${title} from saved` : `Save ${title}`}
-      title={saved ? "Saved — click to remove" : "Save this video"}
+      aria-label={saved ? t("watch.removeLabel", { title }) : t("watch.saveLabel", { title })}
+      title={t(saved ? "watch.savedClickToRemove" : "watch.saveVideo")}
       className={`flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1 text-[11px] transition-colors ${
         saved
           ? "border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--text)]"
@@ -163,7 +166,7 @@ function SaveButton({
       }`}
     >
       {saved ? <BookmarkFilledIcon className="h-3 w-3" /> : <BookmarkIcon className="h-3 w-3" />}
-      {saved ? "Saved" : "Save"}
+      {t(saved ? "watch.savedState" : "watch.save")}
     </button>
   );
 }

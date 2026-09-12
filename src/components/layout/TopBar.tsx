@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
 import { useRef, useState } from "react";
 import { useStudioStore } from "@/store/useStudioStore";
 import { exportProjectToZip, importProjectFromZip } from "@/lib/zip";
@@ -18,6 +19,7 @@ import {
 } from "@/components/icons";
 
 export function TopBar() {
+  const { t, locale } = useI18n();
   const project = useStudioStore((s) => s.project);
   const setProject = useStudioStore((s) => s.setProject);
   const saving = useStudioStore((s) => s.saving);
@@ -51,8 +53,8 @@ export function TopBar() {
       setProject(imported);
     } catch (err) {
       await dialog.alert({
-        title: "Couldn't open that file",
-        description: err instanceof Error ? err.message : "That .zip didn't look like a project.",
+        title: t("studio.openFailed"),
+        description: err instanceof Error ? err.message : t("studio.notAProject"),
       });
     }
   }
@@ -70,13 +72,13 @@ export function TopBar() {
       <div className="flex items-center gap-3 min-w-0">
         <Link
           href="/build"
-          title="Back to your projects"
+          title={t("studio.backToProjects")}
           className="flex items-center gap-2 shrink-0 text-[var(--text)] hover:opacity-80"
         >
           <span className="w-7 h-7 rounded-lg bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-[var(--accent-contrast)]">
             S
           </span>
-          <span className="text-sm font-semibold hidden sm:inline">Projects</span>
+          <span className="text-sm font-semibold hidden sm:inline">{t("studio.projects")}</span>
         </Link>
         {project && (
           <>
@@ -97,7 +99,7 @@ export function TopBar() {
                   setRenaming(true);
                 }}
                 className="text-sm text-[var(--text)] font-medium truncate hover:underline"
-                title="Rename this project"
+                title={t("studio.renameProject")}
               >
                 {project.name}
               </button>
@@ -109,26 +111,30 @@ export function TopBar() {
       <div className="flex items-center gap-1.5 shrink-0">
         {project && (
           <span className="text-[11px] text-[var(--text-faint)] mr-2 hidden md:inline">
-            {saving ? "Saving…" : lastSavedAt ? `Saved ${new Date(lastSavedAt).toLocaleTimeString()}` : ""}
+            {saving
+              ? t("studio.saving")
+              : lastSavedAt
+                ? t("studio.savedAt", { time: new Date(lastSavedAt).toLocaleTimeString(locale) })
+                : ""}
           </span>
         )}
         <Link
           href="/"
-          title="Open chat"
+          title={t("studio.openChat")}
           className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
         >
           <ChatIcon className="w-4 h-4" />
         </Link>
         <Link
           href="/settings"
-          title="Settings"
+          title={t("nav.settings")}
           className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
         >
           <SettingsIcon className="w-4 h-4" />
         </Link>
         <button
           onClick={toggleTheme}
-          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          title={t(theme === "dark" ? "theme.switchToLight" : "theme.switchToDark")}
           className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
         >
           {theme === "dark" ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
@@ -138,28 +144,28 @@ export function TopBar() {
         <button
           onClick={() => fileInputRef.current?.click()}
           className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
-          title="Bring in a project from a .zip file"
+          title={t("studio.importTitle")}
         >
           <UploadIcon className="w-4 h-4" />
-          <span className="hidden sm:inline">Import</span>
+          <span className="hidden sm:inline">{t("studio.import")}</span>
         </button>
         <button
           onClick={handleExport}
           disabled={!project}
           className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)] disabled:opacity-30"
-          title="Download this project as a .zip file"
+          title={t("studio.exportTitle")}
         >
           <DownloadIcon className="w-4 h-4" />
-          <span className="hidden sm:inline">Export</span>
+          <span className="hidden sm:inline">{t("studio.export")}</span>
         </button>
         <button
           onClick={() => persist()}
           disabled={!project}
           className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text)] font-medium disabled:opacity-30"
-          title="Save now"
+          title={t("studio.saveNow")}
         >
           <SaveIcon className="w-4 h-4" />
-          <span className="hidden sm:inline">Save</span>
+          <span className="hidden sm:inline">{t("action.save")}</span>
         </button>
       </div>
     </header>

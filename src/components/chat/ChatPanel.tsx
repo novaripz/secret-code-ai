@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useI18n, type StringKey } from "@/lib/i18n";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useChatStore } from "@/store/useChatStore";
 import { useMemoryStore } from "@/store/useMemoryStore";
@@ -14,14 +15,15 @@ import { ModePills } from "./ModePills";
 import { MessageText } from "./MessageText";
 import { SparkleIcon } from "@/components/icons";
 
-const SUGGESTIONS = [
-  "Make me a simple portfolio site with hero, about, projects, and contact sections",
-  "Make the hero section bigger and add fun animations",
-  "Something on my screen looks wrong — can you help?",
-  "Explain what this file does, step by step",
+const SUGGESTIONS: StringKey[] = [
+  "studio.suggestionPortfolio",
+  "studio.suggestionHero",
+  "studio.suggestionScreen",
+  "studio.suggestionExplainFile",
 ];
 
 export function ChatPanel() {
+  const { t } = useI18n();
   const project = useStudioStore((s) => s.project);
   const activeTab = useStudioStore((s) => s.activeTab);
   const applyOperations = useStudioStore((s) => s.applyOperations);
@@ -101,7 +103,7 @@ export function ChatPanel() {
 
       const data = await res.json();
       if (!res.ok) {
-        addErrorMessage(data.error ?? "Request failed.");
+        addErrorMessage(data.error ?? t("error.requestFailed"));
         return;
       }
 
@@ -112,7 +114,7 @@ export function ChatPanel() {
         for (const path of data.openFiles) openFile(path);
       }
     } catch (err) {
-      addErrorMessage(err instanceof Error ? err.message : "Network error.");
+      addErrorMessage(err instanceof Error ? err.message : t("error.network"));
     } finally {
       setLoading(false);
     }
@@ -127,7 +129,7 @@ export function ChatPanel() {
       }
     }
     if (failed.length > 0) {
-      addErrorMessage(`Some of that didn't work: ${failed.map((f) => f.error).join("; ")}`);
+      addErrorMessage(t("studio.applyFailed", { errors: failed.map((f) => f.error).join("; ") }));
     }
   }
 
@@ -137,24 +139,23 @@ export function ChatPanel() {
     <div className="flex h-full flex-col">
       <div className="flex shrink-0 items-center gap-2 border-b border-[var(--line)] px-3 py-2.5">
         <SparkleIcon className="h-4 w-4 text-[var(--text-dim)]" />
-        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">Assistant</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">{t("studio.assistant")}</span>
       </div>
 
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
         {messages.length === 0 && (
           <div className="space-y-3">
             <p className="text-sm leading-relaxed text-[var(--text-dim)]">
-              {name ? `Alright ${name} — what` : "What"} do you want to build or change? Describe it like you&apos;d
-              describe it to a friend. You&apos;ll always see the changes before anything happens.
+              {name ? t("studio.emptyGreeting", { name }) : t("studio.emptyGreetingNoName")}
             </p>
             <div className="space-y-1.5">
-              {SUGGESTIONS.map((s) => (
+              {SUGGESTIONS.map((key) => (
                 <button
-                  key={s}
-                  onClick={() => void send(s)}
+                  key={key}
+                  onClick={() => void send(t(key))}
                   className="w-full rounded-xl border border-[var(--line)] px-3 py-2.5 text-left text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
                 >
-                  {s}
+                  {t(key)}
                 </button>
               ))}
             </div>
@@ -210,7 +211,7 @@ export function ChatPanel() {
           onSend={() => void send()}
           loading={loading}
           disabled={!project}
-          placeholder={project ? "What should we build or fix?" : "Open a project to start"}
+          placeholder={t(project ? "studio.placeholder" : "studio.placeholderNoProject")}
           footer={<ModePills />}
         />
       </div>

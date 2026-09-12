@@ -4,31 +4,35 @@ import { useState } from "react";
 import { useProfileStore } from "@/store/useProfileStore";
 import { LanguagePicker } from "./LanguagePicker";
 import { Wordmark } from "@/components/Wordmark";
-import { detectLocale, translate } from "@/lib/i18n";
+import { detectLocale, translate, type StringKey } from "@/lib/i18n";
 
 // First-run setup. We ask for the few things that make everything after this
 // feel personal: what to call them, when their birthday is (year optional),
 // and what they're into. Every field can be skipped.
 
-const LIKE_SUGGESTIONS = [
-  "Gaming",
-  "Basketball",
-  "Music",
-  "Anime",
-  "Art",
-  "Soccer",
-  "Minecraft",
-  "Football",
-  "Coding",
-  "Skating",
-  "Movies",
-  "Cars",
+// The stored value stays English while only the label is translated: a student
+// who switches language later would otherwise end up with the same interest
+// saved twice under two spellings.
+const LIKE_SUGGESTIONS: { value: string; key: StringKey }[] = [
+  { value: "Gaming", key: "interest.gaming" },
+  { value: "Basketball", key: "interest.basketball" },
+  { value: "Music", key: "interest.music" },
+  { value: "Anime", key: "interest.anime" },
+  { value: "Art", key: "interest.art" },
+  { value: "Soccer", key: "interest.soccer" },
+  { value: "Minecraft", key: "interest.minecraft" },
+  { value: "Football", key: "interest.football" },
+  { value: "Coding", key: "interest.coding" },
+  { value: "Skating", key: "interest.skating" },
+  { value: "Movies", key: "interest.movies" },
+  { value: "Cars", key: "interest.cars" },
 ];
 
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
+/** Month names in the student's own language, so the picker reads to them. */
+function monthNames(locale: string): string[] {
+  const format = new Intl.DateTimeFormat(locale, { month: "long" });
+  return Array.from({ length: 12 }, (_, i) => format.format(new Date(Date.UTC(2000, i, 1))));
+}
 
 type Step = 0 | 1 | 2 | 3 | 4;
 
@@ -42,8 +46,8 @@ export function Onboarding() {
   // nothing about what the student actually reads.
   const [detected] = useState(() => detectLocale());
   const lang = languages.interface;
-  const t = (key: Parameters<typeof translate>[1], vars?: Record<string, string | number>) =>
-    translate(lang, key, vars);
+  const t = (key: StringKey, vars?: Record<string, string | number>) => translate(lang, key, vars);
+  const months = monthNames(lang);
   const [name, setName] = useState("");
   const [nickname, setNickname] = useState("");
   const [month, setMonth] = useState<string>("");
@@ -102,30 +106,34 @@ export function Onboarding() {
           )}
 
           {step === 1 && (
-            <Step title={t("onboarding.nameTitle")} hint="This is just so the app knows what to call you.">
+            <Step title={t("onboarding.nameTitle")} hint={t("onboarding.nameHint")}>
               <TextField value={name} onChange={setName} placeholder={t("onboarding.namePlaceholder")} autoFocus onEnter={() => canContinue && setStep(2)} />
             </Step>
           )}
 
           {step === 2 && (
             <Step
-              title={`Nice to meet you${name.trim() ? `, ${name.trim().split(/\s+/)[0]}` : ""}. Got a nickname?`}
-              hint="What your friends call you. Skip it and we'll use your name."
+              title={
+                name.trim()
+                  ? t("onboarding.nicknameTitle", { name: name.trim().split(/\s+/)[0] })
+                  : t("onboarding.nicknameTitleNoName")
+              }
+              hint={t("onboarding.nicknameHint")}
             >
-              <TextField value={nickname} onChange={setNickname} placeholder="Nickname (optional)" autoFocus onEnter={() => setStep(3)} />
+              <TextField value={nickname} onChange={setNickname} placeholder={t("onboarding.nicknamePlaceholder")} autoFocus onEnter={() => setStep(3)} />
             </Step>
           )}
 
           {step === 4 && (
-            <Step title="When's your birthday?" hint="The year is optional — leave it blank if you'd rather not say.">
+            <Step title={t("onboarding.birthdayTitle")} hint={t("onboarding.birthdayHint")}>
               <div className="flex gap-2">
                 <select
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                   className="flex-1 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--focus)]"
                 >
-                  <option value="">Month</option>
-                  {MONTHS.map((m, i) => (
+                  <option value="">{t("date.month")}</option>
+                  {months.map((m, i) => (
                     <option key={m} value={i + 1}>
                       {m}
                     </option>
@@ -134,14 +142,14 @@ export function Onboarding() {
                 <input
                   value={day}
                   onChange={(e) => setDay(e.target.value.replace(/\D/g, "").slice(0, 2))}
-                  placeholder="Day"
+                  placeholder={t("date.day")}
                   inputMode="numeric"
                   className="w-20 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-3 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--focus)]"
                 />
                 <input
                   value={year}
                   onChange={(e) => setYear(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                  placeholder="Year"
+                  placeholder={t("date.year")}
                   inputMode="numeric"
                   className="w-24 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-3 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--focus)]"
                 />
@@ -150,21 +158,26 @@ export function Onboarding() {
           )}
 
           {step === 3 && (
-            <Step title="What are you into?" hint="Pick whatever fits. Panda uses this to make examples that actually sound like you.">
+            <Step title={t("onboarding.likesTitle")} hint={t("onboarding.likesHint")}>
               <div className="flex flex-wrap gap-2">
-                {[...LIKE_SUGGESTIONS, ...likes.filter((l) => !LIKE_SUGGESTIONS.includes(l))].map((like) => {
-                  const on = likes.includes(like);
+                {[
+                  ...LIKE_SUGGESTIONS,
+                  ...likes
+                    .filter((l) => !LIKE_SUGGESTIONS.some((s) => s.value === l))
+                    .map((l) => ({ value: l, key: undefined })),
+                ].map(({ value, key }) => {
+                  const on = likes.includes(value);
                   return (
                     <button
-                      key={like}
-                      onClick={() => toggleLike(like)}
+                      key={value}
+                      onClick={() => toggleLike(value)}
                       className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
                         on
                           ? "border-transparent bg-[var(--accent)] text-[var(--accent-contrast)]"
                           : "border-[var(--line-strong)] text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
                       }`}
                     >
-                      {like}
+                      {key ? t(key) : value}
                     </button>
                   );
                 })}
@@ -175,14 +188,14 @@ export function Onboarding() {
                   value={customLike}
                   onChange={(e) => setCustomLike(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomLike())}
-                  placeholder="Add your own…"
+                  placeholder={t("onboarding.addYourOwn")}
                   className="flex-1 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-2.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--focus)]"
                 />
                 <button
                   onClick={addCustomLike}
                   className="rounded-xl border border-[var(--line-strong)] px-4 text-sm text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
                 >
-                  Add
+                  {t("action.add")}
                 </button>
               </div>
 
@@ -190,7 +203,7 @@ export function Onboarding() {
                 value={aboutMe}
                 onChange={(e) => setAboutMe(e.target.value)}
                 rows={3}
-                placeholder="Anything else Panda should always know about you? (optional)"
+                placeholder={t("onboarding.aboutMePlaceholder")}
                 className="mt-3 w-full resize-none rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-2.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--focus)]"
               />
             </Step>
@@ -213,7 +226,7 @@ export function Onboarding() {
                 onClick={() => setStep((s) => (s - 1) as Step)}
                 className="rounded-full px-4 py-2 text-sm text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
               >
-                Back
+                {t("action.back")}
               </button>
             )}
             <button
@@ -221,7 +234,11 @@ export function Onboarding() {
               disabled={!canContinue}
               className="rounded-full bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-30"
             >
-              {step === 4 ? `Let's go${firstName ? `, ${firstName}` : ""}` : t("action.continue")}
+              {step === 4
+                ? firstName
+                  ? t("onboarding.finish", { name: firstName })
+                  : t("onboarding.finishNoName")
+                : t("action.continue")}
             </button>
           </div>
         </div>

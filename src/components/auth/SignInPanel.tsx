@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { useAuthStore } from "@/store/useAuthStore";
 import { GoogleSignIn } from "./GoogleSignIn";
 
@@ -15,6 +16,7 @@ import { GoogleSignIn } from "./GoogleSignIn";
 type Setup = "loading" | "supabase" | "google-only" | "none";
 
 export function SignInPanel({ onDone }: { onDone?: () => void }) {
+  const { t } = useI18n();
   const { signInWithPassword, signUpWithPassword, signInWithGoogle, busy, error, clearError } =
     useAuthStore();
 
@@ -83,8 +85,8 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-            aria-label="Your name"
+            placeholder={t("settings.namePlaceholder")}
+            aria-label={t("settings.namePlaceholder")}
             autoComplete="name"
             className={field}
           />
@@ -95,8 +97,8 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          aria-label="Email"
+          placeholder={t("auth.email")}
+          aria-label={t("auth.email")}
           autoComplete="email"
           className={field}
         />
@@ -107,8 +109,8 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
           minLength={6}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          aria-label="Password"
+          placeholder={t("auth.password")}
+          aria-label={t("auth.password")}
           autoComplete={creating ? "new-password" : "current-password"}
           className={field}
         />
@@ -118,7 +120,7 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
           disabled={busy || !email.trim() || password.length < 6}
           className="rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity disabled:opacity-40"
         >
-          {busy ? "One moment…" : creating ? "Create account" : "Sign in"}
+          {busy ? t("auth.oneMoment") : t(creating ? "auth.createAccount" : "auth.signIn")}
         </button>
       </form>
 
@@ -130,12 +132,12 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
         }}
         className="text-sm text-[var(--text-faint)] underline-offset-4 hover:text-[var(--text-dim)] hover:underline"
       >
-        {creating ? "I already have an account" : "Create an account"}
+        {t(creating ? "auth.haveAccount" : "auth.makeAccount")}
       </button>
 
       <div className="flex items-center gap-3 py-1">
         <span className="h-px flex-1 bg-[var(--line)]" />
-        <span className="text-xs uppercase tracking-wide text-[var(--text-faint)]">or</span>
+        <span className="text-xs uppercase tracking-wide text-[var(--text-faint)]">{t("auth.or")}</span>
         <span className="h-px flex-1 bg-[var(--line)]" />
       </div>
 
@@ -144,11 +146,10 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
         disabled={busy}
         className="rounded-xl border border-[var(--line-strong)] px-4 py-2.5 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-40"
       >
-        Continue with Google
+        {t("auth.continueWithGoogle")}
       </button>
       <p className="text-xs leading-relaxed text-[var(--text-faint)]">
-        Google sends you to accounts.google.com, which some school networks block. Email works either
-        way.
+        {t("auth.googleNote")}
       </p>
 
       {note && <p className="text-sm text-[var(--success)]">{note}</p>}

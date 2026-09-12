@@ -21,9 +21,7 @@ export function LanguageSection() {
     <div className="space-y-8">
       <div>
         <p className="mb-1 text-sm font-medium text-[var(--text)]">{t("settings.interfaceLanguage")}</p>
-        <p className="mb-3 text-sm text-[var(--text-faint)]">
-          Buttons, menus and everything else Panda writes on screen.
-        </p>
+        <p className="mb-3 text-sm text-[var(--text-faint)]">{t("settings.interfaceLanguageHint")}</p>
         <LanguagePicker
           selected={languages.interface}
           onSelect={(code) => setLanguages({ interface: code })}
@@ -32,10 +30,7 @@ export function LanguageSection() {
 
       <div>
         <p className="mb-1 text-sm font-medium text-[var(--text)]">{t("settings.replyLanguage")}</p>
-        <p className="mb-3 text-sm text-[var(--text-faint)]">
-          The language of Panda&apos;s answers. Keep these different if you want the app in one
-          language and your answers in another.
-        </p>
+        <p className="mb-3 text-sm text-[var(--text-faint)]">{t("settings.replyLanguageHint")}</p>
 
         <div className="flex flex-wrap gap-2">
           <button

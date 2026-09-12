@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useI18n } from "@/lib/i18n";
 import { useAuthStore } from "@/store/useAuthStore";
 import { SignInPanel } from "./SignInPanel";
 import { Wordmark } from "@/components/Wordmark";
@@ -17,6 +18,7 @@ function isGuest(): boolean {
 }
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const { account, hydrated, hydrate } = useAuthStore();
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
         <div className="w-full max-w-[19rem] animate-rise text-center">
           <p className="mb-6 text-sm leading-relaxed text-[var(--text-faint)]">
-            Sign in to keep your chats separate from anyone else using this device.
+            {t("auth.whySignIn")}
           </p>
 
           <div className="flex flex-col items-center gap-3">
@@ -45,7 +47,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               }}
               className="text-sm text-[var(--text-faint)] underline-offset-4 hover:text-[var(--text-dim)] hover:underline"
             >
-              Continue as guest
+              {t("auth.continueAsGuest")}
             </button>
           </div>
         </div>
