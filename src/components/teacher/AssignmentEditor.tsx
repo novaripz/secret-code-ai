@@ -16,6 +16,7 @@ import type { AssignmentRules } from "@/lib/school/types";
 import { useTeacherStore, type AssignmentDraft } from "./store";
 import { useDialog } from "@/components/ui/Dialog";
 import {
+  ActionErrorNote,
   Crumb,
   buttonClass,
   cardClass,
@@ -40,6 +41,9 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
   );
   const saveAssignment = useTeacherStore((s) => s.saveAssignment);
   const deleteAssignment = useTeacherStore((s) => s.deleteAssignment);
+  const actionError = useTeacherStore((s) => s.actionError);
+  const clearActionError = useTeacherStore((s) => s.clearActionError);
+  const [saving, setSaving] = useState(false);
 
   const [draft, setDraft] = useState<AssignmentDraft>(() => ({
     title: existing?.title ?? "",
@@ -64,11 +68,16 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
     return `On this assignment Panda can't ${off.join(" or ")}. ${draft.rules.restrictionReason?.trim() || "Your teacher hasn't given a reason yet."}`;
   }, [draft.rules]);
 
-  function submit(e: React.FormEvent) {
+  // Navigating away only after the write lands: leaving early and letting the
+  // rollback happen on a screen the teacher is no longer looking at would mean
+  // they find out their assignment vanished the next time they teach.
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canSave) return;
-    saveAssignment(classId, assignmentId, draft);
-    router.push(`/teacher/classes/${classId}/assignments`);
+    if (!canSave || saving) return;
+    setSaving(true);
+    const id = await saveAssignment(classId, assignmentId, draft);
+    setSaving(false);
+    if (id) router.push(`/teacher/classes/${classId}/assignments`);
   }
 
   async function remove() {
@@ -80,7 +89,7 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
       danger: true,
     });
     if (ok) {
-      deleteAssignment(classId, assignmentId);
+      await deleteAssignment(classId, assignmentId);
       router.push(`/teacher/classes/${classId}/assignments`);
     }
   }
@@ -88,7 +97,7 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
   const base = `/teacher/classes/${classId}`;
 
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={(e) => void submit(e)}>
       <nav aria-label="Breadcrumb" className="text-xs">
         <Crumb href="/teacher">Classes</Crumb>
         <span className="mx-1.5 text-[var(--text-faint)]">/</span>
@@ -245,9 +254,11 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
         </div>
       </section>
 
+      <ActionErrorNote error={actionError} onDismiss={clearActionError} />
+
       <div className="mt-5 flex flex-wrap items-center gap-2">
-        <button type="submit" className={buttonClass} disabled={!canSave}>
-          {assignmentId ? "Save changes" : "Create assignment"}
+        <button type="submit" className={buttonClass} disabled={!canSave || saving}>
+          {saving ? "Saving…" : assignmentId ? "Save changes" : "Create assignment"}
         </button>
         <button type="button" onClick={() => router.push(`${base}/assignments`)} className={quietButtonClass}>
           Cancel

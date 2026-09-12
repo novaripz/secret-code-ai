@@ -9,11 +9,11 @@
 // cannot read. Colour is the second signal, never the only one.
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useTeacherStore } from "./store";
 import {
   Chip,
-  DataSourceNote,
+  LoadNote,
   cardClass,
   formatDue,
   Stat,
@@ -22,6 +22,14 @@ import { ChevronRightIcon } from "@/components/icons";
 
 export function ClassesView() {
   const classes = useTeacherStore((s) => s.classes);
+  const state = useTeacherStore((s) => s.classesState);
+  const loadClasses = useTeacherStore((s) => s.loadClasses);
+
+  // Load once on mount. The store collapses concurrent calls into one request,
+  // so this and the class frame asking at the same moment is still one read.
+  useEffect(() => {
+    void loadClasses();
+  }, [loadClasses]);
 
   const ordered = useMemo(
     () => [...classes].sort((a, b) => b.studentsBehind - a.studentsBehind),
@@ -60,6 +68,17 @@ export function ClassesView() {
       </div>
 
       <div className="mt-6 flex flex-col gap-2.5">
+        <LoadNote state={state} what="your classes" onRetry={() => void loadClasses()} />
+
+        {/* Only said once the read actually succeeded: an empty list is a fact
+            about the database, and we have not earned the right to state it
+            while a request is in flight or after one failed. */}
+        {state.loaded && ordered.length === 0 && (
+          <p className="rounded-2xl border border-dashed border-[var(--line-strong)] px-4 py-10 text-center text-sm text-[var(--text-faint)]">
+            You don&apos;t have any classes yet.
+          </p>
+        )}
+
         {ordered.map((c) => {
           const due = formatDue(c.nextDueAt);
           return (
@@ -102,8 +121,6 @@ export function ClassesView() {
           );
         })}
       </div>
-
-      <DataSourceNote what="the class list" />
     </>
   );
 }

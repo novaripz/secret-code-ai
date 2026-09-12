@@ -10,6 +10,13 @@
 // fail. Checking here is a courtesy to the student, not the security boundary:
 // row-level security is, and it holds even if this component is wrong.
 //
+// The role is read from `profiles` rather than from the local school store,
+// which is what this browser last wrote and therefore something a curious
+// student could edit. Reading it costs a round trip, which is why the loading
+// state is a neutral frame: flashing "this is for teachers" at a teacher whose
+// profile simply hasn't arrived yet is the one failure mode worth engineering
+// around.
+//
 // The frame itself is deliberately plain: one scroll container, a max width
 // that keeps tables readable on a 13" school laptop, and a header that says
 // where you are before it says anything else.
@@ -17,27 +24,34 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import { useSchoolStore } from "@/store/useSchoolStore";
 import { LockIcon } from "@/components/icons";
+import { useTeacherStore } from "./store";
 import { cardClass, quietButtonClass } from "./primitives";
 
 export function TeacherPage({ children }: { children: React.ReactNode }) {
-  const role = useSchoolStore((s) => s.role);
-  const hydrated = useSchoolStore((s) => s.hydrated);
-  const hydrate = useSchoolStore((s) => s.hydrate);
+  const role = useTeacherStore((s) => s.role);
+  const state = useTeacherStore((s) => s.roleState);
+  const loadRole = useTeacherStore((s) => s.loadRole);
 
   useEffect(() => {
-    if (!hydrated) hydrate();
-  }, [hydrated, hydrate]);
+    void loadRole();
+  }, [loadRole]);
+
+  const checking = state.loading || (!state.loaded && state.error === null);
 
   return (
     <AppShell>
       <div className="h-full overflow-y-auto">
         <div className="mx-auto w-full max-w-5xl px-4 py-7 sm:px-6">
-          {!hydrated ? (
-            // A blank frame beats a flash of the "you're a student" wall for a
-            // teacher whose role simply hasn't loaded off disk yet.
-            <p className="text-sm text-[var(--text-faint)]">Loading…</p>
+          {checking ? (
+            // Neutral on purpose. A teacher must never see the student wall
+            // flash past on the way to their own classes.
+            <p className="text-sm text-[var(--text-faint)]">Checking your account…</p>
+          ) : state.error ? (
+            // Not signed in, or no database configured, or the read failed.
+            // All three are stated rather than collapsed into "no access":
+            // only one of them is about who this person is.
+            <Unavailable message={state.error} />
           ) : role !== "teacher" ? (
             <NotATeacher />
           ) : (
@@ -46,6 +60,34 @@ export function TeacherPage({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+/**
+ * Why this screen has nothing on it, when the reason is the deployment rather
+ * than the person. Guests land here too, and a guest is not a student we should
+ * be lecturing about roles.
+ */
+function Unavailable({ message }: { message: string }) {
+  return (
+    <div className={`${cardClass} mx-auto max-w-xl p-6 sm:p-8`}>
+      <h1 className="text-xl font-semibold tracking-tight text-[var(--text)]">
+        We can&apos;t check your account
+      </h1>
+      <p className="mt-2 text-sm leading-relaxed text-[var(--text-dim)]">{message}</p>
+      <p className="mt-2 text-sm leading-relaxed text-[var(--text-dim)]">
+        Teacher screens read rosters and class data from the shared database, so there is nothing to
+        show until we can reach it as you.
+      </p>
+      <div className="mt-5 flex flex-wrap gap-2">
+        <Link href="/settings" className={quietButtonClass}>
+          Sign in
+        </Link>
+        <Link href="/classes" className={quietButtonClass}>
+          Go to my classes
+        </Link>
+      </div>
+    </div>
   );
 }
 

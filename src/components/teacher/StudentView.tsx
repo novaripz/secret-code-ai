@@ -60,7 +60,8 @@ export function StudentView({ classId, studentId }: { classId: string; studentId
       <header className="mt-2">
         <h1 className="text-2xl font-semibold tracking-tight text-[var(--text)]">{student.displayName}</h1>
         <p className="mt-0.5 text-xs text-[var(--text-faint)]">
-          {student.email} · {formatLastActive(student.lastActiveAt)}
+          {student.email}
+          {student.lastActiveAt !== null ? ` · ${formatLastActive(student.lastActiveAt)}` : ""}
         </p>
         <div className="mt-2.5 flex flex-wrap gap-1.5">
           <Chip tone="good">{student.done} done</Chip>
@@ -84,8 +85,10 @@ export function StudentView({ classId, studentId }: { classId: string; studentId
       <div className="mt-6">
         <SectionHeading title="Where they're getting stuck" sub="Loudest first, with the counts behind it." />
         {ranked.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-[var(--line-strong)] px-4 py-10 text-center text-sm text-[var(--text-faint)]">
-            Nothing stood out this week.
+          <p className="rounded-2xl border border-dashed border-[var(--line-strong)] px-4 py-10 text-center text-sm leading-relaxed text-[var(--text-faint)]">
+            No signals are stored for this student. Signals are recorded in their own browser and
+            the shared database has nowhere to keep them yet — so this is an unfinished feature,
+            not a quiet week.
           </p>
         ) : (
           <div className="flex flex-col gap-2.5">
@@ -100,6 +103,8 @@ export function StudentView({ classId, studentId }: { classId: string; studentId
         <PrivacyNote scope="student" />
       </div>
 
+      {/* Their name, email and progress counts come from the database. The
+          signals above them do not — nothing stores them yet. */}
       <DataSourceNote what="this student's signals" />
     </>
   );

@@ -124,7 +124,9 @@ export function OverviewView({ classId }: { classId: string }) {
         </div>
       </div>
 
-      <DataSourceNote what="everything on this tab" />
+      {/* The counts above are live; the signal card is not, and the note is
+          scoped to exactly the part that still isn't. */}
+      <DataSourceNote what="the signal card and the topic count" />
     </>
   );
 }

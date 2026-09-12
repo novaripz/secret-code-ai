@@ -13,7 +13,6 @@ import { useMemo } from "react";
 import { useTeacherStore } from "./store";
 import {
   Chip,
-  DataSourceNote,
   buttonClass,
   cardClass,
   formatDue,
@@ -102,8 +101,6 @@ export function AssignmentsView({ classId }: { classId: string }) {
           })}
         </div>
       )}
-
-      <DataSourceNote what="the assignment list and its progress counts" />
     </>
   );
 }

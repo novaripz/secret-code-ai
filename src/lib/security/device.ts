@@ -12,6 +12,10 @@
 // other. The per-address ceiling is what still bounds someone who rotates it,
 // which is why both limits exist rather than this one replacing the other.
 
+import { DEVICE_HEADER } from "./deviceHeader";
+
+export { DEVICE_HEADER };
+
 const KEY = "sca:device:v1";
 
 let cached: string | null = null;
@@ -39,8 +43,7 @@ export function deviceId(): string {
   }
 }
 
-/** Header name shared by the browser and the guard, so it is spelled once. */
-export const DEVICE_HEADER = "x-panda-device";
+
 
 /** Spread into a fetch's headers. Empty on the server, where there is no device. */
 export function deviceHeader(): Record<string, string> {

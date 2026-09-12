@@ -19,16 +19,22 @@ import { PrivacyNote } from "./PrivacyNote";
 import { evidenceTotal } from "./types";
 
 export function AnalyticsView({ classId }: { classId: string }) {
+  // The roster is real; the signals are not. Both are on this page, so the
+  // note at the bottom names which half is which rather than covering both.
   const analytics = classAnalytics(classId);
   const roster = useTeacherStore((s) => s.roster[classId] ?? []);
 
   if (!analytics) {
     return (
       <div className={`${cardClass} p-6 text-sm text-[var(--text-dim)]`}>
-        <p className="font-medium text-[var(--text)]">No signals for this class yet</p>
+        <p className="font-medium text-[var(--text)]">No signals for this class</p>
         <p className="mt-1.5">
-          Signals appear once students have worked with Panda on this class&apos;s assignments. Nothing
-          is inferred from an empty week.
+          Struggle signals are recorded in each student&apos;s own browser, and the shared database
+          has nowhere to store them yet — so there is nothing here to read, for this class or any
+          other. This is not &quot;a quiet week&quot;: it is a feature that isn&apos;t finished.
+        </p>
+        <p className="mt-1.5">
+          The roster, assignments and progress counts on the other tabs are real.
         </p>
       </div>
     );

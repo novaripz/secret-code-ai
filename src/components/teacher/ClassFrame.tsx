@@ -9,8 +9,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { useTeacherStore } from "./store";
-import { Crumb, Scroller, cardClass } from "./primitives";
+import { Crumb, LoadNote, Scroller, cardClass } from "./primitives";
 
 const TABS = [
   { slug: "", label: "Overview" },
@@ -21,8 +22,26 @@ const TABS = [
 
 export function ClassFrame({ classId, children }: { classId: string; children: React.ReactNode }) {
   const klass = useTeacherStore((s) => s.classes.find((c) => c.id === classId));
+  const state = useTeacherStore((s) => s.classState[classId]) ?? {
+    loading: false,
+    error: null,
+    loaded: false,
+  };
+  const loadClass = useTeacherStore((s) => s.loadClass);
   const pathname = usePathname();
 
+  // Every tab under this frame needs the same class, so it is fetched once here
+  // rather than by each of them.
+  useEffect(() => {
+    void loadClass(classId);
+  }, [classId, loadClass]);
+
+  if (state.error || (state.loading && !state.loaded)) {
+    return <LoadNote state={state} what="this class" onRetry={() => void loadClass(classId)} />;
+  }
+
+  // Only after a successful read is "not here" a true statement rather than a
+  // guess about a request that hasn't finished.
   if (!klass) {
     return (
       <div className={`${cardClass} p-6`}>

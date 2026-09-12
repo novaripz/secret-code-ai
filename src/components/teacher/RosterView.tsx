@@ -17,8 +17,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { useTeacherStore } from "./store";
 import {
+  ActionErrorNote,
   Chip,
-  DataSourceNote,
   Scroller,
   SectionHeading,
   buttonClass,
@@ -36,18 +36,28 @@ export function RosterView({ classId }: { classId: string }) {
   const invite = useTeacherStore((s) => s.invite);
   const cancelInvite = useTeacherStore((s) => s.cancelInvite);
   const removeStudent = useTeacherStore((s) => s.removeStudent);
+  const actionError = useTeacherStore((s) => s.actionError);
+  const clearActionError = useTeacherStore((s) => s.clearActionError);
   const dialog = useDialog();
 
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  // The format and duplicate checks answer instantly; the server's answer takes
+  // a round trip. Clearing the field only after the write lands means a teacher
+  // never has to remember what they typed to try it again.
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const problem = invite(classId, email);
+    if (busy) return;
+    setBusy(true);
+    const typed = email.trim().toLowerCase();
+    const problem = await invite(classId, email);
+    setBusy(false);
     setError(problem);
     if (!problem) {
-      setAdded(email.trim().toLowerCase());
+      setAdded(typed);
       setEmail("");
     }
   }
@@ -60,12 +70,14 @@ export function RosterView({ classId }: { classId: string }) {
       confirmLabel: "Remove",
       danger: true,
     });
-    if (ok) removeStudent(classId, id);
+    if (ok) await removeStudent(classId, id);
   }
 
   return (
     <>
-      <form onSubmit={submit} className={`${cardClass} p-4`}>
+      <ActionErrorNote error={actionError} onDismiss={clearActionError} />
+
+      <form onSubmit={(e) => void submit(e)} className={`${cardClass} mt-3 p-4`}>
         <SectionHeading
           title="Add a student"
           sub="Type their school email. They don't have to accept anything."
@@ -89,8 +101,12 @@ export function RosterView({ classId }: { classId: string }) {
             aria-invalid={error ? true : undefined}
             className={fieldClass}
           />
-          <button type="submit" className={`${buttonClass} sm:w-36`} disabled={!email.trim()}>
-            Add student
+          <button
+            type="submit"
+            className={`${buttonClass} sm:w-36`}
+            disabled={!email.trim() || busy}
+          >
+            {busy ? "Adding…" : "Add student"}
           </button>
         </div>
 
@@ -147,7 +163,11 @@ export function RosterView({ classId }: { classId: string }) {
                     </span>
                   </td>
                   <td className="px-3 py-2.5 whitespace-nowrap text-xs text-[var(--text-dim)]">
-                    {formatLastActive(s.lastActiveAt)}
+                    {/* Nothing in the schema records when a student last used
+                        Panda, so this says "not recorded" rather than the
+                        "never opened Panda" that a null would otherwise print
+                        — which would be a claim we cannot support. */}
+                    {s.lastActiveAt === null ? "Not recorded" : formatLastActive(s.lastActiveAt)}
                   </td>
                   <td className="px-3 py-2.5 whitespace-nowrap text-xs text-[var(--text-faint)]">
                     {formatDate(s.joinedAt)}
@@ -191,7 +211,7 @@ export function RosterView({ classId }: { classId: string }) {
                 </div>
                 <Chip tone="warn">Waiting for first sign-in</Chip>
                 <button
-                  onClick={() => cancelInvite(classId, i.id)}
+                  onClick={() => void cancelInvite(classId, i.id)}
                   aria-label={`Cancel the invite for ${i.email}`}
                   title="Cancel invite"
                   className="rounded-lg p-1.5 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--danger)]"
@@ -203,8 +223,6 @@ export function RosterView({ classId }: { classId: string }) {
           </ul>
         )}
       </div>
-
-      <DataSourceNote what="the roster and the invite list" />
     </>
   );
 }

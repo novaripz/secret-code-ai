@@ -21,7 +21,7 @@
 
 import { NextResponse } from "next/server";
 import { bearerToken, createServerClient } from "@/lib/supabase/server";
-import { DEVICE_HEADER } from "./device";
+import { DEVICE_HEADER } from "./deviceHeader";
 import { checkRateLimit, clientIp, tokenKey, type RateLimitRule } from "./rateLimit";
 
 export type Identity =

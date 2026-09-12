@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useI18n, type StringKey } from "@/lib/i18n";
+import { useTeacherStore } from "@/components/teacher/store";
 import { useAssistantStore } from "@/store/useAssistantStore";
 import { useProfileStore } from "@/store/useProfileStore";
 import { useDialog } from "@/components/ui/Dialog";
@@ -123,6 +124,41 @@ function ThemeToggle() {
   );
 }
 
+/**
+ * The one entry students never see. The role comes from `profiles`, so this
+ * appears only for an account Postgres itself calls a teacher — and it is a
+ * convenience, not a guard: /teacher checks again, and row-level security is
+ * what actually holds. Its label is not translated because the teacher screens
+ * behind it are English-only for now; saying "Teacher" in English is more
+ * honest than translating a door into a room that isn't.
+ */
+function TeacherLink() {
+  const pathname = usePathname();
+  const role = useTeacherStore((s) => s.role);
+  const loadRole = useTeacherStore((s) => s.loadRole);
+
+  useEffect(() => {
+    void loadRole();
+  }, [loadRole]);
+
+  if (role !== "teacher") return null;
+  const active = pathname.startsWith("/teacher");
+
+  return (
+    <Link
+      href="/teacher"
+      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors ${
+        active
+          ? "bg-[var(--surface-2)] text-[var(--text)]"
+          : "text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+      }`}
+    >
+      <UserIcon className="h-4 w-4" />
+      Teacher
+    </Link>
+  );
+}
+
 function Sidebar({ onClose }: { onClose: () => void }) {
   const pathname = usePathname();
   const { t } = useI18n();
@@ -188,6 +224,7 @@ function Sidebar({ onClose }: { onClose: () => void }) {
       </div>
 
       <nav className="flex flex-col gap-0.5 px-2 pb-2">
+        <TeacherLink />
         {NAV.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
           return (

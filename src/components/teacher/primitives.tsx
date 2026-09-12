@@ -144,15 +144,78 @@ export function Scroller({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Said out loud on every screen that shows one: these numbers are fixtures.
- * A dashboard that quietly invents data is worse than one that has none.
+ * Said out loud on every screen that still shows one: these numbers are
+ * fixtures. A dashboard that quietly invents data is worse than one that has
+ * none. The rosters, classes and assignments read the database now and have
+ * dropped this note; the learning signals have nowhere to read from yet and
+ * keep it.
  */
 export function DataSourceNote({ what }: { what: string }) {
   return (
     <p className="mt-3 rounded-xl border border-dashed border-[var(--line-strong)] px-3 py-2 text-[11px] leading-relaxed text-[var(--text-faint)]">
-      Example data — {what} is rendered from a local fixture while the shared database is being
-      wired up. The shapes are final; only the source changes.
+      Example data — {what} is rendered from a local fixture. Struggle signals are recorded in each
+      student&apos;s own browser and the shared database has nowhere to store them yet, so there is
+      nothing real here to show. The shapes are final; only the source changes.
     </p>
+  );
+}
+
+/**
+ * The three states a read can be in, said apart. "Nothing here" and "we
+ * couldn't reach the database" are opposite messages to a teacher, and a
+ * component that renders an empty list for both teaches them to distrust it.
+ * Returns null once the data has loaded, so a caller can render it above the
+ * real content and stop thinking about it.
+ */
+export function LoadNote({
+  state,
+  what,
+  onRetry,
+}: {
+  state: { loading: boolean; error: string | null; loaded: boolean };
+  what: string;
+  onRetry?: () => void;
+}) {
+  if (state.error) {
+    return (
+      <div
+        role="alert"
+        className="rounded-2xl border px-4 py-3 text-sm leading-relaxed"
+        style={{ borderColor: "var(--danger)", background: "var(--danger-soft)", color: "var(--danger)" }}
+      >
+        <p className="font-medium">We couldn&apos;t load {what}</p>
+        <p className="mt-1">{state.error}</p>
+        <p className="mt-1">
+          This is not the same as having none — nothing below is a picture of your class right now.
+        </p>
+        {onRetry && (
+          <button onClick={onRetry} className={`${quietButtonClass} mt-3`}>
+            Try again
+          </button>
+        )}
+      </div>
+    );
+  }
+  if (state.loading && !state.loaded) {
+    return <p className="text-sm text-[var(--text-faint)]">Loading {what}…</p>;
+  }
+  return null;
+}
+
+/** A failed write, after its optimistic version was already on screen. */
+export function ActionErrorNote({ error, onDismiss }: { error: string | null; onDismiss: () => void }) {
+  if (!error) return null;
+  return (
+    <div
+      role="alert"
+      className="mt-3 flex flex-wrap items-start gap-3 rounded-xl border px-3.5 py-2.5 text-sm"
+      style={{ borderColor: "var(--danger)", background: "var(--danger-soft)", color: "var(--danger)" }}
+    >
+      <span className="min-w-0 flex-1 leading-relaxed">{error} Nothing was saved.</span>
+      <button onClick={onDismiss} className="shrink-0 text-xs underline underline-offset-4">
+        Dismiss
+      </button>
+    </div>
   );
 }
 
