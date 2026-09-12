@@ -21,6 +21,7 @@
 
 import { NextResponse } from "next/server";
 import { bearerToken, createServerClient } from "@/lib/supabase/server";
+import { DEVICE_HEADER } from "./device";
 import { checkRateLimit, clientIp, tokenKey, type RateLimitRule } from "./rateLimit";
 
 export type Identity =
@@ -49,6 +50,12 @@ export interface GuardOptions {
    * routes that are public by design and only need a per-IP limit.
    */
   authenticate?: boolean;
+  /**
+   * The whole-address ceiling for guests, which has to fit a classroom sharing
+   * one school connection. Defaults to twelve times the per-guest rule, which
+   * is roughly a class of thirty working at a normal pace.
+   */
+  guestCeiling?: RateLimitRule;
 }
 
 /**
@@ -103,26 +110,62 @@ export async function guardRequest(
   }
 
   const rule = identity.kind === "user" ? options.user : options.guest;
-  const result = checkRateLimit(bucketKey, rule);
 
-  if (!result.ok) {
-    return {
-      ok: false,
-      response: NextResponse.json(
-        { error: options.busyMessage, retryAfter: result.retryAfterSeconds },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(result.retryAfterSeconds),
-            "RateLimit-Limit": String(result.limit),
-            "RateLimit-Remaining": "0",
-            "RateLimit-Reset": String(result.retryAfterSeconds),
-            "Cache-Control": "no-store",
-          },
-        },
-      ),
+  // Guests get counted twice, and the reason is a school's network.
+  //
+  // Every student in the building shares one public address, so an address is
+  // not a person: counting guests by address alone means a class of thirty
+  // trips a limit meant for one caller, and the fix of raising it far enough to
+  // fit a class would hand that whole allowance to any single script.
+  //
+  // So each browser is counted on its own, and the address keeps a ceiling
+  // underneath. An honest guest is bounded by the first, which fits one human.
+  // Someone rotating device ids to escape it walks into the second, which fits
+  // a classroom and not a flood. Neither number is a claim about identity —
+  // the device id is client-supplied and forgeable, and nothing is authorised
+  // by it.
+  if (identity.kind === "guest") {
+    const device = request.headers.get(DEVICE_HEADER)?.slice(0, 64);
+    if (device) {
+      const perDevice = checkRateLimit(`${options.route}:d:${clientIp(request)}:${device}`, rule);
+      if (!perDevice.ok) return tooMany(options, perDevice);
+    }
+
+    const ceiling = options.guestCeiling ?? {
+      limit: rule.limit * 12,
+      windowMs: rule.windowMs,
     };
+    const perAddress = checkRateLimit(`${options.route}:ipc:${clientIp(request)}`, ceiling);
+    if (!perAddress.ok) return tooMany(options, perAddress);
+
+    return { ok: true, identity };
   }
 
+  const result = checkRateLimit(bucketKey, rule);
+  if (!result.ok) return tooMany(options, result);
+
   return { ok: true, identity };
+}
+
+/** The same 429 whichever counter ran out, so a caller cannot tell them apart. */
+function tooMany(
+  options: GuardOptions,
+  result: { retryAfterSeconds: number; limit: number },
+): GuardResult {
+  return {
+    ok: false,
+    response: NextResponse.json(
+      { error: options.busyMessage, retryAfter: result.retryAfterSeconds },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(result.retryAfterSeconds),
+          "RateLimit-Limit": String(result.limit),
+          "RateLimit-Remaining": "0",
+          "RateLimit-Reset": String(result.retryAfterSeconds),
+          "Cache-Control": "no-store",
+        },
+      },
+    ),
+  };
 }

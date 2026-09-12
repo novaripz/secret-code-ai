@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { deviceHeader } from "@/lib/security/device";
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { XIcon } from "@/components/icons";
 
@@ -33,7 +34,7 @@ export function ReportDialog({ onClose }: { onClose: () => void }) {
     try {
       await fetch("/api/report", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...deviceHeader() },
         body: JSON.stringify({ category, details }),
       });
     } catch {

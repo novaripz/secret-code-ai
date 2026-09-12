@@ -5,6 +5,8 @@
 // coalescing chunks into a frame, flushing the decoder's tail, and treating a
 // deliberate stop as a stop rather than a failure.
 
+import { deviceHeader } from "@/lib/security/device";
+
 export interface StreamRequest {
   prompt: string;
   history?: { role: "user" | "assistant"; content: string }[];
@@ -53,7 +55,7 @@ export function streamChat(req: StreamRequest, handlers: StreamHandlers): Stream
       const res = await fetch("/api/ai", {
         method: "POST",
         signal: controller.signal,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...deviceHeader() },
         body: JSON.stringify({ ...req, chatOnly: true, stream: true, fileTree: "", contextFiles: {} }),
       });
 

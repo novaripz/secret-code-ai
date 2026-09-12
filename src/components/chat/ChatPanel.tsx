@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { deviceHeader } from "@/lib/security/device";
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useChatStore } from "@/store/useChatStore";
@@ -85,7 +86,7 @@ export function ChatPanel() {
 
       const res = await fetch("/api/ai", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...deviceHeader() },
         body: JSON.stringify({
           prompt: prompt || "(the user sent attachments with no message)",
           fileTree,

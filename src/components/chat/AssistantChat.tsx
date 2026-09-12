@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { deviceHeader } from "@/lib/security/device";
 import { useAssistantStore } from "@/store/useAssistantStore";
 import { useProfileStore } from "@/store/useProfileStore";
 import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
@@ -107,7 +108,7 @@ export function AssistantChat() {
       const res = await fetch("/api/ai", {
         method: "POST",
         signal: controller.signal,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...deviceHeader() },
         body: JSON.stringify({
           prompt: prompt || "(the user sent attachments with no message)",
           chatOnly: true,
