@@ -323,3 +323,52 @@ status. "Done" is the student's word.
   That is a separate question from this database, and it is worth answering
   separately rather than letting "the database is secure" imply more than it
   says.
+
+---
+
+## Step 6 — apply `0002_signals_and_teacher_codes.sql`
+
+Same as before: open the SQL editor, paste the whole file, Run. It adds two
+things.
+
+**Learning signals.** These used to live in each student's browser, where you
+could never see them. Now they are rows, and the rule that decides who may read
+one is worth knowing because a teacher will ask you:
+
+- A student can read all of their own signals.
+- A teacher can read a signal **only if it is attached to a class they own**.
+- A signal from the general chat belongs to no class, so **no teacher can read
+  it, ever.** That is where a student asks about things that are not
+  schoolwork, and it stays theirs.
+- No signal ever contains message text. It records that difficulty happened and
+  on which assignment, never what was said.
+
+**Teacher codes.** Instead of you running SQL every time a teacher joins, you
+issue a code once and they redeem it when they sign up.
+
+Make a code:
+
+```sql
+insert into public.teacher_codes (code, label, max_uses, expires_at)
+values ('choose-something-hard-to-guess', 'Ms Rivera, room 214', 1, now() + interval '14 days');
+```
+
+Give that string to the teacher. They sign up in the app, enter it, and become a
+teacher. Change `max_uses` if one code should cover a whole department.
+
+See who used what:
+
+```sql
+select code, label, uses, max_uses, revoked, expires_at from public.teacher_codes;
+```
+
+Turn one off:
+
+```sql
+update public.teacher_codes set revoked = true where code = 'the-code';
+```
+
+**A student still cannot promote themselves.** The rule from step 5 is
+unchanged — a role change is refused while anyone is signed in. Redeeming is the
+one exception, and it only opens for a code you deliberately created. Treat a
+code like a password: it is the whole authorisation.
