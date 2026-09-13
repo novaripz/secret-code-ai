@@ -28,12 +28,13 @@ import { useEffect, useRef, useState } from "react";
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { AssignmentRules, Role } from "@/lib/school/types";
+import { CLASS_COLORS, type AssignmentRules, type Role } from "@/lib/school/types";
 import { getSupabase } from "@/lib/supabase/browser";
 import {
   DatabaseError,
   addStudentByEmail,
   createAssignment,
+  createClass,
   deleteAssignment as dbDeleteAssignment,
   getProfile,
   listAssignments,
@@ -45,7 +46,9 @@ import {
   listStudentProfiles,
   listStudentSignals,
   removeStudent as dbRemoveStudent,
+  deleteClass as dbDeleteClass,
   revokeInvite,
+  updateClass,
   updateAssignment,
   type AssignmentStatusRow,
   type ClassWithOwner,
@@ -119,6 +122,11 @@ interface TeacherState {
   loadRole: () => Promise<void>;
   loadClasses: () => Promise<void>;
   loadClass: (classId: string) => Promise<void>;
+
+  /** Returns the new class id, or null when the write failed. */
+  createClass: (name: string, period?: string) => Promise<string | null>;
+  renameClass: (classId: string, name: string, period?: string) => Promise<void>;
+  removeClass: (classId: string) => Promise<void>;
 
   /** Returns an error message, or null when the invite was accepted. */
   invite: (classId: string, email: string) => Promise<string | null>;
@@ -492,6 +500,70 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
         }));
       }
     }),
+
+  // A teacher with no classes can do nothing else — not enroll anyone, not set
+  // an assignment — so this is the first write any of them makes. It is not
+  // optimistic: the row comes back carrying the id every later call needs, and
+  // showing a class that might not exist would be worse than a half-second wait.
+  createClass: async (name, period) => {
+    const trimmed = name.trim();
+    if (!trimmed) return null;
+
+    try {
+      const { supabase, userId } = await session();
+      const colors = CLASS_COLORS;
+      const klass = await createClass(supabase, userId, {
+        name: trimmed,
+        teacher: period?.trim() || undefined,
+        color: colors[get().classes.length % colors.length],
+      });
+
+      const bundle = await loadBundle(supabase, klass, { withStatuses: "overdue" });
+      set((state) => ({
+        classes: [...state.classes, summarize(bundle)],
+        roster: { ...state.roster, [klass.id]: [] },
+        invites: { ...state.invites, [klass.id]: [] },
+        assignments: { ...state.assignments, [klass.id]: [] },
+      }));
+      return klass.id;
+    } catch (err) {
+      set({ actionError: describe(err, "We couldn't create that class.") });
+      return null;
+    }
+  },
+
+  renameClass: async (classId, name, period) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+
+    const before = get().classes;
+    set((state) => ({
+      classes: state.classes.map((c) =>
+        c.id === classId ? { ...c, name: trimmed, period: period?.trim() || undefined } : c,
+      ),
+    }));
+
+    try {
+      const { supabase } = await session();
+      await updateClass(supabase, classId, { name: trimmed, teacher: period?.trim() || undefined });
+    } catch (err) {
+      set({ classes: before, actionError: describe(err, "We couldn't rename that class.") });
+    }
+  },
+
+  // Deleting cascades to enrollments, assignments and signals in the database.
+  // The roster and the work go with it, which is why the screen asks first.
+  removeClass: async (classId) => {
+    const before = get().classes;
+    set((state) => ({ classes: state.classes.filter((c) => c.id !== classId) }));
+
+    try {
+      const { supabase } = await session();
+      await dbDeleteClass(supabase, classId);
+    } catch (err) {
+      set({ classes: before, actionError: describe(err, "We couldn't delete that class.") });
+    }
+  },
 
   invite: async (classId, rawEmail) => {
     const email = rawEmail.trim().toLowerCase();
