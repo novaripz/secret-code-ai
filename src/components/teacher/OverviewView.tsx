@@ -8,12 +8,12 @@
 // that deserves the rest of the period.
 
 import Link from "next/link";
-import { classAnalytics, useTeacherStore } from "./store";
+import { useClassAnalytics, useTeacherStore } from "./store";
 import {
   Chip,
-  DataSourceNote,
   SectionHeading,
   Stat,
+  LoadNote,
   cardClass,
   formatDue,
   quietButtonClass,
@@ -26,7 +26,11 @@ export function OverviewView({ classId }: { classId: string }) {
   const students = useTeacherStore((s) => s.roster[classId] ?? []);
   const invites = useTeacherStore((s) => s.invites[classId] ?? []);
   const assignments = useTeacherStore((s) => s.assignments[classId] ?? []);
-  const analytics = classAnalytics(classId);
+  // Signals are a real read now, and it can fail. This screen is a summary, so
+  // a failure is shown as one line rather than taking the page over — but it is
+  // shown, because a zero here that is really an error would send a teacher
+  // into Monday believing the room is fine.
+  const { data: analytics, state: analyticsState } = useClassAnalytics(classId);
 
   if (!klass) return null;
 
@@ -37,6 +41,7 @@ export function OverviewView({ classId }: { classId: string }) {
   const top = analytics
     ? [...analytics.topics].sort((x, y) => evidenceTotal(y) - evidenceTotal(x))[0]
     : undefined;
+  const signalsBroken = analyticsState.error !== null;
 
   const base = `/teacher/classes/${classId}`;
 
@@ -52,17 +57,33 @@ export function OverviewView({ classId }: { classId: string }) {
         />
         <Stat value={assignments.length || klass.assignmentCount} label="Assignments" />
         <Stat
-          value={analytics ? analytics.topics.filter((t) => t.severity === "critical").length : 0}
+          value={
+            analytics
+              ? analytics.topics.filter((t) => t.severity === "critical").length
+              : signalsBroken
+                ? "—"
+                : "…"
+          }
           label="Topics needing a lesson"
           tone="warn"
-          hint="From this week's signals"
+          hint={
+            signalsBroken
+              ? "Signals didn't load — this is not a zero"
+              : `From the last ${analytics?.windowDays ?? 14} days of signals`
+          }
         />
       </div>
+
+      {signalsBroken && (
+        <div className="mt-6">
+          <LoadNote state={analyticsState} what="this class's learning signals" />
+        </div>
+      )}
 
       {top && (
         <div className="mt-6">
           <SectionHeading
-            title="Biggest signal this week"
+            title="Biggest signal right now"
             sub="The rest, ranked, are on the analytics tab."
             action={
               <Link href={`${base}/analytics`} className={quietButtonClass}>
@@ -124,9 +145,6 @@ export function OverviewView({ classId }: { classId: string }) {
         </div>
       </div>
 
-      {/* The counts above are live; the signal card is not, and the note is
-          scoped to exactly the part that still isn't. */}
-      <DataSourceNote what="the signal card and the topic count" />
     </>
   );
 }

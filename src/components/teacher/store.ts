@@ -16,12 +16,15 @@
 // went wrong, which is what the old comment promised and could not deliver
 // while everything was local.
 //
-// What is NOT here: learning signals. The migration has no table for them
-// (profiles, classes, enrollments, assignments, assignment_status, invites is
-// the whole schema), and signals are captured in the student's own browser, so
-// a teacher cannot read them at all yet. `classAnalytics`/`studentAnalytics`
-// therefore still return fixtures, and those screens still say so on screen.
+// Learning signals are live too, as of the `struggle_signals` table in
+// migration 0002. They arrive by a different route from everything else here:
+// students capture them locally and push them in the background (see
+// src/store/useInsightsStore.ts), so a teacher is reading a copy that can lag
+// behind a student who is offline. The one thing that is still fixture on
+// these screens is nothing — exampleData now survives only for the classes,
+// roster and assignment shapes the screens were designed against.
 
+import { useEffect, useRef, useState } from "react";
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -38,7 +41,9 @@ import {
   listInvites,
   listOwnedClasses,
   listStatusesForAssignment,
+  listClassSignals,
   listStudentProfiles,
+  listStudentSignals,
   removeStudent as dbRemoveStudent,
   revokeInvite,
   updateAssignment,
@@ -46,9 +51,20 @@ import {
   type ClassWithOwner,
   type Invite,
 } from "@/lib/db";
-import { EXAMPLE_NOW, exampleClassAnalytics, exampleStudentAnalytics } from "./exampleData";
+import {
+  estimateEnglishLevel,
+  summarizeStruggles,
+  toTeacherReport,
+  WINDOW_MS,
+  type Confidence,
+  type StruggleSignal,
+  type TeacherReport,
+  type TeacherTopicRow,
+} from "@/lib/insights";
 import type {
   ClassAnalytics,
+  Severity,
+  TopicSignal,
   RosterInvite,
   RosterStudent,
   StudentAnalytics,
@@ -80,7 +96,8 @@ export interface LoadState {
 const IDLE: LoadState = { loading: false, error: null, loaded: false };
 
 interface TeacherState {
-  /** The analytics screens are still fixtures; the rest is live. */
+  /** Every screen reads the database now. Kept because the note component and
+   *  the tests both still ask a store what it is showing. */
   source: DataSource;
 
   role: Role | null;
@@ -702,30 +719,260 @@ export function useTeacherRole(): { role: Role | null; state: LoadState } {
   return { role, state };
 }
 
-// Analytics is read-only from the UI's point of view — nothing a teacher does
-// on these screens changes a learning signal — so it stays a lookup rather than
-// store state.
+// ---------------------------------------------------------------- analytics
 //
-// It is also still example data, and that is not an oversight. Struggle signals
-// are now genuinely captured (useInsightsStore, from the chat surfaces), but
-// they are written to IndexedDB in the student's own browser and the schema has
-// nowhere to put them — there is no signals table and no sync. Until a signals table exists there is genuinely nothing
-// for a teacher to read, so these two functions keep returning the fixture and
-// the screens that use them keep their DataSourceNote.
+// Analytics is read-only from the UI's point of view — nothing a teacher does
+// on these screens changes a learning signal — so it stays a pair of hooks
+// over a one-shot read rather than store state.
+//
+// The important decision is where the aggregation happens: in
+// src/lib/insights, not here and not in SQL. `listClassSignals` returns rows,
+// `summarizeStruggles` turns one student's rows into findings, and
+// `toTeacherReport` projects those down to the teacher-safe shape. Only then
+// does this file map into ./types. Writing the same thresholds a second time
+// in a select statement would give a teacher's screen and a student's own
+// adaptation two different opinions about the same evidence.
+//
+// What is lost on the way through the projection is the per-kind breakdown:
+// a `TeacherTopicRow` carries a count, a confidence and a generated evidence
+// line, and no byKind map. That is the projection doing its job, so each
+// finding becomes one Evidence entry whose label is the generated line — the
+// sentence a teacher can actually check. The `kind` field is a list key here,
+// nothing more.
 
-export function classAnalytics(classId: string): ClassAnalytics | null {
-  return exampleClassAnalytics[classId] ?? null;
+/** Confidence is the engine's word for how much it will claim; severity is the
+ *  UI's. One map, so the two vocabularies meet exactly once. */
+const SEVERITY: Record<Confidence, Severity> = {
+  clear: "critical",
+  likely: "warning",
+  watching: "watch",
+};
+
+const WINDOW_DAYS = Math.round(WINDOW_MS / 86_400_000);
+
+/** A finding, as the teacher screens draw it. `students` is how many people
+ *  contributed — one, on the student screen. */
+function toTopicSignal(
+  id: string,
+  rows: TeacherTopicRow[],
+  students: number,
+  context: string,
+): TopicSignal {
+  // The loudest row decides the stripe: a topic where one student is clearly
+  // stuck and three are merely watched is a topic to reteach.
+  const severity = rows
+    .map((r) => SEVERITY[r.confidence])
+    .reduce((worst, next) =>
+      (["watch", "warning", "critical"].indexOf(next) > ["watch", "warning", "critical"].indexOf(worst)
+        ? next
+        : worst),
+    "watch" as Severity);
+
+  return {
+    id,
+    topic: rows[0].topicLabel,
+    context,
+    severity,
+    studentCount: students,
+    windowDays: WINDOW_DAYS,
+    evidence: rows.map((r) => ({
+      kind: "repeatedQuestion" as const,
+      count: r.evidenceCount,
+      label: r.evidenceLine,
+    })),
+  };
 }
 
-export function studentAnalytics(studentId: string): StudentAnalytics {
-  // No fallback fixture for an id we do not recognise. Every real student now
-  // has a real uuid, and attaching invented evidence — "3 hint requests on
-  // difference of squares" — to a named sixteen-year-old is the single worst
-  // thing these screens could do, note or no note.
-  return (
-    exampleStudentAnalytics[studentId] ?? { studentId, windowDays: 7, sessions: 0, topics: [] }
-  );
+/** One student's rows, run through the engine and the privacy projection. */
+function reportFor(studentId: string, signals: StruggleSignal[], now: number): TeacherReport {
+  // No writing samples: those are text the student typed, they are never
+  // stored, and they never leave their browser. The English estimate a teacher
+  // sees is therefore built from button presses alone, which is thinner than
+  // the student's own and honestly so.
+  const english = estimateEnglishLevel(signals, []);
+  return toTeacherReport(summarizeStruggles(studentId, signals, english, now));
 }
 
-/** The fixture's "today", so relative dates in example data read sensibly. */
-export const exampleNow = EXAMPLE_NOW;
+/**
+ * What one class is stuck on.
+ *
+ * Throws on failure, like everything in src/lib/db, and the hook below turns
+ * that into a sentence. An empty list from here means the class was quiet.
+ */
+export async function classAnalytics(
+  classId: string,
+  now = Date.now(),
+): Promise<ClassAnalytics> {
+  const { supabase } = await session();
+  const klass = useTeacherStore.getState().classes.find((c) => c.id === classId);
+  const stored = await listClassSignals(supabase, classId, { className: klass?.name, now });
+
+  const byStudent = new Map<string, StruggleSignal[]>();
+  for (const { studentId, signal } of stored) {
+    const list = byStudent.get(studentId);
+    if (list) list.push(signal);
+    else byStudent.set(studentId, [signal]);
+  }
+
+  // Grouped by the label a teacher reads rather than the topic key, because
+  // two assignments with the same title are the same lesson to them, and the
+  // label is all that survives the projection anyway.
+  const needs = new Map<string, { rows: TeacherTopicRow[]; students: Set<string> }>();
+  const watching = new Map<string, { rows: TeacherTopicRow[]; students: Set<string> }>();
+  const add = (
+    into: Map<string, { rows: TeacherTopicRow[]; students: Set<string> }>,
+    studentId: string,
+    row: TeacherTopicRow,
+  ) => {
+    const entry = into.get(row.topicLabel) ?? { rows: [], students: new Set<string>() };
+    entry.rows.push(row);
+    entry.students.add(studentId);
+    into.set(row.topicLabel, entry);
+  };
+
+  for (const [studentId, signals] of byStudent) {
+    const report = reportFor(studentId, signals, now);
+    for (const row of report.needsAttention) add(needs, studentId, row);
+    for (const row of report.watching) add(watching, studentId, row);
+  }
+
+  const project = (
+    source: Map<string, { rows: TeacherTopicRow[]; students: Set<string> }>,
+    prefix: string,
+  ): TopicSignal[] =>
+    [...source.entries()].map(([label, entry]) =>
+      toTopicSignal(
+        `${prefix}:${label}`,
+        entry.rows,
+        entry.students.size,
+        klass?.name ?? "This class",
+      ),
+    );
+
+  return {
+    classId,
+    windowDays: WINDOW_DAYS,
+    // "Active" means Panda saw a struggle signal from them, which is narrower
+    // than "used Panda" — a student who sailed through contributes nothing.
+    // The coverage line on the screen is worded for that.
+    activeStudents: byStudent.size,
+    totalStudents: klass?.studentCount ?? useTeacherStore.getState().roster[classId]?.length ?? 0,
+    topics: project(needs, "t"),
+    steady: project(watching, "w"),
+  };
+}
+
+/**
+ * One student, inside one class.
+ *
+ * The class is required rather than optional: a teacher's select policy only
+ * matches classes they own, so "all of this student's signals" would quietly
+ * mean "the ones I happen to be allowed to see" — a number shaped by the asker
+ * rather than by the student. See the note in src/lib/db/signals.ts.
+ */
+export async function studentAnalytics(
+  classId: string,
+  studentId: string,
+  now = Date.now(),
+): Promise<StudentAnalytics> {
+  const { supabase } = await session();
+  const klass = useTeacherStore.getState().classes.find((c) => c.id === classId);
+  const signals = await listStudentSignals(supabase, classId, studentId, {
+    className: klass?.name,
+    now,
+  });
+  const report = reportFor(studentId, signals, now);
+
+  const rows = [...report.needsAttention, ...report.watching];
+  const byTopic = new Map<string, TeacherTopicRow[]>();
+  for (const row of rows) {
+    const list = byTopic.get(row.topicLabel);
+    if (list) list.push(row);
+    else byTopic.set(row.topicLabel, [row]);
+  }
+
+  return {
+    studentId,
+    windowDays: WINDOW_DAYS,
+    // Distinct days with a signal, not sessions. `struggle_signals` has no
+    // session column — the student's session ids stay in their browser — so
+    // this counts days and the screen says "days", rather than printing a
+    // session number nothing measured.
+    sessions: new Set(signals.map((s) => Math.floor(s.at / 86_400_000))).size,
+    topics: [...byTopic.entries()].map(([label, list]) =>
+      toTopicSignal(`t:${label}`, list, 1, klass?.name ?? "This class"),
+    ),
+  };
+}
+
+/**
+ * The three states a read can be in, kept apart all the way to the screen.
+ *
+ * `data` stays null while loading and on failure, so a component physically
+ * cannot render "no struggles" over an error — which is the failure this whole
+ * feature would be worst at, since a quiet class and a broken query look
+ * identical once you have thrown the difference away.
+ */
+export interface AnalyticsResult<T> {
+  data: T | null;
+  state: LoadState;
+}
+
+function useAnalytics<T>(key: string, read: () => Promise<T>): AnalyticsResult<T> {
+  // Keyed by the request rather than reset by it. Storing the key alongside the
+  // answer means "still loading" is derived — the result in state simply does
+  // not belong to the key being asked about yet — instead of being written by
+  // an effect that fires a second render every time the class changes.
+  const [result, setResult] = useState<{ key: string; data: T | null; error: string | null }>({
+    key: "",
+    data: null,
+    error: null,
+  });
+
+  // `read` closes over fresh props each render, so it cannot be a dependency
+  // without refetching on every render. The key identifies the request; this
+  // keeps the callback current without widening that.
+  const latest = useRef(read);
+  useEffect(() => {
+    latest.current = read;
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    latest
+      .current()
+      .then((data) => {
+        if (!cancelled) setResult({ key, data, error: null });
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          setResult({ key, data: null, error: describe(err, "We couldn't load the learning signals.") });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [key]);
+
+  const fresh = result.key === key;
+  return {
+    data: fresh ? result.data : null,
+    state: {
+      loading: !fresh,
+      error: fresh ? result.error : null,
+      loaded: fresh && result.error === null,
+    },
+  };
+}
+
+export function useClassAnalytics(classId: string): AnalyticsResult<ClassAnalytics> {
+  return useAnalytics(`class:${classId}`, () => classAnalytics(classId));
+}
+
+export function useStudentAnalytics(
+  classId: string,
+  studentId: string,
+): AnalyticsResult<StudentAnalytics> {
+  return useAnalytics(`student:${classId}:${studentId}`, () => studentAnalytics(classId, studentId));
+}
+

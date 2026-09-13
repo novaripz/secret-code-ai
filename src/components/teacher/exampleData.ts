@@ -7,18 +7,17 @@
 // therefore the fixture, not a fallback — when src/lib/db and src/lib/insights
 // land, `useTeacherData` swaps its source and nothing in the components moves.
 //
+// The analytics fixtures that used to live at the bottom of this file are gone:
+// the teacher screens read `struggle_signals` now, and inventing "3 hint
+// requests on difference of squares" next to a real sixteen-year-old's name is
+// the one thing those screens must never do. What is left describes classes,
+// rosters and assignments only.
+//
 // Everything here is invented. The names are ordinary-but-varied on purpose:
 // this app is for multilingual students and a roster that is all Smiths would
 // let a layout bug through.
 
-import type {
-  ClassAnalytics,
-  RosterInvite,
-  RosterStudent,
-  StudentAnalytics,
-  TeacherAssignment,
-  TeacherClass,
-} from "./types";
+import type { RosterInvite, RosterStudent, TeacherAssignment, TeacherClass } from "./types";
 
 const DAY = 86_400_000;
 /** Anchored to a fixed point so server and client render the same string. */
@@ -145,125 +144,6 @@ export const exampleAssignments: Record<string, TeacherAssignment[]> = {
         restrictionReason: "The exam is in English and this is the practice, so read the source in English — Panda can still simplify it.",
       },
       done: 12, doing: 8, todo: 11,
-    },
-  ],
-};
-
-export const exampleClassAnalytics: Record<string, ClassAnalytics> = {
-  "c-alg2": {
-    classId: "c-alg2", windowDays: 7, activeStudents: 21, totalStudents: 27,
-    topics: [
-      {
-        id: "t-1", topic: "Factoring when a ≠ 1", context: "Factoring quadratics — practice set B",
-        severity: "critical", studentCount: 12, windowDays: 7,
-        evidence: [
-          { kind: "hintRequest", count: 34, label: "hint requests on factoring" },
-          { kind: "retry", count: 19, label: "second attempts on the same problem" },
-          { kind: "stalled", count: 8, label: "sessions that ended without a finished problem" },
-        ],
-      },
-      {
-        id: "t-2", topic: "Difference of squares", context: "Practice set B, problems 12–18",
-        severity: "warning", studentCount: 7, windowDays: 7,
-        evidence: [
-          { kind: "hintRequest", count: 15, label: "hint requests on difference of squares" },
-          { kind: "repeatedQuestion", count: 6, label: "students asking the same question twice" },
-        ],
-      },
-      {
-        id: "t-3", topic: "Reading the word problems", context: "Quiz corrections",
-        severity: "warning", studentCount: 9, windowDays: 7,
-        evidence: [
-          { kind: "translation", count: 22, label: "translation requests on problem text" },
-          { kind: "simplification", count: 11, label: "requests to simplify the wording" },
-        ],
-      },
-      {
-        id: "t-4", topic: "Vertex form", context: "Graphing project",
-        severity: "watch", studentCount: 4, windowDays: 7,
-        evidence: [{ kind: "hintRequest", count: 6, label: "hint requests on converting to vertex form" }],
-      },
-    ],
-    steady: [
-      {
-        id: "t-5", topic: "Slope and intercepts", context: "Warm-ups",
-        severity: "watch", studentCount: 2, windowDays: 7,
-        evidence: [{ kind: "hintRequest", count: 2, label: "hint requests in the whole week" }],
-      },
-    ],
-  },
-  "c-bio": {
-    classId: "c-bio", windowDays: 7, activeStudents: 18, totalStudents: 24,
-    topics: [
-      {
-        id: "t-6", topic: "ATP vs ADP", context: "Cell respiration reading questions",
-        severity: "warning", studentCount: 6, windowDays: 7,
-        evidence: [
-          { kind: "repeatedQuestion", count: 13, label: "repeat questions about the energy cycle" },
-          { kind: "hintRequest", count: 9, label: "hint requests on question 6" },
-        ],
-      },
-      {
-        id: "t-7", topic: "Vocabulary load in chapter 7", context: "Cell respiration reading",
-        severity: "watch", studentCount: 5, windowDays: 7,
-        evidence: [{ kind: "simplification", count: 17, label: "requests to simplify a paragraph" }],
-      },
-    ],
-    steady: [],
-  },
-  "c-ush": {
-    classId: "c-ush", windowDays: 7, activeStudents: 19, totalStudents: 31,
-    topics: [
-      {
-        id: "t-8", topic: "Sourcing — who wrote it and why", context: "Primary source analysis",
-        severity: "critical", studentCount: 14, windowDays: 7,
-        evidence: [
-          { kind: "hintRequest", count: 41, label: "hint requests on identifying audience" },
-          { kind: "stalled", count: 12, label: "sessions that ended mid-paragraph" },
-        ],
-      },
-      {
-        id: "t-9", topic: "1860s vocabulary", context: "Reconstruction documents",
-        severity: "warning", studentCount: 10, windowDays: 7,
-        evidence: [
-          { kind: "simplification", count: 28, label: "requests to simplify the source text" },
-          { kind: "repeatedQuestion", count: 7, label: "repeat questions about the same term" },
-        ],
-      },
-    ],
-    steady: [],
-  },
-};
-
-export const exampleStudentAnalytics: Record<string, StudentAnalytics> = {
-  "s-2": {
-    studentId: "s-2", windowDays: 7, sessions: 9,
-    topics: [
-      {
-        id: "st-1", topic: "Factoring when a ≠ 1", context: "Practice set B",
-        severity: "critical", studentCount: 1, windowDays: 7,
-        evidence: [
-          { kind: "hintRequest", count: 7, label: "hint requests on factoring" },
-          { kind: "retry", count: 4, label: "second attempts on problem 9" },
-        ],
-      },
-      {
-        id: "st-2", topic: "Problem wording", context: "Quiz corrections",
-        severity: "warning", studentCount: 1, windowDays: 7,
-        evidence: [{ kind: "translation", count: 5, label: "translation requests into Spanish" }],
-      },
-    ],
-  },
-};
-
-/** Students with no analytics fixture still get an honest, populated screen. */
-export const exampleStudentFallback: StudentAnalytics = {
-  studentId: "", windowDays: 7, sessions: 3,
-  topics: [
-    {
-      id: "st-x", topic: "Difference of squares", context: "Practice set B",
-      severity: "watch", studentCount: 1, windowDays: 7,
-      evidence: [{ kind: "hintRequest", count: 3, label: "hint requests this week" }],
     },
   ],
 };

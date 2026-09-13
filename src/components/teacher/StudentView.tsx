@@ -9,11 +9,11 @@
 // as prominent as the findings.
 
 import Link from "next/link";
-import { studentAnalytics, useTeacherStore } from "./store";
+import { useStudentAnalytics, useTeacherStore } from "./store";
 import {
   Chip,
   Crumb,
-  DataSourceNote,
+  LoadNote,
   SectionHeading,
   Stat,
   cardClass,
@@ -26,6 +26,11 @@ import { evidenceTotal } from "./types";
 export function StudentView({ classId, studentId }: { classId: string; studentId: string }) {
   const student = useTeacherStore((s) => (s.roster[classId] ?? []).find((r) => r.id === studentId));
   const klass = useTeacherStore((s) => s.classes.find((c) => c.id === classId));
+  // Scoped to this class on purpose: a teacher's read only ever matches classes
+  // they own, and anything this student did in another teacher's class — or in
+  // the general chat, which no teacher can see at all — is not part of this
+  // picture. Called before the early return below because it is a hook.
+  const { data: analytics, state } = useStudentAnalytics(classId, studentId);
 
   if (!student) {
     return (
@@ -41,9 +46,12 @@ export function StudentView({ classId, studentId }: { classId: string; studentId
     );
   }
 
-  const analytics = studentAnalytics(studentId);
-  const ranked = [...analytics.topics].sort((a, b) => evidenceTotal(b) - evidenceTotal(a));
-  const thin = analytics.sessions < 5;
+  const ranked = analytics
+    ? [...analytics.topics].sort((a, b) => evidenceTotal(b) - evidenceTotal(a))
+    : [];
+  // Thin evidence is a first-class state here, and "we could not read it" is a
+  // different one again — neither may be drawn as a confident empty page.
+  const thin = analytics !== null && analytics.sessions < 3;
 
   return (
     <>
@@ -73,8 +81,10 @@ export function StudentView({ classId, studentId }: { classId: string; studentId
 
       <div className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
         <Stat
-          value={analytics.sessions}
-          label={`Sessions in ${analytics.windowDays} days`}
+          value={analytics ? analytics.sessions : state.error ? "—" : "…"}
+          // Days, not sessions: the table stores no session id, so counting
+          // sessions would mean printing a number nothing measured.
+          label={`Days with signals in ${analytics?.windowDays ?? 14}`}
           tone={thin ? "warn" : "neutral"}
           hint={thin ? "Thin evidence — read the below lightly" : undefined}
         />
@@ -84,11 +94,14 @@ export function StudentView({ classId, studentId }: { classId: string; studentId
 
       <div className="mt-6">
         <SectionHeading title="Where they're getting stuck" sub="Loudest first, with the counts behind it." />
-        {ranked.length === 0 ? (
+        {!analytics ? (
+          <LoadNote state={state} what="this student's learning signals" />
+        ) : ranked.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-[var(--line-strong)] px-4 py-10 text-center text-sm leading-relaxed text-[var(--text-faint)]">
-            No signals are stored for this student. Signals are recorded in their own browser and
-            the shared database has nowhere to keep them yet — so this is an unfinished feature,
-            not a quiet week.
+            No struggle signals from this student in this class in the last {analytics.windowDays}{" "}
+            days. That is an answer, not a gap: they have not been pressing for help on any one
+            topic often enough to show up here. Anything they did in the general chat, outside a
+            class, is theirs and is never shown to a teacher.
           </p>
         ) : (
           <div className="flex flex-col gap-2.5">
@@ -103,9 +116,6 @@ export function StudentView({ classId, studentId }: { classId: string; studentId
         <PrivacyNote scope="student" />
       </div>
 
-      {/* Their name, email and progress counts come from the database. The
-          signals above them do not — nothing stores them yet. */}
-      <DataSourceNote what="this student's signals" />
     </>
   );
 }

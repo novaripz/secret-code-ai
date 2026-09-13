@@ -11,3 +11,4 @@ export * from "./classes";
 export * from "./enrollments";
 export * from "./assignments";
 export * from "./status";
+export * from "./signals";
