@@ -1,6 +1,7 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import { unwrap, unwrapMaybe } from "./errors";
 import { PROFILE_COLUMNS, toProfile, type Profile, type ProfileRow } from "./rows";
+import type { Role } from "@/lib/school/types";
 
 // A person's own row: their name, their two language settings, and their role.
 //
@@ -10,6 +11,13 @@ import { PROFILE_COLUMNS, toProfile, type Profile, type ProfileRow } from "./row
 // and everybody else's work. Promotion is a line of SQL run by whoever owns the
 // project; see docs/DATABASE.md. A function here would only be a nicer-looking
 // way to get that exception.
+//
+// There is no `setRole` still, but there is now `redeemTeacherCode`, and the
+// difference between the two is the whole design. Setting a role is an account
+// deciding what it is; redeeming is an account presenting something a person
+// with the authority to grant it wrote down first. The row it checks lives in a
+// table no browser can read, so the code cannot be guessed from here, and the
+// function is the only thing the trigger will let through.
 //
 // `getProfile` can legitimately come back null: the row is created by a trigger
 // on sign-up, and a caller racing that trigger should see "not yet" rather than
@@ -90,4 +98,28 @@ export async function listStudentProfiles(
     "reading student profiles",
   );
   return rows.map(toProfile);
+}
+
+/** What `rpc` actually resolves to, minus the set-returning assumption. */
+type Result<T> = { data: T | null; error: PostgrestError | null };
+
+/**
+ * Trades a teacher code for the teacher role, and returns the role the server
+ * settled on rather than the one we hoped for — the caller should believe the
+ * database, not its own optimism, and then re-read the profile anyway.
+ *
+ * Every way this can fail comes back as the same 42501 with the same sentence,
+ * deliberately: an unknown code, an expired one, a revoked one and a spent one
+ * are indistinguishable from out here, because telling them apart would turn
+ * the redeem box into an oracle for discovering live codes. So this wrapper
+ * passes the server's message through untouched and adds nothing of its own —
+ * any "hint" we invented would be exactly the leak the migration avoided.
+ *
+ * The code is never logged, for the same reason a password isn't.
+ */
+export async function redeemTeacherCode(supabase: SupabaseClient, code: string): Promise<Role> {
+  const result = (await supabase.rpc("redeem_teacher_code", {
+    p_code: code.trim(),
+  })) as unknown as Result<Role>;
+  return unwrap(result, "redeeming your teacher code");
 }

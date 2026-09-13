@@ -10,6 +10,14 @@
 // fail. Checking here is a courtesy to the student, not the security boundary:
 // row-level security is, and it holds even if this component is wrong.
 //
+// What changed with teacher codes: this page is now also the way in, not only
+// the way out. Signed out, it offers the ordinary sign-in — the same Supabase
+// auth students use, because only the role differs. Signed in as a student, it
+// offers a code box rather than a dead end, and the code is checked by a
+// SECURITY DEFINER function against a table no browser can read. Neither path
+// loosens the gate: after a redeem the role is re-read from the database, never
+// assumed from what this component just did.
+//
 // The role is read from `profiles` rather than from the local school store,
 // which is what this browser last wrote and therefore something a curious
 // student could edit. Reading it costs a round trip, which is why the loading
@@ -24,8 +32,10 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import { LockIcon } from "@/components/icons";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useTeacherStore } from "./store";
+import { RedeemCodePanel } from "./RedeemCodePanel";
+import { TeacherSignIn } from "./TeacherSignIn";
 import { cardClass, quietButtonClass } from "./primitives";
 
 export function TeacherPage({ children }: { children: React.ReactNode }) {
@@ -33,11 +43,23 @@ export function TeacherPage({ children }: { children: React.ReactNode }) {
   const state = useTeacherStore((s) => s.roleState);
   const loadRole = useTeacherStore((s) => s.loadRole);
 
+  const account = useAuthStore((s) => s.account);
+  const hydrated = useAuthStore((s) => s.hydrated);
+  const hydrate = useAuthStore((s) => s.hydrate);
+
+  useEffect(() => {
+    if (!hydrated) hydrate();
+  }, [hydrated, hydrate]);
+
   useEffect(() => {
     void loadRole();
   }, [loadRole]);
 
-  const checking = state.loading || (!state.loaded && state.error === null);
+  // Re-reading the role after a redeem must not blank the screen: the panel
+  // below is already saying "that code worked", and replacing it with
+  // "checking…" reads as the success being taken back. So a refresh of
+  // something we already have is quiet, and only a first read is loud.
+  const checking = !hydrated || (!state.loaded && state.error === null);
 
   return (
     <AppShell>
@@ -47,13 +69,22 @@ export function TeacherPage({ children }: { children: React.ReactNode }) {
             // Neutral on purpose. A teacher must never see the student wall
             // flash past on the way to their own classes.
             <p className="text-sm text-[var(--text-faint)]">Checking your account…</p>
+          ) : !account ? (
+            // Signed out — including a guest who walked in from the student
+            // side. Offer the door rather than an explanation of the lock; the
+            // store's own error for this case says "sign in" and nothing more
+            // actionable than what this screen already is.
+            <TeacherSignIn onSignedIn={() => void loadRole()} />
           ) : state.error ? (
             // Not signed in, or no database configured, or the read failed.
             // All three are stated rather than collapsed into "no access":
             // only one of them is about who this person is.
             <Unavailable message={state.error} />
           ) : role !== "teacher" ? (
-            <NotATeacher />
+            // Signed in, but an ordinary account. The redeem box re-reads the
+            // role from the database on success; it does not flip anything
+            // locally, because local state is exactly what a student can edit.
+            <RedeemCodePanel onRedeemed={() => void loadRole()} />
           ) : (
             children
           )}
@@ -85,54 +116,6 @@ function Unavailable({ message }: { message: string }) {
         </Link>
         <Link href="/classes" className={quietButtonClass}>
           Go to my classes
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function NotATeacher() {
-  return (
-    <div className={`${cardClass} mx-auto max-w-xl p-6 sm:p-8`}>
-      <span
-        className="flex h-11 w-11 items-center justify-center rounded-xl"
-        style={{ background: "var(--surface-2)" }}
-      >
-        <LockIcon className="h-5 w-5" />
-      </span>
-
-      <h1 className="mt-4 text-xl font-semibold tracking-tight text-[var(--text)]">
-        This part of Panda is for teachers
-      </h1>
-      <p className="mt-2 text-sm leading-relaxed text-[var(--text-dim)]">
-        Rosters, assignment rules and class learning signals live behind a teacher account. Your
-        own classes, assignments and plan are all still where you left them.
-      </p>
-
-      <div
-        className="mt-5 rounded-xl border border-[var(--line)] p-4 text-sm leading-relaxed text-[var(--text-dim)]"
-        style={{ background: "var(--surface-1)" }}
-      >
-        <p className="font-medium text-[var(--text)]">Why you can&apos;t just switch this on</p>
-        <p className="mt-1.5">
-          A teacher account can read learning signals for everyone in its classes. If an account
-          could make itself a teacher, any student could read their classmates&apos; data — so the
-          database refuses to let an account change its own role at all. A teacher is promoted once,
-          by whoever runs this school&apos;s Panda install.
-        </p>
-      </div>
-
-      <p className="mt-4 text-sm text-[var(--text-dim)]">
-        If you teach here and landed on this page, ask your administrator to promote your account,
-        then come back.
-      </p>
-
-      <div className="mt-5 flex flex-wrap gap-2">
-        <Link href="/classes" className={quietButtonClass}>
-          Go to my classes
-        </Link>
-        <Link href="/plan" className={quietButtonClass}>
-          Plan my evening
         </Link>
       </div>
     </div>
