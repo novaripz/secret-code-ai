@@ -38,6 +38,32 @@
 
   --background: var(--bg);
   --foreground: var(--text);
+
+  /* TYPE WEIGHT
+     Geist is loaded as a variable font (layout.tsx asks for no specific
+     weights, which is what makes next/font serve the whole 100-900 axis), so
+     every number below is a real instance the file can draw. Nothing here is
+     faux-bolded by the browser — that is the failure mode this was checked
+     for, because synthetic bold on a thin face looks worse than the thin face.
+
+     Three steps, and only three, because the app read washed out for want of
+     weight rather than for want of variety. Body sits above the browser's 400,
+     UI labels sit a step above body so a control reads as a control, and
+     strong sits above that. If everything were bold none of it would be. */
+  --weight-body: 450;
+  --weight-ui: 550;
+  --weight-strong: 650;
+}
+
+/* Dark ink on light paper renders optically heavier than light ink on dark —
+   the same numeric weight that reads crisp on the dark theme goes muddy on
+   sepia. So the light-ground themes step back by 20 rather than sharing the
+   dark numbers. */
+:root[data-theme="light"],
+:root[data-theme="sepia"] {
+  --weight-body: 430;
+  --weight-ui: 530;
+  --weight-strong: 620;
 }
 
 :root[data-theme="light"] {
@@ -188,6 +214,28 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans), ui-sans-serif, system-ui, Arial, Helvetica, sans-serif;
+  font-weight: var(--weight-body);
+}
+
+/* The weight pass, written as element rules on purpose.
+   A Tailwind font-* utility is a class and therefore still wins wherever a
+   component has deliberately chosen a weight, so this raises the floor without
+   flattening any hierarchy that already exists. */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--weight-strong);
+}
+/* Anything that is a control or a label for one. These are the words a student
+   scans rather than reads, and they were the thinnest thing on the screen. */
+button, label, th, legend, summary, optgroup {
+  font-weight: var(--weight-ui);
+}
+strong, b {
+  font-weight: var(--weight-strong);
+}
+/* Inline code inherits the sentence's weight, and at a mono face that reads
+   heavy. It gets the plain body step instead of whatever it is sitting in. */
+code, kbd, samp {
+  font-weight: var(--weight-body);
 }
 
 /* Slim scrollbars so long chats/file trees don't look chunky in dark mode. */
@@ -221,6 +269,23 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .chunk-in { animation: none; }
 }
+
+/* The waiting dot beside "Thinking…". A slow opacity pulse and nothing else:
+   it has to say "still running" from the corner of the eye without becoming
+   the thing being watched. Under reduced motion it stops pulsing and simply
+   stays visible — the status TEXT is what carries the meaning, so losing the
+   animation loses nothing, which is why the indicator was built text-first. */
+@keyframes activity-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+.activity-dot {
+  animation: activity-pulse 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .activity-dot { animation: none; opacity: 1; }
+}
+:root[data-reduce-motion="on"] .activity-dot { animation: none; opacity: 1; }
 
 /* Panda's mascot. The idle set runs forever but stays slow and small, so it
    reads as the thing being alive rather than as an animation demanding

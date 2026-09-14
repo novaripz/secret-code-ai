@@ -19,6 +19,8 @@ import { FileIcon } from "@/components/icons";
 import { buildSuggestions } from "./suggestions";
 import { CopyButton } from "./CopyButton";
 import { parseRemembered } from "./remember";
+import { frameReader, type Source } from "./frames";
+import { Activity, Sources, type ActivityState } from "./Activity";
 
 
 /**
@@ -84,6 +86,16 @@ export function AssistantChat() {
   const stickToBottom = useRef(true);
   // Held so the student can stop a reply that is going the wrong way.
   const abortRef = useRef<AbortController | null>(null);
+  // What Panda is doing right now, or null when it is doing nothing. Set the
+  // moment a message is sent rather than when the server first speaks, because
+  // the wait the student complained about starts at the button, not at the
+  // first byte.
+  const [activity, setActivity] = useState<ActivityState | null>(null);
+  // Citations, by the message they belong to. Kept in this component rather
+  // than in the thread store because the stored message shape is owned
+  // elsewhere; the cost is that sources are lost on reload, which is the right
+  // trade for not reaching into another module's data model.
+  const [sources, setSources] = useState<Record<string, Source[]>>({});
 
   useEffect(() => {
     if (!hydrated) void hydrate();
@@ -129,6 +141,7 @@ export function AssistantChat() {
     setAttachments([]);
     addUserMessage(typed, outgoing);
     setLoading(true);
+    setActivity({ phase: "thinking" });
 
     const insights = useInsightsStore.getState();
     // Only what the student typed themselves. A button's canned prompt is our
@@ -157,6 +170,12 @@ export function AssistantChat() {
           prompt: prompt || "(the user sent attachments with no message)",
           chatOnly: true,
           stream: true,
+          // Opt into the framed (newline-delimited JSON) stream. Without this
+          // the route writes raw prose and there is no channel for progress —
+          // and, on a deployment with search configured, no tool calling
+          // either, precisely because a client that cannot draw progress
+          // should not be made to wait through an invisible round-trip.
+          events: true,
           fileTree: "",
           contextFiles: {},
           history,
@@ -189,24 +208,64 @@ export function AssistantChat() {
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+      const frames = frameReader();
       const id = startAssistantMessage();
-      // The bubble exists now and text is about to land in it, so the waiting
-      // dots have done their job.
+      // The bubble exists now, but nothing has landed in it yet. The waiting
+      // state stays up and is driven by the stream from here on — it is the
+      // status line, not `loading`, that tells the student what is happening.
       setLoading(false);
 
+      // Only text counts as a reply. A stream that carried nothing but a
+      // status frame and then closed is an empty answer, however many bytes
+      // crossed the wire.
       let received = false;
+      let failure: string | undefined;
+
       // Chunks can arrive faster than the screen refreshes. Coalesce whatever
       // lands within a frame into one update: fewer renders, and the fade
       // groups a few words instead of flickering per token. No artificial
       // delay is added — a frame is the display's own tick.
       let pending = "";
-      let frame = 0;
+      let raf = 0;
 
       const flush = () => {
-        frame = 0;
+        raf = 0;
         if (!pending) return;
         appendToAssistantMessage(id, pending);
         pending = "";
+      };
+
+      const handle = (frame: ReturnType<typeof frames.push>[number]) => {
+        if (frame.t === "text") {
+          // The first token is the end of the wait, so the indicator goes
+          // here and not in a timeout: it clears on the same event that gives
+          // the student something to read, and can never linger over prose.
+          if (!received) {
+            received = true;
+            setActivity(null);
+          }
+          pending += frame.v;
+          if (!raf) raf = requestAnimationFrame(flush);
+          return;
+        }
+        if (frame.t === "status") {
+          // Late status frames are ignored once text is flowing. The server
+          // drains its queue as it streams, so a search that finished before
+          // the first word can otherwise arrive after it and reinstate a
+          // spinner over an answer already being written.
+          if (!received) {
+            setActivity({ phase: frame.phase, query: frame.query, count: frame.count, reason: frame.reason });
+          }
+          return;
+        }
+        if (frame.t === "sources") {
+          setSources((prev) => ({ ...prev, [id]: frame.items }));
+          return;
+        }
+        // An error frame is prose the route already wrote for a student, and
+        // it is terminal: whatever text arrived stays, and this is what the
+        // bubble reports when the stream closes.
+        failure = frame.message;
       };
 
       try {
@@ -215,15 +274,21 @@ export function AssistantChat() {
           if (done) break;
           const text = decoder.decode(value, { stream: true });
           if (!text) continue;
-          received = true;
-          pending += text;
-          if (!frame) frame = requestAnimationFrame(flush);
+          for (const frame of frames.push(text)) handle(frame);
         }
       } finally {
-        if (frame) cancelAnimationFrame(frame);
+        if (raf) cancelAnimationFrame(raf);
+        // The decoder's tail can complete a multi-byte character that ends the
+        // last line, so it is pushed through the splitter before the splitter
+        // is asked for its own leftovers.
+        for (const frame of frames.push(decoder.decode())) handle(frame);
+        for (const frame of frames.end()) handle(frame);
         flush();
-        appendToAssistantMessage(id, decoder.decode());
-        finishAssistantMessage(id, received ? undefined : t("error.emptyReply"));
+        // Whatever happened — finished, errored, or stopped mid-sentence —
+        // the indicator comes down here. This is the one path every ending
+        // goes through, which is what stops a spinner outliving its stream.
+        setActivity(null);
+        finishAssistantMessage(id, failure ?? (received ? undefined : t("error.emptyReply")));
 
         // A student who says "my name is Santi, not S" has corrected Panda for
         // every future conversation, not just this one. The model marks the
@@ -243,6 +308,10 @@ export function AssistantChat() {
     } finally {
       abortRef.current = null;
       setLoading(false);
+      // Belt and braces for the paths that never reached the stream at all —
+      // a non-OK response, a thrown fetch. A stuck "Thinking" with no stream
+      // behind it is the exact failure this feature exists to remove.
+      setActivity(null);
     }
   }
 
@@ -341,9 +410,14 @@ export function AssistantChat() {
                     ) : m.content ? (
                       <div
                         className={
+                          // --chat-text is the Appearance text-size setting.
+                          // It was declared in globals.css and never consumed,
+                          // so the small/large choice did nothing to the one
+                          // surface it names; the weight pass is the moment to
+                          // hook it up rather than hard-code 15px again.
                           m.role === "user"
-                            ? "rounded-3xl bg-[var(--bubble-user)] px-4 py-2.5 text-[15px] leading-relaxed text-[var(--text)]"
-                            : "text-[15px] text-[var(--text)]"
+                            ? "rounded-3xl bg-[var(--bubble-user)] px-4 py-2.5 text-[length:var(--chat-text)] leading-relaxed text-[var(--text)]"
+                            : "text-[length:var(--chat-text)] text-[var(--text)]"
                         }
                       >
                         <MessageText content={m.content} streaming={m.streaming} />
@@ -352,6 +426,10 @@ export function AssistantChat() {
                             usually a few turns back by the time they decide to
                             keep it. Never while streaming — half a reply
                             copied silently is worse than no button. */}
+                        {/* Citations as their own block, below the prose —
+                            never woven into the sentence, which is why the
+                            route sends them as data in the first place. */}
+                        {m.role === "assistant" && sources[m.id] && <Sources items={sources[m.id]} />}
                         {m.role === "assistant" && !m.streaming && <CopyButton content={m.content} />}
                         {m.role === "assistant" && !m.streaming && m.id === lastAssistantId && (
                           <MessageActions
@@ -380,15 +458,13 @@ export function AssistantChat() {
                 </div>
               ))}
 
-              {(loading || streaming) && (
-                <div className="flex items-center gap-3">
-                  {loading && (
-                    <div className="flex items-center gap-1.5 text-[var(--text-faint)]">
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-current" />
-                    </div>
-                  )}
+              {(loading || streaming || activity) && (
+                <div className="flex flex-wrap items-center gap-3">
+                  {/* Replaces the three bouncing dots. The dots were the same
+                      shape whether Panda was composing a sentence or waiting
+                      on a web search, which is what made the wait feel like a
+                      hang. */}
+                  <Activity state={activity} />
                   <button
                     onClick={stop}
                     className="rounded-full border border-[var(--line-strong)] px-3 py-1.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
