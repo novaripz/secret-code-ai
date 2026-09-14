@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { FileOperation, Project } from "@/types";
+import { useI18n, type StringKey } from "@/lib/i18n";
 import { findByPath } from "@/lib/fileSystem";
 import { useStudioStore } from "@/store/useStudioStore";
 import { CheckIcon, FileIcon, XIcon } from "@/components/icons";
@@ -16,11 +17,11 @@ import { diffLines, hunks, type DiffResult } from "./diff";
 // attached, and the diff underneath is the proof. A student who is new to code
 // learns faster from seeing the edit than from being told about it.
 
-const VERB: Record<FileOperation["type"], string> = {
-  create: "created",
-  modify: "edited",
-  delete: "deleted",
-  rename: "renamed",
+const VERB: Record<FileOperation["type"], StringKey> = {
+  create: "studio.opCreated",
+  modify: "studio.opEdited",
+  delete: "studio.opDeleted",
+  rename: "studio.opRenamed",
 };
 
 /** Each verb gets a colour it keeps everywhere in the workspace. */
@@ -87,6 +88,7 @@ function DiffBody({ result }: { result: DiffResult }) {
 }
 
 function ActionRow({ op, project }: { op: FileOperation; project: Project | null }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   const previous = project ? (findByPath(project, op.path)?.content ?? "") : "";
@@ -100,7 +102,7 @@ function ActionRow({ op, project }: { op: FileOperation; project: Project | null
 
   const lines = next ? next.split("\n").length : 0;
   const name = op.path.split("/").pop() ?? op.path;
-  const label = `${VERB[op.type]} ${op.path}`;
+  const label = `${t(VERB[op.type])} ${op.path}`;
 
   return (
     <li className="overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface-1)]">
@@ -113,7 +115,7 @@ function ActionRow({ op, project }: { op: FileOperation; project: Project | null
         <span
           className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${VERB_STYLE[op.type]}`}
         >
-          {VERB[op.type]}
+          {t(VERB[op.type])}
         </span>
         <FileIcon className="h-3.5 w-3.5 shrink-0 text-[var(--text-faint)]" />
         <span className="min-w-0 flex-1 truncate font-mono text-[var(--text-dim)]" title={op.path}>
@@ -189,6 +191,73 @@ export function ActionList({
       )}
       {applied && <p className="pt-0.5 text-[11px] text-[var(--success)]">Applied to your files.</p>}
       {rejected && <p className="pt-0.5 text-[11px] text-[var(--text-faint)]">Skipped.</p>}
+    </div>
+  );
+}
+
+/**
+ * The same list, drawn while the agent is still writing it.
+ *
+ * Kept next to ActionList rather than in its own file because it is the same
+ * idea at a different moment — the finished list is what the student approves,
+ * this is that list arriving a row at a time — and the two must never drift
+ * into using different words or different colours for the same operation.
+ *
+ * The honesty rule is the whole point. `done` holds operations the server has
+ * already parsed and validated out of the model's output, and `current` is a
+ * file the model has named and is writing right now. Nothing here is predicted:
+ * there is no row for a file we expect next, and no fake step between them. A
+ * list that ran ahead of the model would be a more convincing spinner, not more
+ * information.
+ */
+export function LiveActions({
+  done,
+  current,
+}: {
+  done: FileOperation[];
+  current?: { type: FileOperation["type"]; path: string };
+}) {
+  const { t } = useI18n();
+
+  if (done.length === 0 && !current) return null;
+
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]">
+        {t("studio.liveHeading")}
+      </p>
+      {/* One live region for the whole list: a student using a screen reader
+          hears each new row as it lands, rather than the list being re-read
+          from the top every time it grows. */}
+      <ul aria-live="polite" className="space-y-1">
+        {done.map((op, index) => (
+          <li
+            key={`${op.type}:${op.path}:${index}`}
+            className="flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface-1)] px-2 py-1 text-[11px]"
+          >
+            <span
+              className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${VERB_STYLE[op.type]}`}
+            >
+              {t(VERB[op.type])}
+            </span>
+            <span className="min-w-0 flex-1 truncate font-mono text-[var(--text-dim)]" title={op.path}>
+              {op.path}
+            </span>
+            <CheckIcon aria-hidden className="h-3 w-3 shrink-0 text-[var(--success)]" />
+          </li>
+        ))}
+        {current && (
+          <li className="flex items-center gap-2 rounded-lg border border-[var(--accent)] bg-[var(--surface-1)] px-2 py-1 text-[11px]">
+            <span
+              aria-hidden
+              className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[var(--accent)] motion-reduce:animate-none"
+            />
+            <span className="min-w-0 flex-1 truncate font-mono text-[var(--text)]" title={current.path}>
+              {t("studio.writingNow", { path: current.path })}
+            </span>
+          </li>
+        )}
+      </ul>
     </div>
   );
 }

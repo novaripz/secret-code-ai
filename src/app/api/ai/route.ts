@@ -3,7 +3,8 @@ import { CHAIN_BUDGET_MS, describeAiFailure, getProviderChain, MAX_DURATION_S } 
 import { isSearchConfigured } from "@/lib/ai/search";
 import { ToolSession, type ProgressEvent } from "@/lib/ai/tools";
 import { validateOperations } from "@/lib/ai/validateOperations";
-import type { AiMessage, ImageAttachment } from "@/lib/ai/provider";
+import type { AiMessage, AiProvider, ImageAttachment } from "@/lib/ai/provider";
+import { readProjectStream } from "@/lib/ai/projectStream";
 import type { ExplainDepth, LearningMode } from "@/lib/ai/systemPrompt";
 import { guardRequest } from "@/lib/security/apiGuard";
 import {
@@ -119,6 +120,20 @@ interface RequestBody {
 //   {"t":"status","phase":"search_failed","reason":"rate-limited"|"unavailable"}
 //   {"t":"sources","items":[{"title","url","snippet"}, …]}   sent once, before done
 //   {"t":"error","message":"…"}                   already student-safe prose
+//
+// A project turn (a build-agent request, `chatOnly` false) uses the same
+// framing with three frames of its own, because what it produces is files
+// rather than prose:
+//
+//   {"t":"op_start","opType":"create","path":"js/game.js"}   being written now
+//   {"t":"op","op":{…}}                                      finished, validated
+//   {"t":"done","message":"…","openFiles":[…],"truncated":false}
+//
+// Every one of those is derived from bytes the model actually emitted — see
+// lib/ai/projectStream.ts. There is no frame for a step we merely expect, and
+// `done` is authoritative: its operations replace anything streamed above, so
+// the list a student approves is always the parsed envelope and never a guess
+// assembled mid-flight.
 //
 // Why newline-delimited JSON and not a marker like "<<<event>>>": any marker we
 // invent is a string a model could also write, and the day it does, a student
@@ -258,9 +273,25 @@ export async function POST(req: NextRequest) {
     images: sanitizeImages(body.images),
   };
 
-  // Streaming only applies to plain chat. A project turn answers in JSON, which
-  // is unparseable until the last brace arrives, so there is nothing to show
-  // early and it stays on the buffered path.
+  // A project turn streams too, and it is the one that needed it most.
+  //
+  // Buffered, the whole job — plan, four files, explanation — had to finish
+  // inside the chain's budget or the student got a timeout with nothing to
+  // show for it, which is what "make a better version of cookie clicker"
+  // reliably hit. Streamed, the only deadline that still applies is the one on
+  // reaching the FIRST token; after that the model may take as long as the
+  // work honestly takes, and each file lands on screen as it is written.
+  //
+  // It requires `events: true` because the payload is structure, not prose:
+  // there is no sensible raw-text rendering of a half-written JSON envelope,
+  // and a client that cannot draw the frames is better served by the buffered
+  // path it already knows.
+  if (body.stream === true && body.events === true && !request.chatOnly) {
+    return streamProjectTurn(request);
+  }
+
+  // Plain-chat streaming. Unchanged: prose, framed only on request, and the
+  // tool session that goes with it.
   if (body.stream === true && request.chatOnly) {
     const framed = body.events === true;
     try {
@@ -380,6 +411,107 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("[api/ai] generation failed:", err);
+    return NextResponse.json({ error: describeAiFailure(err) }, { status: 500 });
+  }
+}
+
+/**
+ * The build agent's turn, streamed.
+ *
+ * The shape deliberately mirrors the chat stream above — same framing, same
+ * closed-once discipline, same first-byte deadline — because two stream
+ * implementations in one route is how they drift apart. What differs is what
+ * travels: operations as they complete rather than words as they are typed.
+ *
+ * The first-byte deadline still guards the case the incident was about, a
+ * provider that never answers at all. It cannot fire once the model has
+ * started, which is the point: a long build is allowed to be long.
+ */
+function streamProjectTurn(request: Parameters<AiProvider["generate"]>[0]): Response {
+  try {
+    const provider = getProviderChain();
+    const encoder = new TextEncoder();
+    const events = readProjectStream(provider.generateStream(request));
+
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        let closed = false;
+        const send = (text: string) => {
+          if (closed) return;
+          controller.enqueue(encoder.encode(text));
+        };
+        const finish = () => {
+          if (closed) return;
+          closed = true;
+          controller.close();
+        };
+
+        // Only model-derived frames count as "something happened". The
+        // thinking frame below is ours, and letting it satisfy the deadline
+        // would turn a dead provider back into the frozen panel this replaces.
+        let modelSpoke = false;
+        const deadline = setTimeout(() => {
+          if (closed || modelSpoke) return;
+          console.error(
+            `[api/ai] a project turn produced nothing within ${FIRST_BYTE_DEADLINE_MS}ms — a ` +
+              "provider is ignoring its deadline. Closing with an error rather than being killed.",
+          );
+          send(
+            frame({
+              t: "error",
+              message: "Panda is taking too long to answer right now. Try again in a moment.",
+            }),
+          );
+          finish();
+        }, FIRST_BYTE_DEADLINE_MS);
+
+        // Said first so the panel has something true to show while the model
+        // reads the project. It is a state, not a claim about work done.
+        send(frame({ t: "status", phase: "thinking" }));
+
+        try {
+          for await (const event of events) {
+            if (closed) break;
+            modelSpoke = true;
+            if (event.kind === "op_start") {
+              send(frame({ t: "op_start", opType: event.type, path: event.path }));
+            } else if (event.kind === "op") {
+              send(frame({ t: "op", op: event.op }));
+            } else {
+              send(
+                frame({
+                  t: "done",
+                  operations: event.response.operations,
+                  message: event.response.message,
+                  openFiles: event.response.openFiles,
+                  truncated: event.truncated,
+                  operationErrors: event.errors.length > 0 ? event.errors : undefined,
+                }),
+              );
+            }
+          }
+        } catch (err) {
+          // Same rule as the chat stream: the provider's own words go to the
+          // log, and the student gets one sentence they can act on.
+          console.error("[api/ai] project stream failed mid-flight:", err);
+          send(frame({ t: "error", message: describeAiFailure(err) }));
+        } finally {
+          clearTimeout(deadline);
+          finish();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "application/x-ndjson; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        "X-Accel-Buffering": "no",
+      },
+    });
+  } catch (err) {
+    // Nothing has been written yet, so this can still be an honest status code.
+    console.error("[api/ai] project stream failed to start:", err);
     return NextResponse.json({ error: describeAiFailure(err) }, { status: 500 });
   }
 }

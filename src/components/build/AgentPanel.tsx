@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { deviceHeader } from "@/lib/security/device";
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useChatStore } from "@/store/useChatStore";
@@ -15,8 +14,9 @@ import { ModePills } from "@/components/chat/ModePills";
 import { MessageText } from "@/components/chat/MessageText";
 import { SparkleIcon } from "@/components/icons";
 import type { FileOperation } from "@/types";
-import { ActionList } from "./ActionList";
+import { ActionList, LiveActions } from "./ActionList";
 import { recoverOperations } from "./recoverOperations";
+import { runBuildStream, type OpStart } from "./buildStream";
 
 // The agent panel: the workspace's own chat, and deliberately not the general
 // one in components/chat. That panel is a conversation; this one is a build
@@ -49,8 +49,22 @@ const recoveries = new Map<string, { source: "truncated-envelope" | "code-block"
 type Phase =
   | { kind: "idle" }
   | { kind: "reading"; files: string[] }
+  /** The request is away and the model has produced nothing yet. */
   | { kind: "waiting" }
   | { kind: "writing"; path: string; index: number; total: number };
+
+/**
+ * The agent's work as it arrives: operations the server has finished parsing,
+ * and the one the model is writing at this moment.
+ *
+ * Held apart from `phase` because it outlives a phase change — the list stays
+ * on screen while the next file is being written — and because everything in
+ * it came off the wire. Nothing is added here that the model did not emit.
+ */
+interface Live {
+  done: FileOperation[];
+  current?: OpStart;
+}
 
 /**
  * The elapsed clock, mounted only while we are waiting. Its own component
@@ -59,25 +73,27 @@ type Phase =
  * reading Date.now() while rendering would not.
  */
 function Elapsed() {
+  const { t } = useI18n();
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => setSeconds((n) => n + 1), 1000);
     return () => clearInterval(timer);
   }, []);
-  return <>Panda is working… {seconds}s</>;
+  return <>{t("studio.working", { seconds })}</>;
 }
 
 function StatusLine({ phase }: { phase: Phase }) {
+  const { t } = useI18n();
   if (phase.kind === "idle") return null;
 
   const text =
     phase.kind === "reading"
       ? phase.files.length === 0
-        ? "Looking at your project"
-        : `Reading ${phase.files.join(", ")}`
+        ? t("studio.lookingAtProject")
+        : t("studio.readingFiles", { files: phase.files.join(", ") })
       : phase.kind === "waiting"
         ? null
-        : `Writing ${phase.path} (${phase.index} of ${phase.total})`;
+        : t("studio.writingCount", { path: phase.path, index: phase.index, total: phase.total });
 
   return (
     <p
@@ -120,6 +136,7 @@ export function AgentPanel() {
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
+  const [live, setLive] = useState<Live>({ done: [] });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -162,10 +179,11 @@ export function AgentPanel() {
         currentFilePath: activeTab ?? undefined,
         prompt: typed,
       });
-      // Naming the files we are about to send is the one honest thing we can
-      // say before the model answers: a project turn is buffered JSON, so there
-      // is no token stream to narrate.
+      // Naming the files we are about to send is honest and instant: these are
+      // the files going up with the request, said before the model has had a
+      // chance to do anything at all.
       setPhase({ kind: "reading", files: Object.keys(contextFiles).slice(0, 4) });
+      setLive({ done: [] });
 
       const history = useChatStore
         .getState()
@@ -176,12 +194,13 @@ export function AgentPanel() {
           content: m.content,
         }));
 
-      setPhase({ kind: "waiting" });
-
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...deviceHeader() },
-        body: JSON.stringify({
+      // The turn is streamed, and that is what makes generating a whole small
+      // app possible: buffered, the entire job had to land inside one deadline,
+      // and "make a better version of cookie clicker" never did. Streamed, only
+      // the first token is on a clock — and the student watches the files
+      // appear instead of watching a spinner.
+      await runBuildStream(
+        {
           prompt: prompt || "(the user sent attachments with no message)",
           fileTree,
           contextFiles,
@@ -192,45 +211,59 @@ export function AgentPanel() {
           images: outgoing
             .filter((a) => a.kind === "image" && a.base64 && a.mimeType)
             .map((a) => ({ data: a.base64!, mimeType: a.mimeType! })),
-        }),
-      });
+        },
+        {
+          onThinking: () => setPhase({ kind: "waiting" }),
+          onOpStart: (op) => setLive((l) => ({ ...l, current: op })),
+          onOp: (op) =>
+            setLive((l) => ({
+              done: [...l.done, op],
+              // The file that just finished is the one that was in flight, so
+              // the "writing now" row retires with it rather than lingering
+              // under a completed one.
+              current: l.current?.path === op.path ? undefined : l.current,
+            })),
+          onError: (message) => addErrorMessage(message),
+          onDone: (result) => {
+            const raw = result.message;
 
-      const data = await res.json();
-      if (!res.ok) {
-        addErrorMessage(data.error ?? t("error.requestFailed"));
-        return;
-      }
+            // Unchanged from the buffered path: no operations means the model
+            // answered as prose (or with code in a fence), and that reply gets
+            // a second reading before it is allowed to become a wall of text.
+            if (result.operations.length === 0) {
+              const recovered = recoverOperations(raw);
+              if (recovered) {
+                const msg = addAssistantMessage(
+                  recovered.note || "Panda wrote some code. Here's where it goes.",
+                  recovered.operations,
+                );
+                recoveries.set(msg.id, { source: recovered.source, raw });
+                return;
+              }
+            }
 
-      const operations: FileOperation[] = Array.isArray(data.operations) ? data.operations : [];
-      const raw: string = typeof data.message === "string" ? data.message : "";
+            const msg = addAssistantMessage(raw || "Done.", result.operations);
+            // A cut-off reply is said out loud rather than presented as a
+            // finished answer: these are the files that completed, and the
+            // student is told to check them before applying.
+            if (result.truncated) {
+              recoveries.set(msg.id, { source: "truncated-envelope", raw });
+            }
+            if (raw) addBuildLogEntry(project.id, raw.slice(0, 200));
 
-      // THE FIX. No operations came back, so the server's parser either got
-      // truncated JSON or genuine prose — and in both cases it hands the whole
-      // raw reply over as `message`. Left alone that is the wall of code in the
-      // transcript. Read it once more for file operations before it lands.
-      if (operations.length === 0) {
-        const recovered = recoverOperations(raw);
-        if (recovered) {
-          const msg = addAssistantMessage(
-            recovered.note || "Panda wrote some code. Here's where it goes.",
-            recovered.operations,
-          );
-          recoveries.set(msg.id, { source: recovered.source, raw });
-          return;
-        }
-      }
-
-      addAssistantMessage(raw || "Done.", operations);
-      if (raw) addBuildLogEntry(project.id, raw.slice(0, 200));
-
-      if (data.openFiles?.length && operations.length === 0) {
-        for (const path of data.openFiles) openFile(path);
-      }
+            if (result.openFiles?.length && result.operations.length === 0) {
+              for (const path of result.openFiles) openFile(path);
+            }
+          },
+        },
+        t("error.requestFailed"),
+      );
     } catch (err) {
       addErrorMessage(err instanceof Error ? err.message : t("error.network"));
     } finally {
       setLoading(false);
       setPhase({ kind: "idle" });
+      setLive({ done: [] });
     }
   }
 
@@ -342,6 +375,10 @@ export function AgentPanel() {
             </div>
           );
         })}
+
+        {(live.done.length > 0 || live.current) && (
+          <LiveActions done={live.done} current={live.current} />
+        )}
 
         {phase.kind !== "idle" && <StatusLine phase={phase} />}
       </div>
