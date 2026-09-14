@@ -121,7 +121,10 @@ export function streamChat(req: StreamRequest, handlers: StreamHandlers): Stream
         handlers.onDone();
         return;
       }
-      handlers.onDone(err instanceof Error ? err.message : "Panda couldn't reach the server.");
+      // A thrown fetch is the network. The browser's own wording ("Failed to
+      // fetch") means nothing to a student, so it stays in the console.
+      console.error("[streamChat] request failed:", err);
+      handlers.onDone("Panda couldn't reach the server. Check the connection and try again.");
     }
   })();
 

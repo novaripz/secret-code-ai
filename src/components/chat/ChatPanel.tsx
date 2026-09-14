@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { deviceHeader } from "@/lib/security/device";
+import { authHeader, authReady, deviceHeader } from "@/lib/security/device";
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useChatStore } from "@/store/useChatStore";
@@ -84,9 +84,11 @@ export function ChatPanel() {
         .slice(-10)
         .map((m) => ({ role: m.role === "user" ? ("user" as const) : ("assistant" as const), content: m.content }));
 
+      await authReady();
+
       const res = await fetch("/api/ai", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...deviceHeader() },
+        headers: { "Content-Type": "application/json", ...deviceHeader(), ...authHeader() },
         body: JSON.stringify({
           prompt: prompt || "(the user sent attachments with no message)",
           fileTree,

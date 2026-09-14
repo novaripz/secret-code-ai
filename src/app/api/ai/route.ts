@@ -52,8 +52,6 @@ interface RequestBody {
   replyLanguage?: string;
   assignmentContext?: string;
   adaptation?: string;
-  humanize?: boolean;
-  aiHomie?: boolean;
   chatOnly?: boolean;
   projectMemory?: string;
   studentProfile?: string;
@@ -193,7 +191,6 @@ export async function POST(req: NextRequest) {
     explainMode: body.explainMode === true,
     explainDepth:
       body.explainDepth && EXPLAIN_DEPTHS.has(body.explainDepth) ? body.explainDepth : "normal",
-    humanize: body.humanize === true,
     // Coaching is the floor. An unrecognised mode from the client can only
     // ever fall back to the most restrictive one, never to "answers".
     learningMode:
@@ -216,7 +213,6 @@ export async function POST(req: NextRequest) {
       typeof body.adaptation === "string" && body.adaptation.trim().length > 0
         ? body.adaptation.slice(0, 2000)
         : undefined,
-    aiHomie: body.aiHomie === true,
     chatOnly: body.chatOnly === true,
     projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,
     studentProfile: typeof body.studentProfile === "string" ? body.studentProfile.slice(0, 2000) : undefined,

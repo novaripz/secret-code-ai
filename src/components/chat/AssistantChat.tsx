@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { deviceHeader } from "@/lib/security/device";
+import { authHeader, authReady, deviceHeader } from "@/lib/security/device";
 import { useAssistantStore } from "@/store/useAssistantStore";
 import { useProfileStore } from "@/store/useProfileStore";
 import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
@@ -146,10 +146,12 @@ export function AssistantChat() {
       const controller = new AbortController();
       abortRef.current = controller;
 
+      await authReady();
+
       const res = await fetch("/api/ai", {
         method: "POST",
         signal: controller.signal,
-        headers: { "Content-Type": "application/json", ...deviceHeader() },
+        headers: { "Content-Type": "application/json", ...deviceHeader(), ...authHeader() },
         body: JSON.stringify({
           prompt: prompt || "(the user sent attachments with no message)",
           chatOnly: true,

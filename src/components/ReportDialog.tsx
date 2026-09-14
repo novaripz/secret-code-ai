@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { deviceHeader } from "@/lib/security/device";
+import { authHeader, authReady, deviceHeader } from "@/lib/security/device";
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { XIcon } from "@/components/icons";
 
@@ -32,9 +32,10 @@ export function ReportDialog({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     setBusy(true);
     try {
+      await authReady();
       await fetch("/api/report", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...deviceHeader() },
+        headers: { "Content-Type": "application/json", ...deviceHeader(), ...authHeader() },
         body: JSON.stringify({ category, details }),
       });
     } catch {
