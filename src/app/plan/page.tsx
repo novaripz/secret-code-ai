@@ -54,6 +54,7 @@ function WeightGlyph({ className }: { className?: string }) {
  * tint is only there to make it findable at a glance.
  */
 function LiftChip({ kind }: { kind: "pinned" | "heavy" }) {
+  const { t } = useI18n();
   const pinned = kind === "pinned";
   return (
     <span
@@ -64,7 +65,7 @@ function LiftChip({ kind }: { kind: "pinned" | "heavy" }) {
       }`}
     >
       {pinned ? <PinGlyph className="h-3 w-3" /> : <WeightGlyph className="h-3 w-3" />}
-      {pinned ? "Teacher pick" : "Big points"}
+      {t(pinned ? "priority.teacherPick" : "priority.bigPoints")}
     </span>
   );
 }

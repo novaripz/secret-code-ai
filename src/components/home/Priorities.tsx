@@ -95,12 +95,12 @@ export function Priorities() {
             {pinned ? (
               <span className="inline-flex shrink-0 items-center gap-1 rounded-md border border-[var(--accent)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--accent)]">
                 <PinGlyph className="h-3 w-3" />
-                Teacher pick
+                {t("priority.teacherPick")}
               </span>
             ) : heavy ? (
               <span className="inline-flex shrink-0 items-center gap-1 rounded-md border border-[var(--line-strong)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-dim)]">
                 <WeightGlyph className="h-3 w-3" />
-                Big points
+                {t("priority.bigPoints")}
               </span>
             ) : null}
             <span className="shrink-0 text-xs text-[var(--text-faint)]">{names.get(a.classId)}</span>

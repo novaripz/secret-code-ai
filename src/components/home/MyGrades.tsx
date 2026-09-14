@@ -24,6 +24,7 @@
 // them to cache in a browser that a student can edit.
 
 import { useEffect, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { getSupabase } from "@/lib/supabase/browser";
 import {
   DatabaseError,
@@ -50,10 +51,11 @@ type State =
   // student with no database configured, or signed out, is not a student with
   // no grades — so this renders nothing at all rather than an empty gradebook.
   | { kind: "unavailable" }
-  | { kind: "error"; message: string }
+  | { kind: "error"; messageKey: "grades.errorDenied" | "grades.errorFetch" }
   | { kind: "ready"; classes: ClassGrade[] };
 
 export function MyGrades({ classId }: { classId?: string } = {}) {
+  const { t } = useI18n();
   const [state, setState] = useState<State>({ kind: "loading" });
 
   useEffect(() => {
@@ -104,11 +106,9 @@ export function MyGrades({ classId }: { classId?: string } = {}) {
       if (cancelled) return;
       // A denial and a fault read differently to a student, and neither of them
       // reads as "you have no grades".
-      const message =
-        err instanceof DatabaseError && err.isDenied
-          ? "Your session may have expired. Signing in again is worth a try."
-          : "We couldn't reach the gradebook just now. This is not the same as having no grades.";
-      setState({ kind: "error", message });
+      const messageKey =
+        err instanceof DatabaseError && err.isDenied ? "grades.errorDenied" : "grades.errorFetch";
+      setState({ kind: "error", messageKey });
     });
 
     return () => {
@@ -125,7 +125,7 @@ export function MyGrades({ classId }: { classId?: string } = {}) {
         className="rounded-2xl border px-4 py-3 text-sm leading-relaxed"
         style={{ borderColor: "var(--danger)", background: "var(--danger-soft)", color: "var(--danger)" }}
       >
-        {state.message}
+        {t(state.messageKey)}
       </div>
     );
   }
@@ -138,11 +138,10 @@ export function MyGrades({ classId }: { classId?: string } = {}) {
         id="my-grades-heading"
         className="text-sm font-medium text-[var(--text)]"
       >
-        Your grades
+        {t("grades.title")}
       </h2>
       <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-faint)]">
-        Only yours — nobody else can see them here, and you cannot see anyone else&apos;s. Work your
-        teacher hasn&apos;t marked yet is left out rather than counted as zero.
+        {t("grades.privacyNote")}
       </p>
 
       <div className="mt-3 flex flex-col gap-3">
@@ -155,6 +154,7 @@ export function MyGrades({ classId }: { classId?: string } = {}) {
 }
 
 function ClassCard({ row }: { row: ClassGrade }) {
+  const { t } = useI18n();
   const { summary } = row;
   const [open, setOpen] = useState(false);
 
@@ -182,21 +182,22 @@ function ClassCard({ row }: { row: ClassGrade }) {
 
       {summary.percent === null ? (
         <p className="mt-2 text-xs leading-relaxed text-[var(--text-faint)]">
-          Nothing has been marked in this class yet, so there is no grade to show. That is not a
-          zero — it is an empty page.
+          {t("grades.noneMarked")}
         </p>
       ) : (
         <>
           <p className="mt-2 text-xs leading-relaxed text-[var(--text-faint)]">
-            From {summary.gradedCount} marked {summary.gradedCount === 1 ? "piece" : "pieces"} of
-            work
-            {summary.ungradedCount > 0
-              ? `. ${summary.ungradedCount} more ${
-                  summary.ungradedCount === 1 ? "is" : "are"
-                } waiting to be marked and ${
-                  summary.ungradedCount === 1 ? "is" : "are"
-                } not counted yet.`
-              : "."}
+            {summary.gradedCount === 1
+              ? t("grades.markedOne")
+              : t("grades.marked", { count: summary.gradedCount })}
+            {summary.ungradedCount > 0 && (
+              <>
+                {" "}
+                {summary.ungradedCount === 1
+                  ? t("grades.waitingOne")
+                  : t("grades.waiting", { count: summary.ungradedCount })}
+              </>
+            )}
           </p>
 
           <button
@@ -204,7 +205,7 @@ function ClassCard({ row }: { row: ClassGrade }) {
             aria-expanded={open}
             className="mt-2 rounded text-xs text-[var(--text-dim)] underline underline-offset-4 transition-colors hover:text-[var(--text)]"
           >
-            {open ? "Hide how this was worked out" : "How was this worked out?"}
+            {t(open ? "grades.hideHowWorkedOut" : "grades.howWorkedOut")}
           </button>
 
           {open && <Breakdown summary={summary} />}
@@ -224,6 +225,8 @@ function ClassCard({ row }: { row: ClassGrade }) {
  * an unmarked assignment as zero.
  */
 function Breakdown({ summary }: { summary: GradeSummary }) {
+  const { t } = useI18n();
+
   return (
     <div className="mt-3 border-t border-[var(--line)] pt-3">
       <div className="max-w-full overflow-x-auto">
@@ -231,16 +234,16 @@ function Breakdown({ summary }: { summary: GradeSummary }) {
           <thead>
             <tr className="text-[var(--text-faint)]">
               <th scope="col" className="py-1 pr-3 text-left font-medium">
-                {summary.uncategorised ? "All work" : "Category"}
+                {t(summary.uncategorised ? "grades.colAllWork" : "grades.colCategory")}
               </th>
               <th scope="col" className="py-1 pr-3 text-right font-medium">
-                Points
+                {t("grades.colPoints")}
               </th>
               <th scope="col" className="py-1 pr-3 text-right font-medium">
-                Your %
+                {t("grades.colYourPercent")}
               </th>
               <th scope="col" className="py-1 text-right font-medium">
-                Share of grade
+                {t("grades.colShare")}
               </th>
             </tr>
           </thead>
@@ -250,7 +253,7 @@ function Breakdown({ summary }: { summary: GradeSummary }) {
                 <th scope="row" className="py-1.5 pr-3 text-left font-normal text-[var(--text)]">
                   {c.name}
                   {c.skipped && (
-                    <span className="ml-1.5 text-[var(--text-faint)]">nothing marked yet</span>
+                    <span className="ml-1.5 text-[var(--text-faint)]">{t("grades.nothingMarkedYet")}</span>
                   )}
                 </th>
                 <td className="py-1.5 pr-3 text-right tabular-nums text-[var(--text-dim)]">
@@ -272,23 +275,18 @@ function Breakdown({ summary }: { summary: GradeSummary }) {
         // Said plainly, because a student comparing this to a syllabus that
         // says "75%" deserves to know why the number here is different.
         <p className="mt-2 text-[11px] leading-relaxed text-[var(--text-faint)]">
-          The shares above are not exactly the percentages on your syllabus. Categories with nothing
-          marked yet are left out, and the rest are scaled to add up to 100% while keeping the same
-          balance between them — so one marked test does not become your whole grade, and an
-          unmarked one does not drag it down.
+          {t("grades.normalisedNote")}
         </p>
       )}
 
       {summary.uncategorised && (
         <p className="mt-2 text-[11px] leading-relaxed text-[var(--text-faint)]">
-          This class has no weighted categories, so your grade is simply the points you earned out
-          of the points on the work that has been marked.
+          {t("grades.uncategorisedNote")}
         </p>
       )}
 
       <p className="mt-2 text-[11px] leading-relaxed text-[var(--text-faint)]">
-        This is Panda&apos;s arithmetic on the marks your teacher entered. Your school&apos;s report
-        card is the official one; if the two disagree, ask your teacher.
+        {t("grades.officialNote")}
       </p>
     </div>
   );

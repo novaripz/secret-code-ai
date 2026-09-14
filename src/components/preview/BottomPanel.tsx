@@ -145,7 +145,7 @@ export function BottomPanel() {
         {tab === "problems" && (
           <div className="h-full overflow-y-auto text-xs p-3 text-[var(--text-faint)]">
             {errorCount === 0 ? (
-              <div className="text-center py-4">Nothing broken that I can see! Click Run to double-check.</div>
+              <div className="text-center py-4">{t("studio.noProblems")}</div>
             ) : (
               <div className="space-y-1">
                 {consoleEntries

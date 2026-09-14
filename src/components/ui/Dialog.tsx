@@ -2,10 +2,18 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
+import { useI18n } from "@/lib/i18n";
+
 // In-app replacements for window.prompt / confirm / alert. The native ones are
 // rendered by the browser, so they show the site's origin and look like they
 // belong to Chrome rather than to this app — which is exactly the thing we're
 // trying to avoid. Everything here is ours, themed, and keyboard-friendly.
+//
+// Callers pass their own already-translated labels, because only the caller
+// knows what the button is doing. The defaults below are the exception: a
+// dialog that never names its buttons still has to say "Cancel" in the
+// student's language, so those two fall back to the catalog rather than to
+// English baked into this file.
 
 type DialogKind = "prompt" | "confirm" | "alert";
 
@@ -42,6 +50,7 @@ export function useDialog(): DialogApi {
 }
 
 export function DialogProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const [pending, setPending] = useState<PendingDialog | null>(null);
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -130,7 +139,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
                   onClick={cancel}
                   className="rounded-full px-4 py-2 text-sm font-medium text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
                 >
-                  {pending.cancelLabel ?? "Cancel"}
+                  {pending.cancelLabel ?? t("action.cancel")}
                 </button>
               )}
               <button
@@ -143,7 +152,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
                     : "bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90"
                 }`}
               >
-                {pending.confirmLabel ?? (pending.kind === "alert" ? "Got it" : "OK")}
+                {pending.confirmLabel ?? (pending.kind === "alert" ? t("action.gotIt") : t("action.ok"))}
               </button>
             </div>
           </div>

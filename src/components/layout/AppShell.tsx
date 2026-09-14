@@ -11,6 +11,7 @@ import { useProfileStore } from "@/store/useProfileStore";
 import { useDialog } from "@/components/ui/Dialog";
 import { Wordmark } from "@/components/Wordmark";
 import { ReportDialog } from "@/components/ReportDialog";
+import { EnglishOffer } from "@/components/onboarding/EnglishOffer";
 import {
   BookIcon,
   ChatIcon,
@@ -101,6 +102,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <main id="main" className="min-h-0 flex-1 overflow-hidden">{children}</main>
       </div>
+
+      {/* Sits over the student screens only. Deliberately not in the root
+          providers: the build workspace is a full-screen editor, and a card
+          that floats over someone's code is an interruption, not an offer. */}
+      <EnglishOffer />
     </div>
   );
 }

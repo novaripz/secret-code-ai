@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { useDialog } from "@/components/ui/Dialog";
+import { useI18n, type StringKey } from "@/lib/i18n";
 import { useProfileStore } from "@/store/useProfileStore";
 import { createEmptyProject, createFile } from "@/lib/fileSystem";
 import { deleteProject, listProjects, saveProject, type ProjectSummary } from "@/lib/storage";
@@ -54,21 +55,36 @@ const STARTER_JS = `console.log("Project loaded. Ready to build!");
 // span nested inside the card's own button — which was both invalid markup and
 // unreachable by keyboard.
 
-/** "3 minutes ago" reads as work; a date reads as an archive. */
-function relativeTime(timestamp: number, now: number): string {
+/**
+ * "3 minutes ago" reads as work; a date reads as an archive.
+ *
+ * Returns a key and its count rather than a built string, so the caller can
+ * translate the whole phrase in one go. Picking the singular or plural key here
+ * instead of appending an "s" is the point: plural rules are a property of the
+ * language, not of the number, and a sentence assembled from a count plus a
+ * translated noun goes wrong in every locale that inflects. The date fallback
+ * is the one thing that is not a phrase, so it comes back ready-made.
+ */
+function relativeTime(
+  timestamp: number,
+  now: number,
+  locale: string,
+): { key: StringKey; count: number } | { text: string } {
   const seconds = Math.max(0, Math.round((now - timestamp) / 1000));
-  if (seconds < 60) return "just now";
+  if (seconds < 60) return { key: "time.justNow", count: 0 };
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `${minutes} min ago`;
+  if (minutes < 60) return { key: "time.minutesAgo", count: minutes };
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  if (hours < 24) return { key: hours === 1 ? "time.hourAgo" : "time.hoursAgo", count: hours };
   const days = Math.round(hours / 24);
-  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
-  return new Date(timestamp).toLocaleDateString();
+  if (days < 30) return { key: days === 1 ? "time.dayAgo" : "time.daysAgo", count: days };
+  // Intl already knows how each locale writes a date; we do not second-guess it.
+  return { text: new Date(timestamp).toLocaleDateString(locale) };
 }
 
 export default function BuildPage() {
   const router = useRouter();
+  const { t, locale } = useI18n();
   const dialog = useDialog();
   const displayName = useProfileStore((s) => s.displayName);
   const hydrated = useProfileStore((s) => s.hydrated);
@@ -91,11 +107,11 @@ export default function BuildPage() {
 
   async function handleCreate() {
     const name = await dialog.prompt({
-      title: "Name your project",
-      description: "You can rename it any time.",
-      placeholder: "My Project",
-      defaultValue: "My Project",
-      confirmLabel: "Create",
+      title: t("build.nameTitle"),
+      description: t("build.nameHint"),
+      placeholder: t("build.defaultName"),
+      defaultValue: t("build.defaultName"),
+      confirmLabel: t("studio.create"),
     });
     if (!name) return;
 
@@ -115,9 +131,9 @@ export default function BuildPage() {
   async function handleDelete(project: ProjectSummary, e: React.MouseEvent) {
     e.stopPropagation();
     const ok = await dialog.confirm({
-      title: "Delete this project?",
-      description: `"${project.name}" and everything in it will be gone for good.`,
-      confirmLabel: "Delete",
+      title: t("build.deleteTitle"),
+      description: t("build.deleteBody", { name: project.name }),
+      confirmLabel: t("action.delete"),
       danger: true,
     });
     if (!ok) return;
@@ -134,8 +150,8 @@ export default function BuildPage() {
       router.push(`/project/${imported.id}`);
     } catch (err) {
       await dialog.alert({
-        title: "Couldn't open that file",
-        description: err instanceof Error ? err.message : "That .zip didn't look like a project.",
+        title: t("studio.openFailed"),
+        description: err instanceof Error ? err.message : t("studio.notAProject"),
       });
     } finally {
       setBusy(false);
@@ -144,6 +160,12 @@ export default function BuildPage() {
 
   const name = hydrated ? displayName() : "";
 
+  /** Resolve the relative-time key against the active catalog. */
+  const humanTime = (timestamp: number): string => {
+    const r = relativeTime(timestamp, now, locale);
+    return "text" in r ? r.text : t(r.key, { count: r.count });
+  };
+
   return (
     <AppShell>
       <div className="h-full overflow-y-auto">
@@ -151,10 +173,10 @@ export default function BuildPage() {
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">
-                {name ? `${name}'s projects` : "Your projects"}
+                {name ? t("build.namedProjects", { name }) : t("build.yourProjects")}
               </h1>
               <p className="mt-1 text-sm text-[var(--text-faint)]">
-                Real files you can edit, run, and download. Everything saves in this browser automatically.
+                {t("build.subtitle")}
               </p>
             </div>
 
@@ -171,7 +193,7 @@ export default function BuildPage() {
                 />
                 <span className="flex items-center gap-1.5">
                   <UploadIcon className="h-4 w-4" />
-                  Import
+                  {t("studio.import")}
                 </span>
               </label>
               <button
@@ -180,7 +202,7 @@ export default function BuildPage() {
                 className="flex items-center gap-1.5 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] hover:opacity-90 disabled:opacity-40"
               >
                 <PlusIcon className="h-4 w-4" />
-                New project
+                {t("build.newProject")}
               </button>
             </div>
           </div>
@@ -188,13 +210,13 @@ export default function BuildPage() {
           {projects !== null && projects.length > 0 && (
             <div className="mt-6">
               <label className="sr-only" htmlFor="project-filter">
-                Filter your projects
+                {t("build.filterLabel")}
               </label>
               <input
                 id="project-filter"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                placeholder="Filter projects…"
+                placeholder={t("build.filterPlaceholder")}
                 className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface-0)] px-3 py-2 text-sm text-[var(--text)] outline-none transition-colors motion-reduce:transition-none placeholder:text-[var(--text-faint)] focus-visible:border-[var(--line-strong)] focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
               />
             </div>
@@ -213,16 +235,15 @@ export default function BuildPage() {
             ) : projects.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-[var(--line-strong)] px-6 py-14 text-center">
                 <HammerIcon className="mx-auto h-7 w-7 text-[var(--text-faint)]" />
-                <p className="mt-3 font-medium text-[var(--text)]">Nothing built yet</p>
+                <p className="mt-3 font-medium text-[var(--text)]">{t("build.emptyTitle")}</p>
                 <p className="mx-auto mt-1.5 max-w-sm text-sm leading-relaxed text-[var(--text-faint)]">
-                  Start a project, then just describe what you want — &ldquo;make me a portfolio site with a hero,
-                  about, and contact section&rdquo; — and it gets built for you.
+                  {t("build.emptyBody")}
                 </p>
                 <button
                   onClick={handleCreate}
                   className="mt-5 rounded-full bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
                 >
-                  Start your first project
+                  {t("build.emptyAction")}
                 </button>
               </div>
             ) : (
@@ -233,7 +254,7 @@ export default function BuildPage() {
                 if (shown.length === 0) {
                   return (
                     <p className="px-1 py-8 text-center text-sm text-[var(--text-faint)]">
-                      No project matches &ldquo;{filter}&rdquo;.
+                      {t("build.noMatch", { query: filter })}
                     </p>
                   );
                 }
@@ -253,13 +274,13 @@ export default function BuildPage() {
                             <span className="truncate font-medium text-[var(--text)]">{p.name}</span>
                           </span>
                           <span className="mt-2 block font-mono text-[11px] text-[var(--text-faint)]">
-                            edited {relativeTime(p.updatedAt, now)}
+                            {t("build.edited", { time: humanTime(p.updatedAt) })}
                           </span>
                         </button>
                         <button
                           onClick={(e) => void handleDelete(p, e)}
-                          aria-label={`Delete ${p.name}`}
-                          title={`Delete ${p.name}`}
+                          aria-label={t("build.deleteLabel", { name: p.name })}
+                          title={t("build.deleteLabel", { name: p.name })}
                           className="absolute right-2 top-2 rounded-lg p-1.5 text-[var(--text-faint)] opacity-0 transition-opacity motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--danger)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] group-hover:opacity-100"
                         >
                           <TrashIcon className="h-3.5 w-3.5" />

@@ -55,6 +55,19 @@ export const en = {
   "chat.stop": "Stop",
   "chat.memoryNote": "Panda remembers what you tell it across every chat.",
 
+  // What Panda is doing while you wait. Each line corresponds to a progress
+  // frame the server actually sends — there is no phase here the stream
+  // cannot produce, because a status that guesses stops being believed.
+  "chat.statusThinking": "Thinking…",
+  "chat.statusSearching": "Searching the web",
+  "chat.statusSearchingFor": "Searching the web for",
+  "chat.statusReading": "Reading the results",
+  "chat.statusReadingCount": "Reading {count} results",
+  "chat.statusSearchBusy": "Web search is busy — answering from what Panda already knows",
+  "chat.statusSearchUnavailable": "Web search isn't available — answering from what Panda already knows",
+  "chat.sourcesTitle": "Sources",
+  "chat.sourceLink": "{title} — opens {domain} in a new tab",
+
   // Chat actions
   "chat.dontUnderstand": "I don't understand",
   "chat.copy": "Copy",
@@ -422,6 +435,88 @@ export const en = {
   "auth.or": "or",
   "auth.continueWithGoogle": "Continue with Google",
   "auth.googleNote": "Google sends you to accounts.google.com, which some school networks block. Email works either way.",
+
+  // Build: the project list
+  "build.yourProjects": "Your projects",
+  "build.namedProjects": "{name}'s projects",
+  "build.subtitle": "Real files you can edit, run, and download. Everything saves in this browser automatically.",
+  "build.filterLabel": "Filter your projects",
+  "build.filterPlaceholder": "Filter projects\u2026",
+  "build.newProject": "New project",
+  "build.emptyTitle": "Nothing built yet",
+  "build.emptyBody": "Start a project, then just describe what you want \u2014 \u201cmake me a portfolio site with a hero, about, and contact section\u201d \u2014 and it gets built for you.",
+  "build.emptyAction": "Start your first project",
+  "build.noMatch": "No project matches \u201c{query}\u201d.",
+  "build.edited": "edited {time}",
+  "build.deleteLabel": "Delete {name}",
+  "build.nameTitle": "Name your project",
+  "build.nameHint": "You can rename it any time.",
+  "build.defaultName": "My Project",
+  "build.deleteTitle": "Delete this project?",
+  "build.deleteBody": "\u201c{name}\u201d and everything in it will be gone for good.",
+
+  // Relative times. One key per plural form rather than a count plus a unit,
+  // because "1 day" and "5 days" inflect differently in most of these locales
+  // and gluing a number to a noun is exactly the bug that produces "5 día".
+  "time.justNow": "just now",
+  "time.minutesAgo": "{count} min ago",
+  "time.hourAgo": "1 hour ago",
+  "time.hoursAgo": "{count} hours ago",
+  "time.dayAgo": "1 day ago",
+  "time.daysAgo": "{count} days ago",
+
+  // Studio odds and ends
+  "studio.loadingProject": "Loading your project\u2026",
+  "studio.projectNotFound": "We couldn't find that project in this browser.",
+  "studio.unsaved": "Unsaved",
+  "studio.folderLabel": "{name} folder",
+  "studio.unsavedLabel": "{name}, unsaved changes",
+  "studio.noProblems": "Nothing broken that I can see! Click Run to double-check.",
+
+  // Priority chips
+  "priority.teacherPick": "Teacher pick",
+  "priority.bigPoints": "Big points",
+
+  // Assignment resources
+  "resources.title": "Resources",
+  "resources.open": "Open \u2197",
+
+  // Dialogs
+  "action.gotIt": "Got it",
+  "action.ok": "OK",
+
+
+  // Grades
+  "grades.title": "Your grades",
+  "grades.privacyNote": "Only yours \u2014 nobody else can see them here, and you cannot see anyone else's. Work your teacher hasn't marked yet is left out rather than counted as zero.",
+  "grades.errorDenied": "Your session may have expired. Signing in again is worth a try.",
+  "grades.errorFetch": "We couldn't reach the gradebook just now. This is not the same as having no grades.",
+  "grades.noneMarked": "Nothing has been marked in this class yet, so there is no grade to show. That is not a zero \u2014 it is an empty page.",
+  "grades.markedOne": "From 1 marked piece of work.",
+  "grades.marked": "From {count} marked pieces of work.",
+  "grades.waitingOne": "1 more is waiting to be marked and is not counted yet.",
+  "grades.waiting": "{count} more are waiting to be marked and are not counted yet.",
+  "grades.howWorkedOut": "How was this worked out?",
+  "grades.hideHowWorkedOut": "Hide how this was worked out",
+  "grades.colAllWork": "All work",
+  "grades.colCategory": "Category",
+  "grades.colPoints": "Points",
+  "grades.colYourPercent": "Your %",
+  "grades.colShare": "Share of grade",
+  "grades.nothingMarkedYet": "nothing marked yet",
+  "grades.normalisedNote": "The shares above are not exactly the percentages on your syllabus. Categories with nothing marked yet are left out, and the rest are scaled to add up to 100% while keeping the same balance between them \u2014 so one marked test does not become your whole grade, and an unmarked one does not drag it down.",
+  "grades.uncategorisedNote": "This class has no weighted categories, so your grade is simply the points you earned out of the points on the work that has been marked.",
+  "grades.officialNote": "This is Panda's arithmetic on the marks your teacher entered. Your school's report card is the official one; if the two disagree, ask your teacher.",
+
+  // The English offer. Asked once, never repeated, and only about the
+  // interface \u2014 never about how Panda replies.
+  "english.offerTitle": "Your English is getting strong",
+  "english.offerBody": "You have been working in English a lot lately. Want Panda's buttons and menus in English too? Panda will still answer you in the language you chose.",
+  "english.offerAccept": "Yes, use English",
+  "english.offerDecline": "No, keep {language}",
+  "english.offerRevert": "You can change this back any time in Settings.",
+  "english.offerLabel": "Switch the app to English?",
+  "english.offerDismiss": "Close",
 } as const;
 
 export type StringKey = keyof typeof en;
@@ -451,6 +546,15 @@ const es: Catalog = {
   "chat.thinking": "Pensando", "chat.writing": "Escribiendo la respuesta…",
   "chat.stop": "Detener",
   "chat.memoryNote": "Panda recuerda lo que le cuentas en todos los chats.",
+  "chat.statusThinking": "Pensando…",
+  "chat.statusSearching": "Buscando en la web",
+  "chat.statusSearchingFor": "Buscando en la web:",
+  "chat.statusReading": "Leyendo los resultados",
+  "chat.statusReadingCount": "Leyendo {count} resultados",
+  "chat.statusSearchBusy": "La búsqueda web está saturada — Panda responde con lo que ya sabe",
+  "chat.statusSearchUnavailable": "La búsqueda web no está disponible — Panda responde con lo que ya sabe",
+  "chat.sourcesTitle": "Fuentes",
+  "chat.sourceLink": "{title} — abre {domain} en una pestaña nueva",
   "chat.dontUnderstand": "No entiendo", "chat.translate": "Traducir al {language}",
   "chat.copy": "Copiar", "chat.copied": "Copiado", "chat.copyFailed": "No se pudo copiar",
   "chat.showOriginal": "Ver original", "chat.hint": "Dame una pista",
@@ -691,6 +795,69 @@ const es: Catalog = {
   "auth.or": "o",
   "auth.continueWithGoogle": "Continuar con Google",
   "auth.googleNote": "Google te manda a accounts.google.com, que algunas redes escolares bloquean. El correo funciona de todos modos.",
+
+  "build.yourProjects": "Tus proyectos",
+  "build.namedProjects": "Proyectos de {name}",
+  "build.subtitle": "Archivos de verdad que puedes editar, ejecutar y descargar. Todo se guarda solo en este navegador.",
+  "build.filterLabel": "Filtra tus proyectos",
+  "build.filterPlaceholder": "Filtrar proyectos\u2026",
+  "build.newProject": "Proyecto nuevo",
+  "build.emptyTitle": "Todav\u00eda no has creado nada",
+  "build.emptyBody": "Empieza un proyecto y luego solo describe lo que quieres \u2014 \u201chazme un portafolio con portada, secci\u00f3n sobre m\u00ed y contacto\u201d \u2014 y se construye solo.",
+  "build.emptyAction": "Empieza tu primer proyecto",
+  "build.noMatch": "Ning\u00fan proyecto coincide con \u201c{query}\u201d.",
+  "build.edited": "editado {time}",
+  "build.deleteLabel": "Eliminar {name}",
+  "build.nameTitle": "Ponle nombre a tu proyecto",
+  "build.nameHint": "Puedes cambiarlo cuando quieras.",
+  "build.defaultName": "Mi proyecto",
+  "build.deleteTitle": "\u00bfEliminar este proyecto?",
+  "build.deleteBody": "\u201c{name}\u201d y todo lo que tiene dentro se perder\u00e1 para siempre.",
+  "time.justNow": "ahora mismo",
+  "time.minutesAgo": "hace {count} min",
+  "time.hourAgo": "hace 1 hora",
+  "time.hoursAgo": "hace {count} horas",
+  "time.dayAgo": "hace 1 d\u00eda",
+  "time.daysAgo": "hace {count} d\u00edas",
+  "studio.loadingProject": "Cargando tu proyecto\u2026",
+  "studio.projectNotFound": "No encontramos ese proyecto en este navegador.",
+  "studio.unsaved": "Sin guardar",
+  "studio.folderLabel": "carpeta {name}",
+  "studio.unsavedLabel": "{name}, con cambios sin guardar",
+  "studio.noProblems": "\u00a1No veo nada roto! Dale a Ejecutar para comprobarlo.",
+  "priority.teacherPick": "Elecci\u00f3n del profe",
+  "priority.bigPoints": "Muchos puntos",
+  "resources.title": "Recursos",
+  "resources.open": "Abrir \u2197",
+  "action.gotIt": "Entendido",
+  "action.ok": "OK",
+  "grades.title": "Tus calificaciones",
+  "grades.privacyNote": "Solo las tuyas \u2014 nadie m\u00e1s puede verlas aqu\u00ed, y t\u00fa no puedes ver las de nadie. El trabajo que tu profesor todav\u00eda no ha calificado se deja fuera en vez de contarlo como cero.",
+  "grades.errorDenied": "Puede que tu sesi\u00f3n haya caducado. Vale la pena volver a iniciar sesi\u00f3n.",
+  "grades.errorFetch": "No pudimos conectar con el libro de calificaciones ahora mismo. Esto no es lo mismo que no tener calificaciones.",
+  "grades.noneMarked": "En esta clase todav\u00eda no han calificado nada, as\u00ed que no hay nota que mostrar. Eso no es un cero \u2014 es una p\u00e1gina en blanco.",
+  "grades.markedOne": "De 1 trabajo calificado.",
+  "grades.marked": "De {count} trabajos calificados.",
+  "grades.waitingOne": "Queda 1 m\u00e1s por calificar y todav\u00eda no cuenta.",
+  "grades.waiting": "Quedan {count} m\u00e1s por calificar y todav\u00eda no cuentan.",
+  "grades.howWorkedOut": "\u00bfC\u00f3mo se calcul\u00f3 esto?",
+  "grades.hideHowWorkedOut": "Ocultar c\u00f3mo se calcul\u00f3",
+  "grades.colAllWork": "Todo el trabajo",
+  "grades.colCategory": "Categor\u00eda",
+  "grades.colPoints": "Puntos",
+  "grades.colYourPercent": "Tu %",
+  "grades.colShare": "Peso en la nota",
+  "grades.nothingMarkedYet": "todav\u00eda sin calificar",
+  "grades.normalisedNote": "Los pesos de arriba no son exactamente los porcentajes de tu programa de clase. Las categor\u00edas donde todav\u00eda no han calificado nada se dejan fuera, y el resto se ajustan para sumar 100% manteniendo la misma proporci\u00f3n entre ellas \u2014 as\u00ed un solo examen calificado no se convierte en toda tu nota, y uno sin calificar no te la baja.",
+  "grades.uncategorisedNote": "Esta clase no tiene categor\u00edas con peso, as\u00ed que tu nota es simplemente los puntos que sacaste sobre los puntos del trabajo que ya calificaron.",
+  "grades.officialNote": "Esto es la cuenta que hace Panda con las notas que puso tu profesor. El bolet\u00edn de tu escuela es el oficial; si los dos no coinciden, pregunta a tu profesor.",
+  "english.offerTitle": "Tu ingl\u00e9s va muy bien",
+  "english.offerBody": "\u00daltimamente trabajas mucho en ingl\u00e9s. \u00bfQuieres los botones y men\u00fas de Panda en ingl\u00e9s tambi\u00e9n? Panda te seguir\u00e1 respondiendo en el idioma que elegiste.",
+  "english.offerAccept": "S\u00ed, usar ingl\u00e9s",
+  "english.offerDecline": "No, seguir en {language}",
+  "english.offerRevert": "Puedes volver a cambiarlo cuando quieras en Ajustes.",
+  "english.offerLabel": "\u00bfCambiar la app a ingl\u00e9s?",
+  "english.offerDismiss": "Cerrar",
 };
 
 const fr: Catalog = {
@@ -729,6 +896,18 @@ const fr: Catalog = {
   "settings.themeSystem": "Système",
   "classes.title": "Tes cours", "assignments.title": "Devoirs",
   "error.generic": "Panda n'a pas pu faire ça. Ton travail est sauvegardé.",
+
+  "priority.teacherPick": "Choix du prof",
+  "priority.bigPoints": "Beaucoup de points",
+  "resources.title": "Ressources",
+  "action.gotIt": "Compris",
+  "grades.title": "Tes notes",
+  "build.yourProjects": "Tes projets",
+  "build.newProject": "Nouveau projet",
+  "build.deleteTitle": "Supprimer ce projet\u00a0?",
+  "time.justNow": "\u00e0 l'instant",
+  "studio.unsaved": "Non enregistr\u00e9",
+  "studio.loadingProject": "Chargement de ton projet\u2026",
 };
 
 const pt: Catalog = {
@@ -761,6 +940,18 @@ const pt: Catalog = {
   "settings.title": "Configurações", "settings.language": "Idioma",
   "classes.title": "Suas turmas", "assignments.title": "Tarefas",
   "error.generic": "O Panda não conseguiu fazer isso agora. Seu trabalho está salvo.",
+
+  "priority.teacherPick": "Escolha do professor",
+  "priority.bigPoints": "Muitos pontos",
+  "resources.title": "Recursos",
+  "action.gotIt": "Entendi",
+  "grades.title": "Suas notas",
+  "build.yourProjects": "Seus projetos",
+  "build.newProject": "Novo projeto",
+  "build.deleteTitle": "Excluir este projeto?",
+  "time.justNow": "agora mesmo",
+  "studio.unsaved": "N\u00e3o salvo",
+  "studio.loadingProject": "Carregando seu projeto\u2026",
 };
 
 const zh: Catalog = {
@@ -791,6 +982,15 @@ const zh: Catalog = {
   "settings.title": "设置", "settings.language": "语言",
   "classes.title": "你的课程", "assignments.title": "作业",
   "error.generic": "Panda 现在无法完成。你的内容已保存。",
+
+  "priority.teacherPick": "\u8001\u5e08\u63a8\u8350",
+  "resources.title": "\u8d44\u6e90",
+  "action.gotIt": "\u77e5\u9053\u4e86",
+  "grades.title": "\u4f60\u7684\u6210\u7ee9",
+  "build.yourProjects": "\u4f60\u7684\u9879\u76ee",
+  "build.newProject": "\u65b0\u5efa\u9879\u76ee",
+  "time.justNow": "\u521a\u521a",
+  "studio.unsaved": "\u672a\u4fdd\u5b58",
 };
 
 const ar: Catalog = {
@@ -822,6 +1022,13 @@ const ar: Catalog = {
   "settings.title": "الإعدادات", "settings.language": "اللغة",
   "classes.title": "صفوفك", "assignments.title": "الواجبات",
   "error.generic": "لم يستطع باندا فعل ذلك الآن. عملك محفوظ.",
+
+  "resources.title": "\u0645\u0635\u0627\u062f\u0631",
+  "action.gotIt": "\u0641\u0647\u0645\u062a",
+  "grades.title": "\u062f\u0631\u062c\u0627\u062a\u0643",
+  "build.yourProjects": "\u0645\u0634\u0627\u0631\u064a\u0639\u0643",
+  "build.newProject": "\u0645\u0634\u0631\u0648\u0639 \u062c\u062f\u064a\u062f",
+  "studio.unsaved": "\u063a\u064a\u0631 \u0645\u062d\u0641\u0648\u0638",
 };
 
 const ko: Catalog = {
@@ -852,6 +1059,13 @@ const ko: Catalog = {
   "settings.title": "설정", "settings.language": "언어",
   "classes.title": "내 수업", "assignments.title": "과제",
   "error.generic": "지금은 처리할 수 없어요. 작업은 안전합니다.",
+
+  "resources.title": "\uc790\ub8cc",
+  "action.gotIt": "\uc54c\uaca0\uc5b4\uc694",
+  "grades.title": "\ub0b4 \uc131\uc801",
+  "build.yourProjects": "\ub0b4 \ud504\ub85c\uc81d\ud2b8",
+  "build.newProject": "\uc0c8 \ud504\ub85c\uc81d\ud2b8",
+  "studio.unsaved": "\uc800\uc7a5 \uc548 \ub428",
 };
 
 const de: Catalog = {
@@ -884,6 +1098,16 @@ const de: Catalog = {
   "settings.title": "Einstellungen", "settings.language": "Sprache",
   "classes.title": "Deine Kurse", "assignments.title": "Aufgaben",
   "error.generic": "Panda konnte das gerade nicht. Deine Arbeit ist sicher.",
+
+  "priority.teacherPick": "Lehrer-Tipp",
+  "resources.title": "Materialien",
+  "action.gotIt": "Verstanden",
+  "grades.title": "Deine Noten",
+  "build.yourProjects": "Deine Projekte",
+  "build.newProject": "Neues Projekt",
+  "build.deleteTitle": "Dieses Projekt l\u00f6schen?",
+  "time.justNow": "gerade eben",
+  "studio.unsaved": "Nicht gespeichert",
 };
 
 const ja: Catalog = {
@@ -914,6 +1138,13 @@ const ja: Catalog = {
   "settings.title": "設定", "settings.language": "言語",
   "classes.title": "あなたの授業", "assignments.title": "課題",
   "error.generic": "今はできませんでした。作業は保存されています。",
+
+  "resources.title": "\u8cc7\u6599",
+  "action.gotIt": "\u308f\u304b\u3063\u305f",
+  "grades.title": "\u3042\u306a\u305f\u306e\u6210\u7e3e",
+  "build.yourProjects": "\u3042\u306a\u305f\u306e\u30d7\u30ed\u30b8\u30a7\u30af\u30c8",
+  "build.newProject": "\u65b0\u3057\u3044\u30d7\u30ed\u30b8\u30a7\u30af\u30c8",
+  "studio.unsaved": "\u672a\u4fdd\u5b58",
 };
 
 const vi: Catalog = {
@@ -945,6 +1176,13 @@ const vi: Catalog = {
   "settings.title": "Cài đặt", "settings.language": "Ngôn ngữ",
   "classes.title": "Lớp của bạn", "assignments.title": "Bài tập",
   "error.generic": "Panda chưa làm được việc đó. Bài của bạn vẫn an toàn.",
+
+  "resources.title": "T\u00e0i li\u1ec7u",
+  "action.gotIt": "\u0110\u00e3 hi\u1ec3u",
+  "grades.title": "\u0110i\u1ec3m c\u1ee7a b\u1ea1n",
+  "build.yourProjects": "D\u1ef1 \u00e1n c\u1ee7a b\u1ea1n",
+  "build.newProject": "D\u1ef1 \u00e1n m\u1edbi",
+  "studio.unsaved": "Ch\u01b0a l\u01b0u",
 };
 
 export const CATALOGS: Record<string, Catalog> = {

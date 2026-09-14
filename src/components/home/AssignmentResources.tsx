@@ -20,11 +20,13 @@
 // which assignment.
 
 import { useEffect, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { getSupabase } from "@/lib/supabase/browser";
 import { getAssignment } from "@/lib/db";
 import type { AssignmentResource } from "@/lib/school/types";
 
 export function AssignmentResources({ assignmentId }: { assignmentId: string }) {
+  const { t } = useI18n();
   const [resources, setResources] = useState<AssignmentResource[]>([]);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export function AssignmentResources({ assignmentId }: { assignmentId: string }) 
   return (
     <section aria-labelledby="resources-heading" className="mt-6">
       <h2 id="resources-heading" className="text-sm font-medium text-[var(--text)]">
-        Resources
+        {t("resources.title")}
       </h2>
       <ul className="mt-2 flex flex-col gap-2">
         {resources.map((r) => (
@@ -66,7 +68,7 @@ export function AssignmentResources({ assignmentId }: { assignmentId: string }) 
               className="flex items-baseline justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface-0)] px-3.5 py-2.5 text-sm text-[var(--text)] transition-colors hover:border-[var(--line-strong)]"
             >
               <span className="min-w-0 flex-1 truncate">{r.label}</span>
-              <span className="shrink-0 text-xs text-[var(--text-faint)]">Open ↗</span>
+              <span className="shrink-0 text-xs text-[var(--text-faint)]">{t("resources.open")}</span>
             </a>
           </li>
         ))}

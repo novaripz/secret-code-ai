@@ -128,7 +128,7 @@ function TreeNode({
           role="button"
           tabIndex={0}
           aria-expanded={open}
-          aria-label={`${node.name} folder`}
+          aria-label={t("studio.folderLabel", { name: node.name })}
           className="group flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-[var(--surface-2)] cursor-pointer select-none text-sm text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)]"
           style={{ paddingLeft: depth * 12 + 6 }}
           onClick={() => setOpen((o) => !o)}
@@ -170,13 +170,13 @@ function TreeNode({
             </span>
           )}
           <div className="hidden group-hover:flex items-center gap-0.5 shrink-0">
-            <button title="New file" onClick={handleNewFile} className="p-0.5 hover:bg-[var(--surface-3)] rounded">
+            <button title={t("studio.newFile")} onClick={handleNewFile} className="p-0.5 hover:bg-[var(--surface-3)] rounded">
               <PlusFileIcon className="w-3.5 h-3.5" />
             </button>
-            <button title="New folder" onClick={handleNewFolder} className="p-0.5 hover:bg-[var(--surface-3)] rounded">
+            <button title={t("studio.newFolder")} onClick={handleNewFolder} className="p-0.5 hover:bg-[var(--surface-3)] rounded">
               <PlusFolderIcon className="w-3.5 h-3.5" />
             </button>
-            <button title="Delete" onClick={handleDelete} className="p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)]">
+            <button title={t("action.delete")} onClick={handleDelete} className="p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)]">
               <TrashIcon className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -194,7 +194,7 @@ function TreeNode({
       role="button"
       tabIndex={0}
       aria-current={isActive ? "true" : undefined}
-      aria-label={isDirty ? `${node.name}, unsaved changes` : node.name}
+      aria-label={isDirty ? t("studio.unsavedLabel", { name: node.name }) : node.name}
       className={`group relative flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer select-none text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)] ${
         isActive
           ? "bg-[var(--accent-soft)] text-[var(--accent-strong)] font-medium"
@@ -234,7 +234,7 @@ function TreeNode({
       {isDirty && (
         <span
           aria-hidden
-          title="Unsaved"
+          title={t("studio.unsaved")}
           className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]"
         />
       )}
