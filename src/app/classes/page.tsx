@@ -1,80 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
 import { useSchoolStore } from "@/store/useSchoolStore";
 import { useI18n } from "@/lib/i18n";
-import { CLASS_COLORS, daysUntil, isOverdue, urgencyScore } from "@/lib/school/types";
-import { PlusIcon, XIcon } from "@/components/icons";
+import { daysUntil, isOverdue, urgencyScore } from "@/lib/school/types";
+import { MyGrades } from "@/components/home/MyGrades";
 
 // Classes, and what is due in each.
 //
 // The list is ordered by what is most urgent inside each class rather than
 // alphabetically, because the question this page answers is "what do I need to
 // deal with", not "what am I enrolled in".
-
-function AddClass({ onDone }: { onDone: () => void }) {
-  const addClass = useSchoolStore((s) => s.addClass);
-  const { t } = useI18n();
-  const [name, setName] = useState("");
-  const [teacher, setTeacher] = useState("");
-  const [color, setColor] = useState(CLASS_COLORS[0]);
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!name.trim()) return;
-    addClass({ name, teacher, color });
-    onDone();
-  }
-
-  return (
-    <form onSubmit={submit} className="rounded-2xl border border-[var(--line)] bg-[var(--surface-0)] p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <p className="font-medium text-[var(--text)]">{t("classes.add")}</p>
-        <button type="button" onClick={onDone} aria-label={t("action.cancel")}
-          className="rounded-lg p-1.5 text-[var(--text-faint)] hover:bg-[var(--surface-2)]">
-          <XIcon className="h-4 w-4" />
-        </button>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <input
-          autoFocus value={name} onChange={(e) => setName(e.target.value)}
-          placeholder={t("classes.name")} aria-label={t("classes.name")}
-          className="rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--focus)]"
-        />
-        <input
-          value={teacher} onChange={(e) => setTeacher(e.target.value)}
-          placeholder={t("classes.teacher")} aria-label={t("classes.teacher")}
-          className="rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--focus)]"
-        />
-      </div>
-
-      <div className="mt-3 flex items-center gap-2">
-        {CLASS_COLORS.map((c) => (
-          <button
-            key={c} type="button" onClick={() => setColor(c)} aria-label={`Colour ${c}`}
-            aria-pressed={color === c}
-            className={`h-6 w-6 rounded-full transition-transform ${color === c ? "ring-2 ring-[var(--text)] ring-offset-2 ring-offset-[var(--surface-0)]" : ""}`}
-            style={{ background: c }}
-          />
-        ))}
-        <button
-          type="submit" disabled={!name.trim()}
-          className="ml-auto rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-40"
-        >
-          {t("action.save")}
-        </button>
-      </div>
-    </form>
-  );
-}
+//
+// A student cannot make a class here. Enrolment is the teacher's, one-sided:
+// they add an email and the student appears. Letting a student invent a class
+// would produce a second, private list that no teacher can see and no grade can
+// belong to, sitting next to the real one under the same heading. The database
+// refuses it too -- the insert policy only passes when the row's teacher is the
+// caller -- so this is the interface agreeing with the rule rather than
+// enforcing it.
 
 export default function ClassesPage() {
   const { classes, assignments, hydrated, hydrate } = useSchoolStore();
   const { t } = useI18n();
-  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     if (!hydrated) hydrate();
@@ -88,26 +38,20 @@ export default function ClassesPage() {
             <h1 className="text-2xl font-semibold tracking-tight text-[var(--text)]">
               {t("classes.title")}
             </h1>
-            {!adding && (
-              <button
-                onClick={() => setAdding(true)}
-                className="flex items-center gap-1.5 rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
-              >
-                <PlusIcon className="h-4 w-4" />
-                {t("classes.add")}
-              </button>
-            )}
           </div>
 
-          {adding && (
-            <div className="mb-5 animate-rise">
-              <AddClass onDone={() => setAdding(false)} />
-            </div>
-          )}
+          {/* Grades come from the database and the classes below come from this
+              browser's own store, so this sits above the list rather than on
+              each card: they are two different sources and pretending otherwise
+              would put a teacher's number on a card a student made. It renders
+              nothing at all when there is no database or nobody is signed in. */}
+          <div className="mb-6">
+            <MyGrades />
+          </div>
 
           {!hydrated ? (
             <p className="text-sm text-[var(--text-faint)]">{t("empty.loading")}</p>
-          ) : classes.length === 0 && !adding ? (
+          ) : classes.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[var(--line-strong)] px-6 py-12 text-center">
               <p className="font-medium text-[var(--text)]">{t("classes.none")}</p>
               <p className="mt-1.5 text-sm text-[var(--text-faint)]">{t("classes.noneHint")}</p>

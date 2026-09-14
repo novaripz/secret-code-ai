@@ -57,6 +57,9 @@ export const en = {
 
   // Chat actions
   "chat.dontUnderstand": "I don't understand",
+  "chat.copy": "Copy",
+  "chat.copied": "Copied",
+  "chat.copyFailed": "Couldn't copy",
   "chat.translate": "Translate to {language}",
   "chat.showOriginal": "Show original",
   "chat.hint": "Give me a hint",
@@ -79,7 +82,7 @@ export const en = {
   // Classes
   "classes.title": "Your classes",
   "classes.none": "No classes yet",
-  "classes.noneHint": "Add a class and Panda will keep its assignments together.",
+  "classes.noneHint": "Your teacher adds you to a class. Once they do, its assignments show up here.",
   "classes.add": "Add a class",
   "classes.name": "Class name",
   "classes.teacher": "Teacher",
@@ -256,6 +259,25 @@ export const en = {
   "settings.forgetAllTitle": "Forget everything?",
   "settings.forgetAllBody": "This clears the saved memories below. Your profile and chats stay.",
   "settings.forgetAllConfirm": "Forget it all",
+
+  // Legal. The full documents live at /legal; these are the labels on the way
+  // there, plus the one promise worth repeating where a student will see it.
+  "settings.legal": "Legal",
+  "settings.legalIntro":
+    "Panda is made by {company}. These pages say what Panda does with your work, in plain words.",
+  "settings.legalTeacherTitle": "Your teacher cannot read your chats",
+  "settings.legalTeacherBody":
+    "Teachers see counts — which topics you found hard, and how often — never what you or Panda wrote. Anything from the general chat is seen by no teacher at all.",
+  "settings.legalTerms": "Terms of Service",
+  "settings.legalTermsHint": "What Panda is, what it is not, and the rules for using it.",
+  "settings.legalPrivacy": "Privacy Policy",
+  "settings.legalPrivacyHint": "What is stored, who can see it, and how to delete it.",
+  "settings.legalContact": "Contact Prismly",
+  "settings.legalContactHint": "Questions, problems, or a request to delete your data.",
+  "settings.legalUpdated": "Last updated {date}.",
+  "settings.legalNotAdvice":
+    "This is not legal advice; a school should have its own counsel review it.",
+
   "settings.signIn": "Sign in",
   "settings.signInHint": "Keeps your profile, chats and memory separate from anyone else using this browser. It does not sync between devices yet, so your history stays on whichever computer you made it on.",
 
@@ -263,6 +285,7 @@ export const en = {
   "composer.placeholder": "Ask anything…",
   "composer.dropHere": "Drop it here…",
   "composer.attach": "Attach a file or image",
+  "composer.takePhoto": "Take a photo",
   "composer.screenshot": "Show me your screen",
   "composer.send": "Send",
   "composer.removeAttachment": "Remove {name}",
@@ -429,6 +452,7 @@ const es: Catalog = {
   "chat.stop": "Detener",
   "chat.memoryNote": "Panda recuerda lo que le cuentas en todos los chats.",
   "chat.dontUnderstand": "No entiendo", "chat.translate": "Traducir al {language}",
+  "chat.copy": "Copiar", "chat.copied": "Copiado", "chat.copyFailed": "No se pudo copiar",
   "chat.showOriginal": "Ver original", "chat.hint": "Dame una pista",
   "chat.explainDifferently": "Explícalo de otra forma", "chat.checkMyWork": "Revisa mi trabajo",
   "chat.example": "Dame un ejemplo", "chat.readyForAnswer": "Ya estoy listo para la respuesta",
@@ -439,7 +463,7 @@ const es: Catalog = {
   "depth.minimal": "Mínimo", "depth.fair": "Poco", "depth.normal": "Normal",
   "depth.extra": "Bastante", "depth.overload": "Todo",
   "classes.title": "Tus clases", "classes.none": "Aún no hay clases",
-  "classes.noneHint": "Agrega una clase y Panda mantendrá sus tareas juntas.",
+  "classes.noneHint": "Tu maestro te agrega a una clase. Cuando lo haga, sus tareas aparecerán aquí.",
   "classes.add": "Agregar clase", "classes.name": "Nombre de la clase",
   "classes.teacher": "Profesor", "classes.assignments": "Tareas",
   "classes.askPanda": "Pregúntale a Panda sobre esta clase",
@@ -549,6 +573,7 @@ const es: Catalog = {
   "composer.placeholder": "Pregunta lo que sea…",
   "composer.dropHere": "Suéltalo aquí…",
   "composer.attach": "Adjuntar un archivo o una imagen",
+  "composer.takePhoto": "Tomar una foto",
   "composer.screenshot": "Muéstrame tu pantalla",
   "composer.send": "Enviar",
   "composer.removeAttachment": "Quitar {name}",

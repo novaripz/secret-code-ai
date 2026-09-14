@@ -1,19 +1,13 @@
-import { GeminiProvider } from "./gemini";
-import type { AiProvider } from "./provider";
+// Types only. Choosing a provider happens in chain.ts.
+//
+// This file used to export a factory that built a Gemini provider directly.
+// Nothing called it any more, but leaving it was a trap: it was the obvious
+// import for anyone adding a new server route, and taking it would have
+// bypassed the fallback chain, the per-provider deadlines and the key checks,
+// reintroducing the single point of failure the chain exists to remove — and
+// doing it quietly, since a Gemini-only path works fine until its daily quota
+// runs out mid-lesson.
+//
+// getProviderChain() in ./chain is the only way to reach a model.
 
 export type { AiProvider, AgentRequest, AiMessage } from "./provider";
-
-/**
- * Single place that decides which AI provider backs the coding agent.
- * To swap providers later (OpenAI, Anthropic, ...), implement AiProvider
- * in a new file and change this factory — nothing else in the app needs to change.
- */
-export function getAiProvider(): AiProvider {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error(
-      "GEMINI_API_KEY is not set. Add it to your .env.local file (see .env.example)."
-    );
-  }
-  return new GeminiProvider(apiKey);
-}

@@ -6,8 +6,9 @@ import { useProfileStore, type ThemeName } from "@/store/useProfileStore";
 import { AvatarPicker } from "./AvatarPicker";
 import { AccountSection } from "./AccountSection";
 import { LanguageSection } from "./LanguageSection";
+import { LegalSection } from "./LegalSection";
 import { useDialog } from "@/components/ui/Dialog";
-import { BrainIcon, MoonIcon, SparkleIcon, UserIcon, XIcon } from "@/components/icons";
+import { BrainIcon, LockIcon, MoonIcon, SparkleIcon, UserIcon, XIcon } from "@/components/icons";
 
 // Settings.
 //
@@ -24,6 +25,9 @@ const SECTIONS = [
   { key: "language", label: "settings.language", icon: SparkleIcon },
   { key: "appearance", label: "settings.appearance", icon: MoonIcon },
   { key: "memory", label: "settings.memory", icon: BrainIcon },
+  // Last on purpose: nobody comes to Settings for the terms, but a parent or a
+  // district reviewer needs to find them without being told where to look.
+  { key: "legal", label: "settings.legal", icon: LockIcon },
 ] as const satisfies readonly { key: string; label: StringKey; icon: unknown }[];
 
 type SectionKey = (typeof SECTIONS)[number]["key"];
@@ -66,6 +70,7 @@ export function SettingsView() {
           {section === "language" && <LanguageSection />}
           {section === "appearance" && <AppearanceSection />}
           {section === "memory" && <MemorySection />}
+          {section === "legal" && <LegalSection />}
         </div>
       </div>
     </div>

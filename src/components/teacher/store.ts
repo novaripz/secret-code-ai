@@ -28,26 +28,44 @@ import { useEffect, useRef, useState } from "react";
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { CLASS_COLORS, type AssignmentRules, type Role } from "@/lib/school/types";
+import {
+  CLASS_COLORS,
+  type AssignmentResource,
+  type AssignmentRules,
+  type Grade,
+  type GradeCategory,
+  cleanResources,
+  type Role,
+} from "@/lib/school/types";
 import { getSupabase } from "@/lib/supabase/browser";
 import {
   DatabaseError,
   addStudentByEmail,
   createAssignment,
+  createCategory,
   createClass,
+  clearGrade,
   deleteAssignment as dbDeleteAssignment,
+  deleteCategory as dbDeleteCategory,
   getProfile,
   listAssignments,
+  listCategories,
   listEnrollments,
+  listGradesForClass,
   listInvites,
   listOwnedClasses,
   listStatusesForAssignment,
+  gradeKey,
+  gradesByCell,
   listClassSignals,
   listStudentProfiles,
   listStudentSignals,
   removeStudent as dbRemoveStudent,
   deleteClass as dbDeleteClass,
+  reorderCategories,
   revokeInvite,
+  setGrade,
+  updateCategory,
   updateClass,
   updateAssignment,
   type AssignmentStatusRow,
@@ -84,6 +102,10 @@ export interface AssignmentDraft {
   /** `yyyy-mm-dd` from a date input, or "" for no deadline. */
   due: string;
   points: string;
+  /** "" means uncategorised, which is a real answer and not a missing one. */
+  categoryId: string;
+  /** Links a student can open. Validated on save; see `cleanResources`. */
+  resources: AssignmentResource[];
   rules: Omit<AssignmentRules, "assignmentId">;
 }
 
@@ -115,6 +137,18 @@ interface TeacherState {
   /** Per class, because each class tab loads on its own. */
   classState: Record<string, LoadState>;
 
+  /** Weighted categories, per class. Empty is a real answer: plain points. */
+  categories: Record<string, GradeCategory[]>;
+  /**
+   * Marks, per class, keyed `${assignmentId}:${studentId}`.
+   *
+   * A Map with no default, deliberately. An absent key is an unmarked
+   * assignment and every reader has to handle that as its own case rather than
+   * finding a 0 waiting for them. See src/lib/db/grades.ts.
+   */
+  grades: Record<string, Map<string, Grade>>;
+  gradebookState: Record<string, LoadState>;
+
   /** A write that failed after its optimistic edit was already on screen. */
   actionError: string | null;
   clearActionError: () => void;
@@ -139,6 +173,29 @@ interface TeacherState {
     draft: AssignmentDraft,
   ) => Promise<string | null>;
   deleteAssignment: (classId: string, assignmentId: string) => Promise<void>;
+
+  /** Categories and marks load together — neither is useful alone. */
+  loadGradebook: (classId: string) => Promise<void>;
+  addCategory: (classId: string, name: string, weight: number) => Promise<void>;
+  editCategory: (
+    classId: string,
+    categoryId: string,
+    patch: { name?: string; weight?: number },
+  ) => Promise<void>;
+  removeCategory: (classId: string, categoryId: string) => Promise<void>;
+  moveCategory: (classId: string, categoryId: string, direction: -1 | 1) => Promise<void>;
+  /**
+   * Records a mark, or clears it back to ungraded when `points` is null.
+   *
+   * Null is not zero and this signature is where that starts: clearing the box
+   * in the grid deletes the row, typing 0 writes one.
+   */
+  saveGrade: (
+    classId: string,
+    assignmentId: string,
+    studentId: string,
+    points: number | null,
+  ) => Promise<void>;
 }
 
 /** Cheap enough to be honest about: this is a format check, not verification. */
@@ -347,6 +404,10 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
   invites: {},
   assignments: {},
   classState: {},
+
+  categories: {},
+  grades: {},
+  gradebookState: {},
 
   actionError: null,
   clearActionError: () => set({ actionError: null }),
@@ -676,14 +737,23 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
       instructions: draft.instructions.trim() || undefined,
       dueAt: dueToMillis(draft.due),
       points: draft.points ? Number(draft.points) : undefined,
+      // "" from the select means uncategorised. It travels as null rather than
+      // undefined because the data layer reads undefined as "leave it alone",
+      // and a teacher who picks "No category" means to unfile it.
+      categoryId: draft.categoryId || null,
+      resources: cleanResources(draft.resources),
       rules,
     };
 
     const existing = previous.find((a) => a.id === assignmentId);
+    // `categoryId` is null in `base` because that is what the write wants; the
+    // UI's Assignment shape says undefined for the same state, so it is mapped
+    // once here rather than at every read.
+    const shown = { ...base, categoryId: base.categoryId ?? undefined };
     const optimistic: TeacherAssignment = existing
-      ? { ...existing, ...base, updatedAt: now }
+      ? { ...existing, ...shown, updatedAt: now }
       : {
-          ...base,
+          ...shown,
           status: "todo",
           source: "local",
           createdAt: now,
@@ -718,6 +788,8 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
               instructions: base.instructions,
               dueAt: base.dueAt,
               points: base.points,
+              categoryId: base.categoryId,
+              resources: base.resources,
             },
             rules,
           )
@@ -727,6 +799,8 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
             instructions: base.instructions,
             dueAt: base.dueAt,
             points: base.points,
+            categoryId: base.categoryId,
+            resources: base.resources,
             rules,
           });
 
@@ -773,6 +847,195 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
         assignments: { ...s.assignments, [classId]: previous },
         classes: previousClasses,
         actionError: describe(err, "We couldn't delete that assignment."),
+      }));
+    }
+  },
+
+  // ------------------------------------------------------------- gradebook
+
+  // Categories and marks arrive together because neither answers anything on
+  // its own: a weight with no scores is a plan, and a score with no weight is a
+  // number out of context. One load state, so a half-drawn gradebook is not a
+  // state this screen can be in.
+  loadGradebook: (classId) =>
+    once(`gradebook:${classId}`, async () => {
+      const before = get().gradebookState[classId] ?? IDLE;
+      set((s) => ({
+        gradebookState: {
+          ...s.gradebookState,
+          [classId]: { loading: true, error: null, loaded: before.loaded },
+        },
+      }));
+      try {
+        const { supabase } = await session();
+        // The assignment list is the grid's columns and the filter for the
+        // marks, so it is read here rather than trusted from whatever the
+        // assignments tab last loaded.
+        const [categories, assignments] = await Promise.all([
+          listCategories(supabase, classId),
+          listAssignments(supabase, classId),
+        ]);
+        const grades = await listGradesForClass(
+          supabase,
+          assignments.map((a) => a.assignment.id),
+        );
+
+        set((s) => ({
+          categories: { ...s.categories, [classId]: categories },
+          grades: { ...s.grades, [classId]: gradesByCell(grades) },
+          gradebookState: {
+            ...s.gradebookState,
+            [classId]: { loading: false, error: null, loaded: true },
+          },
+        }));
+      } catch (err) {
+        set((s) => ({
+          gradebookState: {
+            ...s.gradebookState,
+            [classId]: {
+              loading: false,
+              error: describe(err, "We couldn't load the gradebook."),
+              loaded: false,
+            },
+          },
+        }));
+      }
+    }),
+
+  addCategory: async (classId, name, weight) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const existing = get().categories[classId] ?? [];
+    try {
+      const { supabase } = await session();
+      const created = await createCategory(supabase, classId, {
+        name: trimmed,
+        weight,
+        position: existing.length,
+      });
+      set((s) => ({
+        categories: { ...s.categories, [classId]: [...(s.categories[classId] ?? []), created] },
+      }));
+    } catch (err) {
+      // Not optimistic: the unique constraint on (class_id, name) means a
+      // duplicate is a real and likely failure, and showing the row first would
+      // mean taking it away again half a second later.
+      set({ actionError: describe(err, "We couldn't add that category.") });
+    }
+  },
+
+  editCategory: async (classId, categoryId, patch) => {
+    const previous = get().categories[classId] ?? [];
+    set((s) => ({
+      categories: {
+        ...s.categories,
+        [classId]: previous.map((c) => (c.id === categoryId ? { ...c, ...patch } : c)),
+      },
+    }));
+    try {
+      const { supabase } = await session();
+      await updateCategory(supabase, categoryId, patch);
+    } catch (err) {
+      set((s) => ({
+        categories: { ...s.categories, [classId]: previous },
+        actionError: describe(err, "We couldn't save that category."),
+      }));
+    }
+  },
+
+  // The assignments filed under it survive as uncategorised — `on delete set
+  // null` — so this loses a weighting, never a mark. The confirm on the screen
+  // says exactly that.
+  removeCategory: async (classId, categoryId) => {
+    const previous = get().categories[classId] ?? [];
+    const previousAssignments = get().assignments[classId] ?? [];
+    set((s) => ({
+      categories: { ...s.categories, [classId]: previous.filter((c) => c.id !== categoryId) },
+      assignments: {
+        ...s.assignments,
+        [classId]: previousAssignments.map((a) =>
+          a.categoryId === categoryId ? { ...a, categoryId: undefined } : a,
+        ),
+      },
+    }));
+    try {
+      const { supabase } = await session();
+      await dbDeleteCategory(supabase, categoryId);
+    } catch (err) {
+      set((s) => ({
+        categories: { ...s.categories, [classId]: previous },
+        assignments: { ...s.assignments, [classId]: previousAssignments },
+        actionError: describe(err, "We couldn't delete that category."),
+      }));
+    }
+  },
+
+  moveCategory: async (classId, categoryId, direction) => {
+    const previous = get().categories[classId] ?? [];
+    const index = previous.findIndex((c) => c.id === categoryId);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= previous.length) return;
+
+    const next = [...previous];
+    [next[index], next[target]] = [next[target], next[index]];
+    const renumbered = next.map((c, i) => ({ ...c, position: i }));
+    set((s) => ({ categories: { ...s.categories, [classId]: renumbered } }));
+
+    try {
+      const { supabase } = await session();
+      await reorderCategories(supabase, renumbered.map((c) => c.id));
+    } catch (err) {
+      set((s) => ({
+        categories: { ...s.categories, [classId]: previous },
+        actionError: describe(err, "We couldn't reorder those categories."),
+      }));
+    }
+  },
+
+  // Optimistic, and it has to be: this is the one write in the app a teacher
+  // makes thirty times in two minutes, and a grid that waits for the server
+  // between cells is a grid they use once. The rollback restores the previous
+  // cell exactly — including restoring it to *absent* when it was unmarked
+  // before, which is why this deletes the key rather than writing a zero.
+  saveGrade: async (classId, assignmentId, studentId, points) => {
+    const key = gradeKey(assignmentId, studentId);
+    const previous = get().grades[classId] ?? new Map<string, Grade>();
+    const had = previous.get(key);
+
+    const optimistic = new Map(previous);
+    if (points === null) optimistic.delete(key);
+    else {
+      optimistic.set(key, {
+        assignmentId,
+        studentId,
+        pointsEarned: points,
+        recordedBy: had?.recordedBy ?? null,
+        updatedAt: Date.now(),
+      });
+    }
+    set((s) => ({ grades: { ...s.grades, [classId]: optimistic } }));
+
+    try {
+      const { supabase, userId } = await session();
+      if (points === null) {
+        await clearGrade(supabase, assignmentId, studentId);
+      } else {
+        const saved = await setGrade(supabase, {
+          assignmentId,
+          studentId,
+          pointsEarned: points,
+          recordedBy: userId,
+        });
+        set((s) => {
+          const next = new Map(s.grades[classId] ?? optimistic);
+          next.set(key, saved);
+          return { grades: { ...s.grades, [classId]: next } };
+        });
+      }
+    } catch (err) {
+      set((s) => ({
+        grades: { ...s.grades, [classId]: previous },
+        actionError: describe(err, "We couldn't save that grade."),
       }));
     }
   },

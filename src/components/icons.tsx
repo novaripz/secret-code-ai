@@ -127,6 +127,23 @@ export function CameraIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+export function CopyIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <rect x="7" y="7" width="9" height="9" rx="1.5" />
+      <path d="M13 7V5.5A1.5 1.5 0 0 0 11.5 4h-6A1.5 1.5 0 0 0 4 5.5v6A1.5 1.5 0 0 0 5.5 13H7" strokeLinecap="round" />
+    </svg>
+  );
+}
+/** The screen-share capture, as distinct from the camera that takes a photo. */
+export function MonitorIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <rect x="2.5" y="4" width="15" height="10" rx="1.5" />
+      <path d="M7 17h6M10 14v3" strokeLinecap="round" />
+    </svg>
+  );
+}
 export function LightbulbIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>

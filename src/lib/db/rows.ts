@@ -1,6 +1,10 @@
 import {
   DEFAULT_RULES,
+  cleanResources,
   type Assignment,
+  type AssignmentResource,
+  type Grade,
+  type GradeCategory,
   type AssignmentRules,
   type AssignmentStatus,
   type Role,
@@ -174,6 +178,8 @@ export interface AssignmentRow {
   points: number | null;
   estimate_minutes: number | null;
   teacher_priority: boolean;
+  category_id: string | null;
+  resources: unknown;
   source: Source;
   external_id: string | null;
   panda_instructions: string | null;
@@ -194,6 +200,8 @@ export const ASSIGNMENT_COLUMNS = [
   "points",
   "estimate_minutes",
   "teacher_priority",
+  "category_id",
+  "resources",
   "source",
   "external_id",
   "panda_instructions",
@@ -245,10 +253,92 @@ export function toAssignment(row: AssignmentRow, status: AssignmentStatus = "tod
     // maybe. Kept optional on `Assignment` only because the browser-store data
     // that predates the column has no such field.
     teacherPinned: row.teacher_priority,
+    categoryId: row.category_id ?? undefined,
+    // Cleaned on the way out as well as on the way in. The column is jsonb with
+    // only a shape check, so a row written before this code existed -- or by
+    // hand in the SQL editor -- can hold anything; the student's page renders
+    // these as anchors, and an unchecked `javascript:` href there is the whole
+    // attack. Cheap, and the one place every read passes through.
+    resources: toResources(row.resources),
     status,
     source: row.source,
     externalId: row.external_id ?? undefined,
     createdAt: Date.parse(row.created_at),
+    updatedAt: Date.parse(row.updated_at),
+  };
+}
+
+/**
+ * jsonb in, a list of links out. Anything that is not an array of
+ * `{label, url}` with an http(s) URL is dropped rather than rendered.
+ */
+export function toResources(value: unknown): AssignmentResource[] {
+  if (!Array.isArray(value)) return [];
+  const candidates = value.flatMap((entry) => {
+    if (typeof entry !== "object" || entry === null) return [];
+    const { label, url } = entry as { label?: unknown; url?: unknown };
+    if (typeof label !== "string" || typeof url !== "string") return [];
+    return [{ label, url }];
+  });
+  return cleanResources(candidates);
+}
+
+// ------------------------------------------------------- grade_categories
+
+export interface GradeCategoryRow {
+  id: string;
+  class_id: string;
+  name: string;
+  weight: number | string;
+  position: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export const GRADE_CATEGORY_COLUMNS =
+  "id, class_id, name, weight, position, created_at, updated_at";
+
+export function toGradeCategory(row: GradeCategoryRow): GradeCategory {
+  return {
+    id: row.id,
+    classId: row.class_id,
+    name: row.name,
+    // Numeric, so PostgREST may hand it over as a string. Same coercion as
+    // `points` above, for the same reason.
+    weight: Number(row.weight),
+    position: row.position,
+  };
+}
+
+// ------------------------------------------------------------------ grades
+
+export interface GradeRow {
+  id: string;
+  assignment_id: string;
+  student_id: string;
+  points_earned: number | string;
+  comment: string | null;
+  recorded_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const GRADE_COLUMNS =
+  "id, assignment_id, student_id, points_earned, comment, recorded_by, created_at, updated_at";
+
+/**
+ * A row becomes a `Grade`. There is deliberately no function here that turns
+ * *no row* into anything: the absence of a grade stays the absence of a value
+ * all the way to the UI, because the moment it gains a default it becomes a
+ * zero, and a zero is a different fact. See supabase/migrations/0005.
+ */
+export function toGrade(row: GradeRow): Grade {
+  return {
+    assignmentId: row.assignment_id,
+    studentId: row.student_id,
+    pointsEarned: Number(row.points_earned),
+    comment: row.comment ?? undefined,
+    recordedBy: row.recorded_by,
     updatedAt: Date.parse(row.updated_at),
   };
 }

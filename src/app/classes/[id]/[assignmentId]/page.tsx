@@ -16,6 +16,7 @@ import { isOverdue, type AssignmentRules } from "@/lib/school/types";
 import { LockIcon, SendIcon } from "@/components/icons";
 import { useInsightsStore } from "@/store/useInsightsStore";
 import { signalFromAction, signalFromText, topicForAssignment } from "@/lib/insights";
+import { AssignmentResources } from "@/components/home/AssignmentResources";
 
 // One assignment, with a Panda that can actually see it.
 //
@@ -254,6 +255,11 @@ export default function AssignmentPage({
                 </p>
               </div>
             )}
+
+            {/* The teacher's links, read from the database rather than from this
+                browser's copy of the assignment. Renders nothing when there are
+                none, which is most assignments. */}
+            {messages.length === 0 && <AssignmentResources assignmentId={assignment.id} />}
 
             {messages.length === 0 && (
               <div className="flex flex-col items-center gap-4 py-8 text-center">

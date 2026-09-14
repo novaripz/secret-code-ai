@@ -8,11 +8,29 @@ import {
   type Attachment,
 } from "@/lib/attachments";
 import { useI18n } from "@/lib/i18n";
-import { CameraIcon, FileIcon, PaperclipIcon, SendIcon, XIcon } from "@/components/icons";
+import { CameraIcon, FileIcon, MonitorIcon, PaperclipIcon, SendIcon, XIcon } from "@/components/icons";
+import { downscalePhoto } from "./photo";
 
 // The input the whole app shares. Handles typing, drag-and-drop, paste,
-// file picking, and one-frame screen capture — all in-app, no browser dialogs
-// except the screen-share permission prompt the browser insists on showing.
+// file picking, taking a photo, and one-frame screen capture — all in-app, no
+// browser dialogs except the permission prompts the browser insists on showing.
+//
+// Photo and screenshot are two different things and now look like it. The
+// camera takes a picture of the world (handwritten working, a textbook page, a
+// diagram on a whiteboard); the monitor icon shares what is on screen. They
+// used to share the camera glyph, which promised a camera and opened a
+// screen-share picker — on a phone, where the whole point is photographing
+// homework, that promise was simply false.
+//
+// The camera is a plain `<input type="file" accept="image/*"
+// capture="environment">` rather than getUserMedia and a custom viewfinder.
+// That single attribute hands a phone straight to its own rear camera app —
+// better focus, better exposure, and a preview the student already knows how
+// to use. On a laptop with no camera the same input degrades to the file
+// picker, which is the right thing to happen, not a bug to work around. It
+// also means there is no camera permission to deny in-page: the OS camera app
+// owns that conversation, and a student who backs out just returns with no
+// file, which is indistinguishable from cancelling a file picker.
 
 interface ComposerProps {
   value: string;
@@ -42,6 +60,7 @@ export function Composer({
 }: ComposerProps) {
   const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [dragging, setDragging] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -57,6 +76,22 @@ export function Composer({
       const { attachments: added, errors } = await attachmentsFromFiles(list);
       if (added.length) onAttachmentsChange([...attachments, ...added]);
       if (errors.length) setError(errors.join(" "));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /**
+   * A taken photo goes through the exact same attachment path as a dropped
+   * file — it is only shrunk first, because a phone camera produces a file
+   * several times larger than the request body can hold.
+   */
+  async function ingestPhotos(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setBusy(true);
+    try {
+      const shrunk = await Promise.all(Array.from(files).map(downscalePhoto));
+      await ingest(shrunk);
     } finally {
       setBusy(false);
     }
@@ -127,6 +162,21 @@ export function Composer({
             }}
           />
 
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            // Rear camera: the student is photographing the page in front of
+            // them, not themselves.
+            capture="environment"
+            className="hidden"
+            onChange={(e) => {
+              void ingestPhotos(e.target.files);
+              // Cleared so taking the same shot twice still fires a change.
+              e.target.value = "";
+            }}
+          />
+
           <IconButton
             label={t("composer.attach")}
             disabled={busy}
@@ -135,8 +185,16 @@ export function Composer({
             <PaperclipIcon className="h-5 w-5" />
           </IconButton>
 
-          <IconButton label={t("composer.screenshot")} disabled={busy} onClick={handleScreenshot}>
+          <IconButton
+            label={t("composer.takePhoto")}
+            disabled={busy}
+            onClick={() => cameraInputRef.current?.click()}
+          >
             <CameraIcon className="h-5 w-5" />
+          </IconButton>
+
+          <IconButton label={t("composer.screenshot")} disabled={busy} onClick={handleScreenshot}>
+            <MonitorIcon className="h-5 w-5" />
           </IconButton>
 
           <textarea
@@ -211,7 +269,7 @@ function IconButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-30"
+      className="mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] disabled:opacity-30"
     >
       {children}
     </button>

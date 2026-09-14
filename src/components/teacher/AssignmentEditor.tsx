@@ -11,8 +11,8 @@
 // will read previewed underneath.
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import type { AssignmentRules } from "@/lib/school/types";
+import { useEffect, useMemo, useState } from "react";
+import { isSafeResourceUrl, type AssignmentResource, type AssignmentRules } from "@/lib/school/types";
 import { useTeacherStore, type AssignmentDraft } from "./store";
 import { useDialog } from "@/components/ui/Dialog";
 import {
@@ -39,6 +39,8 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
   const existing = useTeacherStore((s) =>
     assignmentId ? (s.assignments[classId] ?? []).find((a) => a.id === assignmentId) : undefined,
   );
+  const categories = useTeacherStore((s) => s.categories[classId] ?? []);
+  const loadGradebook = useTeacherStore((s) => s.loadGradebook);
   const saveAssignment = useTeacherStore((s) => s.saveAssignment);
   const deleteAssignment = useTeacherStore((s) => s.deleteAssignment);
   const actionError = useTeacherStore((s) => s.actionError);
@@ -50,8 +52,18 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
     instructions: existing?.instructions ?? "",
     due: toDateInput(existing?.dueAt ?? null),
     points: existing?.points !== undefined ? String(existing.points) : "",
+    categoryId: existing?.categoryId ?? "",
+    resources: existing?.resources ?? [],
     rules: existing?.rules ?? { answers: "guided", translation: "allowed", simplification: "allowed" },
   }));
+
+  // The category list is part of the gradebook load rather than the class load,
+  // because most of the teacher's screens have no use for it. Asking for it
+  // here is cheap and means the select is never empty for a teacher who came
+  // straight to this form from a bookmark.
+  useEffect(() => {
+    void loadGradebook(classId);
+  }, [classId, loadGradebook]);
 
   const restricted = draft.rules.translation === "disabled" || draft.rules.simplification === "disabled";
   const canSave = draft.title.trim().length > 0;
@@ -157,6 +169,40 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
               />
             </label>
           </div>
+
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClass}>Category</span>
+            <select
+              value={draft.categoryId}
+              onChange={(e) => setDraft((d) => ({ ...d, categoryId: e.target.value }))}
+              className={fieldClass}
+            >
+              {/* "No category" is a real choice and the default, not a prompt to
+                  pick something. An assignment that is not filed still counts —
+                  it lands in its own bucket in the grade breakdown. */}
+              <option value="">No category</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} · {c.weight}%
+                </option>
+              ))}
+            </select>
+            <span className="text-[11px] leading-relaxed text-[var(--text-faint)]">
+              {categories.length === 0 ? (
+                <>
+                  This class has no categories yet, so grades are plain points across everything
+                  marked. Add weights on the Grades tab when you want tests to count for more.
+                </>
+              ) : (
+                <>Decides which weight this counts under when a grade is worked out.</>
+              )}
+            </span>
+          </label>
+
+          <ResourceEditor
+            resources={draft.resources}
+            onChange={(resources) => setDraft((d) => ({ ...d, resources }))}
+          />
         </div>
       </section>
 
@@ -317,5 +363,94 @@ function Toggle({
         <span className="block text-xs leading-relaxed text-[var(--text-faint)]">{help}</span>
       </span>
     </button>
+  );
+}
+
+/**
+ * The links and materials a student can open from this assignment.
+ *
+ * Kept as a list of label-and-URL pairs rather than free text with links in it,
+ * because the student's page renders these as buttons they can tap on a phone,
+ * and because a URL we have parsed is a URL we can refuse. `javascript:` and
+ * `data:` never make it to an anchor — the check is here for the teacher's
+ * benefit (it tells them why the row is marked), in the data layer because that
+ * is the last code before the write, and again on the way out of the database
+ * because rows can be written by hand.
+ *
+ * No file upload. Panda has no storage bucket, and offering a control that
+ * cannot work is worse than not offering it.
+ */
+function ResourceEditor({
+  resources,
+  onChange,
+}: {
+  resources: AssignmentResource[];
+  onChange: (next: AssignmentResource[]) => void;
+}) {
+  const set = (index: number, patch: Partial<AssignmentResource>) =>
+    onChange(resources.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+
+  return (
+    <fieldset className="border-t border-[var(--line)] pt-4">
+      <legend className="sr-only">Resources</legend>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className={labelClass}>Resources</span>
+        <button
+          type="button"
+          onClick={() => onChange([...resources, { label: "", url: "" }])}
+          className="rounded-lg px-2 py-1 text-xs text-[var(--text-dim)] underline underline-offset-4 transition-colors hover:text-[var(--text)]"
+        >
+          Add a link
+        </button>
+      </div>
+      <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-faint)]">
+        The reading, the slide deck, the practice set. Students see these on the assignment.
+      </p>
+
+      {resources.length > 0 && (
+        <div className="mt-3 flex flex-col gap-2">
+          {resources.map((r, i) => {
+            const bad = r.url.trim().length > 0 && !isSafeResourceUrl(r.url);
+            return (
+              <div key={i} className="flex flex-wrap items-start gap-2">
+                <input
+                  value={r.label}
+                  onChange={(e) => set(i, { label: e.target.value })}
+                  placeholder="Chapter 4 reading"
+                  aria-label={`Resource ${i + 1} label`}
+                  className={`${fieldClass} min-w-0 flex-1 sm:max-w-[14rem]`}
+                />
+                <div className="min-w-0 flex-1">
+                  <input
+                    value={r.url}
+                    onChange={(e) => set(i, { url: e.target.value })}
+                    placeholder="https://…"
+                    inputMode="url"
+                    aria-label={`Resource ${i + 1} link`}
+                    aria-invalid={bad || undefined}
+                    className={fieldClass}
+                    style={bad ? { borderColor: "var(--danger)" } : undefined}
+                  />
+                  {bad && (
+                    <p className="mt-1 text-[11px] text-[var(--danger)]">
+                      Only http:// and https:// links can be shown to students. This one will not be
+                      saved.
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onChange(resources.filter((_, j) => j !== i))}
+                  aria-label={`Remove resource ${i + 1}`}
+                  className="rounded-lg border border-[var(--line-strong)] px-2.5 py-2.5 text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+                >
+                  Remove
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </fieldset>
   );
 }

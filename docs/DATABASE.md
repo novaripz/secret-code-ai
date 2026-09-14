@@ -415,3 +415,64 @@ assignment row, which the teacher already owns and the enrolled student already
 reads. The policies from step 1 cover it unchanged — no new policy, no new
 grant. Every existing assignment gets `false`, so nothing already in the
 database moves.
+
+---
+
+## Step 9 — apply `0005_gradebook.sql`
+
+Paste and Run, same as the others. It adds two tables — `grade_categories` and
+`grades` — and three columns to `assignments`: `category_id`, `resources`, and
+nothing else you need to know about.
+
+**What it is for.** Panda has known what work exists and whether a student says
+they finished it. It has not known how they did. After this, a teacher sets up
+weighted categories for a class ("Tests 75%, Homework 25%"), files each
+assignment under one, and enters scores in a grid; the student sees their own
+grade and the breakdown behind it.
+
+**The one thing worth understanding before you run it.** A missing grade is not
+a zero. If a teacher has not marked something, there is no row in `grades` for
+it, and the grade Panda shows leaves that work out entirely rather than counting
+it against the student. This is deliberate and it is why the table has no
+`graded` flag and no nullable score: a row is a mark, no row is silence, and
+they cannot be confused. A teacher who *wants* to record a zero types 0, which
+writes a row saying so.
+
+**Weights do not have to add up to 100.** The database will happily store "Tests
+75" on its own while you are still typing. Panda scales whatever is there so it
+adds to 100, keeping the ratio between the categories, and tells the student on
+screen that it did. A category with nothing marked in it yet is left out and its
+weight shared among the rest — so the first test of the year does not become the
+entire grade, and an unmarked one does not drag it down.
+
+**Who can see what.** This is the part to check if anyone asks:
+
+- A teacher reads and writes categories and grades only for classes they own.
+- **A student reads their own grades and nothing else.** Not a classmate's, not
+  by knowing an id, not through a join — Postgres applies the rule inside
+  embedded queries too, so a request for a classmate's marks comes back without
+  them rather than with them.
+- A student can never write a grade. There is no policy that would let them, and
+  with row-level security on, no policy means denied.
+
+Both tables are granted to `authenticated` and revoked from `anon`, the same
+double lock as step 7.
+
+**How to check it worked.** Open a **New query** and run:
+
+```sql
+select tablename, policyname, cmd
+from pg_policies
+where tablename in ('grade_categories', 'grades')
+order by tablename, policyname;
+```
+
+You should see four policies on `grade_categories` (select, insert, update,
+delete) and four on `grades`. On `grades`, exactly one of them is a `SELECT`,
+and the other three are the teacher's writes — if you see an `INSERT` or
+`UPDATE` policy mentioning `auth.uid()` as the student, something has been
+edited and a student can mark their own work.
+
+**Re-running it is safe.** Unlike step 1, this file is written with
+`if not exists` and `drop policy if exists` throughout, so running it twice
+changes nothing the second time.

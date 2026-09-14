@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { describeAiFailure, getProviderChain } from "@/lib/ai/chain";
+import { CHAIN_BUDGET_MS, describeAiFailure, getProviderChain, MAX_DURATION_S } from "@/lib/ai/chain";
 import { isSearchConfigured } from "@/lib/ai/search";
 import { ToolSession, type ProgressEvent } from "@/lib/ai/tools";
 import { validateOperations } from "@/lib/ai/validateOperations";
@@ -34,6 +34,44 @@ const LEARNING_MODES = new Set<LearningMode>(["coaching", "study", "review", "an
 const EXPLAIN_DEPTHS = new Set<ExplainDepth>(["minimal", "fair", "normal", "extra", "overload"]);
 
 export const runtime = "nodejs";
+
+// The platform kills the function at this point whatever we are doing, and
+// being killed is the one failure mode with no explanation in it: the socket
+// closes with zero bytes written and the student stares at nothing. So this is
+// stated here rather than left to a default, and everything else is sized to
+// finish inside it — see the TIME section in lib/ai/chain.ts.
+//
+// It has to be a bare literal: Next reads route segment config statically at
+// build time and rejects anything it cannot evaluate, an imported constant
+// included. So the same number lives in two places and the assertion below is
+// what stops them drifting apart — a build-time failure rather than a
+// three-in-the-morning one.
+export const maxDuration = 60;
+
+// Checked at module load, which on a cold start is before the first request.
+// Cheap, and the alternative is the two numbers quietly disagreeing until the
+// chain is budgeting against a ceiling that moved.
+if (maxDuration !== MAX_DURATION_S) {
+  throw new Error(
+    `maxDuration (${maxDuration}s) and MAX_DURATION_S in lib/ai/chain.ts (${MAX_DURATION_S}s) ` +
+      "have drifted apart. The chain's budget is sized against the second; fix both together.",
+  );
+}
+
+/**
+ * The last line of defence, and it should never fire.
+ *
+ * The chain already gives up on its own budget, so reaching this means
+ * something below is not honouring a deadline at all. When that happens the
+ * student still gets a sentence: an error they can read beats a dead screen,
+ * which is precisely what this incident was.
+ *
+ * Honest limitation: closing the response does not unwind whatever is stuck
+ * upstream. That work is abandoned, not cancelled, and it keeps running until
+ * the function is torn down. Fixing the cause belongs in the provider that
+ * failed to stop; this only ensures the student is not the one waiting for it.
+ */
+const FIRST_BYTE_DEADLINE_MS = CHAIN_BUDGET_MS + 3_000;
 
 const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 const MAX_IMAGE_BASE64_CHARS = 8_000_000; // ~6MB decoded, generous for a tab screenshot
@@ -243,21 +281,52 @@ export async function POST(req: NextRequest) {
 
       const stream = new ReadableStream<Uint8Array>({
         async start(controller) {
-          const send = (text: string) => controller.enqueue(encoder.encode(text));
+          // Once the stream is closed — normally, or by the deadline below —
+          // nothing may be enqueued again; a second enqueue on a closed
+          // controller throws, and that throw would replace a delivered answer
+          // with a broken one.
+          let closed = false;
+          const send = (text: string) => {
+            if (closed) return;
+            controller.enqueue(encoder.encode(text));
+          };
+          const finish = () => {
+            if (closed) return;
+            closed = true;
+            controller.close();
+          };
           const drain = () => {
             for (const framed of pending) send(framed);
             pending = [];
           };
 
+          let sentSomething = false;
+          const deadline = setTimeout(() => {
+            if (closed || sentSomething) return;
+            console.error(
+              `[api/ai] nothing was sent within ${FIRST_BYTE_DEADLINE_MS}ms — a provider is ` +
+                "ignoring its deadline. Closing with an error rather than letting the platform " +
+                "kill this with zero bytes.",
+            );
+            const message = "Panda is taking too long to answer right now. Try again in a moment.";
+            send(framed ? frame({ t: "error", message }) : `[stream error] ${message}`);
+            finish();
+          }, FIRST_BYTE_DEADLINE_MS);
+
           try {
             // Said before anything else so a tool round-trip shows as work
             // rather than as a frozen screen. On the ordinary path the first
             // text frame follows immediately behind it.
-            if (session) send(frame({ t: "status", phase: "thinking" }));
+            if (session) {
+              send(frame({ t: "status", phase: "thinking" }));
+              sentSomething = true;
+            }
 
             for await (const chunk of chunks) {
+              if (closed) break;
               drain();
               send(framed ? frame({ t: "text", v: chunk }) : chunk);
+              sentSomething = true;
             }
             drain();
 
@@ -271,9 +340,13 @@ export async function POST(req: NextRequest) {
             // student. The provider's own words stay in the log.
             console.error("[api/ai] stream failed mid-flight:", err);
             const message = describeAiFailure(err);
-            send(framed ? frame({ t: "error", message }) : `\n\n[stream error] ${message}`);
+            // The separating newlines are only right after prose. When nothing
+            // has been written yet they are two blank lines above an error.
+            const prefix = sentSomething ? "\n\n" : "";
+            send(framed ? frame({ t: "error", message }) : `${prefix}[stream error] ${message}`);
           } finally {
-            controller.close();
+            clearTimeout(deadline);
+            finish();
           }
         },
       });

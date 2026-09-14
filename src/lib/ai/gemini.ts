@@ -1,6 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 import type { AgentResponse } from "@/types";
-import type { AgentRequest, AiProvider } from "./provider";
+import { AiTimeoutError, type AgentRequest, type AiProvider, type AttemptOptions } from "./provider";
+import {
+  BUFFERED_TIMEOUT_MS,
+  FIRST_TOKEN_TIMEOUT_MS,
+  IDLE_TIMEOUT_MS,
+} from "./openaiCompatible";
 import { geminiSearchTool, MAX_TOOL_ROUNDS, type ToolSession } from "./tools";
 import {
   allImages,
@@ -21,6 +26,13 @@ import {
 // the chat is created, not per message, so a cap on round-trips cannot be
 // enforced by quietly dropping the declaration the way it is for the others.
 // The ToolSession refuses instead, and the loop below counts as well.
+//
+// Deadlines were the other thing this file was missing entirely. The SDK does
+// its own retrying and has no default timeout, so a Gemini call that never came
+// back held the request open until the platform killed it — and Gemini sits
+// last in the chain, which made it the place the whole thing went to die. Every
+// call now carries an AbortController: a short leash to the first chunk, a long
+// one between chunks afterwards.
 
 const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 
@@ -48,7 +60,12 @@ export class GeminiProvider implements AiProvider {
    * callers try the modern spelling first and fall back, rather than this
    * being pinned to whatever model happens to be configured today.
    */
-  private startTurn(req: AgentRequest, thinking: "level" | "budget" | "none", withTools = false) {
+  private startTurn(
+    req: AgentRequest,
+    thinking: "level" | "budget" | "none",
+    withTools = false,
+    abortSignal?: AbortSignal,
+  ) {
     // Chat keeps reasoning to a minimum. These models otherwise think for
     // several seconds before saying a word, which on a message like "hi" is
     // far longer than writing the answer takes. Project turns plan file
@@ -74,6 +91,9 @@ export class GeminiProvider implements AiProvider {
         // A non-searching request is exactly the request it was before.
         ...(withTools ? { tools: [geminiSearchTool()] } : {}),
         ...(req.chatOnly ? {} : { responseMimeType: "application/json" }),
+        // Pinned on the chat, so every message this chat sends inherits it —
+        // including the follow-up turns a tool round-trip makes.
+        ...(abortSignal ? { abortSignal } : {}),
       },
     });
 
@@ -93,13 +113,17 @@ export class GeminiProvider implements AiProvider {
     return /INVALID_ARGUMENT|invalid argument|400/i.test(text);
   }
 
-  async generate(req: AgentRequest): Promise<AgentResponse> {
+  async generate(req: AgentRequest, options?: AttemptOptions): Promise<AgentResponse> {
     const modes = ["level", "budget", "none"] as const;
     let lastError: unknown;
+    // One budget for the whole buffered answer: there is no first token to wait
+    // for when the reply arrives in one piece.
+    const budget = options?.idleTimeoutMs ?? BUFFERED_TIMEOUT_MS;
 
     for (const thinking of modes) {
+      const deadline = AbortSignal.timeout(budget);
       try {
-        const { chat, message } = this.startTurn(req, thinking);
+        const { chat, message } = this.startTurn(req, thinking, false, deadline);
         const result = await chat.sendMessage({ message });
         const text = result.text ?? "";
         // In plain chat the model answers in prose, so there is no JSON to parse.
@@ -120,14 +144,40 @@ export class GeminiProvider implements AiProvider {
    * Retrying only happens before the first chunk. Once text has reached the
    * reader, starting over would repeat what they already saw.
    */
-  async *generateStream(req: AgentRequest, session?: ToolSession): AsyncIterable<string> {
+  async *generateStream(
+    req: AgentRequest,
+    session?: ToolSession,
+    options?: AttemptOptions,
+  ): AsyncIterable<string> {
     const modes = ["level", "budget", "none"] as const;
+    const firstToken = options?.firstTokenTimeoutMs ?? FIRST_TOKEN_TIMEOUT_MS;
+    const idle = options?.idleTimeoutMs ?? IDLE_TIMEOUT_MS;
     let lastError: unknown;
 
     for (const thinking of modes) {
       let started = false;
+      const abort = new AbortController();
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      // Same shape as the OpenAI-compatible watchdog: short to the first
+      // chunk, long between chunks, aborted for good when the turn ends.
+      const arm = (ms: number) => {
+        if (timer) clearTimeout(timer);
+        // Not unref'd, for the same reason as the adapter's watchdog: a
+        // deadline that the event loop is allowed to skip is not a deadline.
+        timer = setTimeout(
+          () => abort.abort(new AiTimeoutError(`gemini sent nothing for ${ms}ms.`)),
+          ms,
+        );
+      };
+      arm(firstToken);
+
       try {
-        const { chat, message } = this.startTurn(req, thinking, session !== undefined);
+        const { chat, message } = this.startTurn(
+          req,
+          thinking,
+          session !== undefined,
+          abort.signal,
+        );
         let outgoing: MessagePart[] = message;
 
         // One pass per tool round-trip. The +1 is the reply itself, after the
@@ -140,10 +190,14 @@ export class GeminiProvider implements AiProvider {
           for await (const chunk of stream) {
             const text = chunk.text;
             if (text) {
+              arm(idle);
               started = true;
               yield text;
             }
-            for (const call of chunk.functionCalls ?? []) calls.push(call);
+            for (const call of chunk.functionCalls ?? []) {
+              arm(idle);
+              calls.push(call);
+            }
           }
 
           if (!session || calls.length === 0) return;
@@ -160,6 +214,11 @@ export class GeminiProvider implements AiProvider {
       } catch (err) {
         lastError = err;
         if (started || !this.isBadArgument(err)) throw err;
+      } finally {
+        if (timer) clearTimeout(timer);
+        // Returns the connection when the consumer walks away mid-reply, and
+        // stops the SDK's own retrying on an attempt we have given up on.
+        if (!abort.signal.aborted) abort.abort(new Error("stream finished"));
       }
     }
     throw lastError;

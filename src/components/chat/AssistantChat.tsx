@@ -17,6 +17,7 @@ import { Priorities } from "@/components/home/Priorities";
 import { findLocale } from "@/lib/i18n/locales";
 import { FileIcon } from "@/components/icons";
 import { buildSuggestions } from "./suggestions";
+import { CopyButton } from "./CopyButton";
 import { parseRemembered } from "./remember";
 
 
@@ -346,6 +347,12 @@ export function AssistantChat() {
                         }
                       >
                         <MessageText content={m.content} streaming={m.streaming} />
+                        {/* Copy sits on every finished reply, not just the
+                            newest: the answer a student wants in their notes is
+                            usually a few turns back by the time they decide to
+                            keep it. Never while streaming — half a reply
+                            copied silently is worse than no button. */}
+                        {m.role === "assistant" && !m.streaming && <CopyButton content={m.content} />}
                         {m.role === "assistant" && !m.streaming && m.id === lastAssistantId && (
                           <MessageActions
                             replyLocale={replyLocale}

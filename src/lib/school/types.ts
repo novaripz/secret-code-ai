@@ -46,6 +46,21 @@ export interface Assignment {
    * It is a hint to the ordering, not an override of it. See `buildPlan`.
    */
   teacherPinned?: boolean;
+  /**
+   * Which weighted category this counts towards, or undefined for "not filed".
+   *
+   * Optional and staying optional. Every assignment that predates the gradebook
+   * has no category, and a teacher who never sets any still gets a working
+   * grade -- see `buildGrades`, which falls back to plain points across
+   * everything marked. "Uncategorised" is a real state, not a migration
+   * failure.
+   */
+  categoryId?: string;
+  /**
+   * Links and materials a student can open. Empty far more often than not, so
+   * it is absent rather than an empty array on the shapes that never had one.
+   */
+  resources?: AssignmentResource[];
   source: Source;
   externalId?: string;
   createdAt: number;
@@ -68,6 +83,81 @@ export interface AssignmentRules {
   simplification: "allowed" | "disabled";
   /** Shown to the student when something is switched off, so it isn't a mystery. */
   restrictionReason?: string;
+}
+
+/**
+ * One link or file attached to an assignment: the reading, the slide deck, the
+ * practice set.
+ *
+ * A label and a URL and nothing else. Anything richer -- a type, an icon, a
+ * size -- would be a guess we cannot check, since we never fetch the link.
+ */
+export interface AssignmentResource {
+  label: string;
+  url: string;
+}
+
+/**
+ * True only for links we are willing to render as an anchor.
+ *
+ * http and https, nothing else. `javascript:` and `data:` URLs in an href are
+ * the oldest way to turn a teacher's text box into a script that runs in a
+ * student's session, and a teacher has no reason to need either. Parsing with
+ * `URL` rather than a regular expression because the browser's parser is the
+ * thing that will eventually interpret the string, so it is the only opinion
+ * that counts.
+ */
+export function isSafeResourceUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url.trim());
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+/** Drops anything unsafe or unlabelled. Applied on the way in and on the way out. */
+export function cleanResources(resources: readonly AssignmentResource[]): AssignmentResource[] {
+  return resources
+    .map((r) => ({ label: r.label.trim(), url: r.url.trim() }))
+    .filter((r) => r.label.length > 0 && isSafeResourceUrl(r.url));
+}
+
+// ------------------------------------------------------------------ grading
+
+/**
+ * One weighted bucket in a class: "Tests", worth 75.
+ *
+ * `weight` is percentage points as the teacher typed them, and is NOT
+ * guaranteed to sum to 100 across a class. See `buildGrades` for what happens
+ * when it does not; the short version is that it normalises and says so.
+ */
+export interface GradeCategory {
+  id: string;
+  classId: string;
+  name: string;
+  weight: number;
+  /** The order the teacher put them in, which is usually weightiest first. */
+  position: number;
+}
+
+/**
+ * One student's mark on one assignment.
+ *
+ * The absence of a `Grade` is the whole point. Every lookup in this app returns
+ * `Grade | null`, never a number with a sentinel, because ungraded and zero are
+ * different facts and a student whose unmarked homework reads 0% stops
+ * believing the app immediately. TypeScript refusing `grade.pointsEarned` on a
+ * possibly-null value is exactly the check we want at every call site.
+ */
+export interface Grade {
+  assignmentId: string;
+  studentId: string;
+  pointsEarned: number;
+  comment?: string;
+  /** Who marked it. Null for an import, or a teacher whose account is gone. */
+  recordedBy: string | null;
+  updatedAt: number;
 }
 
 export interface SchoolData {

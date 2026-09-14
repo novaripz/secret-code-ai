@@ -10,5 +10,7 @@ export * from "./profiles";
 export * from "./classes";
 export * from "./enrollments";
 export * from "./assignments";
+export * from "./categories";
+export * from "./grades";
 export * from "./status";
 export * from "./signals";

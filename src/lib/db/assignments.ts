@@ -1,5 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Assignment, AssignmentRules, AssignmentStatus } from "@/lib/school/types";
+import {
+  cleanResources,
+  type Assignment,
+  type AssignmentResource,
+  type AssignmentRules,
+  type AssignmentStatus,
+} from "@/lib/school/types";
 import { assertOk, unwrap, unwrapMaybe } from "./errors";
 import {
   ASSIGNMENT_COLUMNS,
@@ -93,6 +99,10 @@ export interface NewAssignment {
   estimateMinutes?: number;
   /** Teacher's "this one matters". Defaults to the column default, false. */
   teacherPinned?: boolean;
+  /** Which weighted category it counts towards. Null or absent for "not filed". */
+  categoryId?: string | null;
+  /** Links a student can open. Anything not http(s) is dropped, not saved. */
+  resources?: AssignmentResource[];
   source?: "local" | "canvas";
   externalId?: string;
   rules?: Partial<Omit<AssignmentRules, "assignmentId">>;
@@ -113,6 +123,10 @@ export async function createAssignment(
         points: input.points ?? null,
         estimate_minutes: input.estimateMinutes ?? null,
         teacher_priority: input.teacherPinned ?? false,
+        category_id: input.categoryId ?? null,
+        // Validated here as well as in the form: the form is a convenience and
+        // this is the last code that runs before the row exists.
+        resources: cleanResources(input.resources ?? []),
         source: input.source ?? "local",
         external_id: input.externalId ?? null,
         // Omitted rule fields fall to the column defaults, which are the same
@@ -128,8 +142,14 @@ export async function createAssignment(
 }
 
 export type AssignmentPatch = Partial<
-  Pick<Assignment, "title" | "instructions" | "dueAt" | "points" | "estimateMinutes" | "teacherPinned">
->;
+  Pick<
+    Assignment,
+    "title" | "instructions" | "dueAt" | "points" | "estimateMinutes" | "teacherPinned" | "resources"
+  >
+> & {
+  /** Null files it back under "uncategorised"; absent leaves it alone. */
+  categoryId?: string | null;
+};
 
 /**
  * Edits the assignment, its rules, or both. One function because they are one
@@ -152,6 +172,11 @@ export async function updateAssignment(
   // which is not the same as unpinning, and a teacher editing a due date should
   // not quietly clear their own flag.
   if (patch.teacherPinned !== undefined) update.teacher_priority = patch.teacherPinned;
+  // Same distinction as the pin: absent means "leave the filing alone", and
+  // explicit null means "unfile it". Collapsing the two would move an
+  // assignment out of its category every time a teacher fixed a typo.
+  if (patch.categoryId !== undefined) update.category_id = patch.categoryId;
+  if (patch.resources !== undefined) update.resources = cleanResources(patch.resources);
 
   if (Object.keys(update).length === 0) {
     const current = await getAssignment(supabase, assignmentId);

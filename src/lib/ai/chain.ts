@@ -5,7 +5,19 @@ import {
   ProviderHttpError,
   type OpenAiCompatibleConfig,
 } from "./openaiCompatible";
-import type { AgentRequest, AiProvider } from "./provider";
+import {
+  AiTimeoutError,
+  clearProviderFailure,
+  keyProblem,
+  recordProviderFailure,
+  type AgentRequest,
+  type AiProvider,
+  type AttemptOptions,
+  type KeySpec,
+} from "./provider";
+import type { ToolSession } from "./tools";
+
+export { AiTimeoutError } from "./provider";
 import { allImages } from "./turn";
 
 // Which model answers, decided per request.
@@ -27,6 +39,60 @@ import { allImages } from "./turn";
 // The one rule that is not about speed: a provider is only ever abandoned
 // before it has produced text. Starting over after that would replay words the
 // student has already read.
+//
+// TIME
+//
+// The chain also owns the clock, because it is the only thing that knows how
+// many providers are still to come. Two deadlines, and they do different jobs.
+//
+// CHAIN_BUDGET_MS is how long the whole chain may spend getting *anybody* to
+// say a first word. It exists because the platform will kill the function at
+// MAX_DURATION_S whatever we do, and being killed means the student gets zero
+// bytes and no explanation — the worst possible outcome and the exact shape of
+// the incident this was written for. Failing on our own terms, with a sentence
+// they can read, is strictly better, so the budget is set well under the
+// platform's ceiling and the remaining headroom belongs to writing the answer.
+//
+// FIRST_TOKEN_MS is one provider's slice of that budget. Healthy Groq and
+// Cerebras answer in well under a second; NVIDIA and Gemini-with-minimal-
+// thinking in two or three. Six seconds is roughly triple the slowest healthy
+// case, which is the right place to draw the line: long enough that a merely
+// busy provider is not thrown away, short enough that four dead ones still
+// leave time to apologise. Four providers at six seconds is more than the
+// budget allows on purpose — the last link gets whatever is actually left
+// rather than a promise the clock cannot keep.
+//
+// After the first word there is no chain deadline at all, only the per-stream
+// idle watchdog in the adapters. A long answer is allowed to take long; a dead
+// socket is not allowed to take forever.
+//
+// KEYS
+//
+// A key is checked for shape before a socket is opened. This is not validation
+// — only the provider can say whether a key is real — it is catching the paste
+// accidents, which are the ones that fail identically on every single message.
+// A 626-character GROQ_API_KEY (a JSON blob, as it turned out) cost every
+// student a round-trip to rediscover the same failure, and a value with a
+// newline in it is not even a legal HTTP header, so it fails inside fetch in a
+// way that reads like a network fault. Skipping it costs nothing and says why.
+
+/**
+ * The platform's hard ceiling, mirrored from `maxDuration` in the route. If one
+ * moves, move the other: everything below is sized to finish inside it.
+ */
+export const MAX_DURATION_S = 60;
+
+/** How long the whole chain may spend reaching a first word. See TIME above. */
+export const CHAIN_BUDGET_MS = 22_000;
+
+/** One provider's slice of that budget. */
+export const FIRST_TOKEN_MS = 6_000;
+
+/**
+ * Below this there is no point starting a provider: a connection alone can eat
+ * it, and a doomed attempt is time the error message could have used.
+ */
+const MIN_ATTEMPT_MS = 1_500;
 
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 const CEREBRAS_ENDPOINT = "https://api.cerebras.ai/v1/chat/completions";
@@ -91,6 +157,64 @@ function openAiCompatibleLink(config: OpenAiCompatibleConfig): ChainLink {
 }
 
 /**
+ * The shape of each provider's key.
+ *
+ * Bounds are wide on purpose. Providers rotate key formats without telling
+ * anyone, and a chain that refuses a perfectly good new-format key is a worse
+ * outage than the one this prevents. What these catch is the class of value
+ * that cannot be a key at all: whitespace, a wrong prefix, or a length nowhere
+ * near the right order of magnitude.
+ */
+export const KEY_SPECS: Record<string, KeySpec> = {
+  // Groq issues `gsk_` + 52 characters today. 32-200 leaves room for a format
+  // change and still rejects a pasted JSON blob by two orders of magnitude.
+  groq: { label: "groq", variable: "GROQ_API_KEY", prefix: "gsk_", minLength: 32, maxLength: 200 },
+  cerebras: {
+    label: "cerebras",
+    variable: "CEREBRAS_API_KEY",
+    prefix: "csk-",
+    minLength: 32,
+    maxLength: 200,
+  },
+  nvidia: {
+    label: "nvidia",
+    variable: "NVIDIA_API_KEY",
+    prefix: "nvapi-",
+    minLength: 32,
+    maxLength: 200,
+  },
+  // Google keys are `AIza...` today, but AI Studio and Vertex issue different
+  // things and the prefix is the least stable of the four. Length only.
+  gemini: { label: "gemini", variable: "GEMINI_API_KEY", minLength: 20, maxLength: 200 },
+};
+
+/**
+ * Which malformed keys have already been complained about.
+ *
+ * Once per problem per instance, not once per message: a class of thirty would
+ * otherwise write the same line thirty times a minute and bury everything else
+ * in the log. The problem text is part of the identity, so a corrected-then-
+ * broken-again key is reported afresh.
+ */
+const announced = new Set<string>();
+
+/** Undefined if this provider's key is usable-looking; the reason if it is not. */
+function rejectKey(name: keyof typeof KEY_SPECS, value: string): string | undefined {
+  const spec = KEY_SPECS[name];
+  const problem = keyProblem(spec, value);
+  if (!problem) return undefined;
+
+  const seen = `${name}:${problem}`;
+  if (!announced.has(seen)) {
+    announced.add(seen);
+    // No part of the value is ever in `problem` — see keyProblem.
+    console.error(`[ai] skipping ${name}: ${problem} Fix it and redeploy; nothing will retry it.`);
+  }
+  recordProviderFailure(name, { reason: problem });
+  return problem;
+}
+
+/**
  * Read fresh on every request rather than cached at import, so a key added to
  * the environment takes effect without a redeploy and a revoked one stops being
  * tried.
@@ -98,70 +222,105 @@ function openAiCompatibleLink(config: OpenAiCompatibleConfig): ChainLink {
 function configuredLinks(): ChainLink[] {
   const links: ChainLink[] = [];
 
-  if (process.env.GROQ_API_KEY) {
+  const groq = process.env.GROQ_API_KEY;
+  if (groq && !rejectKey("groq", groq)) {
     links.push(
       openAiCompatibleLink({
         label: "groq",
         endpoint: GROQ_ENDPOINT,
-        apiKey: process.env.GROQ_API_KEY,
+        apiKey: groq,
         model: GROQ_MODEL,
       }),
     );
   }
 
-  if (process.env.CEREBRAS_API_KEY) {
+  const cerebras = process.env.CEREBRAS_API_KEY;
+  if (cerebras && !rejectKey("cerebras", cerebras)) {
     links.push(
       openAiCompatibleLink({
         label: "cerebras",
         endpoint: CEREBRAS_ENDPOINT,
-        apiKey: process.env.CEREBRAS_API_KEY,
+        apiKey: cerebras,
         model: CEREBRAS_MODEL,
         extraBody: { reasoning_effort: "none" },
       }),
     );
   }
 
-  if (process.env.NVIDIA_API_KEY) {
+  const nvidia = process.env.NVIDIA_API_KEY;
+  if (nvidia && !rejectKey("nvidia", nvidia)) {
     links.push(
       openAiCompatibleLink({
         label: "nvidia",
         endpoint: NVIDIA_ENDPOINT,
-        apiKey: process.env.NVIDIA_API_KEY,
+        apiKey: nvidia,
         model: NVIDIA_MODEL,
         acceptsImages: true,
       }),
     );
   }
 
-  if (process.env.GEMINI_API_KEY) {
+  const gemini = process.env.GEMINI_API_KEY;
+  if (gemini && !rejectKey("gemini", gemini)) {
     links.push({
       label: "gemini",
       acceptsImages: true,
-      provider: new GeminiProvider(process.env.GEMINI_API_KEY),
+      provider: new GeminiProvider(gemini),
     });
   }
 
   return links;
 }
 
+/** Time left of the chain budget, in whole milliseconds. */
+function remaining(deadline: number): number {
+  return deadline - Date.now();
+}
+
+/**
+ * What this attempt is allowed to spend: its own slice, or whatever is left of
+ * the shared budget, whichever is smaller. Undefined when there is not enough
+ * left to bother.
+ */
+function sliceFor(deadline: number): AttemptOptions | undefined {
+  const left = remaining(deadline);
+  if (left < MIN_ATTEMPT_MS) return undefined;
+  return {
+    firstTokenTimeoutMs: Math.min(FIRST_TOKEN_MS, left),
+    // Deliberately not clamped to the budget: the budget is about reaching the
+    // first word. Once text is flowing the student is being served, and the
+    // only thing left to guard against is a socket that has died quietly.
+    idleTimeoutMs: undefined,
+  };
+}
+
 class ProviderChain implements AiProvider {
   async generate(req: AgentRequest): Promise<AgentResponse> {
     const links = linksFor(req);
+    const deadline = Date.now() + CHAIN_BUDGET_MS;
     let lastError: unknown;
 
     for (const [index, link] of links.entries()) {
+      const left = remaining(deadline);
+      if (left < MIN_ATTEMPT_MS) {
+        lastError = outOfTime(links, index);
+        break;
+      }
       try {
-        return await link.provider.generate(req);
+        // A buffered turn produces nothing until it produces everything, so its
+        // whole attempt has to fit inside what is left.
+        const response = await link.provider.generate(req, { idleTimeoutMs: left });
+        clearProviderFailure(link.label);
+        return response;
       } catch (err) {
         lastError = err;
         // Logged even when it is the last link. A chain that falls all the way
         // through used to do it silently, which left nothing to debug from.
         logSkip(link.label, err, index === links.length - 1);
-        if (index === links.length - 1) throw err;
       }
     }
 
-    throw lastError;
+    throw lastError ?? new AiSetupError(NOT_CONFIGURED_DETAIL);
   }
 
   /**
@@ -169,30 +328,58 @@ class ProviderChain implements AiProvider {
    * commits to it. `started` is the whole discipline: after the first chunk has
    * been handed to the caller it has already reached the screen, so a failure
    * from here is propagated rather than retried.
+   *
+   * The budget never overrides that rule. It can stop the chain from *starting*
+   * another provider, never from finishing one that is already talking.
    */
-  async *generateStream(req: AgentRequest): AsyncIterable<string> {
+  async *generateStream(
+    req: AgentRequest,
+    session?: ToolSession,
+  ): AsyncIterable<string> {
     const links = linksFor(req);
+    const deadline = Date.now() + CHAIN_BUDGET_MS;
     let lastError: unknown;
 
     for (const [index, link] of links.entries()) {
+      const slice = sliceFor(deadline);
+      if (!slice) {
+        lastError = outOfTime(links, index);
+        break;
+      }
+
       let started = false;
       try {
-        for await (const chunk of link.provider.generateStream(req)) {
+        for await (const chunk of link.provider.generateStream(req, session, slice)) {
           if (!chunk) continue;
           started = true;
           yield chunk;
         }
+        if (started) clearProviderFailure(link.label);
         return;
       } catch (err) {
         lastError = err;
         const last = started || index === links.length - 1;
-        logSkip(link.label, err, last);
+        logSkip(link.label, err, last, started);
         if (last) throw err;
       }
     }
 
-    throw lastError;
+    throw lastError ?? new AiSetupError(NOT_CONFIGURED_DETAIL);
   }
+}
+
+/**
+ * The budget ran out with providers still untried. Said out loud, because from
+ * the outside it is indistinguishable from "they all failed" and the fix is
+ * completely different.
+ */
+function outOfTime(links: ChainLink[], index: number): AiTimeoutError {
+  const untried = links.slice(index).map((l) => l.label).join(", ");
+  const message =
+    `the chain spent its ${CHAIN_BUDGET_MS}ms budget without a first word` +
+    (untried ? `; never tried ${untried}` : "");
+  console.error(`[ai] ${message}. Answering with an error rather than being killed at ${MAX_DURATION_S}s.`);
+  return new AiTimeoutError(message);
 }
 
 function linksFor(req: AgentRequest): ChainLink[] {
@@ -213,27 +400,38 @@ function linksFor(req: AgentRequest): ChainLink[] {
  * Why we moved on. The key is never part of this: a provider's own error text
  * is quoted, and nothing that was sent is.
  */
-function logSkip(label: string, err: unknown, final = false): void {
-  const next = final ? "and it was the last one left" : "trying the next provider";
+function logSkip(label: string, err: unknown, final = false, started = false): void {
+  // Three facts an incident needs and the old line only had one of: who, what,
+  // and whether the student had already seen words when it happened. The last
+  // one decides whether falling through was even allowed.
+  const when = started ? "mid-reply" : "before saying anything";
+  const next = started
+    ? "the reply is cut short; a retry would repeat what was already read"
+    : final
+      ? "and it was the last one left"
+      : "trying the next provider";
   if (err instanceof ProviderHttpError) {
     if (err.status === 401 || err.status === 403) {
+      recordProviderFailure(label, { status: err.status, reason: "the provider rejected the key" });
       console.error(
-        `[ai] ${label} rejected the API key (${err.status}). Check that key — the request itself was fine.`,
+        `[ai] ${label} rejected the API key (${err.status}) ${when}. Check that key — the ` +
+          "request itself was fine.",
       );
       return;
     }
     const retry = err.retryAfter ? `, retry-after=${err.retryAfter}` : "";
     if (err.status === 429 || err.status === 503) {
-      console.warn(`[ai] ${label} is out of capacity (${err.status}${retry}), ${next}.`);
+      recordProviderFailure(label, { status: err.status, reason: "out of capacity" });
+      console.warn(`[ai] ${label} is out of capacity (${err.status}${retry}) ${when}, ${next}.`);
       return;
     }
-    console.warn(`[ai] ${label} failed (${err.status}${retry}), ${next}: ${err.message}`);
+    recordProviderFailure(label, { status: err.status, reason: err.message });
+    console.warn(`[ai] ${label} failed (${err.status}${retry}) ${when}, ${next}: ${err.message}`);
     return;
   }
-  console.warn(
-    `[ai] ${label} failed before saying anything, ${next}:`,
-    err instanceof Error ? err.message : err,
-  );
+  const reason = err instanceof Error ? err.message : String(err ?? "unknown");
+  recordProviderFailure(label, { reason });
+  console.warn(`[ai] ${label} failed ${when}, ${next}: ${reason}`);
 }
 
 /**
@@ -249,6 +447,10 @@ function logSkip(label: string, err: unknown, final = false): void {
 export function describeAiFailure(err: unknown): string {
   if (err instanceof AiSetupError) {
     return "Panda isn't finished being set up on this server yet. Whoever runs it needs to add an AI key.";
+  }
+
+  if (err instanceof AiTimeoutError) {
+    return "Panda is taking too long to answer right now. Try again in a moment.";
   }
 
   if (err instanceof ProviderHttpError) {

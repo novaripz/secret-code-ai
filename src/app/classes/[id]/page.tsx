@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { isOverdue, urgencyScore, type Assignment } from "@/lib/school/types";
 import { dueLabel } from "../page";
 import { CheckIcon, PlusIcon, TrashIcon, XIcon } from "@/components/icons";
+import { MyGrades } from "@/components/home/MyGrades";
 
 // One class: what is due, and a way in to ask Panda about it.
 
@@ -185,6 +186,13 @@ export default function ClassPage({ params }: { params: Promise<{ id: string }> 
             >
               Delete class
             </button>
+          </div>
+
+          {/* Their own grade in this class, with the breakdown behind it. Only
+              ever theirs: the component reads the signed-in user and the
+              database refuses a request for anyone else's marks. */}
+          <div className="mb-6">
+            <MyGrades classId={cls.id} />
           </div>
 
           <div className="mb-4 flex items-center justify-between">

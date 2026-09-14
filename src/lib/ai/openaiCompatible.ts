@@ -1,7 +1,12 @@
 import type { AgentResponse } from "@/types";
-import type { AgentRequest, AiProvider } from "./provider";
+import { AiTimeoutError, type AgentRequest, type AiProvider, type AttemptOptions } from "./provider";
 import { SseBuffer, SSE_DONE } from "./sse";
-import { openAiSearchTool, parseToolArguments, type ToolSession } from "./tools";
+import {
+  MAX_TOOL_ROUNDS,
+  openAiSearchTool,
+  parseToolArguments,
+  type ToolSession,
+} from "./tools";
 import {
   allImages,
   buildChatTurnText,
@@ -20,10 +25,17 @@ import {
 // The streaming path exists to fix one specific complaint: the reply sitting
 // dead for seconds and then arriving all at once. So deltas are yielded the
 // moment their frame is complete and nothing is accumulated. A provider that
-// has not said a word inside FIRST_TOKEN_TIMEOUT_MS is abandoned rather than
-// waited on, because the caller still has other providers to try. Once text is
-// flowing there is no deadline at all: a slow finish is better than a truncated
-// answer, and by then nobody can start over anyway.
+// has not said a word inside the first-token deadline is abandoned rather than
+// waited on, because the caller still has other providers to try.
+//
+// Once text is flowing the deadline changes rather than disappearing. It used
+// to disappear entirely, and that was a hole: a provider whose socket goes
+// quiet without closing left the reader awaiting a read that would never
+// resolve, and the request hung until the platform killed it. So the watchdog
+// is re-armed after every chunk at a much longer interval — long enough that a
+// model thinking mid-sentence is never cut off, short enough that a dead
+// connection is noticed. A slow finish is still better than a truncated
+// answer; an infinite one is not.
 //
 // Tool calling rides on the same path. When a ToolSession is supplied the
 // request carries one tool declaration and the stream is read for tool-call
@@ -47,10 +59,16 @@ export interface OpenAiCompatibleConfig {
   extraBody?: Record<string, unknown>;
 }
 
-const FIRST_TOKEN_TIMEOUT_MS = 8_000;
+/**
+ * Fallback deadlines, used only when the caller supplies none. The chain is the
+ * real owner of these numbers, because only it knows how many providers are
+ * still left to try and how much of the platform's budget is already spent.
+ */
+export const FIRST_TOKEN_TIMEOUT_MS = 6_000;
+export const IDLE_TIMEOUT_MS = 25_000;
 
 /** Project turns answer in JSON and plan file changes, so they earn more time. */
-const BUFFERED_TIMEOUT_MS = 60_000;
+export const BUFFERED_TIMEOUT_MS = 40_000;
 
 /** Carries the status so callers can decide by number instead of regexing a message. */
 export class ProviderHttpError extends Error {
@@ -71,8 +89,11 @@ export class OpenAiCompatibleProvider implements AiProvider {
     }
   }
 
-  async generate(req: AgentRequest): Promise<AgentResponse> {
-    const res = await this.post(req, false, AbortSignal.timeout(BUFFERED_TIMEOUT_MS));
+  async generate(req: AgentRequest, options?: AttemptOptions): Promise<AgentResponse> {
+    // A buffered turn has no first token to wait for — the whole answer arrives
+    // at once — so the two deadlines collapse into one budget for the request.
+    const budget = options?.idleTimeoutMs ?? BUFFERED_TIMEOUT_MS;
+    const res = await this.post(req, false, AbortSignal.timeout(budget));
     const body = (await res.json()) as {
       choices?: { message?: { content?: unknown } }[];
     };
@@ -84,24 +105,47 @@ export class OpenAiCompatibleProvider implements AiProvider {
     return parseAgentResponse(text);
   }
 
-  async *generateStream(req: AgentRequest, session?: ToolSession): AsyncIterable<string> {
+  async *generateStream(
+    req: AgentRequest,
+    session?: ToolSession,
+    options?: AttemptOptions,
+  ): AsyncIterable<string> {
     // Extra turns accumulated by tool round-trips: the assistant's tool call,
     // then our results. Empty on the common path, so the body is unchanged.
     const extra: ChatMessage[] = [];
 
-    for (;;) {
+    // Bounded explicitly rather than only through the session's own counter.
+    // The old `for (;;)` trusted the session to run out, but ToolSession
+    // refuses a call *before* incrementing its counter, so a model that kept
+    // asking after the allowance was spent was answered "you have no searches
+    // left" forever — a full network round-trip each time, with the student
+    // watching. The loop now cannot outlive its own budget whatever the model
+    // does.
+    for (let round = 0; ; round += 1) {
       // Tools are offered only while the session still has round-trips left.
       // Withdrawing the declaration is what actually ends a loop: a model with
       // no tool to call has nothing left to do but answer.
       const withTools = session !== undefined && session.canCallTools;
-      const round: RoundState = { calls: new Map() };
+      const roundState: RoundState = { calls: new Map() };
 
-      for await (const text of this.streamRound(req, extra, withTools, round)) {
+      for await (const text of this.streamRound(req, extra, withTools, roundState, options)) {
         yield text;
       }
 
-      const calls = [...round.calls.values()].filter((c) => c.name);
+      const calls = [...roundState.calls.values()].filter((c) => c.name);
       if (!session || calls.length === 0) return;
+
+      if (!withTools || round >= MAX_TOOL_ROUNDS) {
+        // It asked for a tool it was not offered, or asked once too often.
+        // Stopping here yields no text, so the chain treats this provider as
+        // never having started and moves to the next one — which is the right
+        // outcome: a model stuck calling tools is not writing an answer.
+        console.warn(
+          `[ai] ${this.config.label} kept requesting tools after its allowance ran out; ` +
+            "abandoning this provider rather than looping.",
+        );
+        return;
+      }
 
       extra.push({
         role: "assistant",
@@ -131,17 +175,13 @@ export class OpenAiCompatibleProvider implements AiProvider {
     extra: ChatMessage[],
     withTools: boolean,
     round: RoundState,
+    options?: AttemptOptions,
   ): AsyncIterable<string> {
+    const firstToken = options?.firstTokenTimeoutMs ?? FIRST_TOKEN_TIMEOUT_MS;
+    const idle = options?.idleTimeoutMs ?? IDLE_TIMEOUT_MS;
+
     const abort = new AbortController();
-    let silence: ReturnType<typeof setTimeout> | undefined = setTimeout(() => {
-      abort.abort(new Error(`${this.config.label} sent nothing within ${FIRST_TOKEN_TIMEOUT_MS}ms.`));
-    }, FIRST_TOKEN_TIMEOUT_MS);
-    const alive = () => {
-      if (silence) {
-        clearTimeout(silence);
-        silence = undefined;
-      }
-    };
+    const watchdog = new Watchdog(abort, this.config.label, firstToken);
 
     try {
       const res = await this.post(req, true, abort.signal, extra, withTools);
@@ -166,11 +206,11 @@ export class OpenAiCompatibleProvider implements AiProvider {
             // A tool-call delta proves the provider is alive just as text does,
             // even though the student has not seen anything yet.
             if (delta.toolCalls.length > 0) {
-              alive();
+              watchdog.poke(idle);
               collectToolCalls(round, delta.toolCalls);
             }
             if (!delta.text) continue;
-            alive();
+            watchdog.poke(idle);
             yield delta.text;
           }
 
@@ -181,7 +221,12 @@ export class OpenAiCompatibleProvider implements AiProvider {
         await reader.cancel().catch(() => {});
       }
     } finally {
-      if (silence) clearTimeout(silence);
+      watchdog.clear();
+      // The stream may be abandoned by the consumer (the chain giving up, the
+      // student closing the tab) rather than ending on its own. Aborting here
+      // is what actually returns the socket; without it a half-read reply kept
+      // the upstream connection alive for nothing.
+      if (!abort.signal.aborted) abort.abort(new Error("stream finished"));
     }
   }
 
@@ -252,6 +297,50 @@ export class OpenAiCompatibleProvider implements AiProvider {
         image_url: { url: `data:${image.mimeType};base64,${image.data}` },
       })),
     ];
+  }
+}
+
+/**
+ * One deadline that can be pushed back.
+ *
+ * Starts at the first-token interval; every piece of output moves it to the
+ * (much longer) idle interval. Firing aborts the request, which is what turns
+ * "waiting forever" into an ordinary error the chain can fall through.
+ */
+class Watchdog {
+  private timer: ReturnType<typeof setTimeout> | undefined;
+
+  constructor(
+    private readonly abort: AbortController,
+    private readonly label: string,
+    private ms: number,
+  ) {
+    this.arm();
+  }
+
+  private arm(): void {
+    const ms = this.ms;
+    this.timer = setTimeout(() => {
+      this.abort.abort(new AiTimeoutError(`${this.label} sent nothing for ${ms}ms.`));
+    }, ms);
+    // Deliberately not unref'd. A deadline whose only job is to fire must be
+    // able to keep the event loop alive long enough to fire: if the only thing
+    // outstanding is a request that will never answer, this timer is the one
+    // thing that can end it. It is cleared in a finally, so it cannot leak.
+  }
+
+  /** Output arrived. Re-arm, from here on at the interval given. */
+  poke(ms: number): void {
+    this.clear();
+    this.ms = ms;
+    this.arm();
+  }
+
+  clear(): void {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
   }
 }
 
