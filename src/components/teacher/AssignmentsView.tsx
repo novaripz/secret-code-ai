@@ -11,6 +11,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useTeacherStore } from "./store";
+import type { TeacherAssignment } from "./types";
 import {
   Chip,
   buttonClass,
@@ -21,8 +22,13 @@ import {
 import { PlusIcon } from "@/components/icons";
 import { RuleChips } from "./RuleChips";
 
+// Same reason as in AssignmentEditor: a selector that builds `[]` on the fly
+// hands React a new reference every snapshot, and a class whose assignments
+// have not loaded yet would render forever.
+const NO_ASSIGNMENTS: readonly TeacherAssignment[] = Object.freeze([]);
+
 export function AssignmentsView({ classId }: { classId: string }) {
-  const assignments = useTeacherStore((s) => s.assignments[classId] ?? []);
+  const assignments = useTeacherStore((s) => s.assignments[classId] ?? NO_ASSIGNMENTS);
 
   const ordered = useMemo(
     () =>
@@ -77,6 +83,13 @@ export function AssignmentsView({ classId }: { classId: string }) {
 
                 <div className="mt-3 flex flex-wrap items-center gap-1.5">
                   <RuleChips rules={a.rules} />
+                  {/* Not a rule, so it is not in RuleChips: the pin says where
+                      this sits in a student's plan, not what Panda may do with
+                      it. Shown on the row because "which of these did I mark as
+                      priority" is a question a teacher asks of the list, and
+                      opening each editor in turn to answer it is the reason the
+                      flag would stop being used. */}
+                  {a.teacherPinned && <Chip tone="warn">Priority</Chip>}
                   {a.points !== undefined && <Chip>{a.points} pts</Chip>}
                   {a.source === "canvas" && <Chip>From Canvas</Chip>}
                 </div>

@@ -12,7 +12,12 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { isSafeResourceUrl, type AssignmentResource, type AssignmentRules } from "@/lib/school/types";
+import {
+  isSafeResourceUrl,
+  type AssignmentResource,
+  type AssignmentRules,
+  type GradeCategory,
+} from "@/lib/school/types";
 import { useTeacherStore, type AssignmentDraft } from "./store";
 import { useDialog } from "@/components/ui/Dialog";
 import {
@@ -27,6 +32,14 @@ import {
 } from "./primitives";
 import { RuleChips } from "./RuleChips";
 
+// A zustand selector has to return the *same* reference when nothing changed,
+// and `?? []` returns a fresh array on every snapshot — which React reads as a
+// new value forever and turns into "Maximum update depth exceeded". One frozen
+// empty array, shared, so the no-categories case is a stable reference rather
+// than a render loop. This is the case a teacher who has not set any weights
+// hits, which is most of them.
+const NO_CATEGORIES: readonly GradeCategory[] = Object.freeze([]);
+
 const ANSWER_CHOICES: { value: AssignmentRules["answers"]; label: string; blurb: string }[] = [
   { value: "guided", label: "Guided only", blurb: "Panda asks questions and gives hints. It never states the answer." },
   { value: "afterUnderstanding", label: "After understanding", blurb: "Panda works through it first, then will confirm the answer." },
@@ -39,7 +52,7 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
   const existing = useTeacherStore((s) =>
     assignmentId ? (s.assignments[classId] ?? []).find((a) => a.id === assignmentId) : undefined,
   );
-  const categories = useTeacherStore((s) => s.categories[classId] ?? []);
+  const categories = useTeacherStore((s) => s.categories[classId] ?? NO_CATEGORIES);
   const loadGradebook = useTeacherStore((s) => s.loadGradebook);
   const saveAssignment = useTeacherStore((s) => s.saveAssignment);
   const deleteAssignment = useTeacherStore((s) => s.deleteAssignment);
@@ -53,6 +66,7 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
     due: toDateInput(existing?.dueAt ?? null),
     points: existing?.points !== undefined ? String(existing.points) : "",
     categoryId: existing?.categoryId ?? "",
+    teacherPinned: existing?.teacherPinned ?? false,
     resources: existing?.resources ?? [],
     rules: existing?.rules ?? { answers: "guided", translation: "allowed", simplification: "allowed" },
   }));
@@ -199,6 +213,30 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
             </span>
           </label>
 
+          {/* The pin lives here, in the same card as the due date and the
+              points, because it is a fact about the work rather than a
+              preference about the app — and because a teacher deciding "this is
+              the one that matters this week" is deciding it while they look at
+              when it is due and what it is worth.
+
+              The sentence underneath is the honest one, and it is deliberately
+              not "students see this first". src/lib/school/planner.ts lifts a
+              pinned assignment by two days and clamps the lift at today, so
+              genuinely overdue work still sits above it. A teacher who pins
+              three things expecting three things at the top, and finds last
+              week's lab report above them, concludes the pin is broken — so the
+              control says what the planner actually does. */}
+          <div className="border-t border-[var(--line)] pt-4">
+            <Toggle
+              label="Priority"
+              onWord="on"
+              offWord="off"
+              help="Moves it up each student's plan by about two days. It never moves above work that's already overdue — late work stays first."
+              on={draft.teacherPinned}
+              onChange={(on) => setDraft((d) => ({ ...d, teacherPinned: on }))}
+            />
+          </div>
+
           <ResourceEditor
             resources={draft.resources}
             onChange={(resources) => setDraft((d) => ({ ...d, resources }))}
@@ -332,11 +370,16 @@ function Toggle({
   help,
   on,
   onChange,
+  onWord = "allowed",
+  offWord = "off",
 }: {
   label: string;
   help: string;
   on: boolean;
   onChange: (on: boolean) => void;
+  /** The state read aloud. "allowed/off" suits a rule; a pin is "on/off". */
+  onWord?: string;
+  offWord?: string;
 }) {
   return (
     <button
@@ -358,7 +401,7 @@ function Toggle({
       </span>
       <span className="min-w-0">
         <span className="block text-sm font-medium text-[var(--text)]">
-          {label}: {on ? "allowed" : "off"}
+          {label}: {on ? onWord : offWord}
         </span>
         <span className="block text-xs leading-relaxed text-[var(--text-faint)]">{help}</span>
       </span>
@@ -389,6 +432,19 @@ function ResourceEditor({
 }) {
   const set = (index: number, patch: Partial<AssignmentResource>) =>
     onChange(resources.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+
+  // Order is the teacher's, and it is information: "read this first, then the
+  // slides" is a sentence they should not have to write in the instructions
+  // because the list already says it. Two buttons rather than drag-and-drop —
+  // dragging has no keyboard story worth the name, and this list is three items
+  // long on the days it exists at all.
+  const move = (index: number, direction: -1 | 1) => {
+    const to = index + direction;
+    if (to < 0 || to >= resources.length) return;
+    const next = [...resources];
+    [next[index], next[to]] = [next[to], next[index]];
+    onChange(next);
+  };
 
   return (
     <fieldset className="border-t border-[var(--line)] pt-4">
@@ -438,14 +494,37 @@ function ResourceEditor({
                     </p>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onChange(resources.filter((_, j) => j !== i))}
-                  aria-label={`Remove resource ${i + 1}`}
-                  className="rounded-lg border border-[var(--line-strong)] px-2.5 py-2.5 text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
-                >
-                  Remove
-                </button>
+                <div className="flex items-center gap-1">
+                  {/* Labelled by position and by what the link is called, so a
+                      screen reader announces "Move Chapter 4 reading up" rather
+                      than four identical arrows. */}
+                  <button
+                    type="button"
+                    onClick={() => move(i, -1)}
+                    disabled={i === 0}
+                    aria-label={`Move ${r.label.trim() || `resource ${i + 1}`} up`}
+                    className="rounded-lg border border-[var(--line-strong)] px-2 py-2.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => move(i, 1)}
+                    disabled={i === resources.length - 1}
+                    aria-label={`Move ${r.label.trim() || `resource ${i + 1}`} down`}
+                    className="rounded-lg border border-[var(--line-strong)] px-2 py-2.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onChange(resources.filter((_, j) => j !== i))}
+                    aria-label={`Remove ${r.label.trim() || `resource ${i + 1}`}`}
+                    className="rounded-lg border border-[var(--line-strong)] px-2.5 py-2.5 text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             );
           })}

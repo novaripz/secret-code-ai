@@ -104,6 +104,15 @@ export interface AssignmentDraft {
   points: string;
   /** "" means uncategorised, which is a real answer and not a missing one. */
   categoryId: string;
+  /**
+   * The teacher's "this one matters". Always a boolean in the draft, never
+   * undefined: the form holds a switch that is either on or off, and a
+   * tri-state here would only invite the editor to send "leave it alone" for a
+   * control the teacher is looking straight at. The *patch* keeps that
+   * distinction (see `updateAssignment`), which is what protects the flag from
+   * every other writer.
+   */
+  teacherPinned: boolean;
   /** Links a student can open. Validated on save; see `cleanResources`. */
   resources: AssignmentResource[];
   rules: Omit<AssignmentRules, "assignmentId">;
@@ -741,6 +750,7 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
       // undefined because the data layer reads undefined as "leave it alone",
       // and a teacher who picks "No category" means to unfile it.
       categoryId: draft.categoryId || null,
+      teacherPinned: draft.teacherPinned,
       resources: cleanResources(draft.resources),
       rules,
     };
@@ -789,6 +799,7 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
               dueAt: base.dueAt,
               points: base.points,
               categoryId: base.categoryId,
+              teacherPinned: base.teacherPinned,
               resources: base.resources,
             },
             rules,
@@ -800,6 +811,7 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
             dueAt: base.dueAt,
             points: base.points,
             categoryId: base.categoryId,
+            teacherPinned: base.teacherPinned,
             resources: base.resources,
             rules,
           });
