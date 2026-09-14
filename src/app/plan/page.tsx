@@ -14,8 +14,60 @@ import { CheckIcon, PlayIcon } from "@/components/icons";
 // The order comes from arithmetic over real due dates and point values, and
 // every item carries the reason it sits where it does. Nothing here is
 // generated, so nothing here can be confidently wrong.
+//
+// Two of those reasons are new and both get a chip: work a teacher pinned, and
+// work worth far more than the rest of its class. Chips rather than a colour,
+// because a row that is only red to some students is only explained to some
+// students -- the shape and the word carry the meaning and the colour is
+// decoration on top of it.
 
 const CHOICES = [30, 60, 90, 120, 180];
+
+/**
+ * Two glyphs, local to this file rather than added to the shared icon set,
+ * because another agent owns that file this week and a chip that cannot ship
+ * until a merge lands is a chip that does not ship.
+ *
+ * Both are decorative: the chip's word is the label a screen reader reads.
+ */
+function PinGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={className} aria-hidden="true">
+      <path d="M6 2h4M8 2v5.2L5 10.2h6L8 7.2M8 10.2V14" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function WeightGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={className} aria-hidden="true">
+      <path d="M8 13V3M8 3 4.5 6.5M8 3l3.5 3.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * Why a row is lifted, in one word and one shape.
+ *
+ * Never colour alone: a colourblind student reading a red row learns nothing a
+ * sighted one does not have to read anyway, so the text is the message and the
+ * tint is only there to make it findable at a glance.
+ */
+function LiftChip({ kind }: { kind: "pinned" | "heavy" }) {
+  const pinned = kind === "pinned";
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
+        pinned
+          ? "border-[var(--accent)] text-[var(--accent)]"
+          : "border-[var(--line-strong)] text-[var(--text-dim)]"
+      }`}
+    >
+      {pinned ? <PinGlyph className="h-3 w-3" /> : <WeightGlyph className="h-3 w-3" />}
+      {pinned ? "Teacher pick" : "Big points"}
+    </span>
+  );
+}
 
 function Focus({ title, minutes, onDone }: { title: string; minutes: number; onDone: () => void }) {
   const { t } = useI18n();
@@ -125,6 +177,16 @@ export default function PlanPage() {
                     </span>
 
                     <div className="min-w-0 flex-1">
+                      {/* The chip row wraps rather than overflowing: at 400px a row
+                          carrying both chips is wider than the column it sits in,
+                          and a chip sliding under the minutes label is worse than
+                          a chip on a second line. */}
+                      {(item.pinned || item.heavy) && (
+                        <div className="mb-1 flex min-w-0 flex-wrap items-center gap-1.5">
+                          {item.pinned && <LiftChip kind="pinned" />}
+                          {item.heavy && <LiftChip kind="heavy" />}
+                        </div>
+                      )}
                       <Link
                         href={`/classes/${item.assignment.classId}/${item.assignment.id}`}
                         className={`block truncate text-sm font-medium ${
@@ -179,7 +241,9 @@ export default function PlanPage() {
               {showWhy && plan.items.length > 0 && (
                 <p className="mt-2.5 animate-rise rounded-xl border border-[var(--line)] bg-[var(--surface-0)] p-3.5 text-sm leading-relaxed text-[var(--text-dim)]">
                   {explainOrder(plan)} Everything after it is ordered the same way: what&apos;s overdue
-                  first, then what&apos;s due soonest, then what&apos;s worth the most.
+                  first, then what&apos;s due soonest, then what&apos;s worth the most. Anything your
+                  teacher pinned, or that&apos;s worth far more than the rest of that class, moves up a
+                  couple of days — never past something that&apos;s already late.
                 </p>
               )}
             </>

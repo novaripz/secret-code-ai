@@ -52,9 +52,28 @@ const CEREBRAS_MODEL = process.env.CEREBRAS_MODEL || "qwen-3.8-27b";
 // swap.
 const NVIDIA_MODEL = process.env.NVIDIA_MODEL || "meta/llama-3.2-90b-vision-instruct";
 
-const NOT_CONFIGURED =
+// Two texts for the same fact. The first is for the server log, where whoever
+// runs Panda needs the variable names; the second is what a student sees, and
+// it never names a vendor, a status code or a key.
+const NOT_CONFIGURED_DETAIL =
   "No AI provider is configured. Set GROQ_API_KEY, CEREBRAS_API_KEY, NVIDIA_API_KEY or " +
   "GEMINI_API_KEY in your .env.local file (see .env.example).";
+
+const NO_VISION_DETAIL =
+  "Looking at an attached image needs NVIDIA_API_KEY or GEMINI_API_KEY — the other providers " +
+  "are text-only.";
+
+/**
+ * A failure that is about how this deployment is set up, not about a provider
+ * misbehaving. Kept apart so the student-facing sentence can say "not set up"
+ * rather than "try again in a minute", which would be a lie.
+ */
+export class AiSetupError extends Error {
+  constructor(detail: string) {
+    super(detail);
+    this.name = "AiSetupError";
+  }
+}
 
 interface ChainLink {
   label: string;
@@ -135,8 +154,10 @@ class ProviderChain implements AiProvider {
         return await link.provider.generate(req);
       } catch (err) {
         lastError = err;
+        // Logged even when it is the last link. A chain that falls all the way
+        // through used to do it silently, which left nothing to debug from.
+        logSkip(link.label, err, index === links.length - 1);
         if (index === links.length - 1) throw err;
-        logSkip(link.label, err);
       }
     }
 
@@ -164,8 +185,9 @@ class ProviderChain implements AiProvider {
         return;
       } catch (err) {
         lastError = err;
-        if (started || index === links.length - 1) throw err;
-        logSkip(link.label, err);
+        const last = started || index === links.length - 1;
+        logSkip(link.label, err, last);
+        if (last) throw err;
       }
     }
 
@@ -176,16 +198,13 @@ class ProviderChain implements AiProvider {
 function linksFor(req: AgentRequest): ChainLink[] {
   const links = configuredLinks();
   if (allImages(req).length === 0) {
-    if (links.length === 0) throw new Error(NOT_CONFIGURED);
+    if (links.length === 0) throw new AiSetupError(NOT_CONFIGURED_DETAIL);
     return links;
   }
 
   const canSee = links.filter((link) => link.acceptsImages);
   if (canSee.length === 0) {
-    throw new Error(
-      "Looking at an attached image needs NVIDIA_API_KEY or GEMINI_API_KEY — " +
-        "the other providers are text-only.",
-    );
+    throw new AiSetupError(NO_VISION_DETAIL);
   }
   return canSee;
 }
@@ -194,7 +213,8 @@ function linksFor(req: AgentRequest): ChainLink[] {
  * Why we moved on. The key is never part of this: a provider's own error text
  * is quoted, and nothing that was sent is.
  */
-function logSkip(label: string, err: unknown): void {
+function logSkip(label: string, err: unknown, final = false): void {
+  const next = final ? "and it was the last one left" : "trying the next provider";
   if (err instanceof ProviderHttpError) {
     if (err.status === 401 || err.status === 403) {
       console.error(
@@ -204,16 +224,53 @@ function logSkip(label: string, err: unknown): void {
     }
     const retry = err.retryAfter ? `, retry-after=${err.retryAfter}` : "";
     if (err.status === 429 || err.status === 503) {
-      console.warn(`[ai] ${label} is out of capacity (${err.status}${retry}), trying the next provider.`);
+      console.warn(`[ai] ${label} is out of capacity (${err.status}${retry}), ${next}.`);
       return;
     }
-    console.warn(`[ai] ${label} failed (${err.status}${retry}), trying the next provider: ${err.message}`);
+    console.warn(`[ai] ${label} failed (${err.status}${retry}), ${next}: ${err.message}`);
     return;
   }
   console.warn(
-    `[ai] ${label} failed before saying anything, trying the next provider:`,
+    `[ai] ${label} failed before saying anything, ${next}:`,
     err instanceof Error ? err.message : err,
   );
+}
+
+/**
+ * The one sentence a student is allowed to see when generation fails.
+ *
+ * A provider's own error text is a wall of JSON — quota metrics, retry delays,
+ * documentation links — and a student once got forty lines of it rendered as
+ * Panda's reply. Nothing from a provider passes through here: the raw text is
+ * logged by the caller and this returns plain English that does not say which
+ * company failed, what the status code was, or that there are several providers
+ * at all.
+ */
+export function describeAiFailure(err: unknown): string {
+  if (err instanceof AiSetupError) {
+    return "Panda isn't finished being set up on this server yet. Whoever runs it needs to add an AI key.";
+  }
+
+  if (err instanceof ProviderHttpError) {
+    if (err.status === 429 || err.status === 503 || err.status === 402) {
+      return "Panda is over its limit for now. Try again in a minute.";
+    }
+    if (err.status === 401 || err.status === 403) {
+      // A rejected key is a setup problem, and telling a student to try again
+      // would waste their time on something only an adult can fix.
+      return "Panda isn't set up correctly on this server. Let whoever runs it know.";
+    }
+    return "Panda couldn't finish that one. Try asking again.";
+  }
+
+  const text = err instanceof Error ? err.message : String(err ?? "");
+  if (/quota|rate limit|too many requests|exhausted|429|insufficient/i.test(text)) {
+    return "Panda is over its limit for now. Try again in a minute.";
+  }
+  if (/fetch failed|ENOTFOUND|ECONNRE|EAI_AGAIN|network|timeout|timed out|abort/i.test(text)) {
+    return "Panda couldn't reach the AI. Check the connection and try again.";
+  }
+  return "Panda couldn't finish that one. Try asking again.";
 }
 
 /**
@@ -221,6 +278,6 @@ function logSkip(label: string, err: unknown): void {
  * a missing key is a clear server error rather than a silent empty reply.
  */
 export function getProviderChain(): AiProvider {
-  if (configuredLinks().length === 0) throw new Error(NOT_CONFIGURED);
+  if (configuredLinks().length === 0) throw new AiSetupError(NOT_CONFIGURED_DETAIL);
   return new ProviderChain();
 }

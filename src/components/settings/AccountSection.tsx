@@ -32,6 +32,8 @@ export function AccountSection() {
           )}
         </span>
 
+        {/* Name and email stay selectable on purpose: this is the one place a
+            student can copy the address their work is filed under. */}
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium text-[var(--text)]">{account.name || t("auth.signedIn")}</p>
           <p className="truncate text-sm text-[var(--text-faint)]">{account.email}</p>
@@ -49,8 +51,8 @@ export function AccountSection() {
 
   return (
     <div className="rounded-2xl border border-[var(--line)] p-4">
-      <p className="font-medium text-[var(--text)]">{t("settings.signIn")}</p>
-      <p className="mt-1 mb-4 text-sm leading-relaxed text-[var(--text-faint)]">{t("settings.signInHint")}</p>
+      <p className="cursor-default select-none font-medium text-[var(--text)]">{t("settings.signIn")}</p>
+      <p className="mt-1 mb-4 cursor-default select-none text-sm leading-relaxed text-[var(--text-faint)]">{t("settings.signInHint")}</p>
       <SignInPanel />
     </div>
   );

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getProviderChain } from "@/lib/ai/chain";
+import { describeAiFailure, getProviderChain } from "@/lib/ai/chain";
+import { isSearchConfigured } from "@/lib/ai/search";
+import { ToolSession, type ProgressEvent } from "@/lib/ai/tools";
 import { validateOperations } from "@/lib/ai/validateOperations";
 import type { AiMessage, ImageAttachment } from "@/lib/ai/provider";
 import type { ExplainDepth, LearningMode } from "@/lib/ai/systemPrompt";
@@ -59,6 +61,54 @@ interface RequestBody {
   images?: ImageAttachment[];
   /** Ask for the reply as a text stream instead of one buffered JSON payload. */
   stream?: boolean;
+  /**
+   * Opt in to the framed stream (see STREAM FRAMING below). Old clients that
+   * do not send this keep getting plain text, byte for byte.
+   */
+  events?: boolean;
+}
+
+// STREAM FRAMING
+//
+// The stream used to be raw prose, which left nowhere to say "I am searching
+// the web" without that sentence landing in the transcript as if Panda had
+// typed it. So a client can ask for the framed form instead, with
+// `events: true`, and gets newline-delimited JSON: one object per line,
+// terminated by "\n".
+//
+//   {"t":"text","v":"..."}                        a piece of the reply
+//   {"t":"status","phase":"thinking"}             a pause with nothing to show yet
+//   {"t":"status","phase":"searching","query":"…"}
+//   {"t":"status","phase":"reading","query":"…","count":3}
+//   {"t":"status","phase":"search_failed","reason":"rate-limited"|"unavailable"}
+//   {"t":"sources","items":[{"title","url","snippet"}, …]}   sent once, before done
+//   {"t":"error","message":"…"}                   already student-safe prose
+//
+// Why newline-delimited JSON and not a marker like "<<<event>>>": any marker we
+// invent is a string a model could also write, and the day it does, a student
+// reads an event as Panda's words. JSON.stringify can never put a raw newline
+// inside a string, so a line break is always a frame boundary and reply text is
+// always inside a `v` field. There is no arrangement of model output that can
+// forge a frame.
+//
+// Framing is opt-in for a second reason as well: a client that cannot render
+// progress should not be given tool calling, because a tool round-trip with no
+// indicator is exactly the dead screen this is meant to prevent.
+
+/** One frame, already newline-terminated. */
+function frame(value: Record<string, unknown>): string {
+  return `${JSON.stringify(value)}\n`;
+}
+
+function progressFrame(event: ProgressEvent): string {
+  if (event.kind === "searching") return frame({ t: "status", phase: "searching", query: event.query });
+  if (event.kind === "reading") {
+    return frame({ t: "status", phase: "reading", query: event.query, count: event.count });
+  }
+  if (event.kind === "search_failed") {
+    return frame({ t: "status", phase: "search_failed", reason: event.reason });
+  }
+  return frame({ t: "status", phase: "thinking" });
 }
 
 function isRequestBody(x: unknown): x is RequestBody {
@@ -178,24 +228,54 @@ export async function POST(req: NextRequest) {
   // is unparseable until the last brace arrives, so there is nothing to show
   // early and it stays on the buffered path.
   if (body.stream === true && request.chatOnly) {
+    const framed = body.events === true;
     try {
       const provider = getProviderChain();
-      const chunks = provider.generateStream(request);
       const encoder = new TextEncoder();
+
+      // Web search only happens on a framed stream, and only when a key is
+      // configured. With neither, `session` stays undefined and every provider
+      // sends exactly the request it sent before — no tool declarations, no
+      // extra tokens, nothing added to the wait for the first word.
+      let pending: string[] = [];
+      const session =
+        framed && isSearchConfigured()
+          ? new ToolSession((event) => pending.push(progressFrame(event)))
+          : undefined;
+
+      const chunks = provider.generateStream(request, session);
 
       const stream = new ReadableStream<Uint8Array>({
         async start(controller) {
+          const send = (text: string) => controller.enqueue(encoder.encode(text));
+          const drain = () => {
+            for (const framed of pending) send(framed);
+            pending = [];
+          };
+
           try {
+            // Said before anything else so a tool round-trip shows as work
+            // rather than as a frozen screen. On the ordinary path the first
+            // text frame follows immediately behind it.
+            if (session) send(frame({ t: "status", phase: "thinking" }));
+
             for await (const chunk of chunks) {
-              controller.enqueue(encoder.encode(chunk));
+              drain();
+              send(framed ? frame({ t: "text", v: chunk }) : chunk);
             }
+            drain();
+
+            // Citations travel as data, never glued into the prose, so the UI
+            // can render them as links and the transcript stays clean.
+            const sources = session?.sources() ?? [];
+            if (framed && sources.length > 0) send(frame({ t: "sources", items: sources }));
           } catch (err) {
             // The response has already begun, so the status line is spent.
-            // Send the failure inline; the client surfaces whatever arrived
-            // plus this note rather than silently truncating.
+            // The failure goes inline instead — as a sentence written for a
+            // student. The provider's own words stay in the log.
             console.error("[api/ai] stream failed mid-flight:", err);
-            const message = err instanceof Error ? err.message : "The reply stopped early.";
-            controller.enqueue(encoder.encode(`\n\n[stream error] ${message}`));
+            const message = describeAiFailure(err);
+            send(framed ? frame({ t: "error", message }) : `\n\n[stream error] ${message}`);
           } finally {
             controller.close();
           }
@@ -204,15 +284,14 @@ export async function POST(req: NextRequest) {
 
       return new Response(stream, {
         headers: {
-          "Content-Type": "text/plain; charset=utf-8",
+          "Content-Type": framed ? "application/x-ndjson; charset=utf-8" : "text/plain; charset=utf-8",
           "Cache-Control": "no-cache, no-transform",
           "X-Accel-Buffering": "no",
         },
       });
     } catch (err) {
       console.error("[api/ai] stream failed to start:", err);
-      const message = err instanceof Error ? err.message : "AI request failed.";
-      return NextResponse.json({ error: message }, { status: 500 });
+      return NextResponse.json({ error: describeAiFailure(err) }, { status: 500 });
     }
   }
 
@@ -232,7 +311,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("[api/ai] generation failed:", err);
-    const message = err instanceof Error ? err.message : "AI request failed.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: describeAiFailure(err) }, { status: 500 });
   }
 }

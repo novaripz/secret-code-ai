@@ -1,6 +1,7 @@
 import type { AgentResponse } from "@/types";
 import type { AgentRequest, AiProvider } from "./provider";
 import { SseBuffer, SSE_DONE } from "./sse";
+import { openAiSearchTool, parseToolArguments, type ToolSession } from "./tools";
 import {
   allImages,
   buildChatTurnText,
@@ -23,6 +24,12 @@ import {
 // waited on, because the caller still has other providers to try. Once text is
 // flowing there is no deadline at all: a slow finish is better than a truncated
 // answer, and by then nobody can start over anyway.
+//
+// Tool calling rides on the same path. When a ToolSession is supplied the
+// request carries one tool declaration and the stream is read for tool-call
+// deltas as well as text; when it is not, the body is byte-for-byte what it
+// always was. That is deliberate: the overwhelming majority of messages need no
+// search, and they must not pay a millisecond for the ones that do.
 
 export interface OpenAiCompatibleConfig {
   /** Used in logs, so a failed hop in the chain is identifiable. */
@@ -77,14 +84,67 @@ export class OpenAiCompatibleProvider implements AiProvider {
     return parseAgentResponse(text);
   }
 
-  async *generateStream(req: AgentRequest): AsyncIterable<string> {
+  async *generateStream(req: AgentRequest, session?: ToolSession): AsyncIterable<string> {
+    // Extra turns accumulated by tool round-trips: the assistant's tool call,
+    // then our results. Empty on the common path, so the body is unchanged.
+    const extra: ChatMessage[] = [];
+
+    for (;;) {
+      // Tools are offered only while the session still has round-trips left.
+      // Withdrawing the declaration is what actually ends a loop: a model with
+      // no tool to call has nothing left to do but answer.
+      const withTools = session !== undefined && session.canCallTools;
+      const round: RoundState = { calls: new Map() };
+
+      for await (const text of this.streamRound(req, extra, withTools, round)) {
+        yield text;
+      }
+
+      const calls = [...round.calls.values()].filter((c) => c.name);
+      if (!session || calls.length === 0) return;
+
+      extra.push({
+        role: "assistant",
+        content: "",
+        tool_calls: calls.map((c) => ({
+          id: c.id,
+          type: "function" as const,
+          function: { name: c.name, arguments: c.args },
+        })),
+      });
+
+      for (const call of calls) {
+        const result = await session.run(call.name, parseToolArguments(call.args));
+        extra.push({ role: "tool", tool_call_id: call.id, content: result });
+      }
+    }
+  }
+
+  /**
+   * One request/response round. Yields text as it lands and records any
+   * tool-call deltas into `round`, which the caller inspects afterwards —
+   * a generator cannot hand back both a stream and a summary, so the summary
+   * goes in a box the caller already holds.
+   */
+  private async *streamRound(
+    req: AgentRequest,
+    extra: ChatMessage[],
+    withTools: boolean,
+    round: RoundState,
+  ): AsyncIterable<string> {
     const abort = new AbortController();
     let silence: ReturnType<typeof setTimeout> | undefined = setTimeout(() => {
       abort.abort(new Error(`${this.config.label} sent nothing within ${FIRST_TOKEN_TIMEOUT_MS}ms.`));
     }, FIRST_TOKEN_TIMEOUT_MS);
+    const alive = () => {
+      if (silence) {
+        clearTimeout(silence);
+        silence = undefined;
+      }
+    };
 
     try {
-      const res = await this.post(req, true, abort.signal);
+      const res = await this.post(req, true, abort.signal, extra, withTools);
       if (!res.body) throw new Error(`${this.config.label} answered with an empty body.`);
 
       const reader = res.body.getReader();
@@ -101,13 +161,17 @@ export class OpenAiCompatibleProvider implements AiProvider {
 
           for (const payload of payloads) {
             if (payload === SSE_DONE) return;
-            const delta = textFrom(this.config.label, payload);
+            const delta = frameFrom(this.config.label, payload);
             if (!delta) continue;
-            if (silence) {
-              clearTimeout(silence);
-              silence = undefined;
+            // A tool-call delta proves the provider is alive just as text does,
+            // even though the student has not seen anything yet.
+            if (delta.toolCalls.length > 0) {
+              alive();
+              collectToolCalls(round, delta.toolCalls);
             }
-            yield delta;
+            if (!delta.text) continue;
+            alive();
+            yield delta.text;
           }
 
           if (done) return;
@@ -121,7 +185,13 @@ export class OpenAiCompatibleProvider implements AiProvider {
     }
   }
 
-  private async post(req: AgentRequest, stream: boolean, signal: AbortSignal): Promise<Response> {
+  private async post(
+    req: AgentRequest,
+    stream: boolean,
+    signal: AbortSignal,
+    extra: ChatMessage[] = [],
+    withTools = false,
+  ): Promise<Response> {
     const res = await fetch(this.config.endpoint, {
       method: "POST",
       signal,
@@ -132,17 +202,23 @@ export class OpenAiCompatibleProvider implements AiProvider {
         Accept: stream ? "text/event-stream" : "application/json",
         Authorization: `Bearer ${this.config.apiKey}`,
       },
-      body: JSON.stringify(this.body(req, stream)),
+      body: JSON.stringify(this.body(req, stream, extra, withTools)),
     });
     if (!res.ok) throw await httpError(this.config.label, res);
     return res;
   }
 
-  private body(req: AgentRequest, stream: boolean): Record<string, unknown> {
-    const messages = [
+  private body(
+    req: AgentRequest,
+    stream: boolean,
+    extra: ChatMessage[] = [],
+    withTools = false,
+  ): Record<string, unknown> {
+    const messages: ChatMessage[] = [
       { role: "system", content: systemInstructionFor(req) },
       ...req.history.map((m) => ({ role: m.role, content: m.content })),
       { role: "user", content: this.userContent(req) },
+      ...extra,
     ];
 
     return {
@@ -152,6 +228,9 @@ export class OpenAiCompatibleProvider implements AiProvider {
       temperature: temperatureFor(req),
       // Project turns must come back as JSON; chat answers in prose.
       ...(req.chatOnly ? {} : { response_format: { type: "json_object" } }),
+      // Absent entirely unless search is live, so nothing changes for the
+      // requests that are not searching — which is nearly all of them.
+      ...(withTools ? { tools: [openAiSearchTool()], tool_choice: "auto" } : {}),
       ...this.config.extraBody,
     };
   }
@@ -180,26 +259,102 @@ type ContentPart =
   | { type: "text"; text: string }
   | { type: "image_url"; image_url: { url: string } };
 
+/** The subset of the chat-completions message shape this adapter ever sends. */
+type ChatMessage = {
+  role: "system" | "user" | "assistant" | "tool";
+  content: string | ContentPart[];
+  tool_calls?: { id: string; type: "function"; function: { name: string; arguments: string } }[];
+  tool_call_id?: string;
+};
+
+/** A tool call being assembled across deltas. Providers send it a piece at a time. */
+interface PartialToolCall {
+  id: string;
+  name: string;
+  args: string;
+}
+
+interface RoundState {
+  /** Keyed by the provider's `index`, which is the only stable handle in deltas. */
+  calls: Map<number, PartialToolCall>;
+}
+
+interface ToolCallDelta {
+  index: number;
+  id?: string;
+  name?: string;
+  args?: string;
+}
+
 /**
- * Reads one frame. Reasoning fields are deliberately left on the floor: the
- * student asked a question, not to watch the model think.
+ * Tool calls arrive the same way text does: in fragments. The id and name turn
+ * up in the first delta for an index and the arguments accrete as a JSON string
+ * over the rest, so everything is appended rather than assigned.
  */
-function textFrom(label: string, payload: string): string {
+function collectToolCalls(round: RoundState, deltas: ToolCallDelta[]): void {
+  for (const delta of deltas) {
+    const existing = round.calls.get(delta.index) ?? { id: "", name: "", args: "" };
+    round.calls.set(delta.index, {
+      id: delta.id || existing.id,
+      name: delta.name || existing.name,
+      args: existing.args + (delta.args ?? ""),
+    });
+  }
+}
+
+/**
+ * Reads one frame into the two things we care about: text for the student, and
+ * tool-call fragments for us. Reasoning fields are deliberately left on the
+ * floor — the student asked a question, not to watch the model think.
+ */
+function frameFrom(
+  label: string,
+  payload: string,
+): { text: string; toolCalls: ToolCallDelta[] } | undefined {
   let frame: {
-    choices?: { delta?: { content?: unknown } }[];
+    choices?: {
+      delta?: {
+        content?: unknown;
+        tool_calls?: unknown;
+      };
+    }[];
     error?: { message?: string };
   };
   try {
     frame = JSON.parse(payload);
   } catch {
     // A frame we cannot read is not worth killing a live reply over.
-    return "";
+    return undefined;
   }
   if (frame.error) {
     throw new Error(`${label} failed mid-stream: ${frame.error.message ?? "no reason given"}`);
   }
-  const content = frame.choices?.[0]?.delta?.content;
-  return typeof content === "string" ? content : "";
+  const delta = frame.choices?.[0]?.delta;
+  const content = delta?.content;
+  return {
+    text: typeof content === "string" ? content : "",
+    toolCalls: readToolCallDeltas(delta?.tool_calls),
+  };
+}
+
+function readToolCallDeltas(raw: unknown): ToolCallDelta[] {
+  if (!Array.isArray(raw)) return [];
+  const out: ToolCallDelta[] = [];
+  for (const [position, entry] of raw.entries()) {
+    if (typeof entry !== "object" || entry === null) continue;
+    const row = entry as Record<string, unknown>;
+    const fn = (typeof row.function === "object" && row.function !== null
+      ? row.function
+      : {}) as Record<string, unknown>;
+    out.push({
+      // Some providers omit `index` when only one call is in flight.
+      index: typeof row.index === "number" ? row.index : position,
+      id: typeof row.id === "string" ? row.id : undefined,
+      name: typeof fn.name === "string" ? fn.name : undefined,
+      args: typeof fn.arguments === "string" ? fn.arguments : undefined,
+    });
+  }
+  return out;
 }
 
 /** The provider's own words about the failure. The key is never part of them. */

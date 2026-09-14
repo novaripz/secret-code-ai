@@ -1,6 +1,18 @@
 "use client";
 
-import { useState } from "react";
+// The file tree, and the thing a student's hand reaches for most. Three
+// affordances were missing and are added here: every row is reachable and
+// operable from the keyboard (arrows to move, Enter to open, left/right to fold
+// a folder), a file with unsaved edits says so with a dot rather than saving
+// silently and hoping, and the row you are on is marked for focus as well as
+// for selection — those are different questions and a tree that answers only
+// the second one strands anyone not using a mouse.
+//
+// Rows stay div-with-role rather than real buttons because each one already
+// contains its own buttons (new file, delete) and a button inside a button is
+// invalid HTML that browsers repair by breaking the layout.
+
+import { useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { FileNode, Project } from "@/types";
 import { getChildren, joinPath } from "@/lib/fileSystem";
@@ -40,6 +52,9 @@ function TreeNode({
 
   const children = node.kind === "folder" ? getChildren(project, node.id) : [];
   const isActive = node.kind === "file" && node.path === activePath;
+  // "Unsaved" here means the autosave timer has not fired yet. It is a second
+  // or so, but a second in which a student can close the tab.
+  const isDirty = useStudioStore((s) => s.tabs.some((t) => t.path === node.path && t.dirty));
 
   async function reportError(err: unknown) {
     await dialog.alert({
@@ -109,9 +124,26 @@ function TreeNode({
     return (
       <div>
         <div
-          className="group flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-[var(--surface-2)] cursor-pointer select-none text-sm text-[var(--text-dim)]"
+          data-tree-row
+          role="button"
+          tabIndex={0}
+          aria-expanded={open}
+          aria-label={`${node.name} folder`}
+          className="group flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-[var(--surface-2)] cursor-pointer select-none text-sm text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)]"
           style={{ paddingLeft: depth * 12 + 6 }}
           onClick={() => setOpen((o) => !o)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setOpen((o) => !o);
+            } else if (e.key === "ArrowRight" && !open) {
+              e.preventDefault();
+              setOpen(true);
+            } else if (e.key === "ArrowLeft" && open) {
+              e.preventDefault();
+              setOpen(false);
+            }
+          }}
         >
           <ChevronRightIcon className={`w-3.5 h-3.5 shrink-0 transition-transform ${open ? "rotate-90" : ""}`} />
           {open ? (
@@ -158,14 +190,28 @@ function TreeNode({
 
   return (
     <div
-      className={`group flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer select-none text-sm ${
+      data-tree-row
+      role="button"
+      tabIndex={0}
+      aria-current={isActive ? "true" : undefined}
+      aria-label={isDirty ? `${node.name}, unsaved changes` : node.name}
+      className={`group relative flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer select-none text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)] ${
         isActive
-          ? "bg-[var(--accent-soft)] text-[var(--accent-strong)]"
+          ? "bg-[var(--accent-soft)] text-[var(--accent-strong)] font-medium"
           : "text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
       }`}
       style={{ paddingLeft: depth * 12 + 22 }}
       onClick={() => openFile(node.path)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openFile(node.path);
+        }
+      }}
     >
+      {/* The active file gets a spine down its left edge: the tint alone is
+          easy to lose against a busy theme, and some of the new ones are. */}
+      {isActive && <span aria-hidden className="absolute left-0 h-5 w-0.5 rounded-r bg-[var(--accent)]" />}
       <FileIcon className="w-4 h-4 shrink-0 text-[var(--text-faint)]" />
       {renaming ? (
         <input
@@ -185,6 +231,13 @@ function TreeNode({
           {node.name}
         </span>
       )}
+      {isDirty && (
+        <span
+          aria-hidden
+          title="Unsaved"
+          className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]"
+        />
+      )}
       <button
         title={t("action.delete")}
         onClick={handleDelete}
@@ -198,6 +251,7 @@ function TreeNode({
 
 export function FileExplorer({ project, activePath }: { project: Project; activePath: string | null }) {
   const { t } = useI18n();
+  const treeRef = useRef<HTMLDivElement>(null);
   const addFile = useStudioStore((s) => s.addFile);
   const addFolder = useStudioStore((s) => s.addFolder);
   const dialog = useDialog();
@@ -244,7 +298,23 @@ export function FileExplorer({ project, activePath }: { project: Project; active
           </button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto py-1 px-1">
+      {/* Arrow keys move between rows here rather than inside each row, because
+          a row cannot know what comes after it in a tree it does not own. */}
+      <div
+        ref={treeRef}
+        className="flex-1 overflow-y-auto py-1 px-1"
+        onKeyDown={(e) => {
+          if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+          const rows = Array.from(
+            treeRef.current?.querySelectorAll<HTMLElement>("[data-tree-row]") ?? [],
+          );
+          const index = rows.indexOf(document.activeElement as HTMLElement);
+          if (index === -1) return;
+          e.preventDefault();
+          const next = rows[index + (e.key === "ArrowDown" ? 1 : -1)];
+          next?.focus();
+        }}
+      >
         {rootChildren.length === 0 ? (
           <div className="px-3 py-6 text-center text-xs text-[var(--text-faint)] leading-relaxed">
             {t("studio.noFiles")}

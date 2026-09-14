@@ -173,6 +173,7 @@ export interface AssignmentRow {
   due_at: string | null;
   points: number | null;
   estimate_minutes: number | null;
+  teacher_priority: boolean;
   source: Source;
   external_id: string | null;
   panda_instructions: string | null;
@@ -192,6 +193,7 @@ export const ASSIGNMENT_COLUMNS = [
   "due_at",
   "points",
   "estimate_minutes",
+  "teacher_priority",
   "source",
   "external_id",
   "panda_instructions",
@@ -239,6 +241,10 @@ export function toAssignment(row: AssignmentRow, status: AssignmentStatus = "tod
     // string once it stops fitting a double. Coerce rather than trusting it.
     points: row.points === null ? undefined : Number(row.points),
     estimateMinutes: row.estimate_minutes ?? undefined,
+    // `not null default false` in the migration, so this is a boolean and not a
+    // maybe. Kept optional on `Assignment` only because the browser-store data
+    // that predates the column has no such field.
+    teacherPinned: row.teacher_priority,
     status,
     source: row.source,
     externalId: row.external_id ?? undefined,

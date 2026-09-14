@@ -20,8 +20,8 @@ export function LanguageSection() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="mb-1 text-sm font-medium text-[var(--text)]">{t("settings.interfaceLanguage")}</p>
-        <p className="mb-3 text-sm text-[var(--text-faint)]">{t("settings.interfaceLanguageHint")}</p>
+        <p className="mb-1 cursor-default select-none text-sm font-medium text-[var(--text)]">{t("settings.interfaceLanguage")}</p>
+        <p className="mb-3 cursor-default select-none text-sm text-[var(--text-faint)]">{t("settings.interfaceLanguageHint")}</p>
         <LanguagePicker
           selected={languages.interface}
           onSelect={(code) => setLanguages({ interface: code })}
@@ -29,8 +29,8 @@ export function LanguageSection() {
       </div>
 
       <div>
-        <p className="mb-1 text-sm font-medium text-[var(--text)]">{t("settings.replyLanguage")}</p>
-        <p className="mb-3 text-sm text-[var(--text-faint)]">{t("settings.replyLanguageHint")}</p>
+        <p className="mb-1 cursor-default select-none text-sm font-medium text-[var(--text)]">{t("settings.replyLanguage")}</p>
+        <p className="mb-3 cursor-default select-none text-sm text-[var(--text-faint)]">{t("settings.replyLanguageHint")}</p>
 
         <div className="flex flex-wrap gap-2">
           <button

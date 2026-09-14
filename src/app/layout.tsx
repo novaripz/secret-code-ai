@@ -27,8 +27,11 @@ export const metadata: Metadata = {
 };
 
 // Applies the saved theme before first paint so a light-mode user never sees a
-// dark flash (and vice versa). Dark is the default when nothing is saved.
-const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("sca:profile:v1");var t=s?JSON.parse(s).theme:null;document.documentElement.dataset.theme=t==="light"?"light":"dark";}catch(e){document.documentElement.dataset.theme="dark";}})();`;
+// dark flash (and vice versa). The palette list is duplicated here on purpose:
+// this runs before any module loads, so it cannot import THEMES from the store.
+// "system", and anyone who has never chosen, follow prefers-color-scheme; dark
+// is the fallback when nothing is saved.
+const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("sca:profile:v1");var t=s?JSON.parse(s).theme:null;var ok=["dark","light","ocean","forest","sepia"];var d=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=ok.indexOf(t)>=0?t:(t==="system"||!t?d:"dark");}catch(e){document.documentElement.dataset.theme="dark";}})();`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

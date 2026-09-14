@@ -68,8 +68,6 @@ export const en = {
 
   // Modes
   "mode.explain": "Explain",
-  "mode.humanize": "Humanize",
-  "mode.homie": "Chill mode",
   "mode.explainOffNote": "Off means the answer only. No workings, no build-up.",
   "mode.howMuch": "How much",
   "depth.minimal": "Minimal",
@@ -272,8 +270,6 @@ export const en = {
 
   // Mode tooltips
   "mode.explainTitle": "Adds the why behind an answer. Off gives you the answer alone.",
-  "mode.humanizeTitle": "Plain, everyday writing for essays and emails",
-  "mode.homieTitle": "Talks to you like a friend, not an assistant",
 
   // Studio assistant
   "studio.assistant": "Assistant",
@@ -292,6 +288,13 @@ export const en = {
   "chat.starterApi": "Explain what an API is like I'm new to this",
   "chat.starterPlanSite": "Help me plan a website about something I like",
   "chat.starterCheckWork": "Check my work — I'll paste it in",
+
+  // Suggested follow-ups built from what the insights engine actually found.
+  // Whole sentences with {topic} interpolated — never a fragment plus a name.
+  "chat.suggestionsLabel": "Suggested things to ask",
+  "chat.suggestPractice": "Want to try another {topic} problem?",
+  "chat.suggestExplain": "Explain {topic} to me again, a different way",
+  "chat.suggestMistake": "What do I keep getting wrong in {topic}?",
   "error.emptyReply": "The reply came back empty.",
   "classes.instructionsPlaceholder": "Paste the instructions here so Panda knows what it asks for (optional)",
 
@@ -430,7 +433,7 @@ const es: Catalog = {
   "chat.explainDifferently": "Explícalo de otra forma", "chat.checkMyWork": "Revisa mi trabajo",
   "chat.example": "Dame un ejemplo", "chat.readyForAnswer": "Ya estoy listo para la respuesta",
   "chat.whyThis": "¿Por qué?",
-  "mode.explain": "Explicar", "mode.humanize": "Natural", "mode.homie": "Modo relajado",
+  "mode.explain": "Explicar",
   "mode.explainOffNote": "Apagado significa solo la respuesta. Sin pasos ni introducción.",
   "mode.howMuch": "Cuánto",
   "depth.minimal": "Mínimo", "depth.fair": "Poco", "depth.normal": "Normal",
@@ -551,8 +554,6 @@ const es: Catalog = {
   "composer.removeAttachment": "Quitar {name}",
   "composer.screenshotFailed": "No se pudo tomar esa captura.",
   "mode.explainTitle": "Agrega el porqué detrás de una respuesta. Apagado te da solo la respuesta.",
-  "mode.humanizeTitle": "Escritura sencilla y cotidiana para ensayos y correos",
-  "mode.homieTitle": "Te habla como un amigo, no como un asistente",
   "studio.assistant": "Asistente",
   "studio.emptyGreeting": "Muy bien {name}: ¿qué quieres crear o cambiar? Descríbelo como se lo describirías a un amigo. Siempre verás los cambios antes de que pase nada.",
   "studio.emptyGreetingNoName": "¿Qué quieres crear o cambiar? Descríbelo como se lo describirías a un amigo. Siempre verás los cambios antes de que pase nada.",
@@ -569,6 +570,10 @@ const es: Catalog = {
   "chat.starterApi": "Explícame qué es una API como si fuera nuevo en esto",
   "chat.starterPlanSite": "Ayúdame a planear un sitio web sobre algo que me gusta",
   "chat.starterCheckWork": "Revisa mi trabajo: te lo pego aquí",
+  "chat.suggestionsLabel": "Sugerencias para preguntar",
+  "chat.suggestPractice": "¿Quieres intentar otro problema de {topic}?",
+  "chat.suggestExplain": "Explícame {topic} otra vez, de otra manera",
+  "chat.suggestMistake": "¿Qué sigo haciendo mal en {topic}?",
   "error.emptyReply": "La respuesta llegó vacía.",
   "classes.instructionsPlaceholder": "Pega aquí las instrucciones para que Panda sepa qué se pide (opcional)",
   "rules.guided": "Panda te va a guiar en vez de darte la respuesta.",

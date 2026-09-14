@@ -5,7 +5,7 @@
 // coalescing chunks into a frame, flushing the decoder's tail, and treating a
 // deliberate stop as a stop rather than a failure.
 
-import { deviceHeader } from "@/lib/security/device";
+import { authHeader, authReady, deviceHeader } from "@/lib/security/device";
 
 export interface StreamRequest {
   prompt: string;
@@ -58,15 +58,28 @@ export function streamChat(req: StreamRequest, handlers: StreamHandlers): Stream
     };
 
     try {
+      // Makes sure the cached access token is in place before the first send.
+      // After that this is already settled and costs nothing; without it a
+      // signed-in student's first message would be counted as a guest's.
+      await authReady();
+
       const res = await fetch("/api/ai", {
         method: "POST",
         signal: controller.signal,
-        headers: { "Content-Type": "application/json", ...deviceHeader() },
+        headers: { "Content-Type": "application/json", ...deviceHeader(), ...authHeader() },
         body: JSON.stringify({ ...req, chatOnly: true, stream: true, fileTree: "", contextFiles: {} }),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          // The session expired. Retrying would only fail again with the same
+          // token, so the student is told to sign in rather than left guessing.
+          handlers.onDone(
+            data.error ?? "Your sign-in has expired. Sign in again, or keep going as a guest.",
+          );
+          return;
+        }
         handlers.onDone(data.error ?? "That didn't go through.");
         return;
       }

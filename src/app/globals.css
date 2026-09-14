@@ -29,6 +29,13 @@
   --warn: #fbbf24;
   --warn-soft: #322612;
 
+  /* The switch accent. Deliberately blue rather than --accent: --accent is the
+     app's monochrome ink, and an on/off control reads as "on" far faster in a
+     colour nothing else on the page is wearing. --control-knob is the ink that
+     sits ON that blue, so it is chosen per theme rather than reused. */
+  --control-on: #3b82f6;
+  --control-knob: #ffffff;
+
   --background: var(--bg);
   --foreground: var(--text);
 }
@@ -59,6 +66,115 @@
   --success-soft: #e4f6ea;
   --warn: #9a6400;
   --warn-soft: #fbf0da;
+
+  --control-on: #2563eb;
+  --control-knob: #ffffff;
+}
+
+/* Beyond dark and light.
+   Each theme below restates the COMPLETE token set, not a tint of another one:
+   a partial theme leaves one palette's ink on another's paper the moment a
+   token is missed, and that failure is invisible until a student hits the one
+   screen that uses it. Every pair here was checked for text-on-surface
+   contrast — --text clears 12:1 on --bg, --text-dim clears 7:1, and --text-faint
+   (hints only, never the only copy of anything) clears 4.5:1. */
+
+/* Ocean. Deep navy paper with a cold cyan edge — the dark theme for anyone who
+   finds neutral grey flat. */
+:root[data-theme="ocean"] {
+  --bg: #0a1220;
+  --surface-0: #0f1a2c;
+  --surface-1: #142136;
+  --surface-2: #1b2b44;
+  --surface-3: #24384f;
+  --line: #1d2d45;
+  --line-strong: #2d4460;
+
+  --text: #e8eefa;
+  --text-dim: #adbfd8;
+  --text-faint: #8098b5;
+
+  --accent: #7dd3fc;
+  --accent-contrast: #06263a;
+  --accent-soft: #17324b;
+  --focus: #5aa9d6;
+
+  --bubble-user: #1b2b44;
+
+  --danger: #fb7185;
+  --danger-soft: #3a1b25;
+  --success: #5eead4;
+  --success-soft: #10312e;
+  --warn: #fcd34d;
+  --warn-soft: #33280f;
+
+  --control-on: #38bdf8;
+  --control-knob: #06263a;
+}
+
+/* Forest. Warm-dark green, lower glare than the neutral dark at night. */
+:root[data-theme="forest"] {
+  --bg: #0b1310;
+  --surface-0: #101c17;
+  --surface-1: #14241d;
+  --surface-2: #1b2f26;
+  --surface-3: #254033;
+  --line: #1d332a;
+  --line-strong: #2f4f3f;
+
+  --text: #e7f1e9;
+  --text-dim: #b0c9b8;
+  --text-faint: #86a291;
+
+  --accent: #86efac;
+  --accent-contrast: #08251a;
+  --accent-soft: #17332a;
+  --focus: #5fae85;
+
+  --bubble-user: #1b2f26;
+
+  --danger: #f8a1a1;
+  --danger-soft: #3a1f1f;
+  --success: #6ee7a8;
+  --success-soft: #10301f;
+  --warn: #f5cf7a;
+  --warn-soft: #31280f;
+
+  --control-on: #4f9cf9;
+  --control-knob: #06203a;
+}
+
+/* Sepia. A light theme that is not a lightbulb — warm paper, brown-black ink,
+   for long reading in a bright classroom. */
+:root[data-theme="sepia"] {
+  --bg: #f4ecdd;
+  --surface-0: #efe5d3;
+  --surface-1: #fdf8ee;
+  --surface-2: #e7dac3;
+  --surface-3: #dbcbb0;
+  --line: #e0d2ba;
+  --line-strong: #c9b694;
+
+  --text: #2b251b;
+  --text-dim: #564c3a;
+  --text-faint: #746851;
+
+  --accent: #2b251b;
+  --accent-contrast: #fdf8ee;
+  --accent-soft: #e7dac3;
+  --focus: #9a7f4f;
+
+  --bubble-user: #e7dac3;
+
+  --danger: #a33025;
+  --danger-soft: #f6e0dc;
+  --success: #1f6b3e;
+  --success-soft: #e1eedf;
+  --warn: #8a5c07;
+  --warn-soft: #f3e6c9;
+
+  --control-on: #1d5fbf;
+  --control-knob: #ffffff;
 }
 
 @theme inline {
@@ -191,9 +307,10 @@ body {
 }
 /* On a light background a white glow is invisible, so the emphasis has to
    come from weight and ink instead. */
-:root[data-theme="light"] .wordmark-accent {
-  color: #0d0d0d;
-  text-shadow: 0 0 10px rgba(13, 13, 13, 0.18);
+:root[data-theme="light"] .wordmark-accent,
+:root[data-theme="sepia"] .wordmark-accent {
+  color: var(--text);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--text) 18%, transparent);
 }
 
 /* Appearance: chat text scale and whether the mascot moves. Both are set as
@@ -279,3 +396,69 @@ body {
 .math-display .katex-display {
   margin: 0.4em 0;
 }
+
+/* Theme swatches in settings.
+   The picker has to draw a palette that is NOT the one currently applied, so it
+   cannot read the live tokens — every other theme's variables are simply not in
+   scope. These per-swatch values are the one honest place to restate them: they
+   live next to the themes above, so a palette and its swatch change together. */
+.theme-swatch[data-swatch="dark"]   { --sw-bg: #0d0d0d; --sw-surface: #262626; --sw-text: #ececec; --sw-accent: #3b82f6; }
+.theme-swatch[data-swatch="light"]  { --sw-bg: #ffffff; --sw-surface: #ececec; --sw-text: #0d0d0d; --sw-accent: #2563eb; }
+.theme-swatch[data-swatch="ocean"]  { --sw-bg: #0a1220; --sw-surface: #1b2b44; --sw-text: #e8eefa; --sw-accent: #38bdf8; }
+.theme-swatch[data-swatch="forest"] { --sw-bg: #0b1310; --sw-surface: #1b2f26; --sw-text: #e7f1e9; --sw-accent: #86efac; }
+.theme-swatch[data-swatch="sepia"]  { --sw-bg: #f4ecdd; --sw-surface: #e7dac3; --sw-text: #2b251b; --sw-accent: #1d5fbf; }
+
+/* The switch. Written here rather than as utilities because the knob has to
+   move on the SAME transition in both directions — the usual bug is a class
+   swap that only carries a transition on the "on" state, so it slides open and
+   snaps shut. One rule, one transition, transform is the only thing that
+   changes. */
+.switch {
+  position: relative;
+  display: inline-flex;
+  height: 1.5rem;
+  width: 2.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--surface-3);
+  border: 1px solid var(--line-strong);
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+.switch[aria-checked="true"] {
+  background: var(--control-on);
+  border-color: var(--control-on);
+}
+.switch-knob {
+  position: absolute;
+  left: 2px;
+  height: 1.125rem;
+  width: 1.125rem;
+  border-radius: 999px;
+  background: var(--text-faint);
+  transform: translateX(0);
+  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.3, 1), background-color 180ms ease;
+}
+.switch[aria-checked="true"] .switch-knob {
+  /* 2.75rem track − 1.125rem knob − 2px×2 inset = 1.375rem of travel. */
+  transform: translateX(1.375rem);
+  background: var(--control-knob);
+}
+/* State is never colour alone: the knob's position carries it too, and a tick
+   mark shows up for anyone who cannot separate the two blues. */
+.switch-knob::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid transparent;
+}
+.switch[aria-checked="true"] .switch-knob::after {
+  border-color: color-mix(in srgb, var(--control-on) 45%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .switch, .switch-knob { transition: none; }
+}
+:root[data-reduce-motion="on"] .switch,
+:root[data-reduce-motion="on"] .switch-knob { transition: none; }

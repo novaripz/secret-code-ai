@@ -38,6 +38,14 @@ export interface Assignment {
   status: AssignmentStatus;
   /** Roughly how long it should take, used by the planner. */
   estimateMinutes?: number;
+  /**
+   * The teacher said this one matters. Set on the assignment row, which the
+   * teacher already owns, so it needs no new permission story: if you can edit
+   * the assignment you can pin it, and if you can read it you can see the pin.
+   *
+   * It is a hint to the ordering, not an override of it. See `buildPlan`.
+   */
+  teacherPinned?: boolean;
   source: Source;
   externalId?: string;
   createdAt: number;

@@ -391,3 +391,27 @@ It changes nothing for students or teachers.
 a table should now say `permission denied` rather than returning `[]`. "There is
 nothing here for you" and "this is not yours to ask about" are different
 answers, and the second is the one you want a stranger to get.
+
+---
+
+## Step 8 — apply `0004_assignment_priority.sql`
+
+Paste and Run, same as the others. It adds one column, `teacher_priority`, to
+`assignments`, and an index over the pinned ones.
+
+**What it is for.** A teacher can now mark an assignment as a priority, and
+Panda's plan lifts it up the student's list and says, in that student's plan,
+"pinned by your teacher". Before this, the plan could only order work by what it
+could measure — due dates and point values — which is right most of the time and
+blind to the one thing only the teacher knows.
+
+**What it does not do.** A pin does not outrank overdue work. The planner lifts
+a pinned assignment by the equivalent of two days and clamps the lift at today,
+so something genuinely late always sits above something merely important. That
+is deliberate: late work costs a grade a student cannot get back.
+
+**Nothing changes about who can see or edit what.** The flag lives on the
+assignment row, which the teacher already owns and the enrolled student already
+reads. The policies from step 1 cover it unchanged — no new policy, no new
+grant. Every existing assignment gets `false`, so nothing already in the
+database moves.

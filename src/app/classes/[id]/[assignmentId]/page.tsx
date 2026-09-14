@@ -150,8 +150,6 @@ export default function AssignmentPage({
         studentProfile: memoryBlock(),
         explainMode: profileModes.explainMode,
         explainDepth: profileModes.explainDepth,
-        humanize: profileModes.humanize,
-        aiHomie: profileModes.aiHomie,
         // The teacher's answer policy chooses the mode; the student cannot
         // pick "answers" for an assignment set to guided.
         learningMode: rule.answers === "allowed" ? "answers" : "coaching",

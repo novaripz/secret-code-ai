@@ -1,9 +1,9 @@
 "use client";
 
 import { create } from "zustand";
-import { accountScope } from "./useAuthStore";
+import { accountScope, useAuthStore } from "./useAuthStore";
 import type { ExplainDepth } from "@/lib/ai/systemPrompt";
-import { DEFAULT_LOCALE } from "@/lib/i18n/locales";
+import { DEFAULT_LOCALE, findLocale } from "@/lib/i18n/locales";
 
 // The user's identity, preferences, modes, and long-term memory. This is the
 // one piece of state that follows them everywhere — chat, the build studio,
@@ -20,7 +20,26 @@ function storageKey() {
   return STORAGE_KEY_BASE + accountScope();
 }
 
-export type ThemeName = "dark" | "light" | "system";
+/**
+ * More than two colours, because "dark or light" is not the only preference a
+ * student has. Each name here maps to a complete token set in globals.css;
+ * THEMES is the single list the picker, the store's validation and the
+ * before-paint script in layout.tsx all read from, so adding a palette is one
+ * edit rather than four.
+ */
+export const THEMES = ["dark", "light", "ocean", "forest", "sepia"] as const;
+export type Theme = (typeof THEMES)[number];
+export type ThemeName = Theme | "system";
+
+/** Dark-family themes, for the few places that need light-or-dark rather than a
+ *  palette name (an embedded editor, a preview frame). */
+const DARK_THEMES = new Set<string>(["dark", "ocean", "forest"]);
+
+export function isDarkTheme(theme: ThemeName): boolean {
+  if (theme !== "system") return DARK_THEMES.has(theme);
+  if (typeof window === "undefined") return true;
+  return !window.matchMedia("(prefers-color-scheme: light)").matches;
+}
 
 /** Body text scale for the chat, for anyone who wants it bigger or tighter. */
 export type TextSize = "small" | "normal" | "large";
@@ -77,16 +96,22 @@ export interface Profile {
   avatar?: string;
 }
 
+/**
+ * What the student can turn on themselves.
+ *
+ * Humanize and Chill mode used to live here and are gone. A saved profile from
+ * before the removal still has those keys in localStorage, which is fine and
+ * deliberately not migrated away: `hydrate` spreads the saved object over
+ * DEFAULT_MODES, so an unknown key is carried as dead weight on an object
+ * nothing reads, while every key that still means something falls back to its
+ * default. The student lands in the default voice rather than in a mode that no
+ * longer exists — no crash, no stuck state, and nothing to clean up on disk.
+ */
 export interface Modes {
   /** How much explaining, when Explain is on. */
   explainDepth: ExplainDepth;
-  /** Plain everyday writing for essays and emails. */
-  humanize: boolean;
-  /** Homework help: the AI coaches toward the answer instead of handing it over. */
   /** Explanation mode: extra-simple, step-by-step explanations. */
   explainMode: boolean;
-  /** AI homie: casual, Gen-Z, chill tone. */
-  aiHomie: boolean;
 }
 
 export interface ProfileState {
@@ -134,9 +159,7 @@ const EMPTY_PROFILE: Profile = {
 
 const DEFAULT_MODES: Modes = {
   explainDepth: "normal",
-  humanize: false,
   explainMode: true,
-  aiHomie: false,
 };
 
 interface Persisted {
@@ -180,7 +203,7 @@ function writePersisted(state: ProfileState) {
 }
 
 /** "system" has no stored colour of its own; it follows the OS setting. */
-function resolveTheme(theme: ThemeName): "dark" | "light" {
+function resolveTheme(theme: ThemeName): Theme {
   if (theme !== "system") return theme;
   if (typeof window === "undefined") return "dark";
   return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
@@ -222,8 +245,17 @@ export const useProfileStore = create<ProfileState>((set, get) => {
     hydrate: () => {
       if (get().hydrated) return;
       const saved = readPersisted();
+      // Nobody who has never chosen gets overruled: no saved theme means
+      // "system", which follows prefers-color-scheme and matches what the
+      // before-paint script in layout.tsx already put on <html>. Anything
+      // unrecognised (an older build, a hand-edited key) falls back to dark
+      // rather than leaving <html> with a data-theme nothing styles.
       const theme: ThemeName =
-        saved.theme === "light" || saved.theme === "system" ? saved.theme : "dark";
+        saved.theme === undefined
+          ? "system"
+          : saved.theme === "system" || (THEMES as readonly string[]).includes(saved.theme)
+            ? saved.theme
+            : "dark";
       const appearance = { ...DEFAULT_APPEARANCE, ...(saved.appearance ?? {}) };
       applyTheme(theme);
       applyAppearance(appearance);
@@ -244,7 +276,9 @@ export const useProfileStore = create<ProfileState>((set, get) => {
       commit({ theme });
     },
 
-    toggleTheme: () => get().setTheme(resolveTheme(get().theme) === "dark" ? "light" : "dark"),
+    // The top-bar switch is still a two-way light/dark flip; from a palette
+    // theme it lands on the plain opposite of whatever that palette reads as.
+    toggleTheme: () => get().setTheme(isDarkTheme(get().theme) ? "light" : "dark"),
 
     setLanguages: (patch) => commit({ languages: { ...get().languages, ...patch } }),
 
@@ -302,8 +336,20 @@ export const useProfileStore = create<ProfileState>((set, get) => {
       return years >= 0 && years < 130 ? years : null;
     },
 
+    /**
+     * Everything Panda is told about who it is talking to.
+     *
+     * The account email and the language settings are in here for one reason:
+     * the app already shows them on the settings screen, so a student asking
+     * "what's my email" and hearing "I don't know" does not read as privacy,
+     * it reads as the memory feature being fake. Nothing new is collected and
+     * nothing leaves the device that was not already on it — this is the same
+     * profile the student is looking at, handed to the assistant that is
+     * supposed to know them. The email comes from the signed-in account rather
+     * than from anything typed, so a guest simply has no line for it.
+     */
     memoryBlock: () => {
-      const { profile, memory } = get();
+      const { profile, memory, languages } = get();
       const age = get().age();
       const lines: string[] = [];
       if (profile.name) lines.push(`Name: ${profile.name}`);
@@ -314,6 +360,21 @@ export const useProfileStore = create<ProfileState>((set, get) => {
       }
       if (profile.likes.length) lines.push(`Into: ${profile.likes.join(", ")}`);
       if (profile.aboutMe.trim()) lines.push(`About them: ${profile.aboutMe.trim()}`);
+      const email = useAuthStore.getState().account?.email;
+      if (email) lines.push(`Signed in as: ${email}`);
+      const ui = findLocale(languages.interface);
+      if (ui) lines.push(`App language: ${ui.englishName}`);
+      // "auto" is not a language and saying so is more useful than resolving it
+      // silently: it tells Panda the student has expressed no preference, which
+      // is exactly when following the language they write in matters most.
+      const reply = languages.reply === "auto" ? ui : findLocale(languages.reply);
+      if (reply) {
+        lines.push(
+          languages.reply === "auto"
+            ? `Answers in: ${reply.englishName} (following the app language; they have not set one)`
+            : `Answers in: ${reply.englishName} (their own choice)`,
+        );
+      }
       for (const fact of memory.slice(-40)) lines.push(`Remembered: ${fact.text}`);
       return lines.join("\n");
     },

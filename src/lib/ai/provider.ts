@@ -1,5 +1,6 @@
 import type { AgentResponse } from "@/types";
 import type { ExplainDepth, LearningMode } from "./systemPrompt";
+import type { ToolSession } from "./tools";
 
 /** A single message in the conversation sent to the model. */
 export interface AiMessage {
@@ -75,6 +76,11 @@ export interface AiProvider {
    *
    * Only meaningful for `chatOnly` requests. Project requests answer in JSON,
    * which cannot be parsed until it is complete, so those still use generate().
+   *
+   * `session` is present only when web search is configured and this is a chat
+   * turn. Without it a provider sends exactly the request it always sent — no
+   * tool declarations, no extra round-trip, no change to how soon the first
+   * word arrives, which is the thing this chain exists to protect.
    */
-  generateStream(request: AgentRequest): AsyncIterable<string>;
+  generateStream(request: AgentRequest, session?: ToolSession): AsyncIterable<string>;
 }

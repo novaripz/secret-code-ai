@@ -4,6 +4,7 @@ import katex from "katex";
 import "katex/dist/katex.min.css";
 
 import { parseMarkdown, type Block, type Inline } from "@/lib/markdown";
+import { stripRemembered } from "./remember";
 
 // Renders an assistant reply, including one that is still arriving.
 //
@@ -175,7 +176,11 @@ function BlockView({ block, animate }: { block: Block; animate: boolean }) {
 }
 
 export function MessageText({ content, streaming }: { content: string; streaming?: boolean }) {
-  const blocks = parseMarkdown(content);
+  // The remember markers are machinery, not writing. Stripping them here rather
+  // than in the store means the raw reply stays intact on disk (so a fact can
+  // be re-read if the parser ever changes) while the student never sees the
+  // mechanism — including the half-typed marker during a stream.
+  const blocks = parseMarkdown(stripRemembered(content, streaming === true));
 
   return (
     <div className="space-y-3">

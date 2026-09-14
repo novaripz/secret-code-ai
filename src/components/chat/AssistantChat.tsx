@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { deviceHeader } from "@/lib/security/device";
 import { useAssistantStore } from "@/store/useAssistantStore";
 import { useProfileStore } from "@/store/useProfileStore";
@@ -10,19 +10,14 @@ import { MessageText } from "./MessageText";
 import { ModePills } from "./ModePills";
 import { PandaSitting } from "@/components/Panda";
 import { MessageActions, actionPrompt, type MessageAction } from "./MessageActions";
-import { useI18n, type StringKey } from "@/lib/i18n";
+import { useI18n } from "@/lib/i18n";
 import { useInsightsStore } from "@/store/useInsightsStore";
-import { NEUTRAL_ACTIONS, signalFromAction, type Topic } from "@/lib/insights";
+import { NEUTRAL_ACTIONS, actionableFindings, signalFromAction, type Topic } from "@/lib/insights";
 import { Priorities } from "@/components/home/Priorities";
 import { findLocale } from "@/lib/i18n/locales";
 import { FileIcon } from "@/components/icons";
-
-const STARTERS: StringKey[] = [
-  "chat.starterScreenshot",
-  "chat.starterApi",
-  "chat.starterPlanSite",
-  "chat.starterCheckWork",
-];
+import { buildSuggestions } from "./suggestions";
+import { parseRemembered } from "./remember";
 
 
 /**
@@ -62,11 +57,25 @@ export function AssistantChat() {
   const replyLocale = languages.reply === "auto" ? languages.interface : languages.reply;
   const replyLanguage = findLocale(replyLocale)?.englishName ?? "English";
   const memoryBlock = useProfileStore((s) => s.memoryBlock);
+  const addMemory = useProfileStore((s) => s.addMemory);
   const displayName = useProfileStore((s) => s.displayName);
   const profileHydrated = useProfileStore((s) => s.hydrated);
 
   const insightsHydrated = useInsightsStore((s) => s.hydrated);
   const hydrateInsights = useInsightsStore((s) => s.hydrate);
+  const signals = useInsightsStore((s) => s.signals);
+  const insightsSummary = useInsightsStore((s) => s.summary);
+
+  // Recomputed when a signal lands, not on every keystroke: `summary()` is
+  // memoised inside the store, and subscribing to `signals` is what tells us
+  // the memo can have moved. Before hydration finishes there is nothing stored
+  // to read, so the chips start generic and quietly become personal a tick
+  // later — better than holding the landing screen blank waiting on IndexedDB.
+  const suggestions = useMemo(
+    () => buildSuggestions(insightsHydrated ? actionableFindings(insightsSummary()) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [insightsHydrated, signals],
+  );
 
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -153,8 +162,6 @@ export function AssistantChat() {
           learningMode: "coaching",
           simplify: opts?.simplify === true,
           replyLanguage,
-          aiHomie: modes.aiHomie,
-          humanize: modes.humanize,
           studentProfile: memoryBlock(),
           // Pure arithmetic over signals already in memory — no await, so this
           // adds nothing measurable before the request leaves.
@@ -214,6 +221,16 @@ export function AssistantChat() {
         flush();
         appendToAssistantMessage(id, decoder.decode());
         finishAssistantMessage(id, received ? undefined : t("error.emptyReply"));
+
+        // A student who says "my name is Santi, not S" has corrected Panda for
+        // every future conversation, not just this one. The model marks the
+        // durable fact itself; we only store what it marked, and only from a
+        // reply that actually finished, so an aborted stream cannot half-write
+        // a fact. `addMemory` is the same list Settings shows and lets them
+        // delete, which is what makes writing to it acceptable at all.
+        const finished =
+          useAssistantStore.getState().activeThread?.messages.find((m) => m.id === id)?.content ?? "";
+        for (const fact of parseRemembered(finished)) addMemory(fact, "chat");
       }
     } catch (err) {
       // Stopping on purpose is not an error; the partial reply stays as it is.
@@ -259,16 +276,20 @@ export function AssistantChat() {
 
             <Priorities />
 
-            <div className="mt-8 flex flex-wrap justify-center gap-2">
-              {STARTERS.map((key) => (
-                <button
-                  key={key}
-                  onClick={() => void send(t(key))}
-                  className="rounded-full border border-[var(--line)] px-3.5 py-2 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
-                >
-                  {t(key)}
-                </button>
-              ))}
+            <div className="mt-8 flex flex-wrap justify-center gap-2" aria-label={t("chat.suggestionsLabel")} role="group">
+              {suggestions.map((s) => {
+                const text = t(s.key, s.vars);
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => void send(text)}
+                    aria-label={text}
+                    className="rounded-full border border-[var(--line)] px-3.5 py-2 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                  >
+                    {text}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -7,6 +7,11 @@ import type { ExplainDepth } from "@/lib/ai/systemPrompt";
 // The modes, under the composer where they started. Outline-only pills that
 // go green when on. When Explain is on a second compact row appears with the
 // depth chips, so the slider has a home without taking a whole side panel.
+//
+// Humanize and Chill mode used to sit alongside Explain and are gone. The row
+// is written as a list rather than collapsed into a single hard-coded button
+// because Explain is not special — it is simply the one mode left, and the next
+// one to arrive should cost one line here, not a rewrite of the layout.
 
 const DEPTHS: { key: ExplainDepth; label: StringKey }[] = [
   { key: "minimal", label: "depth.minimal" },
@@ -18,9 +23,7 @@ const DEPTHS: { key: ExplainDepth; label: StringKey }[] = [
 
 const MODES = [
   { key: "explainMode", label: "mode.explain", title: "mode.explainTitle" },
-  { key: "humanize", label: "mode.humanize", title: "mode.humanizeTitle" },
-  { key: "aiHomie", label: "mode.homie", title: "mode.homieTitle" },
-] as const satisfies readonly { key: string; label: StringKey; title: StringKey }[];
+] as const satisfies readonly { key: "explainMode"; label: StringKey; title: StringKey }[];
 
 export function ModePills({ className = "" }: { className?: string }) {
   const { t } = useI18n();
@@ -37,6 +40,7 @@ export function ModePills({ className = "" }: { className?: string }) {
               key={key}
               onClick={() => setModes({ [key]: !on })}
               title={t(title)}
+              aria-label={`${t(label)} — ${t(title)}`}
               aria-pressed={on}
               className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                 on

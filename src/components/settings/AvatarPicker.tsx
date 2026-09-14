@@ -65,8 +65,8 @@ export function AvatarPicker() {
       </span>
 
       <div className="min-w-0 flex-1">
-        <p className="font-medium text-[var(--text)]">{t("settings.profilePicture")}</p>
-        <p className="mt-1 text-sm text-[var(--text-faint)]">
+        <p className="cursor-default select-none font-medium text-[var(--text)]">{t("settings.profilePicture")}</p>
+        <p className="mt-1 cursor-default select-none text-sm text-[var(--text-faint)]">
           {error ?? t("settings.avatarHint")}
         </p>
       </div>

@@ -45,6 +45,28 @@ h1 { font-size: 2rem; }
 const STARTER_JS = `console.log("Project loaded. Ready to build!");
 `;
 
+// The project list is the first screen of the build tool, so it is the first
+// chance to look like a tool rather than a folder of documents. Three changes
+// carry that: a filter field that a keyboard reaches first (a class ends up
+// with a dozen near-identically named projects by half term), a relative "last
+// edited" that answers the question people actually ask of this list, and a
+// card whose delete control is a real sibling button instead of a clickable
+// span nested inside the card's own button — which was both invalid markup and
+// unreachable by keyboard.
+
+/** "3 minutes ago" reads as work; a date reads as an archive. */
+function relativeTime(timestamp: number, now: number): string {
+  const seconds = Math.max(0, Math.round((now - timestamp) / 1000));
+  if (seconds < 60) return "just now";
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.round(hours / 24);
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+  return new Date(timestamp).toLocaleDateString();
+}
+
 export default function BuildPage() {
   const router = useRouter();
   const dialog = useDialog();
@@ -53,9 +75,18 @@ export default function BuildPage() {
 
   const [projects, setProjects] = useState<ProjectSummary[] | null>(null);
   const [busy, setBusy] = useState(false);
+  const [filter, setFilter] = useState("");
+  // Read once per load rather than per render: a list that recomputes "2 min
+  // ago" on every keystroke is not more correct, only less predictable.
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
-    void listProjects().then(setProjects);
+    void listProjects().then((list) => {
+      // Stamped when the list lands, not while rendering: "edited 2 min ago"
+      // has to be a value React is told about, not one it reads mid-render.
+      setNow(Date.now());
+      setProjects(list);
+    });
   }, []);
 
   async function handleCreate() {
@@ -154,9 +185,31 @@ export default function BuildPage() {
             </div>
           </div>
 
-          <div className="mt-8">
+          {projects !== null && projects.length > 0 && (
+            <div className="mt-6">
+              <label className="sr-only" htmlFor="project-filter">
+                Filter your projects
+              </label>
+              <input
+                id="project-filter"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                placeholder="Filter projects…"
+                className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface-0)] px-3 py-2 text-sm text-[var(--text)] outline-none transition-colors motion-reduce:transition-none placeholder:text-[var(--text-faint)] focus-visible:border-[var(--line-strong)] focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+              />
+            </div>
+          )}
+
+          <div className="mt-6">
             {projects === null ? (
-              <p className="text-sm text-[var(--text-faint)]">Loading…</p>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" aria-hidden>
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="h-24 animate-pulse rounded-2xl border border-[var(--line)] bg-[var(--surface-0)] motion-reduce:animate-none"
+                  />
+                ))}
+              </div>
             ) : projects.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-[var(--line-strong)] px-6 py-14 text-center">
                 <HammerIcon className="mx-auto h-7 w-7 text-[var(--text-faint)]" />
@@ -167,40 +220,55 @@ export default function BuildPage() {
                 </p>
                 <button
                   onClick={handleCreate}
-                  className="mt-5 rounded-full bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] hover:opacity-90"
+                  className="mt-5 rounded-full bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
                 >
                   Start your first project
                 </button>
               </div>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {projects.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => router.push(`/project/${p.id}`)}
-                    className="group rounded-2xl border border-[var(--line)] p-4 text-left transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--surface-0)]"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="truncate font-medium text-[var(--text)]">{p.name}</h3>
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        aria-label={`Delete ${p.name}`}
-                        onClick={(e) => void handleDelete(p, e)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") void handleDelete(p, e as unknown as React.MouseEvent);
-                        }}
-                        className="shrink-0 rounded p-1 text-[var(--text-faint)] opacity-0 hover:text-[var(--danger)] focus:opacity-100 group-hover:opacity-100"
-                      >
-                        <TrashIcon className="h-3.5 w-3.5" />
-                      </span>
-                    </div>
-                    <p className="mt-2 text-xs text-[var(--text-faint)]">
-                      Updated {new Date(p.updatedAt).toLocaleDateString()}
+              (() => {
+                const shown = projects.filter((p) =>
+                  p.name.toLowerCase().includes(filter.trim().toLowerCase()),
+                );
+                if (shown.length === 0) {
+                  return (
+                    <p className="px-1 py-8 text-center text-sm text-[var(--text-faint)]">
+                      No project matches &ldquo;{filter}&rdquo;.
                     </p>
-                  </button>
-                ))}
-              </div>
+                  );
+                }
+                return (
+                  <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {shown.map((p) => (
+                      <li
+                        key={p.id}
+                        className="group relative overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface-0)] transition-colors motion-reduce:transition-none hover:border-[var(--line-strong)]"
+                      >
+                        <button
+                          onClick={() => router.push(`/project/${p.id}`)}
+                          className="w-full px-4 py-3.5 pr-10 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)]"
+                        >
+                          <span className="flex items-center gap-2">
+                            <HammerIcon className="h-3.5 w-3.5 shrink-0 text-[var(--text-faint)]" />
+                            <span className="truncate font-medium text-[var(--text)]">{p.name}</span>
+                          </span>
+                          <span className="mt-2 block font-mono text-[11px] text-[var(--text-faint)]">
+                            edited {relativeTime(p.updatedAt, now)}
+                          </span>
+                        </button>
+                        <button
+                          onClick={(e) => void handleDelete(p, e)}
+                          aria-label={`Delete ${p.name}`}
+                          title={`Delete ${p.name}`}
+                          className="absolute right-2 top-2 rounded-lg p-1.5 text-[var(--text-faint)] opacity-0 transition-opacity motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--danger)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] group-hover:opacity-100"
+                        >
+                          <TrashIcon className="h-3.5 w-3.5" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()
             )}
           </div>
         </div>

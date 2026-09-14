@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useProfileStore } from "@/store/useProfileStore";
+import { isDarkTheme, useProfileStore } from "@/store/useProfileStore";
 
 // The colour the app is actually wearing right now. The profile store holds the
 // student's choice, which can be "system" — and "system" is a live thing, so it
@@ -22,5 +22,6 @@ export function useResolvedTheme(): "dark" | "light" {
   }, [theme]);
 
   if (theme === "system") return systemLight ? "light" : "dark";
-  return theme;
+  // Palette themes (ocean, forest, sepia) still answer light-or-dark here.
+  return isDarkTheme(theme) ? "dark" : "light";
 }

@@ -91,6 +91,8 @@ export interface NewAssignment {
   dueAt?: number | null;
   points?: number;
   estimateMinutes?: number;
+  /** Teacher's "this one matters". Defaults to the column default, false. */
+  teacherPinned?: boolean;
   source?: "local" | "canvas";
   externalId?: string;
   rules?: Partial<Omit<AssignmentRules, "assignmentId">>;
@@ -110,6 +112,7 @@ export async function createAssignment(
         due_at: toTimestamp(input.dueAt ?? null),
         points: input.points ?? null,
         estimate_minutes: input.estimateMinutes ?? null,
+        teacher_priority: input.teacherPinned ?? false,
         source: input.source ?? "local",
         external_id: input.externalId ?? null,
         // Omitted rule fields fall to the column defaults, which are the same
@@ -125,7 +128,7 @@ export async function createAssignment(
 }
 
 export type AssignmentPatch = Partial<
-  Pick<Assignment, "title" | "instructions" | "dueAt" | "points" | "estimateMinutes">
+  Pick<Assignment, "title" | "instructions" | "dueAt" | "points" | "estimateMinutes" | "teacherPinned">
 >;
 
 /**
@@ -145,6 +148,10 @@ export async function updateAssignment(
   if (patch.dueAt !== undefined) update.due_at = toTimestamp(patch.dueAt);
   if (patch.points !== undefined) update.points = patch.points ?? null;
   if (patch.estimateMinutes !== undefined) update.estimate_minutes = patch.estimateMinutes ?? null;
+  // Never coerced to a default here: an absent key means "leave the pin alone",
+  // which is not the same as unpinning, and a teacher editing a due date should
+  // not quietly clear their own flag.
+  if (patch.teacherPinned !== undefined) update.teacher_priority = patch.teacherPinned;
 
   if (Object.keys(update).length === 0) {
     const current = await getAssignment(supabase, assignmentId);

@@ -2,13 +2,22 @@
 
 import { useState } from "react";
 import { useI18n, type StringKey } from "@/lib/i18n";
-import { useProfileStore } from "@/store/useProfileStore";
+import { useProfileStore, type ThemeName } from "@/store/useProfileStore";
 import { AvatarPicker } from "./AvatarPicker";
 import { AccountSection } from "./AccountSection";
 import { LanguageSection } from "./LanguageSection";
-import { CanvasSection } from "./CanvasSection";
 import { useDialog } from "@/components/ui/Dialog";
-import { BrainIcon, MoonIcon, SparkleIcon, SunIcon, UserIcon, XIcon } from "@/components/icons";
+import { BrainIcon, MoonIcon, SparkleIcon, UserIcon, XIcon } from "@/components/icons";
+
+// Settings.
+//
+// One rule runs through the whole screen: chrome is not content. Labels,
+// headings, hints and section titles are furniture, so they get `cursor-default
+// select-none` — a text caret over a heading makes it look like a field you can
+// type in, which is exactly the confusion this screen had. Anything the student
+// might actually want to take away — their name, their email, a memory they
+// wrote — stays selectable, because "can't click on text" is only an improvement
+// until it eats something you needed to copy.
 
 const SECTIONS = [
   { key: "profile", label: "settings.profile", icon: UserIcon },
@@ -32,8 +41,8 @@ export function SettingsView() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("settings.title")}</h1>
-        <p className="mt-1 text-sm text-[var(--text-faint)]">{t("settings.subtitle")}</p>
+        <h1 className="cursor-default select-none text-2xl font-semibold tracking-tight">{t("settings.title")}</h1>
+        <p className="mt-1 cursor-default select-none text-sm text-[var(--text-faint)]">{t("settings.subtitle")}</p>
 
         <div className="mt-6 flex flex-wrap gap-1.5 border-b border-[var(--line)] pb-3">
           {SECTIONS.map(({ key, label, icon: Icon }) => (
@@ -80,7 +89,6 @@ function ProfileSection() {
   return (
     <div className="space-y-6">
       <AccountSection />
-      <CanvasSection />
       <AvatarPicker />
 
       <Field label={t("settings.name")} hint={t("settings.nameHint")}>
@@ -151,7 +159,7 @@ function ProfileSection() {
             </span>
           ))}
           {profile.likes.length === 0 && (
-            <p className="text-sm text-[var(--text-faint)]">{t("settings.likesNone")}</p>
+            <p className="cursor-default select-none text-sm text-[var(--text-faint)]">{t("settings.likesNone")}</p>
           )}
         </div>
         <div className="mt-3 flex gap-2">
@@ -196,10 +204,15 @@ function AppearanceSection() {
   const appearance = useProfileStore((s) => s.appearance);
   const setAppearance = useProfileStore((s) => s.setAppearance);
 
-  const themes = [
-    { key: "dark" as const, label: t("settings.themeDark"), hint: t("settings.themeDarkHint"), icon: MoonIcon },
-    { key: "light" as const, label: t("settings.themeLight"), hint: t("settings.themeLightHint"), icon: SunIcon },
-    { key: "system" as const, label: t("settings.themeSystem"), hint: t("settings.themeSystemHint"), icon: SparkleIcon },
+  // Names, not translated strings: Ocean, Forest and Sepia are proper nouns for
+  // the palettes, and the swatch does the explaining anyway.
+  const themes: { key: ThemeName; label: string; swatch: ThemeName }[] = [
+    { key: "dark", label: t("settings.themeDark"), swatch: "dark" },
+    { key: "light", label: t("settings.themeLight"), swatch: "light" },
+    { key: "ocean", label: "Ocean", swatch: "ocean" },
+    { key: "forest", label: "Forest", swatch: "forest" },
+    { key: "sepia", label: "Sepia", swatch: "sepia" },
+    { key: "system", label: t("settings.themeSystem"), swatch: "system" },
   ];
 
   const sizes = [
@@ -211,25 +224,28 @@ function AppearanceSection() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="mb-3 text-sm font-medium text-[var(--text)]">{t("settings.theme")}</p>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {themes.map(({ key, label, hint, icon: Icon }) => {
+        <p className="mb-3 cursor-default select-none text-sm font-medium text-[var(--text)]">{t("settings.theme")}</p>
+        {/* Two columns at 400px, more when there is room — a swatch has to stay
+            big enough to actually read as a palette. */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {themes.map(({ key, label, swatch }) => {
             const active = theme === key;
             return (
               <button
                 key={key}
                 onClick={() => setTheme(key)}
-                className={`rounded-2xl border p-4 text-left transition-colors ${
+                aria-pressed={active}
+                className={`overflow-hidden rounded-2xl border text-left transition-colors ${
                   active
                     ? "border-[var(--text)] bg-[var(--surface-2)]"
                     : "border-[var(--line)] hover:bg-[var(--surface-2)]"
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  <Icon className="h-4 w-4 text-[var(--text)]" />
-                  <span className="font-medium text-[var(--text)]">{label}</span>
+                <ThemeSwatch theme={swatch} />
+                <span className="flex items-center justify-between gap-2 px-3 py-2">
+                  <span className="cursor-default select-none text-sm font-medium text-[var(--text)]">{label}</span>
+                  {active && <span className="h-1.5 w-1.5 rounded-full bg-[var(--text)]" aria-hidden="true" />}
                 </span>
-                <span className="mt-1.5 block text-sm text-[var(--text-faint)]">{hint}</span>
               </button>
             );
           })}
@@ -237,8 +253,8 @@ function AppearanceSection() {
       </div>
 
       <div>
-        <p className="mb-1 text-sm font-medium text-[var(--text)]">{t("settings.textSize")}</p>
-        <p className="mb-3 text-sm text-[var(--text-faint)]">{t("settings.textSizeHint")}</p>
+        <p className="mb-1 cursor-default select-none text-sm font-medium text-[var(--text)]">{t("settings.textSize")}</p>
+        <p className="mb-3 cursor-default select-none text-sm text-[var(--text-faint)]">{t("settings.textSizeHint")}</p>
         <div className="flex gap-2">
           {sizes.map(({ key, label }) => {
             const active = appearance.textSize === key;
@@ -261,8 +277,8 @@ function AppearanceSection() {
 
       <div className="flex items-start gap-3 rounded-2xl border border-[var(--line)] p-4">
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-[var(--text)]">{t("settings.reduceMotion")}</p>
-          <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">{t("settings.reduceMotionHint")}</p>
+          <p className="cursor-default select-none font-medium text-[var(--text)]">{t("settings.reduceMotion")}</p>
+          <p className="mt-1 cursor-default select-none text-sm leading-relaxed text-[var(--text-faint)]">{t("settings.reduceMotionHint")}</p>
         </div>
         <Toggle
           on={appearance.reduceMotion}
@@ -273,8 +289,8 @@ function AppearanceSection() {
 
       <div className="flex items-start gap-3 rounded-2xl border border-[var(--line)] p-4">
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-[var(--text)]">{t("settings.pandaMotion")}</p>
-          <p className="mt-1 text-sm leading-relaxed text-[var(--text-faint)]">{t("settings.pandaMotionHint")}</p>
+          <p className="cursor-default select-none font-medium text-[var(--text)]">{t("settings.pandaMotion")}</p>
+          <p className="mt-1 cursor-default select-none text-sm leading-relaxed text-[var(--text-faint)]">{t("settings.pandaMotionHint")}</p>
         </div>
         <Toggle
           on={appearance.pandaMotion}
@@ -309,7 +325,7 @@ function MemorySection() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm leading-relaxed text-[var(--text-dim)]">{t("settings.memoryIntro")}</p>
+        <p className="cursor-default select-none text-sm leading-relaxed text-[var(--text-dim)]">{t("settings.memoryIntro")}</p>
         <div className="mt-3 flex gap-2">
           <Input
             value={draft}
@@ -334,7 +350,7 @@ function MemorySection() {
 
       <div className="space-y-2">
         {memory.length === 0 ? (
-          <p className="text-sm text-[var(--text-faint)]">{t("settings.memoryNone")}</p>
+          <p className="cursor-default select-none text-sm text-[var(--text-faint)]">{t("settings.memoryNone")}</p>
         ) : (
           memory.map((fact) => (
             <div
@@ -375,11 +391,42 @@ function MemorySection() {
 
 /* ---------- small shared bits ---------- */
 
+/** A real miniature of the palette — paper, a raised surface, ink and the
+ *  accent — because a theme called "Ocean" tells a twelve-year-old nothing.
+ *  "system" shows both halves it can turn into. */
+function ThemeSwatch({ theme }: { theme: ThemeName }) {
+  if (theme === "system") {
+    return (
+      <span className="flex h-16 w-full" aria-hidden="true">
+        <Swatch theme="dark" className="w-1/2" />
+        <Swatch theme="light" className="w-1/2" />
+      </span>
+    );
+  }
+  return <Swatch theme={theme} className="w-full" />;
+}
+
+function Swatch({ theme, className = "" }: { theme: ThemeName; className?: string }) {
+  return (
+    <span
+      className={`theme-swatch flex h-16 items-end gap-1 bg-[var(--sw-bg)] p-2 ${className}`}
+      data-swatch={theme}
+      aria-hidden="true"
+    >
+      <span className="h-6 flex-1 rounded bg-[var(--sw-surface)]" />
+      <span className="h-3 w-3 rounded-full bg-[var(--sw-text)]" />
+      <span className="h-3 w-3 rounded-full bg-[var(--sw-accent)]" />
+    </span>
+  );
+}
+
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-[var(--text)]">{label}</label>
-      {hint && <p className="mt-1 text-xs leading-relaxed text-[var(--text-faint)]">{hint}</p>}
+      <label className="block cursor-default select-none text-sm font-medium text-[var(--text)]">{label}</label>
+      {hint && (
+        <p className="mt-1 cursor-default select-none text-xs leading-relaxed text-[var(--text-faint)]">{hint}</p>
+      )}
       <div className="mt-2.5">{children}</div>
     </div>
   );
@@ -437,19 +484,14 @@ function NumberInput({
 function Toggle({ on, onChange, label }: { on: boolean; onChange: (on: boolean) => void; label: string }) {
   return (
     <button
+      type="button"
       role="switch"
       aria-checked={on}
       aria-label={label}
       onClick={() => onChange(!on)}
-      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-        on ? "bg-[var(--accent)]" : "bg-[var(--surface-3)]"
-      }`}
+      className="switch"
     >
-      <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full transition-transform ${
-          on ? "translate-x-[1.375rem] bg-[var(--accent-contrast)]" : "translate-x-0.5 bg-[var(--text-faint)]"
-        }`}
-      />
+      <span className="switch-knob" />
     </button>
   );
 }

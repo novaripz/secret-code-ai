@@ -12,6 +12,7 @@
 // other. The per-address ceiling is what still bounds someone who rotates it,
 // which is why both limits exist rather than this one replacing the other.
 
+import { getSupabase } from "@/lib/supabase/browser";
 import { DEVICE_HEADER } from "./deviceHeader";
 
 export { DEVICE_HEADER };
@@ -44,6 +45,59 @@ export function deviceId(): string {
 }
 
 
+// --- Who is asking ----------------------------------------------------------
+//
+// The device id above separates guests; this next part is the opposite job —
+// proving a student is signed in, so the API gives them the signed-in rate
+// limit instead of the tight guest one. Without the header every signed-in
+// student was silently counted as a guest and ran out after a handful of
+// messages.
+//
+// The token is cached rather than fetched per message, because the send path is
+// the one place latency is felt. Supabase keeps the session locally, so reading
+// it costs nothing after the client exists, and onAuthStateChange keeps the
+// cache honest across sign-in, sign-out and a token refresh.
+
+let accessToken: string | null = null;
+let priming: Promise<void> | null = null;
+
+function prime(): Promise<void> {
+  if (priming) return priming;
+  priming = (async () => {
+    const supabase = await getSupabase();
+    // No Supabase on this deployment: everyone is a guest, on purpose.
+    if (!supabase) return;
+    const { data } = await supabase.auth.getSession();
+    accessToken = data.session?.access_token ?? null;
+    supabase.auth.onAuthStateChange((_event, session) => {
+      accessToken = session?.access_token ?? null;
+    });
+  })().catch(() => {
+    // Never let this break a send. A missing token means guest limits, which
+    // is a worse experience, not a broken one.
+  });
+  return priming;
+}
+
+/**
+ * Resolves once the cached token is usable. Only the first call can actually
+ * wait, and what it waits for is a memoised config fetch plus a local session
+ * read — not a round trip per message. Call it before a fetch; every call after
+ * the first returns an already-settled promise.
+ */
+export function authReady(): Promise<void> {
+  return prime();
+}
+
+/**
+ * Spread into a fetch's headers. Empty for a guest, and that is a supported
+ * state rather than an error: the request goes through on the guest limit.
+ */
+export function authHeader(): Record<string, string> {
+  // Starts the cache filling if nobody has yet, but never waits on it.
+  void prime();
+  return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+}
 
 /** Spread into a fetch's headers. Empty on the server, where there is no device. */
 export function deviceHeader(): Record<string, string> {

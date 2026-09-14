@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import type { AgentResponse } from "@/types";
 import type { AgentRequest, AiProvider } from "./provider";
+import { geminiSearchTool, MAX_TOOL_ROUNDS, type ToolSession } from "./tools";
 import {
   allImages,
   buildChatTurnText,
@@ -15,8 +16,18 @@ import {
 // How a turn is worded and how its answer is read live in turn.ts, shared with
 // the OpenAI-compatible providers, so the reply a student gets does not change
 // with whichever backend answered.
+//
+// Tool calling is the one place Gemini genuinely differs: tools are pinned when
+// the chat is created, not per message, so a cap on round-trips cannot be
+// enforced by quietly dropping the declaration the way it is for the others.
+// The ToolSession refuses instead, and the loop below counts as well.
 
 const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+
+type MessagePart =
+  | { text: string }
+  | { inlineData: { data: string; mimeType: string } }
+  | { functionResponse: { name: string; response: Record<string, unknown> } };
 
 export class GeminiProvider implements AiProvider {
   private client: GoogleGenAI;
@@ -37,7 +48,7 @@ export class GeminiProvider implements AiProvider {
    * callers try the modern spelling first and fall back, rather than this
    * being pinned to whatever model happens to be configured today.
    */
-  private startTurn(req: AgentRequest, thinking: "level" | "budget" | "none") {
+  private startTurn(req: AgentRequest, thinking: "level" | "budget" | "none", withTools = false) {
     // Chat keeps reasoning to a minimum. These models otherwise think for
     // several seconds before saying a word, which on a message like "hi" is
     // far longer than writing the answer takes. Project turns plan file
@@ -59,11 +70,13 @@ export class GeminiProvider implements AiProvider {
         systemInstruction: systemInstructionFor(req),
         temperature: temperatureFor(req),
         ...(thinkingConfig ? { thinkingConfig } : {}),
+        // Only present when web search is configured and this is a chat turn.
+        // A non-searching request is exactly the request it was before.
+        ...(withTools ? { tools: [geminiSearchTool()] } : {}),
         ...(req.chatOnly ? {} : { responseMimeType: "application/json" }),
       },
     });
 
-    type MessagePart = { text: string } | { inlineData: { data: string; mimeType: string } };
     const message: MessagePart[] = [
       { text: req.chatOnly ? buildChatTurnText(req) : buildUserTurnText(req) },
     ];
@@ -107,21 +120,41 @@ export class GeminiProvider implements AiProvider {
    * Retrying only happens before the first chunk. Once text has reached the
    * reader, starting over would repeat what they already saw.
    */
-  async *generateStream(req: AgentRequest): AsyncIterable<string> {
+  async *generateStream(req: AgentRequest, session?: ToolSession): AsyncIterable<string> {
     const modes = ["level", "budget", "none"] as const;
     let lastError: unknown;
 
     for (const thinking of modes) {
       let started = false;
       try {
-        const { chat, message } = this.startTurn(req, thinking);
-        const stream = await chat.sendMessageStream({ message });
-        for await (const chunk of stream) {
-          const text = chunk.text;
-          if (text) {
-            started = true;
-            yield text;
+        const { chat, message } = this.startTurn(req, thinking, session !== undefined);
+        let outgoing: MessagePart[] = message;
+
+        // One pass per tool round-trip. The +1 is the reply itself, after the
+        // last search; without it the loop would end holding results nobody
+        // ever turned into an answer.
+        for (let round = 0; round <= MAX_TOOL_ROUNDS; round += 1) {
+          const stream = await chat.sendMessageStream({ message: outgoing });
+          const calls: { name?: string; args?: unknown }[] = [];
+
+          for await (const chunk of stream) {
+            const text = chunk.text;
+            if (text) {
+              started = true;
+              yield text;
+            }
+            for (const call of chunk.functionCalls ?? []) calls.push(call);
           }
+
+          if (!session || calls.length === 0) return;
+
+          const replies: MessagePart[] = [];
+          for (const call of calls) {
+            const name = call.name ?? "";
+            const result = await session.run(name, call.args ?? {});
+            replies.push({ functionResponse: { name, response: { result } } });
+          }
+          outgoing = replies;
         }
         return;
       } catch (err) {

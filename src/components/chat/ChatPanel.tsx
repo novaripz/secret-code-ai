@@ -93,7 +93,6 @@ export function ChatPanel() {
           contextFiles,
           history,
           explainMode: modes.explainMode,
-          aiHomie: modes.aiHomie,
           projectMemory: projectMemorySummary(),
           studentProfile: memoryBlock(),
           images: outgoing

@@ -1,18 +1,19 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useVersionStore } from "@/store/useVersionStore";
 import { FileExplorer } from "@/components/explorer/FileExplorer";
-import { ChatPanel } from "@/components/chat/ChatPanel";
 import { BottomPanel } from "@/components/preview/BottomPanel";
 import { TopBar } from "@/components/layout/TopBar";
 import { ChatIcon } from "@/components/icons";
 import { Pane } from "./Pane";
 import { ResizeHandle } from "./ResizeHandle";
 import { CodeEditor } from "./CodeEditor";
+import { AgentPanel } from "./AgentPanel";
+import { CommandPalette, type Command } from "./CommandPalette";
 import { VersionPanel } from "./VersionPanel";
-import { CodeIcon, FilesIcon, HistoryIcon, MonitorIcon } from "./icons";
+import { CodeIcon, CommandIcon, FilesIcon, HistoryIcon, MonitorIcon } from "./icons";
 import {
   clamp,
   MAX_CHAT,
@@ -65,6 +66,47 @@ export function Workspace() {
     if (!project) return;
     noteChange(project);
   }, [project, noteChange]);
+
+  // The command affordance. Ctrl/Cmd-K is the shortcut every tool this wants to
+  // resemble already uses, so it costs a student nothing to learn here and
+  // carries over when they meet the real thing.
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((open) => !open);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const show = useCallback((key: PanelKey) => layout.open(key), [layout]);
+
+  const commands = useMemo<Command[]>(
+    () => [
+      ...RAIL.map(({ key, label }) => ({
+        id: `panel:${key}`,
+        label: `Show ${label}`,
+        hint: "panel",
+        run: () => show(key),
+      })),
+      {
+        id: "action:ask",
+        label: "Ask Panda to build something",
+        hint: "agent",
+        run: () => {
+          show("chat");
+          // The panel owns its own composer, so it is asked rather than told.
+          window.dispatchEvent(new CustomEvent("panda:focus-composer"));
+        },
+      },
+      { id: "action:reset", label: "Reset the layout", hint: "layout", run: () => layout.reset() },
+    ],
+    [layout, show],
+  );
 
   if (!project) return null;
 
@@ -251,9 +293,9 @@ export function Workspace() {
               className="flex min-h-0 flex-col"
               style={{ width: layout.chatWidth, flex: "0 0 auto" }}
             >
-              <Pane title="Panda" closeLabel="Close the chat with Panda" onClose={() => layout.close("chat")}>
+              <Pane title="Agent" closeLabel="Close the chat with Panda" onClose={() => layout.close("chat")}>
                 <div className="h-full min-h-0">
-                  <ChatPanel />
+                  <AgentPanel />
                 </div>
               </Pane>
             </div>
@@ -289,6 +331,15 @@ export function Workspace() {
           <span aria-hidden className="my-1 h-px w-5 bg-[var(--line)]" />
 
           <button
+            onClick={() => setPaletteOpen(true)}
+            aria-label="Find a file or run a command"
+            title="Find a file or run a command (Ctrl K)"
+            className="rounded-lg p-2 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          >
+            <CommandIcon className="h-4 w-4" />
+          </button>
+
+          <button
             onClick={() => layout.reset()}
             aria-label="Reset the layout back to normal"
             title="Reset the layout back to normal"
@@ -298,6 +349,8 @@ export function Workspace() {
           </button>
         </nav>
       </div>
+
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={commands} />
     </div>
   );
 }
