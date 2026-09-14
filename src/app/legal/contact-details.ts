@@ -11,28 +11,39 @@
 // else needs touching — every surface reads this file.
 
 /**
- * TODO(prismly): replace with the real, monitored contact address before this
- * ships to any school. Keep the shape `name@domain`; the pages check for the
- * literal placeholder below and switch to an honest "not set up yet" notice.
+ * Where people write to Prismly, from the environment rather than the source.
+ *
+ * It lives in an environment variable because the person who has to set it is
+ * running this from a phone, and editing a constant means a commit, a review
+ * and a deploy; setting a variable is one field in a dashboard. It is read only
+ * from server components — the client half of the legal screens needs the
+ * company name and the date, never the address — so it does not have to be a
+ * public build-time value to work.
+ *
+ * Unset is a supported state, not a bug: the pages say plainly that contact is
+ * not configured instead of printing a dead address. A parent who writes to an
+ * inbox nobody reads, hears nothing back, and concludes the company is ignoring
+ * them is worse off than one who was told up front where it stands.
  */
-export const CONTACT_EMAIL = "[[ PLACEHOLDER — SET PRISMLY CONTACT EMAIL ]]";
+export function contactEmail(): string {
+  return (process.env.CONTACT_EMAIL ?? "").trim();
+}
 
-/** The company behind Panda. */
+/**
+ * True once a real address is set.
+ *
+ * The test is "looks like an address", not "differs from some placeholder", so
+ * a half-finished value ("prismly.com", "TBD") still reads as unset rather than
+ * rendering a mailto that goes nowhere.
+ */
+export function contactEmailIsSet(): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail());
+}
+
 export const COMPANY_NAME = "Prismly";
 
 /** The person accountable for it. Named because a district asks who to call. */
 export const FOUNDER_NAME = "Santiago Lopez";
-
-/**
- * True once a human has replaced the placeholder above.
- *
- * The test is "looks like an address", not "is not the placeholder", so a
- * half-finished edit ("prismly.com", "TBD") still reads as unset rather than
- * rendering a broken mailto.
- */
-export function contactEmailIsSet(): boolean {
-  return /^[^\s@[\]]+@[^\s@[\]]+\.[^\s@[\]]+$/.test(CONTACT_EMAIL);
-}
 
 /**
  * The date these documents last changed, as an ISO day.

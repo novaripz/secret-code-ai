@@ -1,4 +1,4 @@
-import { COMPANY_NAME, CONTACT_EMAIL, FOUNDER_NAME, contactEmailIsSet } from "../contact-details";
+import { COMPANY_NAME, FOUNDER_NAME, contactEmail, contactEmailIsSet } from "../contact-details";
 
 // How to reach Prismly, rendered honestly in both states.
 //
@@ -11,6 +11,7 @@ import { COMPANY_NAME, CONTACT_EMAIL, FOUNDER_NAME, contactEmailIsSet } from "..
 
 export function ContactBlock({ compact = false }: { compact?: boolean }) {
   const ready = contactEmailIsSet();
+  const address = contactEmail();
 
   return (
     <div
@@ -27,10 +28,10 @@ export function ContactBlock({ compact = false }: { compact?: boolean }) {
         <p className="mt-4 text-sm text-[var(--text-dim)]">
           Email{" "}
           <a
-            href={`mailto:${CONTACT_EMAIL}`}
+            href={`mailto:${address}`}
             className="rounded font-medium text-[var(--text)] underline underline-offset-4"
           >
-            {CONTACT_EMAIL}
+            {address}
           </a>
           . We read everything sent there.
         </p>
@@ -44,7 +45,7 @@ export function ContactBlock({ compact = false }: { compact?: boolean }) {
             published here, reach {COMPANY_NAME} through whoever gave your school Panda.
           </p>
           <p className="mt-2 text-xs text-[var(--text-faint)]">
-            To fix: set <code className="font-[family-name:var(--font-geist-mono)]">CONTACT_EMAIL</code>{" "}
+            To fix: set <code className="font-[family-name:var(--font-geist-mono)]">CONTACT_EMAIL</code> in the hosting environment{" "}
             in <code className="font-[family-name:var(--font-geist-mono)]">src/app/legal/contact-details.ts</code>.
           </p>
         </div>
