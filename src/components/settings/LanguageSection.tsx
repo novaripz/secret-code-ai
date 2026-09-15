@@ -36,7 +36,7 @@ export function LanguageSection() {
           <button
             onClick={() => setLanguages({ reply: "auto" })}
             aria-pressed={languages.reply === "auto"}
-            className={`rounded-xl border px-3.5 py-2 text-sm transition-colors ${
+            className={`tap inline-flex items-center rounded-xl border px-3.5 py-2 text-sm transition-colors ${
               languages.reply === "auto"
                 ? "border-[var(--text)] bg-[var(--surface-2)] font-medium text-[var(--text)]"
                 : "border-[var(--line)] text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
@@ -53,7 +53,7 @@ export function LanguageSection() {
               key={l.code}
               onClick={() => setLanguages({ reply: l.code })}
               aria-pressed={languages.reply === l.code}
-              className={`rounded-xl border px-3.5 py-2 text-sm transition-colors ${
+              className={`tap inline-flex items-center rounded-xl border px-3.5 py-2 text-sm transition-colors ${
                 languages.reply === l.code
                   ? "border-[var(--text)] bg-[var(--surface-2)] font-medium text-[var(--text)]"
                   : "border-[var(--line)] text-[var(--text-dim)] hover:bg-[var(--surface-2)]"

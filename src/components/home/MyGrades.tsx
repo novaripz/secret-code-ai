@@ -203,7 +203,7 @@ function ClassCard({ row }: { row: ClassGrade }) {
           <button
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
-            className="mt-2 rounded text-xs text-[var(--text-dim)] underline underline-offset-4 transition-colors hover:text-[var(--text)]"
+            className="mt-2 rounded text-sm md:text-xs text-[var(--text-dim)] underline underline-offset-4 transition-colors hover:text-[var(--text)]"
           >
             {t(open ? "grades.hideHowWorkedOut" : "grades.howWorkedOut")}
           </button>
@@ -229,7 +229,7 @@ function Breakdown({ summary }: { summary: GradeSummary }) {
 
   return (
     <div className="mt-3 border-t border-[var(--line)] pt-3">
-      <div className="max-w-full overflow-x-auto">
+      <div className="scroll-x max-w-full">
         <table className="w-full border-collapse text-xs">
           <thead>
             <tr className="text-[var(--text-faint)]">

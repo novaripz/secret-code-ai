@@ -99,7 +99,7 @@ export function AnalyticsView({ classId }: { classId: string }) {
               <Link
                 key={s.id}
                 href={`/teacher/classes/${classId}/students/${s.id}`}
-                className={`${cardClass} flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm transition-colors hover:bg-[var(--surface-1)]`}
+                className={`tap ${cardClass} flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm transition-colors hover:bg-[var(--surface-1)]`}
               >
                 <span className="min-w-0 truncate font-medium text-[var(--text)]">{s.displayName}</span>
                 <span className="shrink-0 text-xs text-[var(--text-faint)]">

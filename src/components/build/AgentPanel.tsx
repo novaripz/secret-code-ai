@@ -319,7 +319,7 @@ export function AgentPanel() {
                 <button
                   key={key}
                   onClick={() => void send(t(key))}
-                  className="w-full rounded-xl border border-[var(--line)] px-3 py-2.5 text-left text-xs text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+                  className="tap inline-flex items-center w-full rounded-xl border border-[var(--line)] px-3 py-2.5 text-left text-sm md:text-xs text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
                 >
                   {t(key)}
                 </button>
@@ -361,7 +361,7 @@ export function AgentPanel() {
                       // wants to see exactly what came back can, it just is not
                       // the first thing the log shows them any more.
                       <details className="mt-1.5">
-                        <summary className="cursor-pointer text-[11px] text-[var(--text-faint)] hover:text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">
+                        <summary className="cursor-pointer text-[13px] sm:text-[11px] text-[var(--text-faint)] hover:text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">
                           Show what Panda actually sent
                         </summary>
                         <pre className="mt-1 max-h-56 overflow-auto rounded-lg border border-[var(--line)] bg-[var(--surface-1)] p-2 font-mono text-[10px] leading-snug whitespace-pre-wrap break-words text-[var(--text-faint)]">

@@ -45,7 +45,7 @@ function AddAssignment({ classId, onDone }: { classId: string; onDone: () => voi
       <div className="mb-3 flex items-center justify-between">
         <p className="font-medium text-[var(--text)]">{t("assignments.add")}</p>
         <button type="button" onClick={onDone} aria-label={t("action.cancel")}
-          className="rounded-lg p-1.5 text-[var(--text-faint)] hover:bg-[var(--surface-2)]">
+          className="tap-sq inline-flex items-center justify-center rounded-lg p-1.5 text-[var(--text-faint)] hover:bg-[var(--surface-2)]">
           <XIcon className="h-4 w-4" />
         </button>
       </div>
@@ -76,7 +76,7 @@ function AddAssignment({ classId, onDone }: { classId: string; onDone: () => voi
           aria-label={t("assignments.instructions")} rows={3} className={`${field} resize-y`} />
 
         <button type="submit" disabled={!title.trim()}
-          className="self-end rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-40">
+          className="tap inline-flex items-center self-end rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-40">
           {t("action.save")}
         </button>
       </div>
@@ -121,7 +121,7 @@ function Row({ a }: { a: Assignment }) {
       <button
         onClick={() => removeAssignment(a.id)}
         aria-label={`Remove ${a.title}`}
-        className="rounded p-1 text-[var(--text-faint)] opacity-0 transition-opacity hover:text-[var(--danger)] focus:opacity-100 group-hover:opacity-100"
+        className="tap-sq inline-flex items-center justify-center rounded p-1 text-[var(--text-faint)] opacity-0 transition-opacity hover:text-[var(--danger)] focus:opacity-100 group-hover:opacity-100 max-md:opacity-100"
       >
         <TrashIcon className="h-3.5 w-3.5" />
       </button>
@@ -167,7 +167,7 @@ export default function ClassPage({ params }: { params: Promise<{ id: string }> 
     <AppShell>
       <div className="h-full overflow-y-auto">
         <div className="mx-auto w-full max-w-3xl px-4 py-8">
-          <Link href="/classes" className="text-xs text-[var(--text-faint)] hover:text-[var(--text-dim)]">
+          <Link href="/classes" className="text-sm md:text-xs text-[var(--text-faint)] hover:text-[var(--text-dim)]">
             ← {t("classes.title")}
           </Link>
 
@@ -182,7 +182,7 @@ export default function ClassPage({ params }: { params: Promise<{ id: string }> 
 
             <button
               onClick={() => removeClass(cls.id)}
-              className="shrink-0 rounded-xl border border-[var(--line-strong)] px-3 py-2 text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+              className="tap inline-flex items-center shrink-0 rounded-xl border border-[var(--line-strong)] px-3 py-2 text-sm md:text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
             >
               Delete class
             </button>
@@ -200,7 +200,7 @@ export default function ClassPage({ params }: { params: Promise<{ id: string }> 
             {!adding && (
               <button
                 onClick={() => setAdding(true)}
-                className="flex items-center gap-1.5 rounded-xl border border-[var(--line-strong)] px-3 py-1.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                className="tap flex items-center gap-1.5 rounded-xl border border-[var(--line-strong)] px-3 py-1.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
               >
                 <PlusIcon className="h-3.5 w-3.5" />
                 {t("assignments.add")}

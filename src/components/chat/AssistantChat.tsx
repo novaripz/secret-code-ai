@@ -325,12 +325,18 @@ export function AssistantChat() {
     <div className="flex h-full flex-col">
       {empty ? (
         // Landing state: greeting and composer centered, like a fresh chat.
-        <div className="flex flex-1 flex-col items-center justify-center px-4">
+        // `overflow-y-auto` and `justify-center` together, on purpose: the
+        // greeting stays optically centred while there is room, and the moment
+        // the keyboard halves the screen the whole landing state becomes
+        // scrollable instead of clipping the panda and the suggestion chips.
+        // A centred flex child with no scroller is the classic way to make
+        // content unreachable rather than merely cramped.
+        <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-6">
           <div className="w-full max-w-2xl animate-rise">
-            <div className="mb-5 flex justify-center">
-              <PandaSitting className="h-[190px] w-[152px]" />
+            <div className="mb-4 flex justify-center sm:mb-5">
+              <PandaSitting className="h-[130px] w-[104px] sm:h-[190px] sm:w-[152px]" />
             </div>
-            <h1 className="mb-8 text-center text-3xl font-semibold tracking-tight text-[var(--text)] sm:text-4xl">
+            <h1 className="mb-6 text-center text-[28px] font-semibold tracking-tight text-[var(--text)] sm:mb-8 sm:text-4xl">
               {name ? t("chat.greeting", { name }) : t("chat.greetingNoName")}
             </h1>
 
@@ -348,7 +354,7 @@ export function AssistantChat() {
 
             <Priorities />
 
-            <div className="mt-8 flex flex-wrap justify-center gap-2" aria-label={t("chat.suggestionsLabel")} role="group">
+            <div className="mt-6 flex flex-wrap justify-center gap-2 sm:mt-8" aria-label={t("chat.suggestionsLabel")} role="group">
               {suggestions.map((s) => {
                 const text = t(s.key, s.vars);
                 return (
@@ -356,7 +362,7 @@ export function AssistantChat() {
                     key={s.id}
                     onClick={() => void send(text)}
                     aria-label={text}
-                    className="rounded-full border border-[var(--line)] px-3.5 py-2 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                    className="tap inline-flex items-center rounded-full border border-[var(--line)] px-4 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] sm:px-3.5 md:text-xs"
                   >
                     {text}
                   </button>
@@ -368,17 +374,17 @@ export function AssistantChat() {
       ) : (
         <>
           <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-3xl space-y-6 px-4 py-8">
+            <div className="mx-auto max-w-3xl space-y-6 overflow-x-hidden px-3 py-6 sm:px-4 sm:py-8">
               {messages.map((m) => (
                 <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
                   {m.role === "assistant" && (
                     <PandaSitting
-                      className="mr-3 h-[46px] w-[37px] shrink-0"
+                      className="mr-1.5 h-[34px] w-[27px] shrink-0 sm:mr-3 sm:h-[46px] sm:w-[37px]"
                       bamboo={false}
                       idle={m.streaming !== true}
                     />
                   )}
-                  <div className={m.role === "user" ? "max-w-[85%]" : "min-w-0 flex-1"}>
+                  <div className={m.role === "user" ? "min-w-0 max-w-[88%] sm:max-w-[85%]" : "min-w-0 flex-1"}>
                     {m.attachments && m.attachments.length > 0 && (
                       <div className="mb-2 flex flex-wrap justify-end gap-2">
                         {m.attachments.map((a) =>
@@ -388,12 +394,12 @@ export function AssistantChat() {
                               key={a.id}
                               src={a.dataUrl}
                               alt={a.name}
-                              className="max-h-48 rounded-xl border border-[var(--line)] object-cover"
+                              className="max-h-40 max-w-full rounded-xl border border-[var(--line)] object-cover sm:max-h-48"
                             />
                           ) : (
                             <span
                               key={a.id}
-                              className="flex items-center gap-1.5 rounded-lg bg-[var(--surface-2)] px-2.5 py-1.5 text-xs text-[var(--text-dim)]"
+                              className="flex max-w-full items-center gap-1.5 rounded-lg bg-[var(--surface-2)] px-2.5 py-1.5 text-[13px] text-[var(--text-dim)] md:text-xs"
                             >
                               <FileIcon className="h-3.5 w-3.5" />
                               {a.name}
@@ -467,7 +473,7 @@ export function AssistantChat() {
                   <Activity state={activity} />
                   <button
                     onClick={stop}
-                    className="rounded-full border border-[var(--line-strong)] px-3 py-1.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                    className="tap inline-flex items-center rounded-full border border-[var(--line-strong)] px-4 py-1.5 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] sm:px-3 md:text-xs"
                   >
                     {t("chat.stop")}
                   </button>
@@ -476,7 +482,10 @@ export function AssistantChat() {
             </div>
           </div>
 
-          <div className="shrink-0 px-4 pb-5">
+          {/* The dock. `pb` carries the home-indicator inset on top of its own
+              padding, because `viewportFit: cover` means the bottom of the dvh
+              box is under the indicator on a modern iPhone. */}
+          <div className="shrink-0 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-5">
             <div className="mx-auto max-w-3xl">
               <Composer
                 value={input}

@@ -90,7 +90,7 @@ export function VersionPanel() {
                 onClick={() => handleRestore(version)}
                 aria-label={`Go back to ${version.label}, ${when(version.createdAt)}`}
                 title="Go back to this"
-                className="shrink-0 rounded p-1 text-[var(--text-faint)] opacity-0 transition-colors hover:bg-[var(--surface-3)] hover:text-[var(--text)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] group-hover:opacity-100"
+                className="tap-sq inline-flex items-center justify-center shrink-0 rounded p-1 text-[var(--text-faint)] opacity-0 transition-colors hover:bg-[var(--surface-3)] hover:text-[var(--text)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] group-hover:opacity-100 max-md:opacity-100"
               >
                 <UndoIcon className="h-3.5 w-3.5" />
               </button>

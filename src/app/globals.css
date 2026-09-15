@@ -527,3 +527,94 @@ code, kbd, samp {
 }
 :root[data-reduce-motion="on"] .switch,
 :root[data-reduce-motion="on"] .switch-knob { transition: none; }
+
+/* ---------------------------------------------------------------------------
+   PHONE FIT-AND-FINISH
+   ---------------------------------------------------------------------------
+   Everything below is conditioned on a phone-width viewport rather than on
+   `pointer: coarse`. A coarse-pointer query is the more honest signal, but it
+   is the one signal we cannot check while working — a resized desktop browser
+   reports a fine pointer — and a rule nobody can verify is a rule that rots.
+   Width is testable at 360px, which is where these bugs were actually found.
+
+   The breakpoint is 767px so it ends exactly where Tailwind's `md:` begins:
+   the same line the sidebar already uses to stop being a drawer. Two different
+   breakpoints for "is this a phone" is how a layout ends up half-converted.
+
+   So: anything that is part of the CONTRACT below — a control's size, a type
+   size — reverts to its desktop value with `md:`, on this same line. Anything
+   that is only density — a margin, a gap, how big the panda is drawn — may
+   still use `sm:`, because getting some room back at 640px is a nicety and
+   not a promise. A send button that shrank to 36px at 640 while `.tap` held
+   44 until 768 is exactly the half-converted state this note exists to
+   prevent, and is the bug that prompted it. */
+
+/* The 44px floor.
+   Applied to the ELEMENT, not to a wrapper, because the thing a thumb has to
+   hit is the thing that handles the tap. Width is left alone for anything that
+   is already wide (a nav row, a full-width chip) — `min-width` on a flex child
+   in a wrapping row would force a second line for no gain, so the height floor
+   and the width floor are separate classes. */
+@media (max-width: 767px) {
+  .tap { min-height: 44px; }
+  .tap-sq { min-height: 44px; min-width: 44px; }
+}
+
+/* Hit area without layout cost.
+   For the small icons that live INSIDE a dense row — the × on an attachment
+   chip, the pencil and bin on a chat in the sidebar. Growing those to 44px for
+   real would reflow the row they sit in and push the label they belong to off
+   the screen, so the drawn size stays and an invisible 44px pad does the
+   catching. The ::after is transparent and has no pointer-events of its own to
+   set: it inherits the button's, which is exactly what makes it work. */
+@media (max-width: 767px) {
+  .tap-pad { position: relative; }
+  .tap-pad::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 44px;
+    width: 44px;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* iOS zooms the whole page when a focused input's font-size is under 16px, and
+   it never zooms back out — the student is left panning a composer that no
+   longer fits. There is no phone-sized reason to draw a control smaller than
+   this, so rather than chase every input one at a time (and lose the next one
+   somebody adds) the floor is enforced here.
+
+   !important is deliberate and is the only place in this file that uses it: a
+   Tailwind `text-xs` is a class and would otherwise outrank a bare element
+   selector. Checkboxes, radios and ranges are excluded because their font-size
+   does not trigger the zoom and does size some of them. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Nothing may push the page sideways. A wide table, a code block or the grade
+   grid gets its own scroller (see `.scroll-x`); the document itself does not
+   get to scroll, because once it does every fixed element is off by the
+   overflow and the drawer no longer covers the screen it is meant to cover. */
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+/* The escape hatch that makes the rule above survivable. `min-width: 0` is the
+   half of this that is always forgotten: a scroll container that is a flex
+   child refuses to shrink below its content without it, and then overflows its
+   parent instead of scrolling. */
+.scroll-x {
+  overflow-x: auto;
+  min-width: 0;
+  -webkit-overflow-scrolling: touch;
+  /* Swiping a wide table should not also flick the page/drawer behind it. */
+  overscroll-behavior-x: contain;
+}

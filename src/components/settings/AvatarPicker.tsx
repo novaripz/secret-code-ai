@@ -74,14 +74,14 @@ export function AvatarPicker() {
       <div className="flex shrink-0 gap-2">
         <button
           onClick={() => input.current?.click()}
-          className="rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+          className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
         >
           {t(profile.avatar ? "settings.change" : "settings.upload")}
         </button>
         {profile.avatar && (
           <button
             onClick={() => updateProfile({ avatar: undefined })}
-            className="rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+            className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
           >
             {t("settings.remove")}
           </button>

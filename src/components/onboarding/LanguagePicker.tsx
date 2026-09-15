@@ -63,7 +63,7 @@ export function LanguagePicker({
           onChange={(e) => setQuery(e.target.value)}
           placeholder={translate(selected, "onboarding.searchLanguages")}
           aria-label={translate(selected, "onboarding.searchLanguages")}
-          className="w-full bg-transparent text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-faint)]"
+          className="tap w-full bg-transparent text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-faint)]"
         />
       </div>
 

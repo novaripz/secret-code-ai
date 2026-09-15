@@ -95,7 +95,7 @@ export function ClassesView() {
         {!adding && (
           <button
             onClick={() => setAdding(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-[var(--accent)] px-3.5 py-2 text-sm font-semibold text-[var(--accent-contrast)]"
+            className="tap flex items-center gap-1.5 rounded-xl bg-[var(--accent)] px-3.5 py-2 text-sm font-semibold text-[var(--accent-contrast)]"
           >
             <PlusIcon className="h-4 w-4" aria-hidden />
             New class
@@ -126,14 +126,14 @@ export function ClassesView() {
             <button
               type="submit"
               disabled={!name.trim() || saving}
-              className="rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-40"
+              className="tap inline-flex items-center rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-40"
             >
               {saving ? "Creating…" : "Create class"}
             </button>
             <button
               type="button"
               onClick={() => setAdding(false)}
-              className="rounded-xl border border-[var(--line-strong)] px-4 py-2.5 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)]"
+              className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-4 py-2.5 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)]"
             >
               Cancel
             </button>
@@ -158,7 +158,7 @@ export function ClassesView() {
             </p>
             <button
               onClick={() => setAdding(true)}
-              className="mt-4 rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)]"
+              className="tap inline-flex items-center mt-4 rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)]"
             >
               Create your first class
             </button>

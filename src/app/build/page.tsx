@@ -199,7 +199,7 @@ export default function BuildPage() {
               <button
                 onClick={handleCreate}
                 disabled={busy}
-                className="flex items-center gap-1.5 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] hover:opacity-90 disabled:opacity-40"
+                className="tap flex items-center gap-1.5 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] hover:opacity-90 disabled:opacity-40"
               >
                 <PlusIcon className="h-4 w-4" />
                 {t("build.newProject")}
@@ -241,7 +241,7 @@ export default function BuildPage() {
                 </p>
                 <button
                   onClick={handleCreate}
-                  className="mt-5 rounded-full bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+                  className="tap inline-flex items-center mt-5 rounded-full bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
                 >
                   {t("build.emptyAction")}
                 </button>
@@ -281,7 +281,7 @@ export default function BuildPage() {
                           onClick={(e) => void handleDelete(p, e)}
                           aria-label={t("build.deleteLabel", { name: p.name })}
                           title={t("build.deleteLabel", { name: p.name })}
-                          className="absolute right-2 top-2 rounded-lg p-1.5 text-[var(--text-faint)] opacity-0 transition-opacity motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--danger)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] group-hover:opacity-100"
+                          className="tap-sq inline-flex items-center justify-center absolute right-2 top-2 rounded-lg p-1.5 text-[var(--text-faint)] opacity-0 transition-opacity motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--danger)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] group-hover:opacity-100 max-md:opacity-100"
                         >
                           <TrashIcon className="h-3.5 w-3.5" />
                         </button>

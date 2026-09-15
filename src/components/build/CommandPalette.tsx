@@ -135,7 +135,7 @@ function Palette({ onClose, actions }: { onClose: () => void; actions: Command[]
                 data-active={index === cursor}
                 onMouseEnter={() => setCursor(index)}
                 onClick={() => choose(index)}
-                className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
+                className={`tap flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
                   index === cursor
                     ? "bg-[var(--surface-2)] text-[var(--text)]"
                     : "text-[var(--text-dim)]"

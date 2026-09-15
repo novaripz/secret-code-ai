@@ -32,7 +32,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
   if (status === "loading") {
     return (
-      <div className="h-screen flex items-center justify-center bg-[var(--bg)] text-[var(--text-faint)] text-sm">
+      <div className="h-dvh flex items-center justify-center bg-[var(--bg)] text-[var(--text-faint)] text-sm">
         {t("studio.loadingProject")}
       </div>
     );
@@ -40,7 +40,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
 
   if (status === "not-found") {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-[var(--bg)] text-[var(--text)] gap-3">
+      <div className="h-dvh flex flex-col items-center justify-center bg-[var(--bg)] text-[var(--text)] gap-3">
         <p>{t("studio.projectNotFound")}</p>
         <Link href="/" className="text-[var(--accent)] text-sm hover:underline">
           {t("studio.backToProjects")}

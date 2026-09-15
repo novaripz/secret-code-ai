@@ -41,7 +41,7 @@ export function AccountSection() {
 
         <button
           onClick={signOut}
-          className="shrink-0 rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+          className="tap inline-flex items-center shrink-0 rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
         >
           {t("auth.signOut")}
         </button>

@@ -351,7 +351,7 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
           <button
             type="button"
             onClick={remove}
-            className="ml-auto rounded-xl px-3.5 py-2 text-sm text-[var(--danger)] transition-colors hover:bg-[var(--danger-soft)]"
+            className="tap inline-flex items-center ml-auto rounded-xl px-3.5 py-2 text-sm text-[var(--danger)] transition-colors hover:bg-[var(--danger-soft)]"
           >
             Delete
           </button>
@@ -494,7 +494,7 @@ function ResourceEditor({
         <button
           type="button"
           onClick={() => onChange([...resources, { label: "", url: "" }])}
-          className="rounded-lg px-2 py-1 text-xs text-[var(--text-dim)] underline underline-offset-4 transition-colors hover:text-[var(--text)]"
+          className="tap inline-flex items-center rounded-lg px-2 py-1 text-sm md:text-xs text-[var(--text-dim)] underline underline-offset-4 transition-colors hover:text-[var(--text)]"
         >
           Add a link
         </button>
@@ -552,7 +552,7 @@ function ResourceEditor({
                     onClick={() => move(i, -1)}
                     disabled={i === 0}
                     aria-label={`Move ${r.label.trim() || `resource ${i + 1}`} up`}
-                    className="rounded-lg border border-[var(--line-strong)] px-2 py-2.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
+                    className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2 py-2.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
                   >
                     ↑
                   </button>
@@ -561,7 +561,7 @@ function ResourceEditor({
                     onClick={() => move(i, 1)}
                     disabled={i === resources.length - 1}
                     aria-label={`Move ${r.label.trim() || `resource ${i + 1}`} down`}
-                    className="rounded-lg border border-[var(--line-strong)] px-2 py-2.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
+                    className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2 py-2.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
                   >
                     ↓
                   </button>
@@ -569,7 +569,7 @@ function ResourceEditor({
                     type="button"
                     onClick={() => onChange(resources.filter((_, j) => j !== i))}
                     aria-label={`Remove ${r.label.trim() || `resource ${i + 1}`}`}
-                    className="rounded-lg border border-[var(--line-strong)] px-2.5 py-2.5 text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+                    className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2.5 py-2.5 text-sm md:text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
                   >
                     Remove
                   </button>

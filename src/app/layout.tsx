@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import { AppProviders } from "@/components/AppProviders";
 import "./globals.css";
@@ -24,6 +24,28 @@ const wordmark = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Panda — chat, build, and ship",
   description: "Chat with Panda, who knows you, drop in files and screenshots, and build real projects in your browser.",
+};
+
+// Next already emits a sane default viewport tag; this restates it only to add
+// the two parts that matter on a phone.
+//
+// `interactiveWidget: "resizes-content"` is the important one. By default the
+// on-screen keyboard overlays the page without changing the layout viewport,
+// so a `100dvh` app column stays full height and the composer ends up behind
+// the keyboard. Asking for the CONTENT to be resized makes dvh shrink to the
+// space actually left, which is what keeps the input and the last message on
+// screen. Chromium honours it; iOS Safari does not, and the composer's own
+// focus handler covers that case.
+//
+// `userScalable` is deliberately NOT set to false. Blocking pinch-zoom is the
+// single most common accessibility failure on a phone, and a student who wants
+// a closer look at a diagram is entitled to one.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-content",
+  // Draw into the notch area; the shell pads itself back out with env() insets.
+  viewportFit: "cover",
 };
 
 // Applies the saved theme before first paint so a light-mode user never sees a

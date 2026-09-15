@@ -61,7 +61,7 @@ export function ReportDialog({ onClose }: { onClose: () => void }) {
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold text-[var(--text)]">{t("report.title")}</h2>
           <button onClick={onClose} aria-label={t("action.cancel")}
-            className="rounded-lg p-1.5 text-[var(--text-faint)] hover:bg-[var(--surface-2)]">
+            className="tap-sq inline-flex items-center justify-center rounded-lg p-1.5 text-[var(--text-faint)] hover:bg-[var(--surface-2)]">
             <XIcon className="h-4 w-4" />
           </button>
         </div>
@@ -70,7 +70,7 @@ export function ReportDialog({ onClose }: { onClose: () => void }) {
           <>
             <p className="text-sm leading-relaxed text-[var(--text-dim)]">{t("report.thanks")}</p>
             <button onClick={onClose}
-              className="mt-4 w-full rounded-xl bg-[var(--accent)] py-2.5 text-sm font-semibold text-[var(--accent-contrast)]">
+              className="tap inline-flex items-center justify-center mt-4 w-full rounded-xl bg-[var(--accent)] py-2.5 text-sm font-semibold text-[var(--accent-contrast)]">
               {t("action.done")}
             </button>
           </>
@@ -98,7 +98,7 @@ export function ReportDialog({ onClose }: { onClose: () => void }) {
             </label>
 
             <button type="submit" disabled={busy}
-              className="mt-4 w-full rounded-xl bg-[var(--accent)] py-2.5 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-40">
+              className="tap inline-flex items-center justify-center mt-4 w-full rounded-xl bg-[var(--accent)] py-2.5 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-40">
               {t("report.submit")}
             </button>
           </form>

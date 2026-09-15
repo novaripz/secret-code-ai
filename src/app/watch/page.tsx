@@ -207,7 +207,7 @@ export default function WatchPage() {
                     onChange={(e) => setQuery(e.target.value)}
                     aria-label={t("watch.searchVideos")}
                     placeholder={t("watch.searchVideos")}
-                    className="min-w-0 flex-1 bg-transparent text-[13px] text-[var(--text)] outline-none placeholder:text-[var(--text-faint)]"
+                    className="tap min-w-0 flex-1 bg-transparent text-[13px] text-[var(--text)] outline-none placeholder:text-[var(--text-faint)]"
                   />
                   {searched && (
                     <button
@@ -215,7 +215,7 @@ export default function WatchPage() {
                       onClick={clearSearch}
                       aria-label={t("watch.clearSearch")}
                       title={t("watch.backToFeed")}
-                      className="shrink-0 rounded-full p-1 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                      className="tap-sq inline-flex items-center justify-center shrink-0 rounded-full p-1 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
                     >
                       <XIcon className="h-3.5 w-3.5" />
                     </button>
@@ -283,7 +283,7 @@ function TabButton({
       role="tab"
       aria-selected={active}
       onClick={() => onSelect(value)}
-      className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
+      className={`tap inline-flex items-center rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
         active
           ? "bg-[var(--surface-2)] font-medium text-[var(--text)]"
           : "text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
@@ -340,7 +340,7 @@ function Reasoning({
       {stale && (
         <button
           onClick={onRefresh}
-          className="mt-3 rounded-lg border border-[var(--line-strong)] px-3 py-1.5 text-[12px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+          className="tap inline-flex items-center mt-3 rounded-lg border border-[var(--line-strong)] px-3 py-1.5 text-[12px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
         >
           {t("watch.rebuildFeed")}
         </button>
@@ -401,7 +401,7 @@ function Trouble({
         {retryable && (
           <button
             onClick={onRetry}
-            className="rounded-lg border border-[var(--line-strong)] px-3 py-1.5 text-[12px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+            className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-3 py-1.5 text-[12px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
           >
             {t("action.retry")}
           </button>
@@ -409,7 +409,7 @@ function Trouble({
         {savedCount > 0 && (
           <button
             onClick={onOpenSaved}
-            className="rounded-lg border border-[var(--line-strong)] px-3 py-1.5 text-[12px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+            className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-3 py-1.5 text-[12px] text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
           >
             {savedCount === 1
               ? t("watch.savedStillPlayOne")

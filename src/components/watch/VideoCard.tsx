@@ -145,7 +145,7 @@ function SaveButton({
         onClick={onRemove}
         aria-label={t("watch.removeLabel", { title })}
         title={t("watch.removeFromSaved")}
-        className="flex shrink-0 items-center gap-1 rounded-lg border border-[var(--line)] px-2 py-1 text-[11px] text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+        className="tap flex shrink-0 items-center gap-1 rounded-lg border border-[var(--line)] px-2 py-1 text-[13px] sm:text-[11px] text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
       >
         <XIcon className="h-3 w-3" />
         {t("watch.remove")}
@@ -159,7 +159,7 @@ function SaveButton({
       aria-pressed={saved}
       aria-label={saved ? t("watch.removeLabel", { title }) : t("watch.saveLabel", { title })}
       title={t(saved ? "watch.savedClickToRemove" : "watch.saveVideo")}
-      className={`flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1 text-[11px] transition-colors ${
+      className={`tap flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1 text-[13px] sm:text-[11px] transition-colors ${
         saved
           ? "border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--text)]"
           : "border-[var(--line)] text-[var(--text-faint)] hover:border-[var(--line-strong)] hover:text-[var(--text)]"

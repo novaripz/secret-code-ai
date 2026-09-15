@@ -42,7 +42,7 @@ export function ModePills({ className = "" }: { className?: string }) {
               title={t(title)}
               aria-label={`${t(label)} — ${t(title)}`}
               aria-pressed={on}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`tap inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium transition-colors sm:px-3 md:text-xs ${
                 on
                   ? "border-[var(--success)] text-[var(--success)]"
                   : "border-[var(--line-strong)] text-[var(--text-faint)] hover:border-[var(--text-faint)] hover:text-[var(--text-dim)]"
@@ -56,7 +56,7 @@ export function ModePills({ className = "" }: { className?: string }) {
 
       {modes.explainMode && (
         <div className="flex flex-wrap items-center justify-center gap-1">
-          <span className="mr-1 text-[11px] text-[var(--text-faint)]">{t("mode.howMuch")}</span>
+          <span className="mr-1 text-[13px] text-[var(--text-faint)] sm:text-[11px]">{t("mode.howMuch")}</span>
           {DEPTHS.map((d) => {
             const on = modes.explainDepth === d.key;
             return (
@@ -64,7 +64,12 @@ export function ModePills({ className = "" }: { className?: string }) {
                 key={d.key}
                 onClick={() => setModes({ explainDepth: d.key })}
                 aria-pressed={on}
-                className={`rounded-full px-2.5 py-1 text-[11px] transition-colors ${
+                // The depth chips were 24px tall and five of them shared one
+                // row — the smallest thing on the chat screen and the easiest
+                // to hit by accident. `tap` gives them the 44px floor; the row
+                // wraps to two lines on a narrow phone, which is the right
+                // trade for being able to hit the one you meant.
+                className={`tap inline-flex items-center rounded-full px-3 py-1 text-[13px] transition-colors sm:px-2.5 sm:text-[11px] ${
                   on
                     ? "bg-[var(--surface-3)] font-medium text-[var(--text)]"
                     : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)]"

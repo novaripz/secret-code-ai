@@ -139,7 +139,7 @@ export function OverviewView({ classId }: { classId: string }) {
               ))}
             </ul>
           )}
-          <Link href={`${base}/roster`} className="mt-3 inline-block text-xs text-[var(--text-faint)] underline underline-offset-4">
+          <Link href={`${base}/roster`} className="mt-3 inline-block text-sm md:text-xs text-[var(--text-faint)] underline underline-offset-4">
             Open the roster
           </Link>
         </div>

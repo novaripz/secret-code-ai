@@ -40,7 +40,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     <I18nProvider locale={locale}>
       <AuthGate>
         <DialogProvider>
-          {!hydrated ? <div className="h-screen bg-[var(--bg)]" /> : onboarded ? children : <Onboarding />}
+          {!hydrated ? <div className="h-dvh bg-[var(--bg)]" /> : onboarded ? children : <Onboarding />}
         </DialogProvider>
       </AuthGate>
     </I18nProvider>

@@ -110,7 +110,7 @@ function ActionRow({ op, project }: { op: FileOperation; project: Project | null
         onClick={() => canDiff && setOpen((o) => !o)}
         aria-expanded={canDiff ? open : undefined}
         aria-label={canDiff ? `${open ? "Hide" : "Show"} the changes to ${op.path}` : label}
-        className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-xs transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)]"
+        className="tap flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm md:text-xs transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)]"
       >
         <span
           className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${VERB_STYLE[op.type]}`}
@@ -175,14 +175,14 @@ export function ActionList({
         <div className="flex flex-wrap items-center gap-2 pt-0.5">
           <button
             onClick={onApply}
-            className="flex items-center gap-1 rounded-md bg-[var(--success-soft)] px-3 py-1.5 text-xs font-medium text-[var(--success)] transition-[filter] motion-reduce:transition-none hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+            className="tap flex items-center gap-1 rounded-md bg-[var(--success-soft)] px-3 py-1.5 text-sm md:text-xs font-medium text-[var(--success)] transition-[filter] motion-reduce:transition-none hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
           >
             <CheckIcon className="h-3.5 w-3.5" />
             Apply {operations.length} change{operations.length === 1 ? "" : "s"}
           </button>
           <button
             onClick={onReject}
-            className="flex items-center gap-1 rounded-md bg-[var(--surface-2)] px-3 py-1.5 text-xs text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+            className="tap flex items-center gap-1 rounded-md bg-[var(--surface-2)] px-3 py-1.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
           >
             <XIcon className="h-3.5 w-3.5" />
             Skip

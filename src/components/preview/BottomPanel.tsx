@@ -65,7 +65,7 @@ export function BottomPanel() {
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors ${
+              className={`tap inline-flex items-center px-3 py-2 text-sm md:text-xs font-medium border-b-2 transition-colors ${
                 tab === t.key
                   ? "border-[var(--accent)] text-[var(--text)]"
                   : "border-transparent text-[var(--text-faint)] hover:text-[var(--text-dim)]"
@@ -83,14 +83,14 @@ export function BottomPanel() {
         <div className="flex items-center gap-1 py-1">
           <button
             onClick={run}
-            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--success-soft)] text-[var(--success)] hover:brightness-95 font-medium"
+            className="tap flex items-center gap-1 text-sm md:text-xs px-3 py-1.5 rounded-md bg-[var(--success-soft)] text-[var(--success)] hover:brightness-95 font-medium"
           >
             <PlayIcon className="w-3.5 h-3.5" /> {t("studio.run")}
           </button>
           <button
             onClick={refresh}
             title={t("studio.refresh")}
-            className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-faint)]"
+            className="tap-sq inline-flex items-center justify-center p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-faint)]"
           >
             <RefreshIcon className="w-3.5 h-3.5" />
           </button>

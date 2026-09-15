@@ -44,7 +44,7 @@ export function MessageActions({
   ];
 
   return (
-    <div className="mt-3 flex flex-wrap gap-1.5">
+    <div className="mt-3 flex flex-wrap gap-2 sm:gap-1.5">
       {actions
         .filter((a) => a.show)
         .map((a) => (
@@ -52,7 +52,11 @@ export function MessageActions({
             key={a.key}
             onClick={() => onAction(a.key)}
             disabled={disabled}
-            className="rounded-full border border-[var(--line)] px-3 py-1.5 text-xs text-[var(--text-dim)] transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-40"
+            // These are the buttons a stuck student reaches for, so they are
+            // the last thing that should be fiddly. 44px tall and 14px type on
+            // a phone; the old 30px/12px read fine at desk distance and not at
+            // all at arm's length on a bus.
+            className="tap inline-flex items-center rounded-full border border-[var(--line)] px-4 py-1.5 text-sm text-[var(--text-dim)] transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-40 sm:px-3 md:text-xs"
           >
             {a.label}
           </button>

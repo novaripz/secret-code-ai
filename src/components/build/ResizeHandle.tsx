@@ -28,6 +28,9 @@ interface ResizeHandleProps {
   onDrag: (delta: number) => void;
   /** Keyboard nudge, in pixels, positive meaning right or down. */
   onNudge: (step: number) => void;
+  /** Extra classes, so a caller can drop the handle at a breakpoint where the
+   *  panes it divides are no longer side by side. */
+  className?: string;
 }
 
 export function ResizeHandle({
@@ -39,6 +42,7 @@ export function ResizeHandle({
   onDragStart,
   onDrag,
   onNudge,
+  className = "",
 }: ResizeHandleProps) {
   const vertical = orientation === "vertical";
   const origin = useRef(0);
@@ -103,7 +107,7 @@ export function ResizeHandle({
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
       onKeyDown={keyDown}
-      className={`group relative z-10 shrink-0 touch-none bg-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
+      className={`group relative z-10 shrink-0 touch-none bg-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${className} ${
         vertical ? "w-1.5 cursor-col-resize" : "h-1.5 cursor-row-resize"
       }`}
     >

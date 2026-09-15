@@ -118,7 +118,7 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
         <button
           type="submit"
           disabled={busy || !email.trim() || password.length < 6}
-          className="rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity disabled:opacity-40"
+          className="tap inline-flex items-center rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity disabled:opacity-40"
         >
           {busy ? t("auth.oneMoment") : t(creating ? "auth.createAccount" : "auth.signIn")}
         </button>
@@ -144,7 +144,7 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
       <button
         onClick={signInWithGoogle}
         disabled={busy}
-        className="rounded-xl border border-[var(--line-strong)] px-4 py-2.5 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-40"
+        className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-4 py-2.5 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-40"
       >
         {t("auth.continueWithGoogle")}
       </button>

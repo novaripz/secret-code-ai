@@ -25,11 +25,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     if (!hydrated) hydrate();
   }, [hydrated, hydrate]);
 
-  if (!hydrated) return <div className="h-screen bg-[var(--bg)]" />;
+  if (!hydrated) return <div className="h-dvh bg-[var(--bg)]" />;
 
   if (!account && !isGuest()) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-8 bg-[var(--bg)] px-4">
+      <div className="flex h-dvh flex-col items-center justify-center gap-8 bg-[var(--bg)] px-4">
         <Wordmark size="lg" />
 
         <div className="w-full max-w-[19rem] animate-rise text-center">
@@ -45,7 +45,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 window.localStorage.setItem(GUEST_KEY, "1");
                 window.location.reload();
               }}
-              className="text-sm text-[var(--text-faint)] underline-offset-4 hover:text-[var(--text-dim)] hover:underline"
+              className="tap inline-flex items-center justify-center px-3 text-sm text-[var(--text-faint)] underline-offset-4 hover:text-[var(--text-dim)] hover:underline"
             >
               {t("auth.continueAsGuest")}
             </button>

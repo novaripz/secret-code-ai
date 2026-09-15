@@ -65,7 +65,7 @@ export function AssignmentResources({ assignmentId }: { assignmentId: string }) 
               href={r.url}
               target="_blank"
               rel="noreferrer"
-              className="flex items-baseline justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface-0)] px-3.5 py-2.5 text-sm text-[var(--text)] transition-colors hover:border-[var(--line-strong)]"
+              className="tap flex items-baseline justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface-0)] px-3.5 py-2.5 text-sm text-[var(--text)] transition-colors hover:border-[var(--line-strong)]"
             >
               <span className="min-w-0 flex-1 truncate">{r.label}</span>
               <span className="shrink-0 text-xs text-[var(--text-faint)]">{t("resources.open")}</span>

@@ -111,7 +111,7 @@ export function Sources({ items }: { items: Source[] }) {
       <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">
         {t("chat.sourcesTitle")}
       </h3>
-      <ul className="flex flex-col gap-1.5">
+      <ul className="flex flex-col gap-0.5 sm:gap-1.5">
         {items.map((s, i) => (
           <li key={`${s.url}-${i}`}>
             <a
@@ -121,7 +121,7 @@ export function Sources({ items }: { items: Source[] }) {
               // The label names the destination, because "read more" repeated
               // five times is useless to anyone listing the links on a page.
               aria-label={t("chat.sourceLink", { title: s.title, domain: domainOf(s.url) })}
-              className="group flex items-baseline gap-2 rounded-md text-[13px] text-[var(--text-dim)] transition-colors hover:text-[var(--text)]"
+              className="tap group flex items-center gap-2 break-words rounded-md py-1 text-[13px] text-[var(--text-dim)] transition-colors hover:text-[var(--text)]"
             >
               <span className="shrink-0 tabular-nums text-[var(--text-faint)]">{i + 1}.</span>
               <span className="min-w-0">

@@ -208,7 +208,7 @@ export function EnglishOffer() {
         <button
           onClick={() => decide("declined")}
           aria-label={t("english.offerDismiss")}
-          className="-m-1 shrink-0 rounded-lg p-1 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          className="tap-sq inline-flex items-center justify-center -m-1 shrink-0 rounded-lg p-1 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
         >
           <XIcon className="h-4 w-4" />
         </button>
@@ -220,13 +220,13 @@ export function EnglishOffer() {
       <div className="mt-4 flex flex-wrap justify-end gap-2">
         <button
           onClick={() => decide("declined")}
-          className="rounded-full px-4 py-2 text-sm font-medium text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          className="tap inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
         >
           {t("english.offerDecline", { language: currentName })}
         </button>
         <button
           onClick={() => decide("accepted")}
-          className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          className="tap inline-flex items-center rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
         >
           {t("english.offerAccept")}
         </button>

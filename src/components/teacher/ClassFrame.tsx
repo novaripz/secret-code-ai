@@ -98,7 +98,7 @@ export function ClassFrame({ classId, children }: { classId: string; children: R
                 key={label}
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                className={`tap inline-flex items-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm transition-colors ${
                   active
                     ? "bg-[var(--surface-2)] font-medium text-[var(--text)]"
                     : "text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"

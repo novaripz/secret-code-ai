@@ -183,7 +183,7 @@ export function RosterView({ classId }: { classId: string }) {
                       onClick={() => confirmRemove(s.id, s.displayName)}
                       aria-label={`Remove ${s.displayName} from this class`}
                       title={`Remove ${s.displayName}`}
-                      className="rounded-lg p-1.5 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--danger)]"
+                      className="tap-sq inline-flex items-center justify-center rounded-lg p-1.5 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--danger)]"
                     >
                       <TrashIcon className="h-4 w-4" />
                     </button>
@@ -220,7 +220,7 @@ export function RosterView({ classId }: { classId: string }) {
                   onClick={() => void cancelInvite(classId, i.id)}
                   aria-label={`Cancel the invite for ${i.email}`}
                   title="Cancel invite"
-                  className="rounded-lg p-1.5 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--danger)]"
+                  className="tap-sq inline-flex items-center justify-center rounded-lg p-1.5 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--danger)]"
                 >
                   <TrashIcon className="h-4 w-4" />
                 </button>

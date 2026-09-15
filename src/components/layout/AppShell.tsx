@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { useTeacherStore } from "@/components/teacher/store";
@@ -55,24 +55,87 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { t } = useI18n();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const section = here(pathname);
+  const asideRef = useRef<HTMLElement>(null);
+  const openerRef = useRef<HTMLButtonElement>(null);
+
+  // The drawer is a modal on a phone, so it has to behave like one: Escape
+  // closes it, focus starts inside it, Tab cannot walk out of it, and closing
+  // puts focus back on the button that opened it. Without the last part a
+  // keyboard or screen-reader user is dropped at the top of the document every
+  // time they dismiss the menu.
+  //
+  // All of it is skipped above `md`, where the sidebar is not a drawer at all
+  // but a permanent column — trapping focus in a column nobody opened would be
+  // a bug, not a feature.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const aside = asideRef.current;
+    // Captured now rather than read in the cleanup: by the time the cleanup
+    // runs React may have re-rendered the header and the ref would point at a
+    // different node (or none), which is exactly the lint rule's complaint.
+    const opener = openerRef.current;
+    aside?.querySelector<HTMLElement>("a, button")?.focus();
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setSidebarOpen(false);
+        return;
+      }
+      if (e.key !== "Tab" || !aside) return;
+      // `visibility: hidden` already keeps the closed drawer out of the tab
+      // order; this is only about the open one, so a plain query is enough.
+      const focusable = aside.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      opener?.focus();
+    };
+  }, [sidebarOpen]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg)] text-[var(--text)]">
-      {/* Mobile drawer scrim */}
+    // h-dvh, not h-screen: `vh` on a mobile browser is measured against the
+    // viewport with the URL bar HIDDEN, so a 100vh app column is taller than
+    // the screen and the composer pinned to its bottom sits under the chrome.
+    // `dvh` tracks the space actually available, including when the keyboard
+    // takes half of it.
+    <div className="flex h-dvh overflow-hidden bg-[var(--bg)] text-[var(--text)]">
+      {/* Mobile drawer scrim. `touch-none` so a drag on the scrim dismisses
+          rather than scrolling the page it is covering. */}
       {sidebarOpen && (
         <button
           aria-label={t("nav.closeMenu")}
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          className="fixed inset-0 z-30 touch-none bg-black/50 md:hidden"
         />
       )}
 
       <a href="#main" className="skip-link">{t("nav.skipToContent")}</a>
 
       <aside
+        ref={asideRef}
         aria-label={t("nav.sidebar")}
-        className={`fixed inset-y-0 left-0 z-40 w-64 shrink-0 border-r border-[var(--line)] bg-[var(--surface-0)] transition-transform md:static md:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        // `invisible` is doing real work, not decoration. A drawer parked
+        // off-screen with `-translate-x-full` is still focusable, so before
+        // this a phone user tabbing from the header walked through the entire
+        // chat list they could not see. visibility:hidden removes it from the
+        // tab order and still animates.
+        className={`fixed inset-y-0 left-0 z-40 w-[min(19rem,85vw)] shrink-0 border-r border-[var(--line)] bg-[var(--surface-0)] transition-transform md:visible md:static md:w-64 md:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "invisible -translate-x-full"
         }`}
       >
         {/* Any click that lands on a link inside also closes the mobile drawer. */}
@@ -82,18 +145,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-[var(--line)] px-3">
+        <header className="flex h-14 shrink-0 items-center gap-1 border-b border-[var(--line)] px-2 md:px-3">
           <button
+            ref={openerRef}
             onClick={() => setSidebarOpen(true)}
             aria-label={t("nav.openMenu")}
-            className="rounded-lg p-2 text-[var(--text-dim)] hover:bg-[var(--surface-2)] md:hidden"
+            aria-expanded={sidebarOpen}
+            className="tap-sq flex items-center justify-center rounded-lg px-2 text-[var(--text-dim)] hover:bg-[var(--surface-2)] md:hidden"
           >
-            <MenuIcon className="h-5 w-5" />
+            <MenuIcon className="h-6 w-6 md:h-5 md:w-5" />
           </button>
 
           {/* Navigation lives in the sidebar now, so the header just carries
               the current place and the theme switch. */}
-          <span className="text-sm font-medium text-[var(--text-dim)]">{section ? t(section) : "Panda"}</span>
+          <span className="truncate px-1 text-[15px] font-medium text-[var(--text-dim)] md:text-sm">
+            {section ? t(section) : "Panda"}
+          </span>
 
           <div className="ml-auto">
             <ThemeToggle />
@@ -123,9 +190,9 @@ function ThemeToggle() {
       onClick={toggleTheme}
       title={label}
       aria-label={label}
-      className="rounded-full p-2 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+      className="tap-sq flex items-center justify-center rounded-full p-2 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
     >
-      {dark ? <SunIcon className="h-4.5 w-4.5" /> : <MoonIcon className="h-4.5 w-4.5" />}
+      {dark ? <SunIcon className="h-5 w-5 md:h-4.5 md:w-4.5" /> : <MoonIcon className="h-5 w-5 md:h-4.5 md:w-4.5" />}
     </button>
   );
 }
@@ -153,13 +220,13 @@ function TeacherLink() {
   return (
     <Link
       href="/teacher"
-      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors ${
+      className={`tap flex items-center gap-3 rounded-lg px-2.5 py-2 text-[15px] transition-colors md:gap-2.5 md:text-sm ${
         active
           ? "bg-[var(--surface-2)] text-[var(--text)]"
           : "text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
       }`}
     >
-      <UserIcon className="h-4 w-4" />
+      <UserIcon className="h-5 w-5 shrink-0 md:h-4 md:w-4" />
       Teacher
     </Link>
   );
@@ -204,17 +271,17 @@ function Sidebar({ onClose }: { onClose: () => void }) {
   const name = profileHydrated ? displayName() : "";
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pt-[env(safe-area-inset-top)] md:p-0">
       <div className="flex items-center gap-2 px-3 py-3">
-        <Link href="/" className="min-w-0">
+        <Link href="/" className="tap inline-flex min-w-0 items-center">
           <Wordmark />
         </Link>
         <button
           onClick={onClose}
           aria-label={t("nav.closeMenu")}
-          className="ml-auto rounded-lg p-1.5 text-[var(--text-faint)] hover:bg-[var(--surface-2)] md:hidden"
+          className="tap-sq ml-auto flex items-center justify-center rounded-lg p-1.5 text-[var(--text-faint)] hover:bg-[var(--surface-2)] md:hidden"
         >
-          <XIcon className="h-4 w-4" />
+          <XIcon className="h-5 w-5" />
         </button>
       </div>
 
@@ -222,7 +289,7 @@ function Sidebar({ onClose }: { onClose: () => void }) {
         <Link
           href="/"
           onClick={() => newThread()}
-          className="flex w-full items-center gap-2 rounded-xl border border-[var(--line-strong)] px-3 py-2.5 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-2)]"
+          className="tap justify-center flex w-full items-center gap-2 rounded-xl border border-[var(--line-strong)] px-3 py-2.5 text-[15px] font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-2)] md:text-sm"
         >
           <PlusIcon className="h-4 w-4" />
           {t("nav.newChat")}
@@ -237,27 +304,27 @@ function Sidebar({ onClose }: { onClose: () => void }) {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors ${
+              className={`tap flex items-center gap-3 rounded-lg px-2.5 py-2 text-[15px] transition-colors md:gap-2.5 md:text-sm ${
                 active
                   ? "bg-[var(--surface-2)] text-[var(--text)]"
                   : "text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
               }`}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-5 w-5 shrink-0 md:h-4 md:w-4" />
               {t(label)}
             </Link>
           );
         })}
       </nav>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-2">
         {threads.length === 0 ? (
-          <p className="px-2 py-3 text-xs leading-relaxed text-[var(--text-faint)]">
+          <p className="px-2 py-3 text-sm leading-relaxed text-[var(--text-faint)] md:text-xs">
             {t("chats.empty")}
           </p>
         ) : (
           <>
-            <p className="px-2 pb-1.5 text-[11px] font-medium uppercase tracking-wide text-[var(--text-faint)]">
+            <p className="px-2 pb-1.5 text-xs font-medium uppercase tracking-wide text-[var(--text-faint)] md:text-[11px]">
               {t("nav.chats")}
             </p>
             {threads.map((thread) => {
@@ -272,24 +339,31 @@ function Sidebar({ onClose }: { onClose: () => void }) {
                   <Link
                     href="/"
                     onClick={() => void openThread(thread.id)}
-                    className="min-w-0 flex-1 truncate px-2 py-2 text-sm text-[var(--text-dim)]"
+                    className="tap flex min-w-0 flex-1 items-center truncate px-2 py-2 text-[15px] text-[var(--text-dim)] md:text-sm"
                     title={thread.title}
                   >
                     {thread.title}
                   </Link>
+                  {/* max-md:opacity-100 is the whole point of this row.
+                      Rename and delete used to appear on hover, and a phone has
+                      no hover — the only way to rename a chat was to find a
+                      laptop. They are always visible below `md`, and the drawn
+                      icon stays small while `tap-pad` gives each one a 44px
+                      catchment, because widening them for real would push the
+                      title out of a 19rem drawer. */}
                   <button
                     onClick={() => void handleRename(thread.id, thread.title)}
                     aria-label={t("chats.renameLabel", { title: thread.title })}
-                    className="rounded p-1 text-[var(--text-faint)] opacity-0 hover:text-[var(--text)] focus:opacity-100 group-hover:opacity-100"
+                    className="tap-pad rounded p-1 text-[var(--text-faint)] opacity-0 hover:text-[var(--text)] focus:opacity-100 group-hover:opacity-100 max-md:opacity-100"
                   >
-                    <PencilIcon className="h-3.5 w-3.5" />
+                    <PencilIcon className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => void handleDelete(thread.id, thread.title)}
                     aria-label={t("chats.deleteLabel", { title: thread.title })}
-                    className="rounded p-1 text-[var(--text-faint)] opacity-0 hover:text-[var(--danger)] focus:opacity-100 group-hover:opacity-100"
+                    className="tap-pad rounded p-1 text-[var(--text-faint)] opacity-0 hover:text-[var(--danger)] focus:opacity-100 group-hover:opacity-100 max-md:opacity-100"
                   >
-                    <TrashIcon className="h-3.5 w-3.5" />
+                    <TrashIcon className="h-4 w-4" />
                   </button>
                 </div>
               );
@@ -300,7 +374,7 @@ function Sidebar({ onClose }: { onClose: () => void }) {
 
       <button
         onClick={() => setReporting(true)}
-        className="mx-2 rounded-lg px-2.5 py-1.5 text-left text-[11px] text-[var(--text-faint)] transition-colors hover:text-[var(--text-dim)]"
+        className="tap inline-flex items-center mx-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[var(--text-faint)] transition-colors hover:text-[var(--text-dim)] md:text-[11px]"
       >
         {t("report.title")}
       </button>
@@ -320,7 +394,7 @@ function Sidebar({ onClose }: { onClose: () => void }) {
         </span>
         <span className="min-w-0">
           <span className="block truncate text-sm font-medium text-[var(--text)]">{name || t("nav.yourProfile")}</span>
-          <span className="block text-[11px] text-[var(--text-faint)]">{t("nav.settingsAndMemory")}</span>
+          <span className="block text-[13px] text-[var(--text-faint)] md:text-[11px]">{t("nav.settingsAndMemory")}</span>
         </span>
       </Link>
     </div>

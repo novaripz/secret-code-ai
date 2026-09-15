@@ -171,7 +171,7 @@ export function Onboarding() {
                     <button
                       key={value}
                       onClick={() => toggleLike(value)}
-                      className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+                      className={`tap inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
                         on
                           ? "border-transparent bg-[var(--accent)] text-[var(--accent-contrast)]"
                           : "border-[var(--line-strong)] text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
@@ -224,7 +224,7 @@ export function Onboarding() {
             {step > 0 && (
               <button
                 onClick={() => setStep((s) => (s - 1) as Step)}
-                className="rounded-full px-4 py-2 text-sm text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
+                className="tap inline-flex items-center rounded-full px-4 py-2 text-sm text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
               >
                 {t("action.back")}
               </button>
@@ -232,7 +232,7 @@ export function Onboarding() {
             <button
               onClick={() => (step === 4 ? finish() : setStep((s) => (s + 1) as Step))}
               disabled={!canContinue}
-              className="rounded-full bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-30"
+              className="tap inline-flex items-center rounded-full bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-[var(--accent-contrast)] disabled:opacity-30"
             >
               {step === 4
                 ? firstName

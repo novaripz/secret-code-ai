@@ -135,17 +135,30 @@ export function Workspace() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-[var(--bg)] text-[var(--text)]">
+    <div className="flex h-dvh flex-col bg-[var(--bg)] text-[var(--text)]">
       <TopBar />
 
-      <div className="flex min-h-0 flex-1">
+      {/* `relative` is what makes the phone layout below possible: the side
+          panes become absolutely-positioned overlays inside this box rather
+          than columns competing for a 360px row. */}
+      <div className="relative flex min-h-0 flex-1">
         {/* Sidebar column: Files above History. */}
         {(visible.files || visible.history) && (
           <>
+            {/* PHONE: one pane at a time.
+                On a laptop this is a column in a row of columns, and the
+                dragged width is what the student set. On a phone, three
+                columns plus two splitters inside 360px gave every pane about
+                a hundred usable pixels — which is how the old single-panel
+                phone layout got lost. Below `md` this becomes a full-screen
+                overlay over the editor instead, driven by exactly the same
+                visibility toggles: open it to use it, close it to get back.
+                The width lives in a custom property so the class can override
+                it below `md`; an inline `width` would win over any class. */}
             <div
               ref={sidebarRef}
-              className="flex min-h-0 flex-col"
-              style={{ width: layout.sidebarWidth, flex: "0 0 auto" }}
+              className="absolute inset-0 z-30 flex min-h-0 w-full flex-col bg-[var(--bg)] md:static md:z-auto md:w-[var(--pane-w)] md:bg-transparent"
+              style={{ "--pane-w": `${layout.sidebarWidth}px`, flex: "0 0 auto" } as React.CSSProperties}
             >
               {visible.files && (
                 <div
@@ -166,6 +179,7 @@ export function Workspace() {
 
               {bothSidebarPanes && (
                 <ResizeHandle
+                  className="hidden md:block"
                   orientation="horizontal"
                   label="Resize the files list against your history"
                   value={Math.round(layout.filesRatio * 100)}
@@ -208,6 +222,7 @@ export function Workspace() {
             </div>
 
             <ResizeHandle
+              className="hidden md:block"
               orientation="vertical"
               label="Resize the files column"
               value={layout.sidebarWidth}
@@ -238,6 +253,7 @@ export function Workspace() {
           {bothCenterPanes && (
             <>
               <ResizeHandle
+                className="hidden md:block"
                 orientation="horizontal"
                 label="Resize the editor against the preview"
                 value={Math.round(layout.editorRatio * 100)}
@@ -277,6 +293,7 @@ export function Workspace() {
         {visible.chat && (
           <>
             <ResizeHandle
+              className="hidden md:block"
               orientation="vertical"
               label="Resize the chat"
               value={layout.chatWidth}
@@ -290,8 +307,8 @@ export function Workspace() {
               onNudge={(step) => layout.setChatWidth(layout.chatWidth - step)}
             />
             <div
-              className="flex min-h-0 flex-col"
-              style={{ width: layout.chatWidth, flex: "0 0 auto" }}
+              className="absolute inset-0 z-30 flex min-h-0 w-full flex-col bg-[var(--bg)] md:static md:z-auto md:w-[var(--pane-w)] md:bg-transparent"
+              style={{ "--pane-w": `${layout.chatWidth}px`, flex: "0 0 auto" } as React.CSSProperties}
             >
               <Pane title="Agent" closeLabel="Close the chat with Panda" onClose={() => layout.close("chat")}>
                 <div className="h-full min-h-0">
@@ -317,7 +334,7 @@ export function Workspace() {
                 aria-pressed={open}
                 aria-label={open ? `Hide ${label}` : `Show ${label}`}
                 title={open ? `Hide ${label}` : `Show ${label}`}
-                className={`rounded-lg p-2 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
+                className={`tap-sq inline-flex items-center justify-center rounded-lg p-2 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
                   open
                     ? "bg-[var(--surface-2)] text-[var(--text)]"
                     : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)]"
@@ -334,7 +351,7 @@ export function Workspace() {
             onClick={() => setPaletteOpen(true)}
             aria-label="Find a file or run a command"
             title="Find a file or run a command (Ctrl K)"
-            className="rounded-lg p-2 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+            className="tap-sq inline-flex items-center justify-center rounded-lg p-2 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
           >
             <CommandIcon className="h-4 w-4" />
           </button>
@@ -343,7 +360,7 @@ export function Workspace() {
             onClick={() => layout.reset()}
             aria-label="Reset the layout back to normal"
             title="Reset the layout back to normal"
-            className="rounded-lg p-2 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+            className="tap-sq inline-flex items-center justify-center rounded-lg p-2 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
           >
             <CodeIcon className="h-4 w-4" />
           </button>

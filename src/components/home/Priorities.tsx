@@ -78,7 +78,7 @@ export function Priorities() {
         <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-faint)]">
           {t("plan.title")}
         </p>
-        <Link href="/plan" className="text-xs text-[var(--text-faint)] underline-offset-4 hover:text-[var(--text-dim)] hover:underline">
+        <Link href="/plan" className="text-sm md:text-xs text-[var(--text-faint)] underline-offset-4 hover:text-[var(--text-dim)] hover:underline">
           {t("plan.make")}
         </Link>
       </div>
@@ -88,7 +88,7 @@ export function Priorities() {
           <Link
             key={a.id}
             href={`/classes/${a.classId}/${a.id}`}
-            className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface-0)] px-3.5 py-2.5 transition-colors hover:border-[var(--line-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+            className="tap flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface-0)] px-3.5 py-2.5 transition-colors hover:border-[var(--line-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
           >
             <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: dot(a) }} />
             <span className="min-w-0 flex-1 truncate text-sm text-[var(--text)]">{a.title}</span>

@@ -55,7 +55,7 @@ export function SettingsView() {
             <button
               key={key}
               onClick={() => setSection(key)}
-              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+              className={`tap flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
                 section === key
                   ? "bg-[var(--surface-2)] text-[var(--text)]"
                   : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)]"
@@ -166,7 +166,7 @@ function ProfileSection() {
               <button
                 onClick={() => removeLike(like)}
                 aria-label={t("settings.removeLike", { like })}
-                className="rounded-full p-0.5 text-[var(--text-faint)] hover:text-[var(--text)]"
+                className="tap-sq inline-flex items-center justify-center rounded-full p-0.5 text-[var(--text-faint)] hover:text-[var(--text)]"
               >
                 <XIcon className="h-3 w-3" />
               </button>
@@ -276,7 +276,7 @@ function AppearanceSection() {
               <button
                 key={key}
                 onClick={() => setAppearance({ textSize: key })}
-                className={`rounded-xl border px-4 py-2.5 text-sm transition-colors ${
+                className={`tap inline-flex items-center rounded-xl border px-4 py-2.5 text-sm transition-colors ${
                   active
                     ? "border-[var(--text)] bg-[var(--surface-2)] font-medium text-[var(--text)]"
                     : "border-[var(--line)] text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
@@ -375,7 +375,7 @@ function MemorySection() {
               <button
                 onClick={() => removeMemory(fact.id)}
                 aria-label={t("settings.forgetThis")}
-                className="rounded p-1 text-[var(--text-faint)] hover:text-[var(--danger)]"
+                className="tap-sq inline-flex items-center justify-center rounded p-1 text-[var(--text-faint)] hover:text-[var(--danger)]"
               >
                 <XIcon className="h-3.5 w-3.5" />
               </button>
@@ -388,13 +388,13 @@ function MemorySection() {
         <button
           onClick={handleClear}
           disabled={memory.length === 0}
-          className="rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--danger)] hover:bg-[var(--surface-2)] disabled:opacity-30"
+          className="tap inline-flex items-center rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--danger)] hover:bg-[var(--surface-2)] disabled:opacity-30"
         >
           {t("settings.clearMemories")}
         </button>
         <button
           onClick={resetOnboarding}
-          className="rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
+          className="tap inline-flex items-center rounded-full border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
         >
           {t("settings.redoSetup")}
         </button>

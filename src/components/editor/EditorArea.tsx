@@ -23,7 +23,7 @@ export function EditorArea() {
           <button
             key={tab.path}
             onClick={() => setActiveTab(tab.path)}
-            className={`group flex items-center gap-2 px-3 py-2 text-sm border-r border-[var(--line)] whitespace-nowrap ${
+            className={`tap group flex items-center gap-2 px-3 py-2 text-sm border-r border-[var(--line)] whitespace-nowrap ${
               activeTab === tab.path
                 ? "bg-[var(--surface-1)] text-[var(--text)]"
                 : "text-[var(--text-faint)] hover:text-[var(--text-dim)] hover:bg-[var(--surface-2)]"

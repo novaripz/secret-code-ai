@@ -137,7 +137,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
               {pending.kind !== "alert" && (
                 <button
                   onClick={cancel}
-                  className="rounded-full px-4 py-2 text-sm font-medium text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
+                  className="tap inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
                 >
                   {pending.cancelLabel ?? t("action.cancel")}
                 </button>
@@ -146,7 +146,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
                 autoFocus={pending.kind !== "prompt"}
                 onClick={submit}
                 onKeyDown={(e) => e.key === "Escape" && cancel()}
-                className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                className={`tap inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${
                   pending.danger
                     ? "bg-[var(--danger)] text-white hover:opacity-90"
                     : "bg-[var(--accent)] text-[var(--accent-contrast)] hover:opacity-90"

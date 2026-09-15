@@ -123,7 +123,7 @@ export function DeactivateTeacherSection() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="mt-3 rounded-xl border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)]"
+          className="tap inline-flex items-center mt-3 rounded-xl border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)]"
           style={{ borderColor: "var(--danger)", color: "var(--danger)" }}
         >
           {t("teacherOff.start")}
@@ -199,7 +199,7 @@ export function DeactivateTeacherSection() {
               // last check, not the only one: the function refuses anything but
               // a demotion whatever this form sends.
               disabled={busy || phrase !== CONFIRM_PHRASE}
-              className="rounded-xl px-3.5 py-2 text-sm font-medium text-[var(--accent-contrast)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-50"
+              className="tap inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-medium text-[var(--accent-contrast)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-50"
               style={{ background: "var(--danger)" }}
             >
               {busy ? t("teacherOff.working") : t("teacherOff.submit")}
@@ -212,7 +212,7 @@ export function DeactivateTeacherSection() {
                 setError(null);
               }}
               disabled={busy}
-              className="rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:border-[var(--focus)] hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-50"
+              className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:border-[var(--focus)] hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-50"
             >
               {t("teacherOff.cancel")}
             </button>

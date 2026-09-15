@@ -127,11 +127,13 @@ export function SectionHeading({
   );
 }
 
+// Every teacher button funnels through these two, so the 44px phone floor is
+// applied once here rather than at each of the forty call sites.
 export const buttonClass =
-  "inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-3.5 py-2 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity hover:opacity-90 disabled:opacity-50";
+  "tap inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-3.5 py-2 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity hover:opacity-90 disabled:opacity-50";
 
 export const quietButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]";
+  "tap inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]";
 
 /**
  * Tables and anything else that can outgrow a phone get their own scroller, so
@@ -140,7 +142,7 @@ export const quietButtonClass =
 export function Scroller({ children }: { children: React.ReactNode }) {
   // No negative margin here: bleeding past the padded column is what makes
   // the *page* scroll sideways, which is the exact thing this is meant to stop.
-  return <div className="max-w-full overflow-x-auto">{children}</div>;
+  return <div className="scroll-x max-w-full">{children}</div>;
 }
 
 /**
@@ -212,7 +214,7 @@ export function ActionErrorNote({ error, onDismiss }: { error: string | null; on
       style={{ borderColor: "var(--danger)", background: "var(--danger-soft)", color: "var(--danger)" }}
     >
       <span className="min-w-0 flex-1 leading-relaxed">{error} Nothing was saved.</span>
-      <button onClick={onDismiss} className="shrink-0 text-xs underline underline-offset-4">
+      <button onClick={onDismiss} className="shrink-0 text-sm md:text-xs underline underline-offset-4">
         Dismiss
       </button>
     </div>

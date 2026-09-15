@@ -116,6 +116,29 @@ export function Composer({
     el.style.height = `${Math.min(el.scrollHeight, 224)}px`;
   }
 
+  /**
+   * Keep the composer above the on-screen keyboard.
+   *
+   * Chromium honours `interactiveWidget: resizes-content` (set in the root
+   * layout), so there the dvh column shrinks and the composer is already where
+   * it should be. iOS Safari does not: it leaves the layout viewport alone and
+   * slides the keyboard over the bottom of the page, which on a chat screen is
+   * precisely the input the student just tapped.
+   *
+   * The rAF-after-timeout is not superstition. The keyboard animates in over
+   * roughly 250ms and the visual viewport is not final until it has settled, so
+   * scrolling immediately scrolls to the pre-keyboard geometry and lands in the
+   * wrong place. `block: "end"` keeps the last message visible above the input
+   * rather than centring the composer in what is left.
+   */
+  function keepVisible() {
+    const el = textareaRef.current;
+    if (!el) return;
+    window.setTimeout(() => {
+      requestAnimationFrame(() => el.scrollIntoView({ block: "end", behavior: "smooth" }));
+    }, 300);
+  }
+
   const canSend = !disabled && !loading && (value.trim().length > 0 || attachments.length > 0);
 
   return (
@@ -150,7 +173,7 @@ export function Composer({
           </div>
         )}
 
-        <div className="flex items-end gap-1.5 p-2.5">
+        <div className="flex items-end gap-0.5 p-2 sm:gap-1.5 sm:p-2.5">
           <input
             ref={fileInputRef}
             type="file"
@@ -215,6 +238,7 @@ export function Composer({
                 void ingest(files);
               }
             }}
+            onFocus={keepVisible}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -224,7 +248,11 @@ export function Composer({
                 }
               }
             }}
-            className="max-h-56 flex-1 resize-none bg-transparent px-1.5 py-2 text-[15px] leading-relaxed text-[var(--text)] outline-none placeholder:text-[var(--text-faint)] disabled:opacity-50"
+            // 16px, not the 15px this was. Below 16 iOS zooms the page the
+            // instant the field takes focus and never zooms back out, leaving
+            // the student panning a composer that no longer fits the screen.
+            // One pixel, and it was the difference between usable and not.
+            className="max-h-56 min-w-0 flex-1 resize-none bg-transparent px-1.5 py-2.5 text-[16px] leading-relaxed text-[var(--text)] outline-none placeholder:text-[var(--text-faint)] disabled:opacity-50"
           />
 
           <button
@@ -234,18 +262,18 @@ export function Composer({
             }}
             disabled={!canSend}
             aria-label={t("composer.send")}
-            className="mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] transition-opacity hover:opacity-90 disabled:opacity-25"
+            className="mb-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-contrast)] transition-opacity hover:opacity-90 disabled:opacity-25 md:h-9 md:w-9"
           >
             {loading ? (
               <span className="h-3 w-3 rounded-sm bg-current" />
             ) : (
-              <SendIcon className="h-4 w-4" />
+              <SendIcon className="h-5 w-5 md:h-4 md:w-4" />
             )}
           </button>
         </div>
       </div>
 
-      {error && <p className="mt-2 px-2 text-xs text-[var(--danger)]">{error}</p>}
+      {error && <p className="mt-2 px-2 text-sm text-[var(--danger)] md:text-xs">{error}</p>}
       {footer && <div className="mt-3">{footer}</div>}
     </div>
   );
@@ -269,7 +297,10 @@ function IconButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] disabled:opacity-30"
+      // 44px square on a phone, the 36px it always was from `sm` up. Three of
+      // these plus a send button have to share a 360px row with the text, so
+      // the gap between them shrinks instead of the buttons.
+      className="mb-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] disabled:opacity-30 md:h-9 md:w-9"
     >
       {children}
     </button>
@@ -280,7 +311,7 @@ function AttachmentChip({ attachment, onRemove }: { attachment: Attachment; onRe
   const { t } = useI18n();
 
   return (
-    <div className="group relative flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-1.5 pr-7">
+    <div className="group relative flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-1.5 pr-8">
       {attachment.kind === "image" && attachment.dataUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={attachment.dataUrl} alt={attachment.name} className="h-10 w-10 rounded-lg object-cover" />
@@ -290,15 +321,19 @@ function AttachmentChip({ attachment, onRemove }: { attachment: Attachment; onRe
         </span>
       )}
       <div className="min-w-0 max-w-[10rem]">
-        <p className="truncate text-xs font-medium text-[var(--text)]">{attachment.name}</p>
-        <p className="text-[11px] text-[var(--text-faint)]">{formatSize(attachment.size)}</p>
+        <p className="truncate text-[13px] font-medium text-[var(--text)]">{attachment.name}</p>
+        <p className="text-xs text-[var(--text-faint)]">{formatSize(attachment.size)}</p>
       </div>
+      {/* `tap-pad`, not a bigger button. The × is pinned to the corner of a
+          chip barely 44px tall itself, so drawing it at 44 would cover the
+          filename it is meant to sit beside; the invisible pad catches the
+          thumb instead. */}
       <button
         onClick={onRemove}
         aria-label={t("composer.removeAttachment", { name: attachment.name })}
-        className="absolute right-1 top-1 rounded-full p-1 text-[var(--text-faint)] hover:bg-[var(--surface-3)] hover:text-[var(--text)]"
+        className="tap-pad absolute right-0.5 top-0.5 rounded-full p-1.5 text-[var(--text-faint)] hover:bg-[var(--surface-3)] hover:text-[var(--text)]"
       >
-        <XIcon className="h-3 w-3" />
+        <XIcon className="h-3.5 w-3.5" />
       </button>
     </div>
   );

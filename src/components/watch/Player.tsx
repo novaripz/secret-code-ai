@@ -58,7 +58,7 @@ export function Player({ video, saved, onSave, onRemove, onClose }: PlayerProps)
             onClick={() => (saved ? onRemove(video.id) : onSave(video))}
             aria-pressed={saved}
             aria-label={saved ? "Remove this video from saved" : "Save this video"}
-            className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-[13px] transition-colors ${
+            className={`tap flex items-center gap-1.5 rounded-xl border px-3 py-2 text-[13px] transition-colors ${
               saved
                 ? "border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--text)]"
                 : "border-[var(--line-strong)] text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
@@ -71,7 +71,7 @@ export function Player({ video, saved, onSave, onRemove, onClose }: PlayerProps)
             onClick={onClose}
             aria-label={t("watch.closePlayer")}
             title={t("watch.closePlayer")}
-            className="rounded-xl border border-[var(--line-strong)] p-2 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+            className="tap-sq inline-flex items-center justify-center rounded-xl border border-[var(--line-strong)] p-2 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
           >
             <XIcon className="h-4 w-4" />
           </button>

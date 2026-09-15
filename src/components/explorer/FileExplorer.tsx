@@ -170,13 +170,13 @@ function TreeNode({
             </span>
           )}
           <div className="hidden group-hover:flex items-center gap-0.5 shrink-0">
-            <button title={t("studio.newFile")} onClick={handleNewFile} className="p-0.5 hover:bg-[var(--surface-3)] rounded">
+            <button title={t("studio.newFile")} onClick={handleNewFile} className="tap-sq inline-flex items-center justify-center p-0.5 hover:bg-[var(--surface-3)] rounded">
               <PlusFileIcon className="w-3.5 h-3.5" />
             </button>
-            <button title={t("studio.newFolder")} onClick={handleNewFolder} className="p-0.5 hover:bg-[var(--surface-3)] rounded">
+            <button title={t("studio.newFolder")} onClick={handleNewFolder} className="tap-sq inline-flex items-center justify-center p-0.5 hover:bg-[var(--surface-3)] rounded">
               <PlusFolderIcon className="w-3.5 h-3.5" />
             </button>
-            <button title={t("action.delete")} onClick={handleDelete} className="p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)]">
+            <button title={t("action.delete")} onClick={handleDelete} className="tap-sq inline-flex items-center justify-center p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)]">
               <TrashIcon className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -241,7 +241,7 @@ function TreeNode({
       <button
         title={t("action.delete")}
         onClick={handleDelete}
-        className="hidden group-hover:block p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)] shrink-0"
+        className="tap-sq inline-flex items-center justify-center hidden group-hover:block p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)] shrink-0"
       >
         <TrashIcon className="w-3.5 h-3.5" />
       </button>
@@ -285,14 +285,14 @@ export function FileExplorer({ project, activePath }: { project: Project; active
           <button
             title={t("studio.newFile")}
             onClick={() => void createAtRoot("file")}
-            className="p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
+            className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
           >
             <PlusFileIcon className="w-4 h-4" />
           </button>
           <button
             title={t("studio.newFolder")}
             onClick={() => void createAtRoot("folder")}
-            className="p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
+            className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
           >
             <PlusFolderIcon className="w-4 h-4" />
           </button>

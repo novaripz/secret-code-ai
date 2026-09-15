@@ -94,13 +94,13 @@ function Focus({ title, minutes, onDone }: { title: string; minutes: number; onD
       <div className="mt-5 flex justify-center gap-2">
         <button
           onClick={() => setRunning((r) => !r)}
-          className="rounded-xl border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+          className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-4 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
         >
           {running ? t("focus.pause") : t("focus.start")}
         </button>
         <button
           onClick={onDone}
-          className="rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)]"
+          className="tap inline-flex items-center rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)]"
         >
           {t("focus.finish")}
         </button>
@@ -156,7 +156,7 @@ export default function PlanPage() {
                     key={m}
                     onClick={() => setMinutes(m)}
                     aria-pressed={minutes === m}
-                    className={`rounded-xl border px-3.5 py-2 text-sm transition-colors ${
+                    className={`tap inline-flex items-center rounded-xl border px-3.5 py-2 text-sm transition-colors ${
                       minutes === m
                         ? "border-[var(--text)] bg-[var(--surface-2)] font-medium text-[var(--text)]"
                         : "border-[var(--line)] text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
@@ -210,7 +210,7 @@ export default function PlanPage() {
                         onClick={() => setFocus({ title: item.assignment.title, minutes: item.minutes })}
                         aria-label={t("plan.startFocus")}
                         title={t("plan.startFocus")}
-                        className="rounded-lg p-1.5 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                        className="tap-sq inline-flex items-center justify-center rounded-lg p-1.5 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
                       >
                         <PlayIcon className="h-4 w-4" />
                       </button>
@@ -218,7 +218,7 @@ export default function PlanPage() {
                         onClick={() => setStatus(item.assignment.id, "done")}
                         aria-label={t("assignments.markDone")}
                         title={t("assignments.markDone")}
-                        className="rounded-lg p-1.5 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--success)]"
+                        className="tap-sq inline-flex items-center justify-center rounded-lg p-1.5 text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--success)]"
                       >
                         <CheckIcon className="h-4 w-4" />
                       </button>

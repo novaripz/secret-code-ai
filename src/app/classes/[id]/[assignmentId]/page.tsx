@@ -206,7 +206,7 @@ export default function AssignmentPage({
       <div className="flex h-full flex-col">
         <div className="shrink-0 border-b border-[var(--line)] px-4 py-4">
           <div className="mx-auto w-full max-w-3xl">
-            <Link href={`/classes/${cls.id}`} className="text-xs text-[var(--text-faint)] hover:text-[var(--text-dim)]">
+            <Link href={`/classes/${cls.id}`} className="text-sm md:text-xs text-[var(--text-faint)] hover:text-[var(--text-dim)]">
               ← {cls.name}
             </Link>
             <h1 className="mt-2 text-lg font-semibold tracking-tight text-[var(--text)]">{assignment.title}</h1>
@@ -220,7 +220,7 @@ export default function AssignmentPage({
               {assignment.points !== undefined && <span>{t("assignments.points", { points: assignment.points })}</span>}
               <button
                 onClick={() => setStatus(assignment.id, assignment.status === "done" ? "todo" : "done")}
-                className="rounded-full border border-[var(--line-strong)] px-2.5 py-1 transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                className="tap inline-flex items-center rounded-full border border-[var(--line-strong)] px-2.5 py-1 transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
               >
                 {assignment.status === "done" ? t("assignments.done") : t("assignments.markDone")}
               </button>
@@ -315,7 +315,7 @@ export default function AssignmentPage({
             {busy && (
               <button
                 onClick={() => streamRef.current?.stop()}
-                className="rounded-full border border-[var(--line-strong)] px-3 py-1.5 text-xs text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
+                className="tap inline-flex items-center rounded-full border border-[var(--line-strong)] px-3 py-1.5 text-sm md:text-xs text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
               >
                 {t("chat.stop")}
               </button>

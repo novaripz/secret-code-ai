@@ -153,7 +153,7 @@ function CategoryPanel({ classId }: { classId: string }) {
                   onClick={() => void moveCategory(classId, c.id, -1)}
                   disabled={i === 0}
                   aria-label={`Move ${c.name} up`}
-                  className="rounded-lg border border-[var(--line-strong)] px-2 py-1.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
+                  className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2 py-1.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
                 >
                   ↑
                 </button>
@@ -161,14 +161,14 @@ function CategoryPanel({ classId }: { classId: string }) {
                   onClick={() => void moveCategory(classId, c.id, 1)}
                   disabled={i === categories.length - 1}
                   aria-label={`Move ${c.name} down`}
-                  className="rounded-lg border border-[var(--line-strong)] px-2 py-1.5 text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
+                  className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2 py-1.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
                 >
                   ↓
                 </button>
                 <button
                   onClick={() => void confirmRemove(c)}
                   aria-label={`Delete ${c.name}`}
-                  className="rounded-lg border border-[var(--line-strong)] px-2.5 py-1.5 text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+                  className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2.5 py-1.5 text-sm md:text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
                 >
                   Delete
                 </button>
@@ -337,7 +337,7 @@ function GradeGrid({ classId }: { classId: string }) {
                 >
                   <Link
                     href={`/teacher/classes/${classId}/assignments/${a.id}`}
-                    className="block truncate text-xs font-medium text-[var(--text)] underline-offset-4 hover:underline"
+                    className="block truncate text-sm md:text-xs font-medium text-[var(--text)] underline-offset-4 hover:underline"
                     title={a.title}
                   >
                     {a.title}
@@ -527,7 +527,11 @@ function GradeCell({
         }
       }}
       placeholder="—"
-      className="w-20 rounded-lg border border-[var(--line)] bg-[var(--surface-1)] px-2 py-1.5 text-sm tabular-nums text-[var(--text)] outline-none transition-colors placeholder:text-[var(--text-faint)] focus:border-[var(--focus)]"
+      // A grade cell is the one control a teacher hits hundreds of times in
+      // a row, so it gets the 44px floor even though the grid around it stays
+      // a desktop shape. The row grows; the grid still scrolls sideways in its
+      // own container, which is what keeps the page itself from doing so.
+      className="tap inline-flex items-center w-20 rounded-lg border border-[var(--line)] bg-[var(--surface-1)] px-2 py-1.5 text-sm tabular-nums text-[var(--text)] outline-none transition-colors placeholder:text-[var(--text-faint)] focus:border-[var(--focus)]"
       style={over ? { borderColor: "var(--warn)" } : undefined}
     />
   );

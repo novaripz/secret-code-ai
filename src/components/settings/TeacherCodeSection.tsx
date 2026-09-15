@@ -72,7 +72,7 @@ export function TeacherCodeSection() {
         </p>
         <Link
           href="/teacher"
-          className="mt-3 inline-flex rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:border-[var(--focus)] hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)]"
+          className="tap items-center mt-3 inline-flex rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:border-[var(--focus)] hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)]"
         >
           {t("teacherCode.openDashboard")}
         </Link>
@@ -136,7 +136,7 @@ export function TeacherCodeSection() {
             <button
               type="submit"
               disabled={busy || code.trim().length === 0}
-              className="rounded-xl bg-[var(--accent)] px-3.5 py-2 text-sm font-medium text-[var(--accent-contrast)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-50"
+              className="tap inline-flex items-center rounded-xl bg-[var(--accent)] px-3.5 py-2 text-sm font-medium text-[var(--accent-contrast)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-50"
             >
               {busy ? t("teacherCode.checking") : t("teacherCode.submit")}
             </button>

@@ -84,7 +84,7 @@ export function CodeEditor() {
 
   return (
     <div className="flex h-full min-w-0 flex-col bg-[var(--surface-1)]">
-      <div className="flex h-8 shrink-0 items-center overflow-x-auto border-b border-[var(--line)] bg-[var(--surface-0)]">
+      <div className="scroll-x flex h-8 shrink-0 items-center border-b border-[var(--line)] bg-[var(--surface-0)]">
         {tabs.length === 0 ? (
           <span className="px-3 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-faint)]">
             Editor
@@ -103,7 +103,7 @@ export function CodeEditor() {
                 <button
                   onClick={() => setActiveTab(tab.path)}
                   aria-current={active ? "true" : undefined}
-                  className={`flex h-full items-center gap-1.5 pl-2.5 text-xs ${
+                  className={`flex h-full items-center gap-1.5 pl-2.5 text-sm md:text-xs ${
                     active ? "text-[var(--text)]" : "text-[var(--text-faint)] hover:text-[var(--text-dim)]"
                   }`}
                 >
@@ -115,7 +115,7 @@ export function CodeEditor() {
                   onClick={() => closeTab(tab.path)}
                   aria-label={`Close ${name}`}
                   title={`Close ${name}`}
-                  className="shrink-0 rounded p-0.5 text-[var(--text-faint)] hover:bg-[var(--surface-3)] hover:text-[var(--text)]"
+                  className="tap-sq inline-flex items-center justify-center shrink-0 rounded p-0.5 text-[var(--text-faint)] hover:bg-[var(--surface-3)] hover:text-[var(--text)]"
                 >
                   <XIcon className="h-3 w-3" />
                 </button>

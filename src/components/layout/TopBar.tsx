@@ -121,21 +121,21 @@ export function TopBar() {
         <Link
           href="/"
           title={t("studio.openChat")}
-          className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
+          className="tap-sq inline-flex items-center justify-center p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
         >
           <ChatIcon className="w-4 h-4" />
         </Link>
         <Link
           href="/settings"
           title={t("nav.settings")}
-          className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
+          className="tap-sq inline-flex items-center justify-center p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
         >
           <SettingsIcon className="w-4 h-4" />
         </Link>
         <button
           onClick={toggleTheme}
           title={t(theme === "dark" ? "theme.switchToLight" : "theme.switchToDark")}
-          className="p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
+          className="tap-sq inline-flex items-center justify-center p-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
         >
           {theme === "dark" ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
         </button>
@@ -143,7 +143,7 @@ export function TopBar() {
         <input ref={fileInputRef} type="file" accept=".zip" className="hidden" onChange={handleImportFile} />
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
+          className="tap flex items-center gap-1 text-sm md:text-xs px-2.5 py-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)]"
           title={t("studio.importTitle")}
         >
           <UploadIcon className="w-4 h-4" />
@@ -152,7 +152,7 @@ export function TopBar() {
         <button
           onClick={handleExport}
           disabled={!project}
-          className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)] disabled:opacity-30"
+          className="tap flex items-center gap-1 text-sm md:text-xs px-2.5 py-1.5 rounded-md hover:bg-[var(--surface-2)] text-[var(--text-dim)] disabled:opacity-30"
           title={t("studio.exportTitle")}
         >
           <DownloadIcon className="w-4 h-4" />
@@ -161,7 +161,7 @@ export function TopBar() {
         <button
           onClick={() => persist()}
           disabled={!project}
-          className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text)] font-medium disabled:opacity-30"
+          className="tap flex items-center gap-1 text-sm md:text-xs px-3 py-1.5 rounded-md bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--text)] font-medium disabled:opacity-30"
           title={t("studio.saveNow")}
         >
           <SaveIcon className="w-4 h-4" />

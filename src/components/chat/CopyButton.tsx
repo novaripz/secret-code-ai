@@ -67,7 +67,7 @@ export function CopyButton({ content }: { content: string }) {
     state === "copied" ? t("chat.copied") : state === "failed" ? t("chat.copyFailed") : t("chat.copy");
 
   return (
-    <div className="mt-3 flex flex-wrap gap-1.5">
+    <div className="mt-3 flex flex-wrap gap-2 sm:gap-1.5">
       <button
         type="button"
         onClick={() => void copy()}
@@ -75,13 +75,13 @@ export function CopyButton({ content }: { content: string }) {
         // aria-live so a screen reader hears the outcome; the visible label
         // changing is the same message for everyone else.
         aria-live="polite"
-        className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] motion-reduce:transition-none ${
+        className={`tap flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] motion-reduce:transition-none sm:px-3 md:text-xs ${
           state === "failed"
             ? "border-[var(--danger)] text-[var(--danger)]"
             : "border-[var(--line)] text-[var(--text-dim)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
         }`}
       >
-        {state === "copied" ? <CheckIcon className="h-3.5 w-3.5" /> : <CopyIcon className="h-3.5 w-3.5" />}
+        {state === "copied" ? <CheckIcon className="h-4 w-4 md:h-3.5 md:w-3.5" /> : <CopyIcon className="h-4 w-4 md:h-3.5 md:w-3.5" />}
         {label}
       </button>
     </div>

@@ -144,7 +144,7 @@ export function ChatPanel() {
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">{t("studio.assistant")}</span>
       </div>
 
-      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
+      <div ref={scrollRef} className="min-w-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-4">
         {messages.length === 0 && (
           <div className="space-y-3">
             <p className="text-sm leading-relaxed text-[var(--text-dim)]">
@@ -155,7 +155,7 @@ export function ChatPanel() {
                 <button
                   key={key}
                   onClick={() => void send(t(key))}
-                  className="w-full rounded-xl border border-[var(--line)] px-3 py-2.5 text-left text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                  className="tap inline-flex items-center w-full rounded-xl border border-[var(--line)] px-3 py-2.5 text-left text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] md:text-xs"
                 >
                   {t(key)}
                 </button>
@@ -169,8 +169,8 @@ export function ChatPanel() {
             <div
               className={
                 m.role === "user"
-                  ? "max-w-[92%] rounded-2xl bg-[var(--bubble-user)] px-3.5 py-2 text-sm text-[var(--text)]"
-                  : "w-full text-sm text-[var(--text)]"
+                  ? "min-w-0 max-w-[92%] rounded-2xl bg-[var(--bubble-user)] px-3.5 py-2 text-sm text-[var(--text)]"
+                  : "w-full min-w-0 text-sm text-[var(--text)]"
               }
             >
               {m.error ? (
@@ -204,7 +204,7 @@ export function ChatPanel() {
         )}
       </div>
 
-      <div className="shrink-0 border-t border-[var(--line)] p-2.5">
+      <div className="shrink-0 border-t border-[var(--line)] p-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
         <Composer
           value={input}
           onChange={setInput}

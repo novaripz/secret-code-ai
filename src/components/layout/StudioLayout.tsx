@@ -18,7 +18,7 @@ export function StudioLayout() {
   if (!project) return null;
 
   return (
-    <div className="flex flex-col h-screen bg-[var(--bg)] text-[var(--text)]">
+    <div className="flex flex-col h-dvh bg-[var(--bg)] text-[var(--text)]">
       <TopBar />
 
       {/* Desktop / tablet layout */}

@@ -128,7 +128,7 @@ function BlockView({ block, animate }: { block: Block; animate: boolean }) {
 
     case "ul":
       return (
-        <ul className="list-disc space-y-1.5 pl-5 leading-[1.7]">
+        <ul className="list-disc space-y-1.5 break-words pl-5 leading-[1.7]">
           {block.items.map((item) => (
             <li key={item.offset}>
               <Inlines runs={item.inlines} animate={animate} />
@@ -139,7 +139,7 @@ function BlockView({ block, animate }: { block: Block; animate: boolean }) {
 
     case "ol":
       return (
-        <ol className="list-decimal space-y-1.5 pl-5 leading-[1.7]">
+        <ol className="list-decimal space-y-1.5 break-words pl-5 leading-[1.7]">
           {block.items.map((item) => (
             <li key={item.offset}>
               <Inlines runs={item.inlines} animate={animate} />
@@ -150,9 +150,9 @@ function BlockView({ block, animate }: { block: Block; animate: boolean }) {
 
     case "code":
       return (
-        <pre className="overflow-x-auto rounded-xl border border-[var(--line)] bg-[var(--surface-0)] p-3 text-[13px] leading-relaxed">
+        <pre className="scroll-x rounded-xl border border-[var(--line)] bg-[var(--surface-0)] p-3 text-[13px] leading-relaxed">
           {block.language && (
-            <div className="mb-2 text-[11px] uppercase tracking-wide text-[var(--text-faint)]">
+            <div className="mb-2 text-xs uppercase tracking-wide text-[var(--text-faint)]">
               {block.language}
             </div>
           )}
@@ -168,7 +168,7 @@ function BlockView({ block, animate }: { block: Block; animate: boolean }) {
 
     default:
       return (
-        <p className="whitespace-pre-wrap leading-[1.7]">
+        <p className="whitespace-pre-wrap break-words leading-[1.7]">
           <Inlines runs={block.inlines} animate={animate} />
         </p>
       );
@@ -183,7 +183,7 @@ export function MessageText({ content, streaming }: { content: string; streaming
   const blocks = parseMarkdown(stripRemembered(content, streaming === true));
 
   return (
-    <div className="space-y-3">
+    <div className="min-w-0 space-y-3">
       {blocks.map((block) => (
         <BlockView key={block.offset} block={block} animate={streaming === true} />
       ))}

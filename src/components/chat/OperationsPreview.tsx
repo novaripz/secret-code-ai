@@ -26,7 +26,7 @@ function OperationRow({ op }: { op: FileOperation }) {
   return (
     <div className="border border-[var(--line)] rounded-lg overflow-hidden bg-[var(--surface-1)]">
       <button
-        className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs text-left hover:bg-[var(--surface-2)]"
+        className="tap w-full flex items-center gap-2 px-2.5 py-1.5 text-[13px] md:text-xs text-left hover:bg-[var(--surface-2)]"
         onClick={() => op.content && setExpanded((e) => !e)}
       >
         <span className={`px-1.5 py-0.5 rounded uppercase text-[10px] font-semibold shrink-0 ${TYPE_STYLE[op.type]}`}>
@@ -44,7 +44,7 @@ function OperationRow({ op }: { op: FileOperation }) {
         )}
       </button>
       {expanded && op.content && (
-        <pre className="text-[11px] leading-snug text-[var(--text-dim)] bg-[var(--surface-2)] px-2.5 py-2 overflow-x-auto max-h-64 overflow-y-auto font-mono border-t border-[var(--line)]">
+        <pre className="scroll-x text-xs sm:text-[11px] leading-snug text-[var(--text-dim)] bg-[var(--surface-2)] px-2.5 py-2 max-h-64 overflow-y-auto font-mono border-t border-[var(--line)]">
           {op.content}
         </pre>
       )}
@@ -76,13 +76,13 @@ export function OperationsPreview({
         <div className="flex items-center gap-2 pt-1">
           <button
             onClick={onApply}
-            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--success-soft)] text-[var(--success)] hover:brightness-95 font-medium"
+            className="tap flex items-center gap-1 text-sm md:text-xs px-4 sm:px-3 py-1.5 rounded-md bg-[var(--success-soft)] text-[var(--success)] hover:brightness-95 font-medium"
           >
             <CheckIcon className="w-3.5 h-3.5" /> {t("studio.applyChange")}
           </button>
           <button
             onClick={onReject}
-            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-[var(--surface-2)] text-[var(--text-dim)] hover:bg-[var(--surface-3)]"
+            className="tap flex items-center gap-1 text-sm md:text-xs px-4 sm:px-3 py-1.5 rounded-md bg-[var(--surface-2)] text-[var(--text-dim)] hover:bg-[var(--surface-3)]"
           >
             <XIcon className="w-3.5 h-3.5" /> {t("studio.rejectChange")}
           </button>
