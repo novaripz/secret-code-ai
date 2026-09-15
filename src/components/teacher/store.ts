@@ -428,10 +428,30 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
       try {
         const { supabase, userId } = await session();
         const profile = await getProfile(supabase, userId);
-        // A null profile is a real answer: the sign-up trigger may not have run
-        // yet. Treat it as "not a teacher", not as a failure.
+
+        // A missing profile row is NOT the same as being a student, and
+        // conflating them is how a teacher silently loses their role: the
+        // account has no row, the read comes back null, and the app quietly
+        // decides they are a student. They then redeem their code again,
+        // spending another use of it, and a single-use code refuses them.
+        //
+        // So it is an error. Whatever went wrong is a real problem somebody
+        // has to see, and "we could not check your account" sends a teacher to
+        // ask rather than to a code box that cannot help them.
+        if (!profile) {
+          set({
+            role: null,
+            roleState: {
+              loading: false,
+              error: "We couldn't find your account details. Try signing out and back in.",
+              loaded: false,
+            },
+          });
+          return;
+        }
+
         set({
-          role: profile?.role ?? "student",
+          role: profile.role,
           roleState: { loading: false, error: null, loaded: true },
         });
       } catch (err) {
