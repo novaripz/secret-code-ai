@@ -19,15 +19,17 @@ interface Check {
   what: string;
   /** A column this migration adds, as "table.column". */
   column?: [table: string, column: string];
-  /** A function this migration defines. */
+  /** A function this migration defines, with its parameter names. */
   fn?: string;
+  /** Parameter names, so PostgREST can match the signature. */
+  args?: string[];
 }
 
 const CHECKS: Check[] = [
   { migration: "0002", what: "learning signals", column: ["struggle_signals", "id"] },
-  { migration: "0002", what: "teacher codes", fn: "redeem_teacher_code" },
+  { migration: "0002", what: "teacher codes", fn: "redeem_teacher_code", args: ["p_code"] },
   { migration: "0004", what: "assignment priority", column: ["assignments", "teacher_priority"] },
-  { migration: "0005", what: "gradebook", column: ["grades", "points"] },
+  { migration: "0005", what: "gradebook", column: ["grades", "points_earned"] },
   { migration: "0005", what: "assignment categories", column: ["assignments", "category_id"] },
   { migration: "0005", what: "assignment resources", column: ["assignments", "resources"] },
   { migration: "0008", what: "leaving teacher mode", fn: "leave_teacher_mode" },
@@ -40,12 +42,19 @@ async function ask(url: string, key: string, path: string): Promise<boolean> {
       headers: { apikey: key, Authorization: `Bearer ${key}` },
       cache: "no-store",
     });
-    // A missing column or function is a 404 or a 42703/42883 body. Anything
-    // else -- including the permission denial an anonymous caller gets on a
-    // table that exists -- means the thing is there.
+    // Only two answers mean "not there": the catalog says the name is unknown
+    // (42703 for a column, 42883 for a function, PGRST202 when PostgREST cannot
+    // match a signature), or the route itself is absent.
+    //
+    // Everything else proves existence, including the answers that look like
+    // failures. Permission denied is Postgres refusing something it can see.
+    // Method not allowed is PostgREST refusing to run a function that writes
+    // over a GET -- which is exactly why these are GETs: asking whether
+    // `redeem_teacher_code` exists must never spend a teacher's code to find
+    // out.
     if (res.status === 404) return false;
     const body = await res.text();
-    return !/does not exist|PGRST202|PGRST204|42703|42883/.test(body);
+    return !/does not exist|PGRST202|42703|42883/.test(body);
   } catch {
     return false;
   }
@@ -64,9 +73,13 @@ export async function GET() {
 
   const results = await Promise.all(
     CHECKS.map(async (check) => {
+      // Parameter names go on the query string so PostgREST can find the
+      // signature; their values are never used, because a volatile function
+      // refuses a GET before it runs anything.
+      const params = (check.args ?? []).map((a) => `${a}=`).join("&");
       const applied = check.column
         ? await ask(url, key, `/rest/v1/${check.column[0]}?select=${check.column[1]}&limit=1`)
-        : await ask(url, key, `/rest/v1/rpc/${check.fn}`);
+        : await ask(url, key, `/rest/v1/rpc/${check.fn}${params ? `?${params}` : ""}`);
       return { migration: check.migration, what: check.what, applied };
     }),
   );
