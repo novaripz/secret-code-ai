@@ -129,6 +129,11 @@ export interface LoadState {
 
 const IDLE: LoadState = { loading: false, error: null, loaded: false };
 
+/** What `invite` reports back. `enrolled` is only meaningful when `ok`. */
+export type InviteOutcome =
+  | { ok: true; email: string; enrolled: boolean }
+  | { ok: false; error: string };
+
 interface TeacherState {
   /** Every screen reads the database now. Kept because the note component and
    *  the tests both still ask a store what it is showing. */
@@ -172,7 +177,14 @@ interface TeacherState {
   removeClass: (classId: string) => Promise<void>;
 
   /** Returns an error message, or null when the invite was accepted. */
-  invite: (classId: string, email: string) => Promise<string | null>;
+  /**
+   * Adds a student by email. The outcome is three-way, not two: the write can
+   * fail, or it can succeed in one of two ways the teacher genuinely needs to
+   * tell apart — enrolled right now because the address already had an
+   * account, versus waiting until that address signs in. Collapsing those into
+   * "ok" is what made the roster claim everyone was still waiting.
+   */
+  invite: (classId: string, email: string) => Promise<InviteOutcome>;
   cancelInvite: (classId: string, inviteId: string) => Promise<void>;
   removeStudent: (classId: string, studentId: string) => Promise<void>;
   /** Returns the assignment id, or null when the write failed. */
@@ -659,15 +671,15 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
     const email = rawEmail.trim().toLowerCase();
     // The client-side checks stay: they are instant, and they are the two
     // mistakes a teacher actually makes. The server still gets the last word.
-    if (!looksLikeEmail(email)) return "That doesn't look like an email address.";
+    if (!looksLikeEmail(email)) return { ok: false, error: "That doesn't look like an email address." };
 
     const joined = get().roster[classId] ?? [];
     if (joined.some((s) => s.email.toLowerCase() === email)) {
-      return "That student is already in this class.";
+      return { ok: false, error: "That student is already in this class." };
     }
     const pending = get().invites[classId] ?? [];
     if (pending.some((i) => i.email.toLowerCase() === email)) {
-      return "You've already invited that address.";
+      return { ok: false, error: "You've already invited that address." };
     }
 
     // One-sided by design: the teacher owns the roster, the student accepts
@@ -698,8 +710,9 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
           ),
         },
       }));
-      if (created.claimedAt !== null) void get().loadClass(classId);
-      return null;
+      const enrolled = created.claimedAt !== null;
+      if (enrolled) void get().loadClass(classId);
+      return { ok: true, email, enrolled };
     } catch (err) {
       set((s) => ({
         invites: {
@@ -707,7 +720,7 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
           [classId]: (s.invites[classId] ?? []).filter((i) => i.id !== optimisticId),
         },
       }));
-      return describe(err, "We couldn't add that student.");
+      return { ok: false, error: describe(err, "We couldn't add that student.") };
     }
   },
 

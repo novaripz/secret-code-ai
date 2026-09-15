@@ -42,7 +42,12 @@ export function RosterView({ classId }: { classId: string }) {
 
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [added, setAdded] = useState<string | null>(null);
+  // Which of the two good outcomes happened, and to whom. "Enrolled now" and
+  // "waiting for their first sign-in" are different answers to the only
+  // question a teacher is asking — can I see this student's work yet? — so the
+  // line under the field says which one, rather than the invite wording it used
+  // to print over both.
+  const [added, setAdded] = useState<{ email: string; enrolled: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
 
   // The format and duplicate checks answer instantly; the server's answer takes
@@ -52,12 +57,11 @@ export function RosterView({ classId }: { classId: string }) {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
-    const typed = email.trim().toLowerCase();
-    const problem = await invite(classId, email);
+    const outcome = await invite(classId, email);
     setBusy(false);
-    setError(problem);
-    if (!problem) {
-      setAdded(typed);
+    setError(outcome.ok ? null : outcome.error);
+    if (outcome.ok) {
+      setAdded({ email: outcome.email, enrolled: outcome.enrolled });
       setEmail("");
     }
   }
@@ -118,7 +122,9 @@ export function RosterView({ classId }: { classId: string }) {
         >
           {error ??
             (added
-              ? `${added} is invited. They join this class automatically the first time they sign in.`
+              ? added.enrolled
+                ? `${added.email} already had a Panda account and is in this class now — they're in the list below.`
+                : `${added.email} is invited. They join this class automatically the first time they sign in with that address; nothing for them to accept.`
               : "If they already use Panda they appear below straight away. If not, the invite waits for them.")}
         </p>
       </form>

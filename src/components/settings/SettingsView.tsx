@@ -5,6 +5,8 @@ import { useI18n, type StringKey } from "@/lib/i18n";
 import { useProfileStore, type ThemeName } from "@/store/useProfileStore";
 import { AvatarPicker } from "./AvatarPicker";
 import { AccountSection } from "./AccountSection";
+import { TeacherCodeSection } from "./TeacherCodeSection";
+import { DeactivateTeacherSection } from "./DeactivateTeacherSection";
 import { LanguageSection } from "./LanguageSection";
 import { LegalSection } from "./LegalSection";
 import { useDialog } from "@/components/ui/Dialog";
@@ -94,6 +96,13 @@ function ProfileSection() {
   return (
     <div className="space-y-6">
       <AccountSection />
+      {/* Directly under the account it changes: becoming a teacher is a fact
+          about this account, not a preference. It renders itself away for
+          people it has nothing to say to. */}
+      <TeacherCodeSection />
+      {/* Directly under the way in, because the way out belongs next to it —
+          and it renders for nobody but a teacher. */}
+      <DeactivateTeacherSection />
       <AvatarPicker />
 
       <Field label={t("settings.name")} hint={t("settings.nameHint")}>

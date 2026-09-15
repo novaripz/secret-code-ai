@@ -123,3 +123,19 @@ export async function redeemTeacherCode(supabase: SupabaseClient, code: string):
   })) as unknown as Result<Role>;
   return unwrap(result, "redeeming your teacher code");
 }
+
+/**
+ * Gives up the teacher role. Demotion only — see
+ * `supabase/migrations/0008_leaving_teacher_mode.sql`, where the new role is a
+ * literal rather than an argument, so there is nothing to pass here and
+ * nothing this call could be pointed at except the caller's own row.
+ *
+ * It exists for the same reason `redeemTeacherCode` does: the role guard
+ * refuses a self-service role change, and the polite direction is refused
+ * alongside the dangerous one. Returns the role the server settled on, which
+ * the caller should then re-read from `profiles` rather than assume.
+ */
+export async function leaveTeacherMode(supabase: SupabaseClient): Promise<Role> {
+  const result = (await supabase.rpc("leave_teacher_mode")) as unknown as Result<Role>;
+  return unwrap(result, "turning off teacher mode");
+}

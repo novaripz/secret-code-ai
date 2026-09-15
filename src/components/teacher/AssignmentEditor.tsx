@@ -420,9 +420,49 @@ function Toggle({
  * is the last code before the write, and again on the way out of the database
  * because rows can be written by hand.
  *
- * No file upload. Panda has no storage bucket, and offering a control that
- * cannot work is worse than not offering it.
+ * No file upload, and that is a decision rather than an omission. Panda has no
+ * storage bucket: building one that a teacher could trust with a worksheet
+ * means a private bucket, policies mirroring the class rules, a progress and
+ * failure story for a 20MB PDF on school wifi, and a server-side check on what
+ * the file actually is. A half-built uploader that swallows a worksheet is
+ * worse than a link field that works, and nearly every worksheet a teacher has
+ * is already in Drive or Classroom with a link attached. So this makes the link
+ * route obvious and quick instead of pretending to be something else — see the
+ * note under the heading, which says outright that files are not stored here.
+ *
+ * The two bits of help below are for what teachers actually paste. A copied
+ * Drive URL arrives complete; a typed one arrives as "docs.google.com/..." with
+ * no scheme, which `isSafeResourceUrl` rejects and `cleanResources` then drops
+ * on save — a silently missing resource. So a bare host gets https:// on blur.
+ * And a pasted link with an empty label gets the host as a starting point,
+ * because an unlabelled resource is dropped on save too.
  */
+/**
+ * What a teacher's pasted link needs before it can be saved, or null when it
+ * needs nothing. Runs on blur rather than on every keystroke: rewriting a URL
+ * under someone mid-type is how a field starts fighting its user.
+ *
+ * Only ever adds https:// to something with no scheme at all. A link that says
+ * ftp:// or javascript: is left exactly as typed, so the validation below still
+ * shows it as rejected instead of us quietly turning it into something else.
+ */
+function repairLink(url: string, label: string): Partial<AssignmentResource> | null {
+  const trimmed = url.trim();
+  if (trimmed.length === 0) return null;
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(trimmed);
+  const fixed = hasScheme ? trimmed : `https://${trimmed}`;
+  if (!isSafeResourceUrl(fixed)) return null;
+
+  const patch: Partial<AssignmentResource> = {};
+  if (fixed !== url) patch.url = fixed;
+  // An unlabelled resource is dropped on save, so a host is a better starting
+  // point than nothing — and it is a suggestion the teacher can type over.
+  if (label.trim().length === 0) {
+    patch.label = new URL(fixed).hostname.replace(/^www\./, "");
+  }
+  return Object.keys(patch).length > 0 ? patch : null;
+}
+
 function ResourceEditor({
   resources,
   onChange,
@@ -462,6 +502,11 @@ function ResourceEditor({
       <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-faint)]">
         The reading, the slide deck, the practice set. Students see these on the assignment.
       </p>
+      <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-faint)]">
+        Panda doesn&apos;t store files. To share a worksheet or a photo of the board, put it in
+        Drive, Classroom or OneDrive, set it so anyone with the link can view, and paste that link
+        here.
+      </p>
 
       {resources.length > 0 && (
         <div className="mt-3 flex flex-col gap-2">
@@ -480,7 +525,11 @@ function ResourceEditor({
                   <input
                     value={r.url}
                     onChange={(e) => set(i, { url: e.target.value })}
-                    placeholder="https://…"
+                    onBlur={(e) => {
+                      const patch = repairLink(e.target.value, r.label);
+                      if (patch) set(i, patch);
+                    }}
+                    placeholder="Paste a Drive or Classroom link"
                     inputMode="url"
                     aria-label={`Resource ${i + 1} link`}
                     aria-invalid={bad || undefined}

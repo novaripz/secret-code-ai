@@ -17,6 +17,16 @@
 // thing we can honestly give them.
 //
 // The code is never logged, echoed into a URL, or kept after it is spent.
+//
+// Since teachers were getting stuck — the sidebar link to /teacher only renders
+// for accounts that are already teachers, so the door to becoming one sat
+// behind a door only teachers could open — the redeem step also appears in
+// Settings. That second home is why the moving parts below (`useRedeemCode`,
+// `codeInputProps`) are exported rather than kept local: there must be exactly
+// one path that talks to `redeem_teacher_code`, one place that decides what to
+// print when it fails, and one definition of the input hardening. A second copy
+// would be a second thing to get wrong, and the thing it would get wrong is a
+// teacher's account.
 
 import { useState } from "react";
 import Link from "next/link";
@@ -39,7 +49,36 @@ function serverMessage(err: unknown): string {
   return "We couldn't reach the database. Nothing changed — it's worth trying again.";
 }
 
-export function RedeemCodePanel({ onRedeemed }: { onRedeemed: () => void }) {
+/**
+ * No autocapitalise, no autocorrect, no password manager: a code is typed once
+ * from a slip of paper, and a browser "helpfully" capitalising it turns a valid
+ * code into a wrong one. Shared so the Settings copy of this field cannot
+ * quietly drift into being the lenient one.
+ */
+export const codeInputProps = {
+  autoComplete: "off",
+  autoCapitalize: "none",
+  autoCorrect: "off",
+  spellCheck: false,
+} as const;
+
+/**
+ * The whole redeem step, minus any opinion about how it looks. Both homes for
+ * this flow — the /teacher wall and the Settings section — drive the same
+ * state machine here, so there is one round trip to `redeem_teacher_code` and
+ * one rule about what comes back: print the server's sentence, never a guess.
+ *
+ * `onRedeemed` is where the role gets re-read from `profiles`. It fires after
+ * the success flag is set, so the caller can show "that worked" immediately
+ * instead of holding the good news hostage to a second round trip.
+ */
+export function useRedeemCode({
+  onRedeemed,
+  offlineMessage,
+}: {
+  onRedeemed: () => void;
+  offlineMessage?: string;
+}) {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +92,10 @@ export function RedeemCodePanel({ onRedeemed }: { onRedeemed: () => void }) {
     try {
       const supabase = await getSupabase();
       if (!supabase) {
-        setError("This copy of Panda has no database connected, so a code can't be checked here.");
+        setError(
+          offlineMessage ??
+            "This copy of Panda has no database connected, so a code can't be checked here.",
+        );
         return;
       }
       await redeemTeacherCode(supabase, code);
@@ -68,6 +110,18 @@ export function RedeemCodePanel({ onRedeemed }: { onRedeemed: () => void }) {
       setBusy(false);
     }
   }
+
+  /** Typing again clears the last complaint; a stale error reads as a new one. */
+  function change(next: string) {
+    setCode(next);
+    setError((prev) => (prev === null ? prev : null));
+  }
+
+  return { code, change, busy, error, done, submit };
+}
+
+export function RedeemCodePanel({ onRedeemed }: { onRedeemed: () => void }) {
+  const { code, change, busy, error, done, submit } = useRedeemCode({ onRedeemed });
 
   return (
     <div className={`${cardClass} mx-auto max-w-xl p-6 sm:p-8`}>
@@ -116,17 +170,8 @@ export function RedeemCodePanel({ onRedeemed }: { onRedeemed: () => void }) {
             id="teacher-code"
             name="teacher-code"
             value={code}
-            onChange={(e) => {
-              setCode(e.target.value);
-              if (error) setError(null);
-            }}
-            // No autocapitalise, no autocorrect, no password manager: a code is
-            // typed once from a slip of paper, and a browser "helpfully"
-            // capitalising it turns a valid code into a wrong one.
-            autoComplete="off"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
+            onChange={(e) => change(e.target.value)}
+            {...codeInputProps}
             placeholder="Your teacher code"
             aria-describedby={error ? "teacher-code-error" : undefined}
             aria-invalid={error !== null}

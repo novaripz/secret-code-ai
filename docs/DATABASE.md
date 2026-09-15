@@ -476,3 +476,68 @@ edited and a student can mark their own work.
 **Re-running it is safe.** Unlike step 1, this file is written with
 `if not exists` and `drop policy if exists` throughout, so running it twice
 changes nothing the second time.
+
+## Step 10 — apply `0008_leaving_teacher_mode.sql`
+
+Paste and Run. Apply it after `0007_redeem_cannot_lie.sql`; re-running either is
+safe. It adds one function, `leave_teacher_mode`, and changes no tables, no
+policies and no data.
+
+**What it is for.** A teacher can now turn teacher mode off themselves, in
+Settings, by typing `Delete123` into a confirmation box. Until now the only way
+out was for you to run SQL, which is a reasonable thing to ask of you and an
+impossible one to ask of a teacher on a Sunday.
+
+**Why it needs a function at all.** The role guard from step 6 refuses *any*
+account changing its own role — that rule is what stops a student writing
+`teacher` into their own row and reading every roster in the school. It catches
+the harmless direction on the way past, so going down needs the same escorted
+route going up already has: a `security definer` function that sets the
+transaction-local flag the guard accepts, and nothing else can set it.
+
+**Why it cannot be used to promote anyone.** Three things, and it is worth
+checking all three if you are reviewing this:
+
+- the new role is the literal `'student'`, not an argument — there is no value a
+  caller can pass that raises them;
+- the update only matches a row whose role is currently `'teacher'`, so it can
+  only ever be a demotion;
+- the row is `id = auth.uid()`, so it only ever touches the caller's own account.
+
+**Nothing is deleted.** The account keeps its classes, rosters, assignments,
+categories and grades; those rows are keyed to the account's id and are
+untouched. What stops is the teacher *view* — every teacher screen is gated on
+`profiles.role`. Redeeming a fresh code (step 6) puts the view back exactly as
+it was, which is what the confirmation in Settings tells the teacher.
+
+**If nothing changed, it says so.** Like `redeem_teacher_code` after 0007, the
+function checks `row_count` and raises rather than returning a success it did
+not achieve. Calling it on an account that is already a student is an error, not
+a quiet no-op.
+
+**How to check it worked.** Open a **New query** and run:
+
+```sql
+select proname, prosecdef
+from pg_proc
+where proname = 'leave_teacher_mode';
+```
+
+One row, `prosecdef` true. To see it refuse the direction that matters, sign in
+as a student in the app and call it from the browser console — it will raise
+"This account is not a teacher account", and no row in `profiles` will change.
+
+---
+
+## Step 11 — apply `0009_only_teachers_make_classes.sql`
+
+Paste and Run. One sentence of what it does:
+
+Creating a class previously checked that the class was *yours*, not that you
+were a *teacher* — so a student who bypassed the app could have made an empty
+class of their own. Nothing was exposed by that (every other rule is keyed on
+ownership or enrolment), but the restriction lived only in the interface, and a
+rule enforced only by a hidden button is a suggestion.
+
+Now the database refuses it, which is the answer you want when a district asks
+how the roles are actually separated.
