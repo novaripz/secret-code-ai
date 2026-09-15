@@ -55,3 +55,15 @@ export function CommandIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function DiffIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      {/* A plus over a minus: the two things a diff is made of. */}
+      <path d="M6 3v8" />
+      <path d="M2 7h8" />
+      <path d="M14 17h8" />
+      <path d="M4 21h4a4 4 0 0 0 4-4V7" />
+    </svg>
+  );
+}

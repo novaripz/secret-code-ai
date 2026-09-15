@@ -157,8 +157,24 @@ export function Composer({
           setDragging(false);
           void ingest(e.dataTransfer.files);
         }}
-        className={`rounded-3xl border bg-[var(--surface-1)] transition-colors ${
-          dragging ? "border-[var(--text)] bg-[var(--surface-2)]" : "border-[var(--line-strong)]"
+        // `composer-shell` (globals.css) owns the resting and focused border.
+        // It was `--line-strong` at rest, which on the light and sepia grounds
+        // drew a hard box around the input and made an idle composer look like
+        // a form field someone had already tabbed into. The resting border is
+        // now `--line`, the same hairline the chips and cards use, so the
+        // input reads as part of the surface — and the strong treatment is
+        // spent where it means something, on focus. That rule lives in CSS
+        // because `:has(:focus-visible)` is the only way to say "the wrapper
+        // draws the ring the textarea gave up", and the textarea has to give
+        // it up or the ring lands inside the rounded shell.
+        //
+        // The drag state moved to a data attribute for the same reason: this
+        // file's CSS is unlayered and Tailwind's utilities are not, so a bare
+        // `border-[...]` class here would lose to the rule below no matter
+        // what order it is written in. Both border states now live together.
+        data-dragging={dragging || undefined}
+        className={`composer-shell rounded-3xl border bg-[var(--surface-1)] transition-colors motion-reduce:transition-none ${
+          dragging ? "bg-[var(--surface-2)]" : ""
         }`}
       >
         {attachments.length > 0 && (

@@ -13,7 +13,8 @@ import { CodeEditor } from "./CodeEditor";
 import { AgentPanel } from "./AgentPanel";
 import { CommandPalette, type Command } from "./CommandPalette";
 import { VersionPanel } from "./VersionPanel";
-import { CodeIcon, CommandIcon, FilesIcon, HistoryIcon, MonitorIcon } from "./icons";
+import { ChangesPanel } from "./ChangesPanel";
+import { CodeIcon, CommandIcon, DiffIcon, FilesIcon, HistoryIcon, MonitorIcon } from "./icons";
 import {
   clamp,
   MAX_CHAT,
@@ -33,6 +34,7 @@ import {
 const RAIL: { key: PanelKey; label: string; Icon: typeof FilesIcon }[] = [
   { key: "files", label: "Files", Icon: FilesIcon },
   { key: "history", label: "History", Icon: HistoryIcon },
+  { key: "changes", label: "Changes", Icon: DiffIcon },
   { key: "preview", label: "Preview", Icon: MonitorIcon },
   { key: "chat", label: "Panda chat", Icon: ChatIcon },
 ];
@@ -110,7 +112,13 @@ export function Workspace() {
 
   if (!project) return null;
 
-  const bothSidebarPanes = visible.files && visible.history;
+  // Files keeps its dragged share whenever it is sharing the column; History
+  // and Changes split what is left between them. Three stacked splitters in a
+  // 232px column would be three things to get wrong for no gain, so only the
+  // Files split is draggable and the rest is even.
+  const stackedBelowFiles = Number(visible.history) + Number(visible.changes);
+  const bothSidebarPanes = visible.files && stackedBelowFiles > 0;
+  const belowShare = stackedBelowFiles > 0 ? (1 - layout.filesRatio) / stackedBelowFiles : 0;
   const bothCenterPanes = visible.preview;
 
   function sidebarHeight() {
@@ -142,8 +150,8 @@ export function Workspace() {
           panes become absolutely-positioned overlays inside this box rather
           than columns competing for a 360px row. */}
       <div className="relative flex min-h-0 flex-1">
-        {/* Sidebar column: Files above History. */}
-        {(visible.files || visible.history) && (
+        {/* Sidebar column: Files above History and Changes. */}
+        {(visible.files || visible.history || visible.changes) && (
           <>
             {/* PHONE: one pane at a time.
                 On a laptop this is a column in a row of columns, and the
@@ -181,7 +189,7 @@ export function Workspace() {
                 <ResizeHandle
                   className="hidden md:block"
                   orientation="horizontal"
-                  label="Resize the files list against your history"
+                  label="Resize the files list against what is below it"
                   value={Math.round(layout.filesRatio * 100)}
                   min={15}
                   max={85}
@@ -204,7 +212,7 @@ export function Workspace() {
                   className="flex min-h-0 flex-col"
                   style={
                     bothSidebarPanes
-                      ? { flex: `${1 - layout.filesRatio} 1 0`, minHeight: MIN_STACKED }
+                      ? { flex: `${belowShare} 1 0`, minHeight: MIN_STACKED }
                       : { flex: "1 1 0" }
                   }
                 >
@@ -215,6 +223,27 @@ export function Workspace() {
                   >
                     <div className="h-full min-h-0">
                       <VersionPanel />
+                    </div>
+                  </Pane>
+                </div>
+              )}
+
+              {visible.changes && (
+                <div
+                  className="flex min-h-0 flex-col"
+                  style={
+                    bothSidebarPanes
+                      ? { flex: `${belowShare} 1 0`, minHeight: MIN_STACKED }
+                      : { flex: "1 1 0" }
+                  }
+                >
+                  <Pane
+                    title="Changes"
+                    closeLabel="Close the list of changes"
+                    onClose={() => layout.close("changes")}
+                  >
+                    <div className="h-full min-h-0">
+                      <ChangesPanel />
                     </div>
                   </Pane>
                 </div>

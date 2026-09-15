@@ -17,6 +17,7 @@ import { Priorities } from "@/components/home/Priorities";
 import { findLocale } from "@/lib/i18n/locales";
 import { FileIcon } from "@/components/icons";
 import { buildSuggestions } from "./suggestions";
+import { deriveFollowUps, type FollowUp } from "./followUps";
 import { CopyButton } from "./CopyButton";
 import { parseRemembered } from "./remember";
 import { frameReader, type Source } from "./frames";
@@ -318,8 +319,17 @@ export function AssistantChat() {
   const name = profileHydrated ? displayName() : "";
   const empty = messages.length === 0;
   // Actions belong on the newest reply only; older ones are history.
-  const lastAssistantId = [...messages].reverse().find((m) => m.role === "assistant" && !m.error)?.id;
+  const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant" && !m.error);
+  const lastAssistantId = lastAssistant?.id;
   const streaming = messages.some((m) => m.streaming);
+
+  // Chips derived from the reply they sit under. Memoised on the finished text
+  // so the parse does not run on every token: while `streaming` is true this
+  // stays an empty list, which is also the answer to "what shows mid-stream" —
+  // nothing, because a chip about a numbered list is a lie until the list has
+  // finished arriving.
+  const finishedReply = lastAssistant && !lastAssistant.streaming ? lastAssistant.content : "";
+  const followUps: FollowUp[] = useMemo(() => deriveFollowUps(finishedReply), [finishedReply]);
 
   return (
     <div className="flex h-full flex-col">
@@ -443,6 +453,13 @@ export function AssistantChat() {
                             showTranslate={replyLocale !== "en"}
                             showHint={messages.length > 1}
                             disabled={loading}
+                            followUps={followUps}
+                            // Derived chips carry their own prompt and are not
+                            // MessageActions, so they deliberately bypass the
+                            // insights `record` above: we know the student
+                            // asked about a formula, which is curiosity, not
+                            // the struggle signal that path is scored for.
+                            onFollowUp={(f: FollowUp) => void send(f.prompt)}
                             onAction={(action: MessageAction) => {
                               if (NEUTRAL_ACTIONS.includes(action)) {
                                 useInsightsStore.getState().record(

@@ -15,7 +15,7 @@ import { create } from "zustand";
 
 const STORAGE_KEY = "panda:workspace:v1";
 
-export type PanelKey = "files" | "history" | "preview" | "chat";
+export type PanelKey = "files" | "history" | "changes" | "preview" | "chat";
 
 /** Pixel floors. Below these a pane is a sliver you can see but not use. */
 export const MIN_SIDEBAR = 180;
@@ -58,7 +58,10 @@ const DEFAULTS: Persisted = {
   editorRatio: 0.62,
   // History starts closed: it's the thing you go looking for, not the thing you
   // work in, and an empty list on first open explains nothing.
-  visible: { files: true, history: false, preview: true, chat: true },
+  // Changes starts closed for the same reason History does: it is somewhere
+  // you go when you have a question ("what did that actually do?"), and on a
+  // brand-new project it has nothing to say yet.
+  visible: { files: true, history: false, changes: false, preview: true, chat: true },
 };
 
 export function clamp(value: number, min: number, max: number): number {

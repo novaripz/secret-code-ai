@@ -618,3 +618,42 @@ html, body {
   /* Swiping a wide table should not also flick the page/drawer behind it. */
   overscroll-behavior-x: contain;
 }
+
+/* The composer shell: resting versus focused.
+
+   The complaint was a hard bright box around the message input that was there
+   all the time. It was `--line-strong`, the token meant for a control that
+   wants to be noticed, and an always-noticeable input is one a student reads
+   as already focused — so the real focus state had nothing left to say. At
+   rest it is now `--line`, the hairline every card and chip already uses, and
+   it settles into the surface instead of fencing it off.
+
+   Removing the ring outright was the obvious fix and the wrong one: a keyboard
+   user needs to see where they are. So the shell draws the ring instead of the
+   textarea. The textarea keeps `outline-none` because an outline on the
+   textarea is a rectangle inside a 24px-rounded container, which reads as a
+   rendering bug; `:has(textarea:focus-visible)` moves that job to the element
+   with the right shape. Scoped to the textarea rather than any descendant so
+   the icon buttons keep their own rings and the whole composer does not light
+   up when a student tabs onto the paperclip.
+
+   `:focus-visible` rather than `:focus` is the point of the change: browsers
+   always match it for text entry, so clicking into the box still shows the
+   ring, while the resting state stays quiet. The ring is `--focus`, which each
+   theme sets against its own ground — a colour bright enough on #0d0d0d would
+   be shouting on sepia's paper — and the halo is a `color-mix` of that same
+   token rather than a hard-coded rgba, so it inherits the theme too. It is a
+   box-shadow, not a border-width change, because growing the border by a pixel
+   on focus would reflow the input and nudge the text the student is typing. */
+.composer-shell {
+  border-color: var(--line);
+}
+.composer-shell:has(textarea:focus-visible) {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 28%, transparent);
+}
+/* Drag-over outranks focus: mid-drop, where the file will land matters more
+   than where the caret is. */
+.composer-shell[data-dragging] {
+  border-color: var(--text);
+}

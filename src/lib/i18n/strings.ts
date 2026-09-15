@@ -80,6 +80,14 @@ export const en = {
   "chat.checkMyWork": "Check my work",
   "chat.example": "Give me an example",
   "chat.readyForAnswer": "I'm ready for the answer",
+  // Follow-up chips derived from the reply itself (see chat/followUps.ts).
+  // Each one only appears when the reply actually contains the thing it names,
+  // so the wording can be specific without over-promising.
+  "chat.followUpTerm": "What does \"{term}\" mean?",
+  "chat.followUpStep": "I'm stuck on step 1",
+  "chat.followUpCode": "What does that code do?",
+  "chat.followUpFormula": "Where's that formula from?",
+  "chat.followUpAnswer": "I'm not sure how to answer",
   "chat.whyThis": "Why?",
 
   // Modes
@@ -615,6 +623,10 @@ const es: Catalog = {
   "chat.showOriginal": "Ver original", "chat.hint": "Dame una pista",
   "chat.explainDifferently": "Explícalo de otra forma", "chat.checkMyWork": "Revisa mi trabajo",
   "chat.example": "Dame un ejemplo", "chat.readyForAnswer": "Ya estoy listo para la respuesta",
+  "chat.followUpTerm": "¿Qué significa \"{term}\"?",
+  "chat.followUpStep": "Me atoré en el paso 1", "chat.followUpCode": "¿Qué hace ese código?",
+  "chat.followUpFormula": "¿De dónde sale esa fórmula?",
+  "chat.followUpAnswer": "No sé muy bien qué responder",
   "chat.whyThis": "¿Por qué?",
   "mode.explain": "Explicar",
   "mode.explainOffNote": "Apagado significa solo la respuesta. Sin pasos ni introducción.",
