@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CHAIN_BUDGET_MS, describeAiFailure, getProviderChain, MAX_DURATION_S } from "@/lib/ai/chain";
+import {
+  CHAIN_BUDGET_MS,
+  describeAiFailure,
+  getProviderChain,
+  MAX_DURATION_S,
+  PROJECT_CHAIN_BUDGET_MS,
+} from "@/lib/ai/chain";
 import { isSearchConfigured } from "@/lib/ai/search";
 import { ToolSession, type ProgressEvent } from "@/lib/ai/tools";
 import { validateOperations } from "@/lib/ai/validateOperations";
@@ -7,6 +13,7 @@ import type { AiMessage, AiProvider, ImageAttachment } from "@/lib/ai/provider";
 import { readProjectStream } from "@/lib/ai/projectStream";
 import type { ExplainDepth, LearningMode } from "@/lib/ai/systemPrompt";
 import { guardRequest } from "@/lib/security/apiGuard";
+import type { FileOperation } from "@/types";
 import {
   MAX_AI_BODY_BYTES,
   MAX_AI_CONTEXT_CHARS,
@@ -74,6 +81,37 @@ if (maxDuration !== MAX_DURATION_S) {
  */
 const FIRST_BYTE_DEADLINE_MS = CHAIN_BUDGET_MS + 3_000;
 
+/**
+ * When a project turn stops generating and hands back what it has.
+ *
+ * The first-byte deadline above guards a provider that never speaks. This
+ * guards the opposite failure, the one a whole-app request actually hits: the
+ * model is answering perfectly well and simply will not finish inside the
+ * platform's ceiling. Left alone, the function is killed mid-stream, the
+ * socket closes with no closing frame, the student's fetch throws, and every
+ * file that already streamed is thrown away — a network error for a problem
+ * that was never the network's.
+ *
+ * So we stop first, by a margin, and close cleanly with the operations that
+ * completed. The margin is 6 seconds of the 60: a `done` frame carrying
+ * several files can be a few hundred kilobytes, and it has to be serialised,
+ * enqueued, flushed through the platform's proxy and read by the client while
+ * the function is still alive. One second would be a race; six is comfortably
+ * more than that transfer needs and still leaves 90% of the window for real
+ * generation. It is derived from maxDuration rather than written as a second
+ * literal, so moving the ceiling moves this with it.
+ */
+/**
+ * The same last line of defence for a project turn, against the project
+ * chain's own (longer) budget. A build is allowed to be slow to its first
+ * file — providers can buffer a JSON reply whole, so the first frame may not
+ * come until the model has finished writing — and a deadline sized for prose
+ * was aborting every provider before a whole-app answer could exist.
+ */
+const PROJECT_FIRST_BYTE_DEADLINE_MS = PROJECT_CHAIN_BUDGET_MS + 3_000;
+
+const GENERATION_DEADLINE_MS = (maxDuration - 6) * 1_000;
+
 const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 const MAX_IMAGE_BASE64_CHARS = 8_000_000; // ~6MB decoded, generous for a tab screenshot
 
@@ -127,7 +165,14 @@ interface RequestBody {
 //
 //   {"t":"op_start","opType":"create","path":"js/game.js"}   being written now
 //   {"t":"op","op":{…}}                                      finished, validated
-//   {"t":"done","message":"…","openFiles":[…],"truncated":false}
+//   {"t":"done","message":"…","openFiles":[…],"truncated":false,"interrupted":false}
+//
+// `interrupted` is the out-of-time close: the turn was going fine and the
+// clock ended it, so `operations` is what finished rather than what was asked
+// for. It is kept distinct from `truncated` (the envelope itself was cut off
+// mid-JSON) because they tell a student two different things — one is "these
+// files may be half-written", the other is "these files are fine, there are
+// just fewer of them than you asked for".
 //
 // Every one of those is derived from bytes the model actually emitted — see
 // lib/ai/projectStream.ts. There is no frame for a step we merely expect, and
@@ -453,7 +498,7 @@ function streamProjectTurn(request: Parameters<AiProvider["generate"]>[0]): Resp
         const deadline = setTimeout(() => {
           if (closed || modelSpoke) return;
           console.error(
-            `[api/ai] a project turn produced nothing within ${FIRST_BYTE_DEADLINE_MS}ms — a ` +
+            `[api/ai] a project turn produced nothing within ${PROJECT_FIRST_BYTE_DEADLINE_MS}ms — a ` +
               "provider is ignoring its deadline. Closing with an error rather than being killed.",
           );
           send(
@@ -463,11 +508,33 @@ function streamProjectTurn(request: Parameters<AiProvider["generate"]>[0]): Resp
             }),
           );
           finish();
-        }, FIRST_BYTE_DEADLINE_MS);
+        }, PROJECT_FIRST_BYTE_DEADLINE_MS);
 
         // Said first so the panel has something true to show while the model
         // reads the project. It is a state, not a claim about work done.
         send(frame({ t: "status", phase: "thinking" }));
+
+        // Everything the model has actually finished, kept so the out-of-time
+        // close below has something true to hand back. These are the same
+        // validated operations already sent as `op` frames.
+        const finishedOps: FileOperation[] = [];
+
+        const outOfTime = setTimeout(() => {
+          if (closed) return;
+          send(
+            frame({
+              t: "done",
+              operations: finishedOps,
+              message:
+                finishedOps.length > 0
+                  ? "Panda ran out of time on this one. Here's what it finished — ask it to carry on from here."
+                  : "Panda ran out of time before it finished anything. Try asking for a smaller piece first — one screen, or one feature — and then build on it.",
+              truncated: false,
+              interrupted: true,
+            }),
+          );
+          finish();
+        }, GENERATION_DEADLINE_MS);
 
         try {
           for await (const event of events) {
@@ -476,6 +543,7 @@ function streamProjectTurn(request: Parameters<AiProvider["generate"]>[0]): Resp
             if (event.kind === "op_start") {
               send(frame({ t: "op_start", opType: event.type, path: event.path }));
             } else if (event.kind === "op") {
+              finishedOps.push(event.op);
               send(frame({ t: "op", op: event.op }));
             } else {
               send(
@@ -494,9 +562,27 @@ function streamProjectTurn(request: Parameters<AiProvider["generate"]>[0]): Resp
           // Same rule as the chat stream: the provider's own words go to the
           // log, and the student gets one sentence they can act on.
           console.error("[api/ai] project stream failed mid-flight:", err);
-          send(frame({ t: "error", message: describeAiFailure(err) }));
+          // Words already on their way to the student are never replaced by a
+          // second provider (see chain.ts); the same rule applies here, so a
+          // mid-flight failure after operations have streamed hands back what
+          // finished rather than erasing it with an error.
+          if (finishedOps.length > 0) {
+            send(
+              frame({
+                t: "done",
+                operations: finishedOps,
+                message:
+                  "Panda stopped part-way through. Here's what it finished — ask it to carry on from here.",
+                truncated: false,
+                interrupted: true,
+              }),
+            );
+          } else {
+            send(frame({ t: "error", message: describeAiFailure(err) }));
+          }
         } finally {
           clearTimeout(deadline);
+          clearTimeout(outOfTime);
           finish();
         }
       },

@@ -16,6 +16,19 @@ import type { FileOperation } from "@/types";
 
 const TYPES = new Set<FileOperation["type"]>(["create", "modify", "delete", "rename"]);
 
+/**
+ * What a student reads when the clock ended the turn.
+ *
+ * Not a network error. The old behaviour sent them to check their wifi for a
+ * problem that was never theirs, and threw away finished files while doing it.
+ * These two sentences are written for the two real cases: work survived, or
+ * nothing had been produced yet.
+ */
+const OUT_OF_TIME_WITH_WORK =
+  "Panda ran out of time on this one. Here's what it finished — ask it to carry on from here.";
+const OUT_OF_TIME_EMPTY =
+  "Panda ran out of time before it finished anything. Try asking for a smaller piece first — one screen, or one feature — and then build on it.";
+
 /** The file the model is writing at this moment, as it announced it. */
 export interface OpStart {
   type: FileOperation["type"];
@@ -28,6 +41,16 @@ export interface BuildResult {
   openFiles?: string[];
   /** The model's reply was cut off; these are the files that finished. */
   truncated: boolean;
+  /**
+   * The turn ran out of time rather than finishing — either the server closed
+   * the stream cleanly on its own deadline, or the socket died under us.
+   *
+   * Deliberately separate from `truncated`. That one means the JSON envelope
+   * never closed: the model stopped mid-sentence. This one means the model was
+   * still going fine and the clock is what ended it. The student is told two
+   * different things, and only one of them is a reason to distrust the files.
+   */
+  interrupted?: boolean;
 }
 
 export interface BuildStreamHandlers {
@@ -98,6 +121,7 @@ function handle(value: unknown, handlers: BuildStreamHandlers): BuildResult | un
       message: typeof f.message === "string" ? f.message : "",
       openFiles: Array.isArray(f.openFiles) ? f.openFiles.map(String) : undefined,
       truncated: f.truncated === true,
+      interrupted: f.interrupted === true,
     };
   }
 
@@ -148,6 +172,11 @@ export async function runBuildStream(
   let result: BuildResult | undefined;
   let failed = false;
 
+  // Every operation the server already sent us, validated on its way out. If
+  // the connection dies after this point these are real, finished files — the
+  // whole reason the turn is streamed is so that they do not die with it.
+  const received: FileOperation[] = [];
+
   const consume = (line: string) => {
     const trimmed = line.trim();
     if (!trimmed) return;
@@ -159,12 +188,31 @@ export async function runBuildStream(
     }
     const done = handle(value, {
       ...handlers,
+      onOp: (op) => {
+        received.push(op);
+        handlers.onOp(op);
+      },
       onError: (message) => {
         failed = true;
         handlers.onError(message);
       },
     });
     if (done) result = done;
+  };
+
+  /** The socket died, or the stream stopped without saying goodbye. */
+  const endedEarly = () => {
+    if (failed) return;
+    if (received.length > 0) {
+      handlers.onDone({
+        operations: received,
+        message: OUT_OF_TIME_WITH_WORK,
+        truncated: false,
+        interrupted: true,
+      });
+      return;
+    }
+    handlers.onError(OUT_OF_TIME_EMPTY);
   };
 
   try {
@@ -182,6 +230,16 @@ export async function runBuildStream(
     // A last line the server wrote without its newline (a torn connection,
     // a proxy cutting the tail) is still worth parsing.
     consume(buffer);
+  } catch (err) {
+    // The platform severed the connection mid-stream: `fetch`'s reader throws
+    // and there will be no `done` frame, ever. That is the normal shape of a
+    // build that outgrew its deadline, and it is NOT a reason to discard the
+    // files that already arrived.
+    //
+    // A deliberate cancellation is different — the student asked for it, and
+    // it is theirs to handle — so it goes back up untouched.
+    if (signal?.aborted || (err instanceof DOMException && err.name === "AbortError")) throw err;
+    console.warn("[build] the stream was cut mid-flight:", err);
   } finally {
     await reader.cancel().catch(() => {});
   }
@@ -190,7 +248,8 @@ export async function runBuildStream(
     handlers.onDone(result);
     return;
   }
-  // No `done` frame and no error frame: the stream simply stopped. Saying so
-  // is better than leaving the panel waiting on something that will not come.
-  if (!failed) handlers.onError(fallbackError);
+  // No `done` frame. Whether the socket was severed or the stream just stopped,
+  // the absence of `done` is the normal shape of a build that ran out of time,
+  // so it must not invalidate what preceded it.
+  endedEarly();
 }

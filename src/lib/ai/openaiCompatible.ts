@@ -220,6 +220,24 @@ export class OpenAiCompatibleProvider implements AiProvider {
         // Releases the socket when the reader walks away mid-reply.
         await reader.cancel().catch(() => {});
       }
+    } catch (err) {
+      // OUR DEADLINE IS NOT THEIR NETWORK.
+      //
+      // When the watchdog fires it aborts with an AiTimeoutError, but what the
+      // caller actually catches depends on where the abort landed: before the
+      // response headers, fetch rejects with our reason; once the body is being
+      // read, the runtime raises its own "terminated"/AbortError instead. That
+      // second shape matches the network branch of describeAiFailure, so a
+      // deadline WE chose was being reported to the student as "Panda couldn't
+      // reach the AI. Check the connection" — sending them to look at their
+      // wifi for a limit we set.
+      //
+      // So the abort reason wins over whatever the runtime substituted. Only
+      // our own watchdog can set that reason, so a genuine network fault is
+      // still reported as one.
+      const reason = abort.signal.reason;
+      if (reason instanceof AiTimeoutError) throw reason;
+      throw err;
     } finally {
       watchdog.clear();
       // The stream may be abandoned by the consumer (the chain giving up, the
@@ -272,6 +290,21 @@ export class OpenAiCompatibleProvider implements AiProvider {
       stream,
       temperature: temperatureFor(req),
       // Project turns must come back as JSON; chat answers in prose.
+      // KEPT DELIBERATELY, having been suspected of the timeout incident.
+      //
+      // A provider may buffer a JSON-mode reply until the object is complete,
+      // which defeats the incremental scanner in projectStream.ts — the events
+      // then all arrive at once instead of file by file. That is a cost, and it
+      // is the reason project turns now get a first-token allowance long enough
+      // to survive it (PROJECT_FIRST_TOKEN_MS in chain.ts).
+      //
+      // It is not a reason to drop the flag. Without it the model is free to
+      // wrap the envelope in prose or a markdown fence, and every project turn
+      // falls back on the recovery paths that exist for when it does — which is
+      // trading a reliable slow path for an unreliable fast one. Which
+      // providers actually buffer under JSON mode could not be measured here
+      // (no keys in this environment), so the change that helps whether or not
+      // they do is the one that was made. Revisit with real measurements.
       ...(req.chatOnly ? {} : { response_format: { type: "json_object" } }),
       // Absent entirely unless search is live, so nothing changes for the
       // requests that are not searching — which is nearly all of them.

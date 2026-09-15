@@ -107,6 +107,37 @@ export const CHAIN_BUDGET_MS = 22_000;
 /** One provider's slice of that budget. */
 export const FIRST_TOKEN_MS = 6_000;
 
+// A PROJECT TURN IS NOT A CHAT TURN, AND SIX SECONDS WAS KILLING IT.
+//
+// Everything above is written for prose, where the first word really does
+// arrive in under a second and silence past six means the provider is gone. A
+// project turn is asked for `response_format: json_object` (see
+// openaiCompatible.body). Providers are entitled to buffer and validate a JSON
+// object before emitting any of it, and when one does, time-to-first-token IS
+// time-to-complete: nothing is emitted until the whole envelope exists.
+//
+// Against that, a six-second first-token deadline does not mean "this provider
+// is silent", it means "this answer is bigger than six seconds" — so every
+// provider in the chain got aborted in turn, a whole-app request could never
+// succeed no matter how healthy the providers were, and the student was told
+// to check their connection. Small edits finished inside the window, which is
+// why the path looked sound under a small test.
+//
+// So a project turn gets its own, much longer allowance. The watchdog still
+// does its real job — a provider that is genuinely dead is still abandoned and
+// the next one still gets tried — it simply stops mistaking "busy writing four
+// files" for "not there". The numbers sit under the route's own out-of-time
+// close, which is what guarantees a student hears something either way.
+export const PROJECT_FIRST_TOKEN_MS = 30_000;
+
+/** The project chain's equivalent of CHAIN_BUDGET_MS. See above. */
+export const PROJECT_CHAIN_BUDGET_MS = 45_000;
+
+/** The whole-chain budget for this request. Prose and files are not alike. */
+export function chainBudgetFor(req: AgentRequest): number {
+  return req.chatOnly ? CHAIN_BUDGET_MS : PROJECT_CHAIN_BUDGET_MS;
+}
+
 /**
  * Below this there is no point starting a provider: a connection alone can eat
  * it, and a doomed attempt is time the error message could have used.
@@ -301,11 +332,11 @@ function remaining(deadline: number): number {
  * the shared budget, whichever is smaller. Undefined when there is not enough
  * left to bother.
  */
-function sliceFor(deadline: number): AttemptOptions | undefined {
+function sliceFor(deadline: number, req: AgentRequest): AttemptOptions | undefined {
   const left = remaining(deadline);
   if (left < MIN_ATTEMPT_MS) return undefined;
   return {
-    firstTokenTimeoutMs: Math.min(FIRST_TOKEN_MS, left),
+    firstTokenTimeoutMs: Math.min(req.chatOnly ? FIRST_TOKEN_MS : PROJECT_FIRST_TOKEN_MS, left),
     // Deliberately not clamped to the budget: the budget is about reaching the
     // first word. Once text is flowing the student is being served, and the
     // only thing left to guard against is a socket that has died quietly.
@@ -316,7 +347,7 @@ function sliceFor(deadline: number): AttemptOptions | undefined {
 class ProviderChain implements AiProvider {
   async generate(req: AgentRequest): Promise<AgentResponse> {
     const links = linksFor(req);
-    const deadline = Date.now() + CHAIN_BUDGET_MS;
+    const deadline = Date.now() + chainBudgetFor(req);
     let lastError: unknown;
 
     for (const [index, link] of links.entries()) {
@@ -357,11 +388,11 @@ class ProviderChain implements AiProvider {
     session?: ToolSession,
   ): AsyncIterable<string> {
     const links = linksFor(req);
-    const deadline = Date.now() + CHAIN_BUDGET_MS;
+    const deadline = Date.now() + chainBudgetFor(req);
     let lastError: unknown;
 
     for (const [index, link] of links.entries()) {
-      const slice = sliceFor(deadline);
+      const slice = sliceFor(deadline, req);
       if (!slice) {
         lastError = outOfTime(links, index);
         break;
@@ -399,7 +430,7 @@ class ProviderChain implements AiProvider {
 function outOfTime(links: ChainLink[], index: number): AiTimeoutError {
   const untried = links.slice(index).map((l) => l.label).join(", ");
   const message =
-    `the chain spent its ${CHAIN_BUDGET_MS}ms budget without a first word` +
+    `the chain spent its budget without a first word` +
     (untried ? `; never tried ${untried}` : "");
   console.error(`[ai] ${message}. Answering with an error rather than being killed at ${MAX_DURATION_S}s.`);
   return new AiTimeoutError(message);

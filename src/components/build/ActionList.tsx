@@ -17,6 +17,24 @@ import { diffLines, hunks, type DiffResult } from "./diff";
 // attached, and the diff underneath is the proof. A student who is new to code
 // learns faster from seeing the edit than from being told about it.
 
+/**
+ * Why this list is not simply "what Panda decided to do".
+ *
+ * "out-of-time" is the one that is not a defect: the files are complete and
+ * validated, there are just fewer of them than the student asked for, and the
+ * useful next move is to ask Panda to carry on — not to distrust what is here.
+ */
+export type RecoveryNote = "truncated-envelope" | "code-block" | "out-of-time";
+
+const NOTE: Record<RecoveryNote, string> = {
+  "truncated-envelope":
+    "Panda's reply got cut off part-way through. These are the files it finished — check them before applying.",
+  "code-block":
+    "Panda wrote this out as code instead of changing the files itself. Apply it and the code goes where it belongs.",
+  "out-of-time":
+    "Panda ran out of time before it could finish everything. These files are done — apply them, then ask Panda to carry on from here.",
+};
+
 const VERB: Record<FileOperation["type"], StringKey> = {
   create: "studio.opCreated",
   modify: "studio.opEdited",
@@ -32,7 +50,13 @@ const VERB_STYLE: Record<FileOperation["type"], string> = {
   rename: "bg-[var(--accent-soft)] text-[var(--accent-strong)]",
 };
 
-function DiffBody({ result }: { result: DiffResult }) {
+/**
+ * The rows of one diff. Exported because the Changes panel shows the same
+ * comparison at a different moment — before approving an operation there, at
+ * any time here — and two renderings of the same diff would eventually
+ * disagree about what a removed line looks like.
+ */
+export function DiffBody({ result }: { result: DiffResult }) {
   const blocks = useMemo(() => hunks(result.rows), [result.rows]);
 
   if (result.tooLarge) {
@@ -151,7 +175,7 @@ export function ActionList({
   rejected?: boolean;
   onApply: () => void;
   onReject: () => void;
-  recovered?: "truncated-envelope" | "code-block";
+  recovered?: RecoveryNote;
 }) {
   const project = useStudioStore((s) => s.project);
 
@@ -159,9 +183,7 @@ export function ActionList({
     <div className="mt-2 space-y-1.5">
       {recovered && (
         <p className="rounded-lg border border-[var(--warn)] bg-[var(--warn-soft)] px-2.5 py-1.5 text-[11px] leading-relaxed text-[var(--warn)]">
-          {recovered === "truncated-envelope"
-            ? "Panda's reply got cut off part-way through. These are the files it finished — check them before applying."
-            : "Panda wrote this out as code instead of changing the files itself. Apply it and the code goes where it belongs."}
+          {NOTE[recovered]}
         </p>
       )}
 

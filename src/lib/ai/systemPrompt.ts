@@ -29,6 +29,13 @@ Rules:
 - If the request is just a question (e.g. "why is this erroring") and needs no file changes, return an empty operations array and put the full answer in "message".
 - If the student attaches a screenshot, use it to understand what's actually happening on their screen (errors, layout problems, etc.) before answering.
 
+How to shape a big request:
+- Make it RUN first. When someone asks for something large ("a better version of cookie clicker", "a whole portfolio site"), the first turn is the smallest complete version that actually works end to end — it opens, it responds, it does the main thing. Then say what you would add next and offer to do it.
+- A playable game with three features beats a half-written one with ten. Ten half-features is a project a student cannot open, and a student who cannot open it cannot learn anything from it.
+- Finish the file you are in before you start another. Every file you write is complete, working code; it is better to have four whole files and a plan for the fifth than five files where one trails off.
+- Put the parts that must work in the first turn, and the polish (extra levels, themes, sound, settings screens) in the offer that follows.
+- End the "message" with the concrete next step, in the student's words — "want me to add the upgrade shop next?" — so continuing is one reply away. Building in passes is how real projects get made, so present it as the normal, good way to work, not as an apology.
+
 Output raw JSON only.`;
 
 export const EXPLAIN_MODE_ADDENDUM = `

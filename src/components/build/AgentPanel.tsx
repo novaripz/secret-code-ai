@@ -14,7 +14,7 @@ import { ModePills } from "@/components/chat/ModePills";
 import { MessageText } from "@/components/chat/MessageText";
 import { SparkleIcon } from "@/components/icons";
 import type { FileOperation } from "@/types";
-import { ActionList, LiveActions } from "./ActionList";
+import { ActionList, LiveActions, type RecoveryNote } from "./ActionList";
 import { recoverOperations } from "./recoverOperations";
 import { runBuildStream, type OpStart } from "./buildStream";
 
@@ -43,7 +43,7 @@ const SUGGESTIONS: StringKey[] = [
  * project history, and adding a field to the shared ChatMessage type would
  * reach every other surface for the benefit of one.
  */
-const recoveries = new Map<string, { source: "truncated-envelope" | "code-block"; raw: string }>();
+const recoveries = new Map<string, { source: RecoveryNote; raw: string }>();
 
 /** What the panel is doing right now, in words that are true. */
 type Phase =
@@ -246,10 +246,17 @@ export function AgentPanel() {
             // A cut-off reply is said out loud rather than presented as a
             // finished answer: these are the files that completed, and the
             // student is told to check them before applying.
-            if (result.truncated) {
+            //
+            // Running out of time is its own note. The files are whole — the
+            // turn just ended before the model got to the rest — so the student
+            // is told to apply them and ask Panda to carry on, not sent off to
+            // check a connection that was never the problem.
+            if (result.interrupted) {
+              recoveries.set(msg.id, { source: "out-of-time", raw: "" });
+            } else if (result.truncated) {
               recoveries.set(msg.id, { source: "truncated-envelope", raw });
             }
-            if (raw) addBuildLogEntry(project.id, raw.slice(0, 200));
+            if (raw && !result.interrupted) addBuildLogEntry(project.id, raw.slice(0, 200));
 
             if (result.openFiles?.length && result.operations.length === 0) {
               for (const path of result.openFiles) openFile(path);
@@ -356,7 +363,7 @@ export function AgentPanel() {
                         onReject={() => markRejected(m.id)}
                       />
                     )}
-                    {recovery && (
+                    {recovery && recovery.raw && (
                       // The raw reply is kept, not thrown away: a student who
                       // wants to see exactly what came back can, it just is not
                       // the first thing the log shows them any more.

@@ -212,8 +212,13 @@ export class GeminiProvider implements AiProvider {
         }
         return;
       } catch (err) {
-        lastError = err;
-        if (started || !this.isBadArgument(err)) throw err;
+        // Our own deadline is reported as a deadline, not as the student's
+        // connection — same reasoning as the OpenAI-compatible adapter: the SDK
+        // substitutes its own abort error and that text reads like a network
+        // fault to describeAiFailure.
+        const reason = abort.signal.reason;
+        lastError = reason instanceof AiTimeoutError ? reason : err;
+        if (started || !this.isBadArgument(err)) throw lastError;
       } finally {
         if (timer) clearTimeout(timer);
         // Returns the connection when the consumer walks away mid-reply, and
