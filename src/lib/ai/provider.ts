@@ -212,3 +212,209 @@ export function clearProviderFailure(label: string): void {
 export function lastProviderFailures(): Record<string, ProviderFailure> {
   return Object.fromEntries(failures);
 }
+
+// ---------------------------------------------------------------------------
+// Cooldowns: remembering that a provider already said "not now".
+//
+// Failover alone re-discovers an exhausted provider on every single message.
+// Gemini's free tier is 20 requests a DAY, and Groq's and Cerebras' are not
+// much bigger against a class of thirty; once one is spent, every later message
+// pays a full round-trip to be told the same thing before reaching a provider
+// that works. A class hitting limits mid-period feels the app get slower and
+// slower with nothing on screen to explain it. So a provider that reports being
+// out is remembered and skipped for a while.
+//
+// Same honest caveat as the rate limiter in lib/security/rateLimit.ts: this is
+// a Map in one server process. On a serverless deployment every instance keeps
+// its own, so a cooldown learned by one instance does nothing for the next
+// request if it lands elsewhere, and a cold start forgets everything. That
+// makes it a latency optimisation that degrades to today's behaviour, not a
+// quota accountant. A shared store would fix it, and is not worth its cost
+// until traffic justifies one.
+// ---------------------------------------------------------------------------
+
+/**
+ * The shortest cooldown worth having.
+ *
+ * Sixty seconds because the smallest limit any of these providers enforces is
+ * per-minute: if what we hit was a burst limit, it has cleared by the time this
+ * expires and the provider is tried again on the next message, costing that
+ * message nothing.
+ */
+const BASE_COOLDOWN_MS = 60_000;
+
+/**
+ * The longest a quota cooldown may grow to.
+ *
+ * A daily quota and a per-minute burst limit look identical from here — both
+ * are a 429, and only some providers send Retry-After. We cannot tell them
+ * apart, so we do not pretend to: the cooldown starts at a minute and doubles
+ * each time the provider is tried again and says no again. A burst limit stops
+ * at the first step; a spent daily quota climbs out of the way within a few
+ * messages. The cap exists because quotas do reset, and nothing here is told
+ * when: fifteen minutes is the longest we are willing to keep a recovered
+ * provider benched.
+ */
+const MAX_COOLDOWN_MS = 15 * 60_000;
+
+/**
+ * A rejected key. Not a quota problem and it will not fix itself — the value in
+ * the environment has to change, which on every platform we deploy to means a
+ * restart, which clears this Map anyway. So the number only has to be long
+ * enough to stop paying for the same rejection all lesson.
+ */
+const BAD_KEY_COOLDOWN_MS = 60 * 60_000;
+
+/** Retry-After is a provider's own number, but it is still bounded by ours. */
+const MIN_RETRY_AFTER_MS = 5_000;
+const MAX_RETRY_AFTER_MS = 60 * 60_000;
+
+export interface ProviderCooldown {
+  /** Epoch milliseconds. Before this, skip the provider if there is an alternative. */
+  until: number;
+  /** Why, in words an operator can act on. Never contains key material. */
+  reason: string;
+  /** HTTP status that caused it, when there was one. */
+  status?: number;
+  /** Where the length came from: the provider said so, or we guessed. */
+  source: "retry-after" | "backoff" | "bad-key";
+}
+
+interface CooldownEntry extends ProviderCooldown {
+  /** How many quota refusals in a row, which is what doubles the next wait. */
+  strikes: number;
+}
+
+/**
+ * How long an expired cooldown is still remembered.
+ *
+ * It has to outlive the cooldown itself, or the doubling could never happen:
+ * the provider is only retried after its wait expires, so if expiry forgot
+ * everything, every refusal would look like the first one and a spent daily
+ * quota would be re-checked once a minute all day. Keeping the record for one
+ * more full cap past expiry means a provider that goes quiet for a quarter of
+ * an hour is genuinely treated as recovered, and one that is still refusing
+ * carries its count forward.
+ */
+const STRIKE_MEMORY_MS = MAX_COOLDOWN_MS;
+
+const cooldowns = new Map<string, CooldownEntry>();
+
+/**
+ * Text that means "you are over a limit" rather than "your key is wrong".
+ *
+ * This is the only way to tell a quota 403 from a bad-key 403. Google returns
+ * 403 with RESOURCE_EXHAUSTED or a billing message for a spent free tier and
+ * 403 with PERMISSION_DENIED for a key that is not allowed to be there, and the
+ * status alone does not separate them. Matching the message is guessing, and it
+ * guesses in the safe direction: an unmatched 403 is treated as a bad key, so
+ * it stays skipped rather than being retried every minute forever.
+ */
+const QUOTA_TEXT =
+  /quota|rate.?limit|resource.?exhausted|too many requests|exceed|insufficient|billing|credit|out of capacity|429/i;
+
+/** Retry-After in milliseconds: delta-seconds or an HTTP date. Undefined if neither. */
+function parseRetryAfter(value: string | null | undefined): number | undefined {
+  if (!value) return undefined;
+  const raw = value.trim();
+  const seconds = Number(raw);
+  const ms = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(raw) - Date.now();
+  if (!Number.isFinite(ms) || ms <= 0) return undefined;
+  return Math.min(Math.max(ms, MIN_RETRY_AFTER_MS), MAX_RETRY_AFTER_MS);
+}
+
+export interface CooldownSignal {
+  /** HTTP status, when the failure carried one. */
+  status?: number;
+  /** The provider's Retry-After header, verbatim, when it sent one. */
+  retryAfter?: string | null;
+  /** The provider's error text. Used only to tell a quota 403 from a bad-key 403. */
+  message?: string;
+}
+
+/**
+ * Decide whether this failure means "not now" or "not with this key", and bench
+ * the provider accordingly. Returns the cooldown, or undefined for a failure
+ * that says nothing about availability — a timeout, a 500, a dropped socket.
+ * Those are already handled by falling through to the next provider, and
+ * benching on them would take a provider out over one bad minute.
+ */
+export function coolDownProvider(
+  label: string,
+  signal: CooldownSignal,
+): ProviderCooldown | undefined {
+  const { status, message = "" } = signal;
+  const quotaShaped = status === 429 || status === 402 || QUOTA_TEXT.test(message);
+  const keyShaped = status === 401 || (status === 403 && !QUOTA_TEXT.test(message));
+
+  if (keyShaped) {
+    const entry: CooldownEntry = {
+      until: Date.now() + BAD_KEY_COOLDOWN_MS,
+      reason: "the provider rejected the key",
+      status,
+      source: "bad-key",
+      strikes: 0,
+    };
+    cooldowns.set(label, entry);
+    return entry;
+  }
+
+  if (!quotaShaped) return undefined;
+
+  const previous = cooldowns.get(label);
+  // Strikes accumulate across refusals, including ones separated by an expired
+  // cooldown — that sequence IS the signal that this is a daily quota rather
+  // than a burst limit. Any success clears the entry outright, and so does a
+  // long enough silence, so a provider that recovers starts from a minute again.
+  const fresh =
+    previous === undefined ||
+    previous.source !== "backoff" ||
+    Date.now() - previous.until > STRIKE_MEMORY_MS;
+  const strikes = (fresh ? 0 : previous.strikes) + 1;
+  const stated = parseRetryAfter(signal.retryAfter);
+  const backoff = Math.min(BASE_COOLDOWN_MS * 2 ** (strikes - 1), MAX_COOLDOWN_MS);
+  const entry: CooldownEntry = {
+    until: Date.now() + (stated ?? backoff),
+    reason: stated
+      ? "over its limit; the provider asked us to wait this long"
+      : "over its limit; waiting a guessed interval because it sent no Retry-After",
+    status,
+    source: stated ? "retry-after" : "backoff",
+    strikes,
+  };
+  cooldowns.set(label, entry);
+  return entry;
+}
+
+/**
+ * The live cooldown for this provider, or undefined if it is free to try.
+ *
+ * An expired entry is kept, not deleted: its strike count is what tells a
+ * daily quota from a one-off burst. It stops being a reason to skip the moment
+ * it expires, and is thrown away entirely once it is STRIKE_MEMORY_MS stale.
+ */
+export function providerCooldown(label: string, now = Date.now()): ProviderCooldown | undefined {
+  const entry = cooldowns.get(label);
+  if (!entry) return undefined;
+  if (entry.until <= now) {
+    if (now - entry.until > STRIKE_MEMORY_MS) cooldowns.delete(label);
+    return undefined;
+  }
+  return entry;
+}
+
+/** A provider answered, so whatever we remembered about it is stale. */
+export function clearProviderCooldown(label: string): void {
+  cooldowns.delete(label);
+}
+
+/** For /api/ai/status: who is benched and until when. */
+export function providerCooldowns(): Record<string, ProviderCooldown> {
+  const now = Date.now();
+  const live: Record<string, ProviderCooldown> = {};
+  for (const label of cooldowns.keys()) {
+    const entry = providerCooldown(label, now);
+    if (entry) live[label] = entry;
+  }
+  return live;
+}

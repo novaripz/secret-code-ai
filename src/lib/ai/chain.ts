@@ -7,8 +7,11 @@ import {
 } from "./openaiCompatible";
 import {
   AiTimeoutError,
+  clearProviderCooldown,
   clearProviderFailure,
+  coolDownProvider,
   keyProblem,
+  providerCooldown,
   recordProviderFailure,
   type AgentRequest,
   type AiProvider,
@@ -39,6 +42,22 @@ import { allImages } from "./turn";
 // The one rule that is not about speed: a provider is only ever abandoned
 // before it has produced text. Starting over after that would replay words the
 // student has already read.
+//
+// COOLDOWNS
+//
+// A provider that has told us it is out of quota is skipped for a while rather
+// than asked again on the next message — see the cooldown section in
+// provider.ts for the lengths and the per-instance caveat. Two things about it
+// belong here, because they are about ordering rather than about one provider:
+//
+// A cooldown may never empty the chain. If every provider is benched we try
+// them anyway, soonest-to-expire first. A cooldown is a guess about someone
+// else's quota clock, and a wrong guess must cost a slow message, never a dead
+// app — the quota may well have reset and nothing here would be told.
+//
+// A cooldown never overrides the image rule either: the filtering happens after
+// linksFor has picked who can see a photo, so a benched vision provider is
+// still tried rather than the request failing as "nobody can see images".
 //
 // TIME
 //
@@ -311,6 +330,7 @@ class ProviderChain implements AiProvider {
         // whole attempt has to fit inside what is left.
         const response = await link.provider.generate(req, { idleTimeoutMs: left });
         clearProviderFailure(link.label);
+        clearProviderCooldown(link.label);
         return response;
       } catch (err) {
         lastError = err;
@@ -354,7 +374,10 @@ class ProviderChain implements AiProvider {
           started = true;
           yield chunk;
         }
-        if (started) clearProviderFailure(link.label);
+        if (started) {
+          clearProviderFailure(link.label);
+          clearProviderCooldown(link.label);
+        }
         return;
       } catch (err) {
         lastError = err;
@@ -386,14 +409,52 @@ function linksFor(req: AgentRequest): ChainLink[] {
   const links = configuredLinks();
   if (allImages(req).length === 0) {
     if (links.length === 0) throw new AiSetupError(NOT_CONFIGURED_DETAIL);
-    return links;
+    return afterCooldowns(links);
   }
 
   const canSee = links.filter((link) => link.acceptsImages);
   if (canSee.length === 0) {
     throw new AiSetupError(NO_VISION_DETAIL);
   }
-  return canSee;
+  return afterCooldowns(canSee);
+}
+
+/**
+ * Drops the providers that said they were out of quota recently, keeping the
+ * rest in their usual order.
+ *
+ * The important half is the fallback. If that would leave nothing, every link
+ * is handed back instead, ordered by which cooldown expires first — the one
+ * closest to its own stated reset is the likeliest to answer. Refusing outright
+ * would mean a stale guess about someone else's quota clock could take the app
+ * down for a class while the quota was in fact fine, which is a far worse
+ * failure than one slow message.
+ */
+function afterCooldowns(links: ChainLink[]): ChainLink[] {
+  const now = Date.now();
+  const ready = links.filter((link) => providerCooldown(link.label, now) === undefined);
+  if (ready.length > 0) {
+    if (ready.length < links.length) {
+      const benched = links
+        .filter((link) => !ready.includes(link))
+        .map((link) => {
+          const cooling = providerCooldown(link.label, now);
+          return `${link.label} (${Math.round(((cooling?.until ?? now) - now) / 1000)}s left)`;
+        })
+        .join(", ");
+      console.info(`[ai] skipping ${benched}: cooling down. See /api/ai/status.`);
+    }
+    return ready;
+  }
+
+  console.warn(
+    "[ai] every provider is cooling down; trying them anyway, soonest reset first. " +
+      "A cooldown is a guess and must not be the reason nobody answers.",
+  );
+  return [...links].sort(
+    (a, b) =>
+      (providerCooldown(a.label, now)?.until ?? 0) - (providerCooldown(b.label, now)?.until ?? 0),
+  );
 }
 
 /**
@@ -411,18 +472,29 @@ function logSkip(label: string, err: unknown, final = false, started = false): v
       ? "and it was the last one left"
       : "trying the next provider";
   if (err instanceof ProviderHttpError) {
-    if (err.status === 401 || err.status === 403) {
+    // coolDownProvider decides for itself whether this status means "not now"
+    // or "not with this key"; a 403 can be either and only its text says which.
+    const benched = coolDownProvider(label, {
+      status: err.status,
+      retryAfter: err.retryAfter,
+      message: err.message,
+    });
+    const rest = benched ? ` ${describeCooldown(benched.until)}` : "";
+    if (err.status === 401 || (err.status === 403 && benched?.source === "bad-key")) {
       recordProviderFailure(label, { status: err.status, reason: "the provider rejected the key" });
+      // The key itself is never in this line — only that one was rejected.
       console.error(
         `[ai] ${label} rejected the API key (${err.status}) ${when}. Check that key — the ` +
-          "request itself was fine.",
+          `request itself was fine.${rest} A new key needs a redeploy, which clears this anyway.`,
       );
       return;
     }
     const retry = err.retryAfter ? `, retry-after=${err.retryAfter}` : "";
-    if (err.status === 429 || err.status === 503) {
+    if (err.status === 429 || err.status === 503 || err.status === 402 || err.status === 403) {
       recordProviderFailure(label, { status: err.status, reason: "out of capacity" });
-      console.warn(`[ai] ${label} is out of capacity (${err.status}${retry}) ${when}, ${next}.`);
+      console.warn(
+        `[ai] ${label} is out of capacity (${err.status}${retry}) ${when}, ${next}.${rest}`,
+      );
       return;
     }
     recordProviderFailure(label, { status: err.status, reason: err.message });
@@ -430,8 +502,22 @@ function logSkip(label: string, err: unknown, final = false, started = false): v
     return;
   }
   const reason = err instanceof Error ? err.message : String(err ?? "unknown");
+  // Gemini answers through an SDK, so its quota refusals arrive as an ordinary
+  // Error with the status buried in the text. Nothing here is benched unless
+  // that text actually reads like a quota — a timeout or a dropped socket says
+  // nothing about availability, and benching on one would take a healthy
+  // provider out over a single bad minute.
+  const benched = coolDownProvider(label, { message: reason });
   recordProviderFailure(label, { reason });
-  console.warn(`[ai] ${label} failed ${when}, ${next}: ${reason}`);
+  console.warn(
+    `[ai] ${label} failed ${when}, ${next}: ${reason}` +
+      (benched ? ` ${describeCooldown(benched.until)}` : ""),
+  );
+}
+
+/** "Not trying it again for 60s." — the same sentence wherever a bench is logged. */
+function describeCooldown(until: number): string {
+  return `Not trying it again for ${Math.max(1, Math.round((until - Date.now()) / 1000))}s.`;
 }
 
 /**
