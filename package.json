@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check:ai": "tsx scripts/checks/ai-chain.test.ts"
+    "check:ai": "tsx scripts/checks/ai-chain.test.ts",
+    "check": "npm run check:ai && npm run check:files",
+    "check:files": "tsx scripts/checks/project-files.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.19.0",

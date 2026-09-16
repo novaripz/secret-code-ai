@@ -477,6 +477,16 @@ export function AssistantChat() {
                         )}
                       </div>
                     ) : null}
+
+                    {/* Copy under the student's own message too. Asking the
+                        same question a different way means retyping it, and a
+                        long prompt retyped from memory comes back shorter and
+                        vaguer — which is usually why the second answer is
+                        worse than the first. Not shown on an errored turn:
+                        there is nothing there to copy. */}
+                    {m.role === "user" && m.content && !m.error && (
+                      <CopyButton content={m.content} variant="own" />
+                    )}
                   </div>
                 </div>
               ))}

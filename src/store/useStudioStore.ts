@@ -44,12 +44,43 @@ interface StudioState {
   persist: () => Promise<void>;
 }
 
+// AUTOSAVE, AND THE PROJECT IT BELONGS TO
+//
+// The debounce used to fire a callback that read `get().project` -- whatever
+// project the store held 800ms later. Open a project, type, and click through
+// to another project inside that window, and the timer woke up pointing at the
+// wrong one: the edit that was waiting to be written was dropped on the floor,
+// and the student came back to a file that had silently lost their last few
+// keystrokes. Nothing was written into the other project (saveProject keys on
+// project.id), so nothing leaked -- it was quieter than that, and worse.
+//
+// The pending edit is now held by reference rather than looked up again, so a
+// save always writes the project the edit was made in. Switching projects
+// flushes it first instead of cancelling it.
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingProject: Project | null = null;
 
-function scheduleAutosave(get: () => StudioState) {
+async function flushAutosave(): Promise<void> {
+  const project = pendingProject;
+  pendingProject = null;
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  if (!project) return;
+  try {
+    await saveProject(project);
+  } catch (err) {
+    console.error("Failed to save project", err);
+  }
+}
+
+function scheduleAutosave(project: Project) {
+  pendingProject = project;
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    get().persist();
+    saveTimer = null;
+    void flushAutosave();
   }, 800);
 }
 
@@ -61,7 +92,13 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   saving: false,
   lastSavedAt: null,
 
-  setProject: (project) => set({ project, tabs: [], activeTab: null, consoleEntries: [] }),
+  setProject: (project) => {
+    // The outgoing project's unsaved edit is written before the store forgets
+    // it exists. Deliberately not awaited: the new project should open now, and
+    // the write is already pointed at the right record.
+    void flushAutosave();
+    set({ project, tabs: [], activeTab: null, consoleEntries: [] });
+  },
 
   openFile: (path) =>
     set((s) => {
@@ -93,7 +130,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       project: { ...project },
       tabs: s.tabs.map((t) => (t.path === path ? { ...t, dirty: true } : t)),
     }));
-    scheduleAutosave(get);
+    scheduleAutosave(project);
   },
 
   addFile: (path, content = "") => {
@@ -101,7 +138,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     if (!project) return;
     createFile(project, path, content);
     set({ project: { ...project } });
-    scheduleAutosave(get);
+    scheduleAutosave(project);
   },
 
   addFolder: (path) => {
@@ -109,7 +146,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     if (!project) return;
     createFolder(project, path);
     set({ project: { ...project } });
-    scheduleAutosave(get);
+    scheduleAutosave(project);
   },
 
   removeNode: (path) => {
@@ -121,7 +158,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       tabs: s.tabs.filter((t) => !t.path.startsWith(path)),
       activeTab: s.activeTab && s.activeTab.startsWith(path) ? null : s.activeTab,
     }));
-    scheduleAutosave(get);
+    scheduleAutosave(project);
   },
 
   renamePath: (path, newPath) => {
@@ -133,7 +170,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       tabs: s.tabs.map((t) => (t.path === path ? { ...t, path: newPath } : t)),
       activeTab: s.activeTab === path ? newPath : s.activeTab,
     }));
-    scheduleAutosave(get);
+    scheduleAutosave(project);
   },
 
   applyOperations: (ops) => {
@@ -191,6 +228,13 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   persist: async () => {
     const { project } = get();
     if (!project) return;
+    // An explicit save supersedes whatever the debounce was holding; letting it
+    // fire afterwards would write the same bytes a second time.
+    pendingProject = null;
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
     set({ saving: true });
     try {
       await saveProject(project);

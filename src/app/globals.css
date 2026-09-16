@@ -619,41 +619,39 @@ html, body {
   overscroll-behavior-x: contain;
 }
 
-/* The composer shell: resting versus focused.
+/* The composer shell, and why it has no focus ring at all.
 
-   The complaint was a hard bright box around the message input that was there
-   all the time. It was `--line-strong`, the token meant for a control that
-   wants to be noticed, and an always-noticeable input is one a student reads
-   as already focused — so the real focus state had nothing left to say. At
-   rest it is now `--line`, the hairline every card and chip already uses, and
-   it settles into the surface instead of fencing it off.
+   It had two, and you could see both: `:focus-visible` at the top of this file
+   is unlayered while Tailwind's `outline-none` on the textarea is layered, so
+   the utility lost and the textarea drew a hard rectangle inside a 24px-rounded
+   shell. The shell then drew a second, correctly-shaped ring around that. A
+   green box inside a green box, every time anyone typed.
 
-   Removing the ring outright was the obvious fix and the wrong one: a keyboard
-   user needs to see where they are. So the shell draws the ring instead of the
-   textarea. The textarea keeps `outline-none` because an outline on the
-   textarea is a rectangle inside a 24px-rounded container, which reads as a
-   rendering bug; `:has(textarea:focus-visible)` moves that job to the element
-   with the right shape. Scoped to the textarea rather than any descendant so
-   the icon buttons keep their own rings and the whole composer does not light
-   up when a student tabs onto the paperclip.
+   Both are gone now, and that is a deliberate exception to the rule above
+   rather than an oversight. A focus indicator answers "where am I typing?", and
+   in a text field the caret already answers it — blinking, exactly where the
+   next character will go, in every theme, without the ring. This is the one
+   control on the page where the indicator is redundant, so it is the one
+   control that gives it up. Everything else on the page keeps its ring, and
+   the icon buttons INSIDE the composer keep theirs: tabbing onto the paperclip
+   has nothing else to show you where you are.
 
-   `:focus-visible` rather than `:focus` is the point of the change: browsers
-   always match it for text entry, so clicking into the box still shows the
-   ring, while the resting state stays quiet. The ring is `--focus`, which each
-   theme sets against its own ground — a colour bright enough on #0d0d0d would
-   be shouting on sepia's paper — and the halo is a `color-mix` of that same
-   token rather than a hard-coded rgba, so it inherits the theme too. It is a
-   box-shadow, not a border-width change, because growing the border by a pixel
-   on focus would reflow the input and nudge the text the student is typing. */
+   The resting hairline stays. It is the composer's shape, not a focus state --
+   without it the input has no edge and floats on the surface. */
 .composer-shell {
   border-color: var(--line);
 }
-.composer-shell:has(textarea:focus-visible) {
-  border-color: var(--focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 28%, transparent);
+/* The textarea's own outline, suppressed here rather than in a Tailwind class
+   because the rule it is fighting is unlayered and would win regardless of
+   what the element's class list says. */
+.composer-shell textarea:focus-visible,
+.composer-shell textarea:focus,
+.composer-shell input[type="text"]:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
-/* Drag-over outranks focus: mid-drop, where the file will land matters more
-   than where the caret is. */
+/* Drag-over is not focus: it says where a dropped file will land, which nothing
+   else on screen says, so it keeps its border. */
 .composer-shell[data-dragging] {
   border-color: var(--text);
 }

@@ -30,7 +30,18 @@ const FEEDBACK_MS = 1800;
 
 type State = "idle" | "copied" | "failed";
 
-export function CopyButton({ content }: { content: string }) {
+/**
+ * "reply" is the labelled button under one of Panda's answers. "own" is the
+ * quiet icon under the student's own message, which exists because re-typing a
+ * long prompt to ask it a second way is the most common reason a student gives
+ * up on a question. It is small because their own words need no explaining back
+ * to them, and it is ALWAYS VISIBLE rather than appearing on hover: a phone has
+ * no hover, and a control that only exists for mouse users does not exist for
+ * most of this app's users.
+ */
+type Variant = "reply" | "own";
+
+export function CopyButton({ content, variant = "reply" }: { content: string; variant?: Variant }) {
   const { t } = useI18n();
   const [state, setState] = useState<State>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -65,6 +76,29 @@ export function CopyButton({ content }: { content: string }) {
 
   const label =
     state === "copied" ? t("chat.copied") : state === "failed" ? t("chat.copyFailed") : t("chat.copy");
+
+  if (variant === "own") {
+    return (
+      <div className="mt-1 flex justify-end">
+        <button
+          type="button"
+          onClick={() => void copy()}
+          aria-label={label}
+          aria-live="polite"
+          // Sized to the 44px touch target even though the mark inside is
+          // small: a control a thumb cannot reliably hit is decoration.
+          className={`tap flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] motion-reduce:transition-none ${
+            state === "failed" ? "text-[var(--danger)]" : "text-[var(--text-faint)] hover:text-[var(--text)]"
+          }`}
+        >
+          {state === "copied" ? <CheckIcon className="h-4 w-4" /> : <CopyIcon className="h-4 w-4" />}
+          {/* The word is for screen readers only; the icon carries it visually,
+              and "Copied" in full next to a student's own sentence is noise. */}
+          <span className="sr-only">{label}</span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-3 flex flex-wrap gap-2 sm:gap-1.5">
