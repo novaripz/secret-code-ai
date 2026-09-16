@@ -157,12 +157,20 @@ const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 const CEREBRAS_ENDPOINT = "https://api.cerebras.ai/v1/chat/completions";
 const NVIDIA_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
 
-// Groq's fastest production model that does no reasoning pass at all, so the
-// first word arrives immediately — the thing this whole chain exists for. Groq
-// also serves gpt-oss faster on paper, but gpt-oss cannot turn reasoning off,
-// which brings back the silence we are removing. Drop to "llama-3.1-8b-instant"
-// if the free quota, rather than latency, becomes what hurts.
-const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+// The comment that used to sit here argued that llama-3.3-70b-versatile was the
+// right pick because it does no reasoning pass. It was, until Groq shut the
+// model off on 2026-08-16 along with llama-3.1-8b-instant. Since then every
+// Groq request in production has come back 404 model_not_found in about 150ms,
+// so the chain has been running on three providers while believing it had four.
+//
+// Groq's own named replacement is openai/gpt-oss-120b. The old objection to it
+// — that reasoning cannot be switched off — is answered by reasoning_effort
+// "low" below, which is as close to the previous behaviour as this model
+// offers. openai/gpt-oss-20b is the lighter, faster, weaker swap.
+//
+// Model ids expire. /api/ai/models asks Groq what this key may actually call,
+// and GROQ_MODEL overrides this without a code change.
+const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 
 // Qwen reasons by default. `reasoning_effort: "none"` is what keeps Cerebras
 // answering as promptly as Groq, and it is the only one of these models where
@@ -173,9 +181,16 @@ const CEREBRAS_MODEL = process.env.CEREBRAS_MODEL || "qwen-3.8-27b";
 // OpenAI-compatible model here that can read the photo, so the model choice is
 // decided by that rather than by speed. Not a reasoning model, so no
 // reasoning_effort is sent — asking for more thinking is the opposite of what
-// this chain is for. "meta/llama-3.2-11b-vision-instruct" is the faster, weaker
-// swap.
-const NVIDIA_MODEL = process.env.NVIDIA_MODEL || "meta/llama-3.2-90b-vision-instruct";
+// this chain is for.
+//
+// This was the 90b until production measurement said otherwise: NVIDIA accepted
+// every request and then sent nothing at all, for the full thirty-second
+// allowance, on every attempt. The 90b is still listed in NVIDIA's catalogue,
+// so this is queueing rather than a retired id, but a model that never produces
+// a first token is not serving anybody. The 11b is the same family, the same
+// vision capability and a fraction of the weight. Put the 90b back through
+// NVIDIA_MODEL if it starts answering again.
+const NVIDIA_MODEL = process.env.NVIDIA_MODEL || "meta/llama-3.2-11b-vision-instruct";
 
 // Two texts for the same fact. The first is for the server log, where whoever
 // runs Panda needs the variable names; the second is what a student sees, and
@@ -289,6 +304,11 @@ function configuredLinks(): ChainLink[] {
         endpoint: GROQ_ENDPOINT,
         apiKey: groq,
         model: GROQ_MODEL,
+        // gpt-oss always does a reasoning pass; "low" is the least of it. Sent
+        // unconditionally because a model that ignores the field ignores it
+        // harmlessly, and dropping it costs seconds of silence on one that
+        // does not.
+        extraBody: { reasoning_effort: "low" },
       }),
     );
   }
