@@ -133,6 +133,15 @@ export const PROJECT_FIRST_TOKEN_MS = 30_000;
 /** The project chain's equivalent of CHAIN_BUDGET_MS. See above. */
 export const PROJECT_CHAIN_BUDGET_MS = 45_000;
 
+/**
+ * The least a project-turn provider is given before the chain moves on, however
+ * many providers are waiting behind it. Measured: a healthy provider's first
+ * token on a project turn arrived in about a second, and a whole small project
+ * finished in under two. Eight seconds is generous against that and still
+ * leaves room for three more attempts inside PROJECT_CHAIN_BUDGET_MS.
+ */
+const FAIR_SHARE_FLOOR_MS = 8_000;
+
 /** The whole-chain budget for this request. Prose and files are not alike. */
 export function chainBudgetFor(req: AgentRequest): number {
   return req.chatOnly ? CHAIN_BUDGET_MS : PROJECT_CHAIN_BUDGET_MS;
@@ -332,11 +341,41 @@ function remaining(deadline: number): number {
  * the shared budget, whichever is smaller. Undefined when there is not enough
  * left to bother.
  */
-function sliceFor(deadline: number, req: AgentRequest): AttemptOptions | undefined {
+/**
+ * How long THIS provider may stay silent, given who is left behind it.
+ *
+ * A project turn's first-token allowance is thirty seconds, for the good reason
+ * written above PROJECT_FIRST_TOKEN_MS: a provider buffering a JSON envelope is
+ * working, not dead. The bad consequence, measured against production, is that
+ * one provider which answers *never* spends thirty of the chain's forty-five
+ * seconds proving it, and the providers behind it — including the one that
+ * works — inherit a budget too small to try. NVIDIA was doing exactly this on
+ * every project request: thirty seconds of nothing, every time, before the
+ * chain got to Gemini.
+ *
+ * So the allowance is shared. Each provider gets an even cut of what is left,
+ * never less than a floor that a genuinely-working model can finish inside, and
+ * the last one in line gets everything remaining because there is nobody left
+ * to save it for. The cap above is still the ceiling; this only lowers it.
+ */
+export function patience(left: number, index: number, total: number, req: AgentRequest): number {
+  const behind = total - index - 1;
+  if (behind <= 0) return left;
+  const floor = req.chatOnly ? FIRST_TOKEN_MS : FAIR_SHARE_FLOOR_MS;
+  return Math.max(Math.min(floor, left), Math.floor(left / (behind + 1)));
+}
+
+function sliceFor(
+  deadline: number,
+  req: AgentRequest,
+  index: number,
+  total: number,
+): AttemptOptions | undefined {
   const left = remaining(deadline);
   if (left < MIN_ATTEMPT_MS) return undefined;
+  const cap = req.chatOnly ? FIRST_TOKEN_MS : PROJECT_FIRST_TOKEN_MS;
   return {
-    firstTokenTimeoutMs: Math.min(req.chatOnly ? FIRST_TOKEN_MS : PROJECT_FIRST_TOKEN_MS, left),
+    firstTokenTimeoutMs: Math.min(cap, patience(left, index, total, req)),
     // Deliberately not clamped to the budget: the budget is about reaching the
     // first word. Once text is flowing the student is being served, and the
     // only thing left to guard against is a socket that has died quietly.
@@ -392,7 +431,7 @@ class ProviderChain implements AiProvider {
     let lastError: unknown;
 
     for (const [index, link] of links.entries()) {
-      const slice = sliceFor(deadline, req);
+      const slice = sliceFor(deadline, req, index, links.length);
       if (!slice) {
         lastError = outOfTime(links, index);
         break;
@@ -517,6 +556,15 @@ function logSkip(label: string, err: unknown, final = false, started = false): v
       console.error(
         `[ai] ${label} rejected the API key (${err.status}) ${when}. Check that key — the ` +
           `request itself was fine.${rest} A new key needs a redeploy, which clears this anyway.`,
+      );
+      return;
+    }
+    if (benched?.source === "misconfigured") {
+      recordProviderFailure(label, { status: err.status, reason: "the configured model id is wrong" });
+      console.error(
+        `[ai] ${label} does not serve the model id this deployment asks for (${err.status}) ${when}. ` +
+          `Set ${label.toUpperCase()}_MODEL to one of the ids /api/ai/models lists for it. ` +
+          `Until then every request pays a round trip to be refused.${rest}`,
       );
       return;
     }

@@ -265,6 +265,30 @@ const MAX_COOLDOWN_MS = 15 * 60_000;
  */
 const BAD_KEY_COOLDOWN_MS = 60 * 60_000;
 
+/**
+ * A model id this key cannot call. Same shape of problem as a rejected key and
+ * the same remedy: a value in the environment has to change. Benched for as
+ * long, because retrying it costs a round trip and can never succeed until
+ * somebody redeploys -- which clears this Map anyway.
+ */
+const MISCONFIGURED_COOLDOWN_MS = BAD_KEY_COOLDOWN_MS;
+
+/**
+ * A provider that accepted the request and then said nothing at all until we
+ * gave up waiting.
+ *
+ * This used to be deliberately un-benched, on the reasoning that a timeout says
+ * nothing about availability. That reasoning was right about mid-stream
+ * timeouts and wrong about this one, and production showed the difference:
+ * NVIDIA answered no project request, ever, and because silence left no record,
+ * every single request paid its full first-token allowance to rediscover that.
+ *
+ * Shorter than a bad key, because silence really can be one bad minute, and it
+ * doubles like a quota refusal so a provider that is simply gone stops being
+ * asked. Any answer at all clears it.
+ */
+const SILENCE_COOLDOWN_MS = 2 * 60_000;
+
 /** Retry-After is a provider's own number, but it is still bounded by ours. */
 const MIN_RETRY_AFTER_MS = 5_000;
 const MAX_RETRY_AFTER_MS = 60 * 60_000;
@@ -277,7 +301,7 @@ export interface ProviderCooldown {
   /** HTTP status that caused it, when there was one. */
   status?: number;
   /** Where the length came from: the provider said so, or we guessed. */
-  source: "retry-after" | "backoff" | "bad-key";
+  source: "retry-after" | "backoff" | "bad-key" | "misconfigured" | "silent";
 }
 
 interface CooldownEntry extends ProviderCooldown {
@@ -313,6 +337,18 @@ const cooldowns = new Map<string, CooldownEntry>();
 const QUOTA_TEXT =
   /quota|rate.?limit|resource.?exhausted|too many requests|exceed|insufficient|billing|credit|out of capacity|429/i;
 
+/**
+ * Text that means "that model is not a thing you can call", as opposed to any
+ * other 404. Providers word it differently and all of them say the model is
+ * either absent or closed to this account; either way the id in the environment
+ * is wrong and no amount of retrying fixes it.
+ */
+const MISSING_MODEL_TEXT =
+  /does not exist|do not have access|unknown model|model.?not.?found|no such model|invalid.?model/i;
+
+/** The watchdog's own wording when a provider never sent a first token. */
+const SILENCE_TEXT = /sent nothing for \d+ms/i;
+
 /** Retry-After in milliseconds: delta-seconds or an HTTP date. Undefined if neither. */
 function parseRetryAfter(value: string | null | undefined): number | undefined {
   if (!value) return undefined;
@@ -346,6 +382,20 @@ export function coolDownProvider(
   const { status, message = "" } = signal;
   const quotaShaped = status === 429 || status === 402 || QUOTA_TEXT.test(message);
   const keyShaped = status === 401 || (status === 403 && !QUOTA_TEXT.test(message));
+  const modelShaped = (status === 404 || status === 400) && MISSING_MODEL_TEXT.test(message);
+
+  if (modelShaped) {
+    const entry: CooldownEntry = {
+      until: Date.now() + MISCONFIGURED_COOLDOWN_MS,
+      // Named so /api/ai/status points at the fix rather than at the symptom.
+      reason: "the configured model id is not one this key can call",
+      status,
+      source: "misconfigured",
+      strikes: 0,
+    };
+    cooldowns.set(label, entry);
+    return entry;
+  }
 
   if (keyShaped) {
     const entry: CooldownEntry = {
@@ -359,7 +409,28 @@ export function coolDownProvider(
     return entry;
   }
 
-  if (!quotaShaped) return undefined;
+  if (!quotaShaped) {
+    if (status !== undefined || !SILENCE_TEXT.test(message)) return undefined;
+    // Silence doubles the same way a refusal does, and for the same reason: one
+    // quiet minute is forgivable, a provider that is never there should stop
+    // being paid for.
+    const before = cooldowns.get(label);
+    const carried =
+      before !== undefined &&
+      before.source === "silent" &&
+      Date.now() - before.until <= STRIKE_MEMORY_MS
+        ? before.strikes
+        : 0;
+    const count = carried + 1;
+    const entry: CooldownEntry = {
+      until: Date.now() + Math.min(SILENCE_COOLDOWN_MS * 2 ** (count - 1), MAX_COOLDOWN_MS),
+      reason: "accepted the request and then sent nothing",
+      source: "silent",
+      strikes: count,
+    };
+    cooldowns.set(label, entry);
+    return entry;
+  }
 
   const previous = cooldowns.get(label);
   // Strikes accumulate across refusals, including ones separated by an expired
