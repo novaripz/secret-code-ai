@@ -1,5 +1,6 @@
 import type { FileNode, Project } from "@/types";
 import { listAllFiles } from "@/lib/fileSystem";
+import { MAX_NOTES_CHARS, PROJECT_NOTES_PATH } from "./projectNotes";
 
 const MAX_FILES = 12;
 const MAX_CHARS_PER_FILE = 8000;
@@ -98,6 +99,20 @@ export function selectContextFiles(
 
   const result: Record<string, string> = {};
   let totalChars = 0;
+
+  // PANDA.md first, and outside every budget below.
+  //
+  // It is the one file whose absence costs more than its size: without it a
+  // model re-derives the project from source every turn, which is the expense
+  // this whole selection exists to bound. It is also the shortest file here.
+  // Counting it against MAX_FILES would mean a project with twelve source files
+  // silently dropped its own brief, which is exactly backwards.
+  const notes = allFiles.find((f) => f.path === PROJECT_NOTES_PATH);
+  if (notes?.content?.trim()) {
+    result[PROJECT_NOTES_PATH] = notes.content.slice(0, MAX_NOTES_CHARS);
+    picked.delete(PROJECT_NOTES_PATH);
+  }
+
   for (const f of picked.values()) {
     const content = (f.content ?? "").slice(0, MAX_CHARS_PER_FILE);
     if (totalChars + content.length > MAX_TOTAL_CHARS) break;

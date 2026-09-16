@@ -18,7 +18,10 @@ import {
   PROJECT_FIRST_TOKEN_MS,
   patience,
 } from "../../src/lib/ai/chain";
+import { selectContextFiles } from "../../src/lib/ai/contextSelection";
 import { OpenAiCompatibleProvider, ProviderHttpError } from "../../src/lib/ai/openaiCompatible";
+import { MAX_NOTES_CHARS, PROJECT_NOTES_PATH, readProjectNotes } from "../../src/lib/ai/projectNotes";
+import { buildUserTurnText } from "../../src/lib/ai/turn";
 import { AiTimeoutError, clearProviderCooldown, coolDownProvider, providerCooldown } from "../../src/lib/ai/provider";
 
 let failures = 0;
@@ -102,6 +105,58 @@ clearProviderCooldown("cerebras");
 clearProviderCooldown("z");
 ok("a rejected key is still a rejected key", coolDownProvider("z", { status: 401, message: "Invalid API Key" })?.source === "bad-key");
 clearProviderCooldown("z");
+
+
+// ---------------------------------------------------------------------------
+// The project's brief
+// ---------------------------------------------------------------------------
+//
+// PANDA.md only pays for itself if it is ALWAYS there. A brief that gets
+// dropped whenever the project grows past twelve files is worse than none:
+// the model silently goes back to re-deriving everything, on exactly the
+// projects where that costs most.
+
+console.log("\nthe project brief");
+
+function projectWith(files: Record<string, string>): never {
+  const nodes: Record<string, unknown> = {};
+  let n = 0;
+  for (const [path, content] of Object.entries(files)) {
+    const id = `f${n++}`;
+    nodes[id] = { id, name: path.split("/").pop(), kind: "file", path, parentId: "root", content, createdAt: 0, updatedAt: 0 };
+  }
+  nodes.root = { id: "root", name: "", kind: "folder", path: "", parentId: null, createdAt: 0, updatedAt: 0 };
+  return { id: "p", name: "Test", createdAt: 0, updatedAt: 0, rootId: "root", files: nodes } as never;
+}
+
+const crowded: Record<string, string> = { [PROJECT_NOTES_PATH]: "# Test\nWhat it is: a game." };
+for (let i = 0; i < 20; i++) crowded[`src/file${i}.js`] = `// file ${i}\n`.repeat(50);
+const crowdedProject = projectWith(crowded);
+
+// With an open file, as the editor always has: the brief rides along on top of
+// the source the selector would have sent anyway.
+const selected = selectContextFiles(crowdedProject, {
+  prompt: "add a score counter",
+  currentFilePath: "src/file3.js",
+});
+ok("the brief survives a project with twenty files", PROJECT_NOTES_PATH in selected);
+ok("and does not displace the source files", Object.keys(selected).length > 1, Object.keys(selected).join(", "));
+
+const long = projectWith({ [PROJECT_NOTES_PATH]: "x".repeat(MAX_NOTES_CHARS * 3) });
+ok("an overgrown brief is capped", (readProjectNotes(long) ?? "").length === MAX_NOTES_CHARS);
+ok("an empty brief reads as absent", readProjectNotes(projectWith({ [PROJECT_NOTES_PATH]: "   \n" })) === undefined);
+
+const turn = buildUserTurnText({
+  prompt: "add a score counter",
+  fileTree: `${PROJECT_NOTES_PATH}\nsrc/game.js`,
+  contextFiles: { [PROJECT_NOTES_PATH]: "# Test\nWhat it is: a game.", "src/game.js": "let score = 0;" },
+  chatOnly: false,
+  history: [],
+} as never);
+ok("the brief gets its own heading", turn.includes("THIS PROJECT'S BRIEF"));
+ok("and is stated before the source", turn.indexOf("THIS PROJECT'S BRIEF") < turn.indexOf("RELEVANT FILE CONTENTS"));
+ok("and is not repeated as a source file", !turn.includes(`--- FILE: ${PROJECT_NOTES_PATH} ---`));
+ok("while the real source files still arrive", turn.includes("--- FILE: src/game.js ---"));
 
 // ---------------------------------------------------------------------------
 // Against a provider that behaves like the broken ones did

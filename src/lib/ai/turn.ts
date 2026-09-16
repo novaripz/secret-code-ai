@@ -1,5 +1,6 @@
 import type { AgentResponse, FileOperation } from "@/types";
 import type { AgentRequest, ImageAttachment } from "./provider";
+import { PROJECT_NOTES_PATH } from "./projectNotes";
 import { buildSystemPrompt, CHAT_SYSTEM_PROMPT, SYSTEM_PROMPT } from "./systemPrompt";
 
 // How a request becomes a turn: the system prompt, the text of the message, and
@@ -30,12 +31,24 @@ export function temperatureFor(req: AgentRequest): number {
 }
 
 export function buildUserTurnText(req: AgentRequest): string {
-  const contextBlock = Object.entries(req.contextFiles)
+  // PANDA.md is lifted out of the file list and given its own heading, high up.
+  //
+  // Buried among "RELEVANT FILE CONTENTS" it reads as one more source file to
+  // be edited. It is not: it is what the last model concluded about this
+  // project, and this model -- which is very often a different one, since the
+  // chain picks whoever answers first -- should start from it rather than
+  // re-deriving it. Stated before the tree and the source so it frames them.
+  const { [PROJECT_NOTES_PATH]: notes, ...otherFiles } = req.contextFiles;
+  const contextBlock = Object.entries(otherFiles)
     .map(([path, content]) => `--- FILE: ${path} ---\n${content}`)
     .join("\n\n");
 
   const parts = [
     req.studentProfile ? `WHAT WE KNOW ABOUT THE USER (remember this across every chat and project):\n${req.studentProfile}` : "",
+    notes
+      ? `THIS PROJECT'S BRIEF (${PROJECT_NOTES_PATH}, written by you on an earlier turn — trust it, ` +
+        `and correct it in this turn's operations if the project has moved on):\n${notes}`
+      : "",
     req.projectMemory ? `WHAT WE'VE ALREADY BUILT IN THIS PROJECT (working memory):\n${req.projectMemory}` : "",
     `PROJECT FILE TREE:\n${req.fileTree}`,
     contextBlock ? `RELEVANT FILE CONTENTS:\n${contextBlock}` : "RELEVANT FILE CONTENTS: (none selected)",
