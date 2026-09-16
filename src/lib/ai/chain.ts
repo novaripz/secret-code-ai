@@ -19,6 +19,7 @@ import {
   type KeySpec,
 } from "./provider";
 import type { ToolSession } from "./tools";
+import type { BuildEffort } from "./systemPrompt";
 
 export { AiTimeoutError } from "./provider";
 import { allImages } from "./turn";
@@ -681,7 +682,26 @@ export function getProviderChain(): AiProvider {
  * Deliberately not part of any student request path: it costs one model call
  * per provider, and it exists to be run by hand when something is wrong.
  */
-export async function probeProviders(): Promise<
+/**
+ * What to ask the providers. Defaults to a one-line edit, which is the cheapest
+ * question that still exercises the JSON-mode path.
+ *
+ * Overridable because the failures worth diagnosing are never the cheap ones. A
+ * turn that dies after twenty-six seconds with no tokens at all cannot be
+ * explained by a probe that asks something else and comes back in one second --
+ * the whole point is to hand every provider the REQUEST THAT FAILED and see
+ * which of them choked on it, and how.
+ */
+export interface ProbeOptions {
+  prompt?: string;
+  buildEffort?: BuildEffort;
+  contextFiles?: Record<string, string>;
+  fileTree?: string;
+  /** Per-provider patience. The chain's own slices are smaller; this is a ceiling. */
+  timeoutMs?: number;
+}
+
+export async function probeProviders(options: ProbeOptions = {}): Promise<
   Array<{
     provider: string;
     ok: boolean;
@@ -700,15 +720,25 @@ export async function probeProviders(): Promise<
       let chars = 0;
 
       try {
-        const stream = link.provider.generateStream({
-          prompt: "Add an empty <p> tag to index.html.",
-          fileTree: "index.html",
-          contextFiles: { "index.html": "<!doctype html><html><body></body></html>" },
-          // Project shape on purpose: this is the path that is slow, and it is
-          // the JSON-mode request that a chat probe would not exercise.
-          chatOnly: false,
-          history: [],
-        }, undefined, { firstTokenTimeoutMs: 30_000, idleTimeoutMs: 30_000 });
+        const stream = link.provider.generateStream(
+          {
+            prompt: options.prompt ?? "Add an empty <p> tag to index.html.",
+            fileTree: options.fileTree ?? "index.html",
+            contextFiles: options.contextFiles ?? {
+              "index.html": "<!doctype html><html><body></body></html>",
+            },
+            // Project shape on purpose: this is the path that is slow, and it is
+            // the JSON-mode request that a chat probe would not exercise.
+            chatOnly: false,
+            history: [],
+            buildEffort: options.buildEffort,
+          },
+          undefined,
+          {
+            firstTokenTimeoutMs: options.timeoutMs ?? 30_000,
+            idleTimeoutMs: options.timeoutMs ?? 30_000,
+          },
+        );
 
         for await (const chunk of stream) {
           if (first === null) first = Date.now() - started;
