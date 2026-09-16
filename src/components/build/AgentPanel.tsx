@@ -10,7 +10,9 @@ import { selectContextFiles } from "@/lib/ai/contextSelection";
 import { projectFileTreeText } from "@/lib/fileSystem";
 import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
 import { Composer } from "@/components/chat/Composer";
-import { ModePills } from "@/components/chat/ModePills";
+import { CopyButton } from "@/components/chat/CopyButton";
+import { useLiveWrite } from "./useLiveWrite";
+import { EffortPills } from "./EffortPills";
 import { MessageText } from "@/components/chat/MessageText";
 import { SparkleIcon } from "@/components/icons";
 import type { FileOperation } from "@/types";
@@ -129,6 +131,10 @@ export function AgentPanel() {
   } = useChatStore();
 
   const { hydrate, projectMemorySummary, addBuildLogEntry } = useMemoryStore();
+  // Read as the store object rather than as selected values: this is only ever
+  // written to from inside the stream handlers, so subscribing the panel to its
+  // contents would re-render the whole transcript on every token.
+  const liveWrite = useLiveWrite.getState();
   const modes = useProfileStore((s) => s.modes);
   const memoryBlock = useProfileStore((s) => s.memoryBlock);
   const displayName = useProfileStore((s) => s.displayName);
@@ -206,6 +212,7 @@ export function AgentPanel() {
           contextFiles,
           history,
           explainMode: modes.explainMode,
+          buildEffort: modes.buildEffort,
           projectMemory: projectMemorySummary(),
           studentProfile: memoryBlock(),
           images: outgoing
@@ -214,7 +221,12 @@ export function AgentPanel() {
         },
         {
           onThinking: () => setPhase({ kind: "waiting" }),
-          onOpStart: (op) => setLive((l) => ({ ...l, current: op })),
+          onOpStart: (op) => {
+            setLive((l) => ({ ...l, current: op }));
+            // The editor switches to this file and starts filling it in.
+            liveWrite.begin(op.path, op.type);
+          },
+          onOpDelta: (path, delta) => liveWrite.append(path, delta),
           onOp: (op) =>
             setLive((l) => ({
               done: [...l.done, op],
@@ -271,6 +283,10 @@ export function AgentPanel() {
       setLoading(false);
       setPhase({ kind: "idle" });
       setLive({ done: [] });
+      // However the turn ended — finished, failed, aborted — the editor stops
+      // showing a draft. A live view left up after the stream died would be a
+      // half-written file presented as the state of things.
+      liveWrite.end();
     }
   }
 
@@ -378,6 +394,14 @@ export function AgentPanel() {
                     )}
                   </>
                 )}
+
+                {/* Copy under the student's own message here too, for the same
+                    reason as in chat: asking again a different way means
+                    retyping, and a long build prompt retyped from memory comes
+                    back shorter and vaguer. */}
+                {m.role === "user" && m.content && !m.error && (
+                  <CopyButton content={m.content} variant="own" />
+                )}
               </div>
             </div>
           );
@@ -400,7 +424,7 @@ export function AgentPanel() {
           loading={loading}
           disabled={!project}
           placeholder={t(project ? "studio.placeholder" : "studio.placeholderNoProject")}
-          footer={<ModePills />}
+          footer={<EffortPills />}
         />
       </div>
     </div>

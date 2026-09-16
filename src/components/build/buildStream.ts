@@ -57,6 +57,8 @@ export interface BuildStreamHandlers {
   /** The model is reading the project and has produced nothing yet. */
   onThinking?: () => void;
   onOpStart: (op: OpStart) => void;
+  /** More of the in-flight file's contents. The delta only — append it. */
+  onOpDelta?: (path: string, delta: string) => void;
   /** One operation is complete, validated server-side, and safe to show. */
   onOp: (op: FileOperation) => void;
   /** Exactly one of these fires, last. */
@@ -70,6 +72,8 @@ export interface BuildStreamRequest {
   contextFiles: Record<string, string>;
   history: { role: "user" | "assistant"; content: string }[];
   explainMode?: boolean;
+  /** How hard to work on this turn. See BUILD_EFFORT_ADDENDUM. */
+  buildEffort?: string;
   projectMemory?: string;
   studentProfile?: string;
   images?: { data: string; mimeType: string }[];
@@ -88,8 +92,14 @@ function asOperation(value: unknown): FileOperation | undefined {
   };
 }
 
-/** One decoded line, dispatched. Returns the result frame when it was one. */
-function handle(value: unknown, handlers: BuildStreamHandlers): BuildResult | undefined {
+/**
+ * One decoded line, dispatched. Returns the result frame when it was one.
+ *
+ * Exported for `npm run check`: the reader around it needs a browser fetch and a
+ * relative URL, but this is where every frame's meaning is decided, and the
+ * op_delta path in particular is what puts code on screen as it is written.
+ */
+export function handleFrame(value: unknown, handlers: BuildStreamHandlers): BuildResult | undefined {
   if (!value || typeof value !== "object") return undefined;
   const f = value as Record<string, unknown>;
 
@@ -102,6 +112,13 @@ function handle(value: unknown, handlers: BuildStreamHandlers): BuildResult | un
     const type = f.opType as FileOperation["type"];
     if (TYPES.has(type) && typeof f.path === "string" && f.path) {
       handlers.onOpStart({ type, path: f.path });
+    }
+    return undefined;
+  }
+
+  if (f.t === "op_delta") {
+    if (typeof f.path === "string" && f.path && typeof f.delta === "string") {
+      handlers.onOpDelta?.(f.path, f.delta);
     }
     return undefined;
   }
@@ -186,7 +203,7 @@ export async function runBuildStream(
     } catch {
       return;
     }
-    const done = handle(value, {
+    const done = handleFrame(value, {
       ...handlers,
       onOp: (op) => {
         received.push(op);

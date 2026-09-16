@@ -21,6 +21,9 @@ export function systemInstructionFor(req: AgentRequest): string {
     aiHomie: req.aiHomie,
     humanize: req.humanize,
     adaptation: req.adaptation,
+    // Project turns only. A chat turn has nothing to build, so it gets no
+    // effort text at all rather than a default one.
+    buildEffort: req.chatOnly ? undefined : (req.buildEffort ?? "normal"),
   });
 }
 

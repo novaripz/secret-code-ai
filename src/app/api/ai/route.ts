@@ -11,7 +11,7 @@ import { ToolSession, type ProgressEvent } from "@/lib/ai/tools";
 import { validateOperations } from "@/lib/ai/validateOperations";
 import type { AiMessage, AiProvider, ImageAttachment } from "@/lib/ai/provider";
 import { readProjectStream } from "@/lib/ai/projectStream";
-import type { ExplainDepth, LearningMode } from "@/lib/ai/systemPrompt";
+import { BUILD_EFFORTS, type BuildEffort, type ExplainDepth, type LearningMode } from "@/lib/ai/systemPrompt";
 import { guardRequest } from "@/lib/security/apiGuard";
 import type { FileOperation } from "@/types";
 import {
@@ -131,6 +131,7 @@ interface RequestBody {
   adaptation?: string;
   chatOnly?: boolean;
   projectMemory?: string;
+  buildEffort?: string;
   studentProfile?: string;
   image?: ImageAttachment;
   images?: ImageAttachment[];
@@ -313,6 +314,12 @@ export async function POST(req: NextRequest) {
         : undefined,
     chatOnly: body.chatOnly === true,
     projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,
+    // Validated against the known set rather than passed through: this string
+    // becomes a key into BUILD_EFFORT_ADDENDUM, and an unknown one would index
+    // to undefined and concatenate "undefined" into the system prompt.
+    buildEffort: BUILD_EFFORTS.includes(body.buildEffort as BuildEffort)
+      ? (body.buildEffort as BuildEffort)
+      : undefined,
     studentProfile: typeof body.studentProfile === "string" ? body.studentProfile.slice(0, 2000) : undefined,
     image: sanitizeImage(body.image),
     images: sanitizeImages(body.images),
@@ -542,6 +549,11 @@ function streamProjectTurn(request: Parameters<AiProvider["generate"]>[0]): Resp
             modelSpoke = true;
             if (event.kind === "op_start") {
               send(frame({ t: "op_start", opType: event.type, path: event.path }));
+            } else if (event.kind === "op_delta") {
+              // The file's contents as they are written. Only the new text —
+              // see the comment on ProjectStreamEvent for why not the whole
+              // buffer each time.
+              send(frame({ t: "op_delta", path: event.path, delta: event.delta }));
             } else if (event.kind === "op") {
               finishedOps.push(event.op);
               send(frame({ t: "op", op: event.op }));

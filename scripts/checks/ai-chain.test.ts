@@ -20,6 +20,9 @@ import {
 } from "../../src/lib/ai/chain";
 import { selectContextFiles } from "../../src/lib/ai/contextSelection";
 import { OpenAiCompatibleProvider, ProviderHttpError } from "../../src/lib/ai/openaiCompatible";
+import { readProjectStream } from "../../src/lib/ai/projectStream";
+import { handleFrame } from "../../src/components/build/buildStream";
+import { useLiveWrite } from "../../src/components/build/useLiveWrite";
 import { MAX_NOTES_CHARS, PROJECT_NOTES_PATH, readProjectNotes } from "../../src/lib/ai/projectNotes";
 import { buildUserTurnText } from "../../src/lib/ai/turn";
 import { AiTimeoutError, clearProviderCooldown, coolDownProvider, providerCooldown } from "../../src/lib/ai/provider";
@@ -158,6 +161,154 @@ ok("and is stated before the source", turn.indexOf("THIS PROJECT'S BRIEF") < tur
 ok("and is not repeated as a source file", !turn.includes(`--- FILE: ${PROJECT_NOTES_PATH} ---`));
 ok("while the real source files still arrive", turn.includes("--- FILE: src/game.js ---"));
 
+
+// ---------------------------------------------------------------------------
+// Watching a file being written
+// ---------------------------------------------------------------------------
+//
+// The editor shows code landing in a file as the model emits it, which means
+// decoding a JSON string that is by definition unfinished: no closing quote,
+// and a last character that may be half an escape sequence. Getting that wrong
+// is not a cosmetic bug -- a `\` or a partial `\u00` at a chunk boundary is the
+// NORMAL case, not the edge one, and a decoder that throws on it either kills
+// the turn or silently shows nothing.
+//
+// So the stream is driven one character at a time, which is the cruellest chunk
+// boundary available, and the reassembled deltas are checked against the text
+// the model meant to send.
+
+async function streamingChecks(): Promise<void> {
+console.log("\nstreaming a file into the editor");
+
+async function drainStream(raw: string, chunkSize: number) {
+  async function* chunks() {
+    for (let i = 0; i < raw.length; i += chunkSize) yield raw.slice(i, i + chunkSize);
+  }
+  const deltas: { path: string; delta: string }[] = [];
+  const starts: string[] = [];
+  const ops: string[] = [];
+  let done: { truncated: boolean; count: number } | undefined;
+  for await (const event of readProjectStream(chunks())) {
+    if (event.kind === "op_delta") deltas.push({ path: event.path, delta: event.delta });
+    if (event.kind === "op_start") starts.push(event.path);
+    if (event.kind === "op") ops.push(event.op.path);
+    if (event.kind === "done") done = { truncated: event.truncated, count: event.response.operations.length };
+  }
+  return { deltas, starts, ops, done };
+}
+
+// Every nasty thing a real file contains: newlines, quotes, backslashes, a tab,
+// and a unicode escape -- each one a place the naive decoder breaks.
+const fileText = 'const s = "hi\\n";\nif (a > 1) {\n\tconsole.log(\'x\\u00e9\');\n}\n';
+const envelope = JSON.stringify({
+  operations: [
+    { type: "create", path: "js/game.js", content: fileText },
+    { type: "create", path: "js/shop.js", content: "// shop\n" },
+  ],
+  message: "Done.",
+});
+
+for (const size of [1, 3, 17, 4096]) {
+  const { deltas, starts, ops, done } = await drainStream(envelope, size);
+  const rebuilt = new Map<string, string>();
+  for (const d of deltas) rebuilt.set(d.path, (rebuilt.get(d.path) ?? "") + d.delta);
+  ok(
+    `chunked ${size}: the streamed file matches what was sent`,
+    rebuilt.get("js/game.js") === fileText,
+    JSON.stringify(rebuilt.get("js/game.js")?.slice(0, 40) ?? null),
+  );
+  ok(`chunked ${size}: the second file streams too`, rebuilt.get("js/shop.js") === "// shop\n");
+  ok(`chunked ${size}: both files were announced`, starts.length === 2 && ops.length === 2);
+  ok(`chunked ${size}: the envelope closed cleanly`, done?.truncated === false && done.count === 2);
+}
+
+// A delta must never carry another file's text. The scanner keys them on the
+// announced path, and this is what proves the keying works rather than the
+// deltas merely arriving in a lucky order.
+{
+  const { deltas } = await drainStream(envelope, 1);
+  const game = deltas.filter((d) => d.path === "js/game.js").map((d) => d.delta).join("");
+  ok("one file's deltas never contain another's", !game.includes("// shop"));
+}
+
+// A cut-off reply: the file being written when the stream died still arrives as
+// far as it got, and the completed one before it survives as an operation.
+{
+  const cut = envelope.slice(0, envelope.indexOf("// shop") + 4);
+  const { deltas, ops, done } = await drainStream(cut, 1);
+  const rebuilt = deltas.filter((d) => d.path === "js/shop.js").map((d) => d.delta).join("");
+  ok("a truncated stream still streams what arrived", rebuilt.startsWith("// s"), JSON.stringify(rebuilt));
+  ok("and keeps the file that completed before the cut", ops.includes("js/game.js"));
+  ok("and says it was truncated", done?.truncated === true);
+}
+
+// Deletes and renames have no content at all. The decoder must return nothing
+// rather than throw or invent an empty file.
+{
+  const noContent = JSON.stringify({
+    operations: [{ type: "delete", path: "old.js" }, { type: "rename", path: "a.js", newPath: "b.js" }],
+    message: "Tidied up.",
+  });
+  const { deltas, ops } = await drainStream(noContent, 1);
+  ok("an operation with no content streams no deltas", deltas.length === 0);
+  ok("but still completes", ops.length === 2);
+}
+}
+
+
+// The other half of the same feature: the frames the route sends have to reach
+// the store the editor reads, and the store has to end up holding exactly the
+// file. The server half is checked above against the model's own JSON; this is
+// what happens to it on the way to the screen.
+
+console.log("\nfrom the wire to the editor");
+
+{
+  const live = useLiveWrite.getState();
+  live.end();
+
+  const seen: string[] = [];
+  const handlers = {
+    onOpStart: (op: { type: string; path: string }) => {
+      seen.push(`start:${op.path}`);
+      useLiveWrite.getState().begin(op.path, op.type);
+    },
+    onOpDelta: (path: string, delta: string) => useLiveWrite.getState().append(path, delta),
+    onOp: () => {},
+    onDone: () => {},
+    onError: () => {},
+  };
+
+  handleFrame({ t: "op_start", opType: "create", path: "js/game.js" }, handlers as never);
+  ok("an op_start opens the live view", useLiveWrite.getState().path === "js/game.js");
+  ok("and names what it is doing", useLiveWrite.getState().kind === "create");
+
+  for (const piece of ["let n = 0;\n", "function tick() {\n", "  n++;\n", "}\n"]) {
+    handleFrame({ t: "op_delta", path: "js/game.js", delta: piece }, handlers as never);
+  }
+  ok(
+    "the deltas accumulate into the file",
+    useLiveWrite.getState().content === "let n = 0;\nfunction tick() {\n  n++;\n}\n",
+    JSON.stringify(useLiveWrite.getState().content),
+  );
+
+  // The guard that matters: frames for the previous file can still be in flight
+  // when the next one is announced, and appending one file's tail to another
+  // file's head would show the student code that was never written anywhere.
+  const before = useLiveWrite.getState().content;
+  handleFrame({ t: "op_delta", path: "css/theme.css", delta: "body { }" }, handlers as never);
+  ok("a delta for another file is ignored", useLiveWrite.getState().content === before);
+
+  handleFrame({ t: "op_start", opType: "modify", path: "index.html" }, handlers as never);
+  ok("the next file starts from empty", useLiveWrite.getState().content === "");
+  ok("and carries its own verb", useLiveWrite.getState().kind === "modify");
+
+  useLiveWrite.getState().end();
+  ok("ending the turn clears the live view", useLiveWrite.getState().path === null);
+  ok("and stops claiming to be streaming", useLiveWrite.getState().streaming === false);
+  ok("both files were announced on the way", seen.join(",") === "start:js/game.js,start:index.html");
+}
+
 // ---------------------------------------------------------------------------
 // Against a provider that behaves like the broken ones did
 // ---------------------------------------------------------------------------
@@ -256,7 +407,9 @@ server.close();
 // resolution loads provider.ts a second time and quietly breaks every
 // instanceof check against it. A plain async function keeps one copy of each
 // module, which is what the app has.
-void endToEnd().then(() => {
-  console.log(failures === 0 ? "\nall good\n" : `\n${failures} failed\n`);
-  process.exit(failures === 0 ? 0 : 1);
-});
+void streamingChecks()
+  .then(endToEnd)
+  .then(() => {
+    console.log(failures === 0 ? "\nall good\n" : `\n${failures} failed\n`);
+    process.exit(failures === 0 ? 0 : 1);
+  });

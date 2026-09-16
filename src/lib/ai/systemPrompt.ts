@@ -187,6 +187,73 @@ Go all the way. Start from first principles, define every term, work a full exam
 step by step, mention the common mistakes, and finish with a recap. Long is fine here.`,
 };
 
+/**
+ * How hard Panda works on a build, which is a different question from how much
+ * it explains afterwards.
+ *
+ * The build panel used to show the Explain scale, and it was the wrong dial in
+ * the wrong place: in the studio the student is not asking how much prose they
+ * want, they are asking how much project they want. "Minimal" there should mean
+ * a small, surgical change -- not a small paragraph about a large one.
+ *
+ * The words are shared with the Explain scale on purpose. A student who has
+ * learned what "Extra" means in chat should not have to learn a second
+ * vocabulary two tabs away.
+ */
+export type BuildEffort = "minimal" | "fair" | "normal" | "extra" | "overload";
+
+/** The five levels, in order, as one list the UI and the route both read from. */
+export const BUILD_EFFORTS: readonly BuildEffort[] = [
+  "minimal",
+  "fair",
+  "normal",
+  "extra",
+  "overload",
+];
+
+export const BUILD_EFFORT_ADDENDUM: Record<BuildEffort, string> = {
+  minimal: `
+
+EFFORT: MINIMAL. Make the smallest change that honestly satisfies what was
+asked and stop. Touch as few files as the job allows. Do not add features, do
+not refactor what you passed on the way, do not improve anything you were not
+asked about. If you notice something worth doing, say so in one line at the end
+of "message" and leave it undone. "Smallest" is about scope, never about
+quality: the change you do make is complete and works.`,
+  fair: `
+
+EFFORT: FAIR. Do what was asked, plus the small things that would otherwise
+leave it half-wired -- the button that needs a handler, the style that keeps it
+from looking broken. Nothing beyond that.`,
+  normal: `
+
+EFFORT: NORMAL. The default. Build the thing properly: it should run, look
+deliberate, and handle the obvious cases. Split into new files where the code
+genuinely wants to be split. Finish with what you would add next.`,
+  extra: `
+
+EFFORT: EXTRA. Go further than asked in the same direction. Build the feature
+out fully across as many files as it deserves, handle the edge cases, and make
+it feel finished rather than demonstrated -- real states for empty, loading and
+error, keyboard as well as mouse, and a layout that survives a phone. Do not
+change direction or invent a different project; more of what they asked for, not
+something else.`,
+  overload: `
+
+EFFORT: OVERLOAD. Everything you have. Treat the request as the brief for a
+complete, polished project: full feature set, animation and sound where they
+belong, persistence, settings, the lot, across as many well-named files as it
+takes.
+
+One hard limit, and it is not negotiable: this must still be a single answer
+that arrives complete. You have one turn and it is time-bounded -- an answer
+that is cut off mid-file gives the student nothing at all, which is strictly
+worse than a smaller thing that runs. So when a request is genuinely too big to
+finish here, build the largest version that WILL finish, say plainly which
+parts you left for the next turn, and offer them. That is not a failure of
+effort; shipping something broken because the setting said "overload" is.`,
+};
+
 export const NO_EXPLAIN_ADDENDUM = `
 
 Lead with the answer and keep the workings to a minimum:
@@ -325,6 +392,12 @@ export interface PromptModes {
    * is, and the rules for what counts as evidence live in one place.
    */
   adaptation?: string;
+
+  /**
+   * How hard to work on a project turn. Absent on chat turns, which is what
+   * keeps the effort text out of a conversation that has nothing to build.
+   */
+  buildEffort?: BuildEffort;
 }
 
 /** Assembles the system prompt for a request: base persona + whichever modes are on. */
@@ -352,6 +425,10 @@ export function buildSystemPrompt(base: string, modes: PromptModes = {}): string
   } else {
     prompt += NO_EXPLAIN_ADDENDUM;
   }
+  // Only a project turn has an effort level: chat has nothing to build, and a
+  // paragraph written at "overload" would just be the Explain scale again
+  // wearing a different name.
+  if (modes.buildEffort) prompt += BUILD_EFFORT_ADDENDUM[modes.buildEffort];
   // Last, so what we know about this student is the freshest thing in the
   // prompt and survives every tone setting above it.
   if (modes.adaptation) prompt += modes.adaptation;

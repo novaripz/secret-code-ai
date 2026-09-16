@@ -56,7 +56,16 @@ const VERB_STYLE: Record<FileOperation["type"], string> = {
  * any time here — and two renderings of the same diff would eventually
  * disagree about what a removed line looks like.
  */
-export function DiffBody({ result }: { result: DiffResult }) {
+export function DiffBody({
+  result,
+  // The Changes column is far taller than an inline proposal in the chat, so
+  // the cap is the caller's to set. 72 stays the default because that is what
+  // every existing caller wants.
+  maxHeightClass = "max-h-72",
+}: {
+  result: DiffResult;
+  maxHeightClass?: string;
+}) {
   const blocks = useMemo(() => hunks(result.rows), [result.rows]);
 
   if (result.tooLarge) {
@@ -72,7 +81,7 @@ export function DiffBody({ result }: { result: DiffResult }) {
   }
 
   return (
-    <div className="max-h-72 overflow-auto font-mono text-[11px] leading-[1.45]">
+    <div className={`${maxHeightClass} overflow-auto font-mono text-[11px] leading-[1.45]`}>
       {blocks.map((block, index) => (
         <div key={index}>
           {block.skipped > 0 && (

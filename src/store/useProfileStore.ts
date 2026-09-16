@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { accountScope, useAuthStore } from "./useAuthStore";
-import type { ExplainDepth } from "@/lib/ai/systemPrompt";
+import type { BuildEffort, ExplainDepth } from "@/lib/ai/systemPrompt";
 import { DEFAULT_LOCALE, findLocale } from "@/lib/i18n/locales";
 
 // The user's identity, preferences, modes, and long-term memory. This is the
@@ -112,6 +112,13 @@ export interface Modes {
   explainDepth: ExplainDepth;
   /** Explanation mode: extra-simple, step-by-step explanations. */
   explainMode: boolean;
+  /**
+   * How hard Panda works in the build studio. Deliberately separate from
+   * explainDepth even though they share their five words: one is about how much
+   * project gets built, the other about how much prose explains it, and a
+   * student who wants a big build with a short note is not confused.
+   */
+  buildEffort: BuildEffort;
 }
 
 export interface ProfileState {
@@ -160,6 +167,7 @@ const EMPTY_PROFILE: Profile = {
 const DEFAULT_MODES: Modes = {
   explainDepth: "normal",
   explainMode: true,
+  buildEffort: "normal",
 };
 
 interface Persisted {

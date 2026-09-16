@@ -3,6 +3,13 @@ import { listAllFiles } from "@/lib/fileSystem";
 import { MAX_NOTES_CHARS, PROJECT_NOTES_PATH } from "./projectNotes";
 
 const MAX_FILES = 12;
+
+/**
+ * The files a person would open first, in the order they would open them. Used
+ * twice: to top up a selection that has room, and as the first resort when
+ * nothing matched at all.
+ */
+const ENTRY_NAMES = ["index.html", "index.js", "index.ts", "main.py", "app.py", "package.json"];
 const MAX_CHARS_PER_FILE = 8000;
 const MAX_TOTAL_CHARS = 40000;
 
@@ -85,8 +92,7 @@ export function selectContextFiles(
   }
 
   // Always include entry-point-ish files if there's room, since the AI often needs them.
-  const entryNames = ["index.html", "index.js", "index.ts", "main.py", "app.py", "package.json"];
-  for (const name of entryNames) {
+  for (const name of ENTRY_NAMES) {
     if (picked.size >= MAX_FILES) break;
     const match = allFiles.find((f) => f.path === name);
     if (match) picked.set(match.path, match);
@@ -95,6 +101,40 @@ export function selectContextFiles(
   // If the project is small enough, just include everything — simpler and still cheap.
   if (allFiles.length <= MAX_FILES) {
     for (const f of allFiles) picked.set(f.path, f);
+  }
+
+  // NOTHING MATCHED. This is the hole the passes above leave.
+  //
+  // A project with more than MAX_FILES files, no file open in the editor, and a
+  // prompt whose words happen to match no path — "make it look nicer", "why is
+  // this broken", "add sound" — selected literally nothing. The model was sent
+  // a file tree and asked to modify code it had never been shown, which is the
+  // one situation the rules explicitly forbid it to guess its way out of. It
+  // either refused or invented the file's contents.
+  //
+  // So when the honest answer is "no idea which files", send the ones any
+  // reader would open first: the entry points, then the largest source files,
+  // which in a project this size are where the code actually lives. A rough
+  // guess that is usually right beats nothing, which is never right.
+  if (picked.size === 0) {
+    const byWeight = allFiles
+      .filter((f) => f.kind === "file" && (f.content ?? "").trim().length > 0)
+      .sort((a, b) => {
+        const aEntry = ENTRY_NAMES.indexOf(a.path);
+        const bEntry = ENTRY_NAMES.indexOf(b.path);
+        // An entry point first, in the order ENTRY_NAMES lists them; everything
+        // else by size, biggest first.
+        if (aEntry !== -1 || bEntry !== -1) {
+          if (aEntry === -1) return 1;
+          if (bEntry === -1) return -1;
+          return aEntry - bEntry;
+        }
+        return (b.content?.length ?? 0) - (a.content?.length ?? 0);
+      });
+    for (const f of byWeight) {
+      if (picked.size >= MAX_FILES) break;
+      picked.set(f.path, f);
+    }
   }
 
   const result: Record<string, string> = {};

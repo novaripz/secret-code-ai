@@ -11,39 +11,52 @@ import { deleteProject, listProjects, saveProject, type ProjectSummary } from "@
 import { importProjectFromZip } from "@/lib/zip";
 import { HammerIcon, PlusIcon, TrashIcon, UploadIcon } from "@/components/icons";
 
+// ONE FILE, NOT THREE.
+//
+// Every new project used to be seeded with index.html, style.css and script.js.
+// The complaint was that file creation "seems to save into every project" --
+// nothing was leaking, every project simply opened looking exactly like every
+// other one, and the three names sitting there were also the reason nothing
+// ever got split: the model was told not to duplicate files that already exist
+// and to keep changes scoped, so it poured a whole game into script.js rather
+// than make js/shop.js next to a style.css that already existed.
+//
+// So a project starts as one page that runs. The CSS and the JS are inline, in
+// the smallest form that works, which is exactly how a beginner's first file
+// looks anyway. When the project grows, Panda decides the file layout the
+// project actually needs and moves things out -- the studio prompt says so, and
+// having nowhere pre-decided to put things is what lets that happen.
 const STARTER_HTML = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Project</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0d0d0d;
+      color: #ececec;
+    }
+    h1 { font-size: 2rem; }
+  </style>
 </head>
 <body>
   <main>
     <h1>Welcome to your new project</h1>
     <p>Edit this file, or ask for help and I&apos;ll build something for you.</p>
   </main>
-  <script src="script.js"></script>
+  <script>
+    console.log("Project loaded. Ready to build!");
+  </script>
 </body>
 </html>
-`;
-
-const STARTER_CSS = `body {
-  margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #0d0d0d;
-  color: #ececec;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  text-align: center;
-}
-h1 { font-size: 2rem; }
-`;
-
-const STARTER_JS = `console.log("Project loaded. Ready to build!");
 `;
 
 // The project list is the first screen of the build tool, so it is the first
@@ -119,8 +132,6 @@ export default function BuildPage() {
     try {
       const project = createEmptyProject(name);
       createFile(project, "index.html", STARTER_HTML);
-      createFile(project, "style.css", STARTER_CSS);
-      createFile(project, "script.js", STARTER_JS);
       await saveProject(project);
       router.push(`/project/${project.id}`);
     } finally {

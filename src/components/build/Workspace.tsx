@@ -18,7 +18,9 @@ import { CodeIcon, CommandIcon, DiffIcon, FilesIcon, HistoryIcon, MonitorIcon } 
 import {
   clamp,
   MAX_CHAT,
+  MAX_CHANGES,
   MAX_SIDEBAR,
+  MIN_CHANGES,
   MIN_CHAT,
   MIN_SIDEBAR,
   MIN_STACKED,
@@ -112,11 +114,10 @@ export function Workspace() {
 
   if (!project) return null;
 
-  // Files keeps its dragged share whenever it is sharing the column; History
-  // and Changes split what is left between them. Three stacked splitters in a
-  // 232px column would be three things to get wrong for no gain, so only the
-  // Files split is draggable and the rest is even.
-  const stackedBelowFiles = Number(visible.history) + Number(visible.changes);
+  // Files keeps its dragged share whenever History is open under it. Changes
+  // used to be stacked here too and is now a column of its own on the right,
+  // so this is a two-way split again.
+  const stackedBelowFiles = Number(visible.history);
   const bothSidebarPanes = visible.files && stackedBelowFiles > 0;
   const belowShare = stackedBelowFiles > 0 ? (1 - layout.filesRatio) / stackedBelowFiles : 0;
   const bothCenterPanes = visible.preview;
@@ -150,8 +151,8 @@ export function Workspace() {
           panes become absolutely-positioned overlays inside this box rather
           than columns competing for a 360px row. */}
       <div className="relative flex min-h-0 flex-1">
-        {/* Sidebar column: Files above History and Changes. */}
-        {(visible.files || visible.history || visible.changes) && (
+        {/* Sidebar column: Files above History. */}
+        {(visible.files || visible.history) && (
           <>
             {/* PHONE: one pane at a time.
                 On a laptop this is a column in a row of columns, and the
@@ -228,26 +229,6 @@ export function Workspace() {
                 </div>
               )}
 
-              {visible.changes && (
-                <div
-                  className="flex min-h-0 flex-col"
-                  style={
-                    bothSidebarPanes
-                      ? { flex: `${belowShare} 1 0`, minHeight: MIN_STACKED }
-                      : { flex: "1 1 0" }
-                  }
-                >
-                  <Pane
-                    title="Changes"
-                    closeLabel="Close the list of changes"
-                    onClose={() => layout.close("changes")}
-                  >
-                    <div className="h-full min-h-0">
-                      <ChangesPanel />
-                    </div>
-                  </Pane>
-                </div>
-              )}
             </div>
 
             <ResizeHandle
@@ -317,6 +298,46 @@ export function Workspace() {
             </>
           )}
         </div>
+
+        {/* CHANGES: its own column, to the right of the editor.
+            It used to be stacked under Files in a 232px sidebar, which left a
+            diff about ninety pixels to render code in. A diff is a reading
+            surface — two versions of a line, side by side, with their numbers —
+            and ninety pixels is not one. Placed right of the centre rather than
+            left of it because you read it AGAINST the editor: glance from the
+            file to what changed in it without crossing the whole window. */}
+        {visible.changes && (
+          <>
+            <ResizeHandle
+              className="hidden md:block"
+              orientation="vertical"
+              label="Resize the changes column"
+              value={layout.changesWidth}
+              min={MIN_CHANGES}
+              max={MAX_CHANGES}
+              onDragStart={() => {
+                start.current = layout.changesWidth;
+              }}
+              // Right of the centre, so dragging left makes it wider.
+              onDrag={(delta) => layout.setChangesWidth(start.current - delta)}
+              onNudge={(step) => layout.setChangesWidth(layout.changesWidth - step)}
+            />
+            <div
+              className="absolute inset-0 z-30 flex min-h-0 w-full flex-col bg-[var(--bg)] md:static md:z-auto md:w-[var(--pane-w)] md:bg-transparent"
+              style={{ "--pane-w": `${layout.changesWidth}px`, flex: "0 0 auto" } as React.CSSProperties}
+            >
+              <Pane
+                title="Changes"
+                closeLabel="Close the list of changes"
+                onClose={() => layout.close("changes")}
+              >
+                <div className="h-full min-h-0">
+                  <ChangesPanel />
+                </div>
+              </Pane>
+            </div>
+          </>
+        )}
 
         {/* Panda's chat. Closable like anything else. */}
         {visible.chat && (

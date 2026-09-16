@@ -619,31 +619,32 @@ html, body {
   overscroll-behavior-x: contain;
 }
 
-/* The composer shell, and why it has no focus ring at all.
+/* The composer shell has no border and no focus ring.
 
-   It had two, and you could see both: `:focus-visible` at the top of this file
-   is unlayered while Tailwind's `outline-none` on the textarea is layered, so
-   the utility lost and the textarea drew a hard rectangle inside a 24px-rounded
-   shell. The shell then drew a second, correctly-shaped ring around that. A
-   green box inside a green box, every time anyone typed.
+   The ring went first: `:focus-visible` at the top of this file is unlayered
+   while Tailwind's `outline-none` on the textarea is layered, so the utility
+   lost and the textarea drew a hard rectangle inside a 24px-rounded shell --
+   and the shell then drew a second, correctly-shaped ring around that. A box
+   inside a box, every time anyone typed.
 
-   Both are gone now, and that is a deliberate exception to the rule above
-   rather than an oversight. A focus indicator answers "where am I typing?", and
-   in a text field the caret already answers it — blinking, exactly where the
-   next character will go, in every theme, without the ring. This is the one
-   control on the page where the indicator is redundant, so it is the one
-   control that gives it up. Everything else on the page keeps its ring, and
-   the icon buttons INSIDE the composer keep theirs: tabbing onto the paperclip
-   has nothing else to show you where you are.
+   The resting hairline went second, on the same complaint: "fully remove the
+   outline". The shell keeps its own background (`--surface-1`) against the page
+   (`--bg`), and that contrast is what gives it an edge -- a filled shape rather
+   than an outlined one. It reads as somewhere to type without being fenced off.
 
-   The resting hairline stays. It is the composer's shape, not a focus state --
-   without it the input has no edge and floats on the surface. */
+   Dropping the focus ring is a deliberate exception to the rule above, not an
+   oversight. A focus indicator answers "where am I typing?", and in a text field
+   the caret already answers it -- blinking, in the exact spot, in every theme.
+   This is the one control on the page where the indicator is redundant, so it is
+   the one control that gives it up. Everything else keeps its ring, including
+   the icon buttons INSIDE the composer: tabbing onto the paperclip has nothing
+   else to show you where you are. */
 .composer-shell {
-  border-color: var(--line);
+  border-color: transparent;
 }
 /* The textarea's own outline, suppressed here rather than in a Tailwind class
-   because the rule it is fighting is unlayered and would win regardless of
-   what the element's class list says. */
+   because the rule it is fighting is unlayered and would win regardless of what
+   the element's class list says. */
 .composer-shell textarea:focus-visible,
 .composer-shell textarea:focus,
 .composer-shell input[type="text"]:focus-visible {
@@ -651,7 +652,7 @@ html, body {
   box-shadow: none;
 }
 /* Drag-over is not focus: it says where a dropped file will land, which nothing
-   else on screen says, so it keeps its border. */
+   else on screen says, so it is the one state that still draws a border. */
 .composer-shell[data-dragging] {
   border-color: var(--text);
 }

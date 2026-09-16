@@ -1,5 +1,5 @@
 import type { AgentResponse } from "@/types";
-import type { ExplainDepth, LearningMode } from "./systemPrompt";
+import type { BuildEffort, ExplainDepth, LearningMode } from "./systemPrompt";
 import type { ToolSession } from "./tools";
 
 /** A single message in the conversation sent to the model. */
@@ -54,6 +54,8 @@ export interface AgentRequest {
   chatOnly?: boolean;
   /** Short plain-language summary of what's already been built in this project ("working memory"). */
   projectMemory?: string;
+  /** Build studio only: how hard to work on this turn. See BUILD_EFFORT_ADDENDUM. */
+  buildEffort?: BuildEffort;
   /** Short plain-language facts about the student, carried across projects. */
   studentProfile?: string;
   /** Optional screenshot the student captured (e.g. of their preview or the whole tab). */

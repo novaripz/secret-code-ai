@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useVersionStore, type Version } from "@/store/useVersionStore";
-import type { FileNode } from "@/types";
+import type { FileNode, FileOperation } from "@/types";
 import { CheckIcon, FileIcon } from "@/components/icons";
 import { DiffBody } from "./ActionList";
 import { diffLines, type DiffResult } from "./diff";
@@ -99,56 +99,168 @@ function make(path: string, kind: ChangeKind, before: string, after: string): Fi
   return { path, kind, before, after, result: diffLines(before, after) };
 }
 
-function FileRow({ change }: { change: FileChange }) {
-  const [open, setOpen] = useState(false);
-  const name = change.path.split("/").pop() ?? change.path;
+/** A patch a student could paste elsewhere. Unified-ish, and honest about hunks. */
+function asPatch(change: FileChange): string {
+  const head = `--- a/${change.path}\n+++ b/${change.path}`;
+  if (change.result.tooLarge) return `${head}\n(too large to compare line by line)`;
+  const body = change.result.rows
+    .map((row) => `${row.kind === "added" ? "+" : row.kind === "removed" ? "-" : " "}${row.text}`)
+    .join("\n");
+  return `${head}\n${body}`;
+}
+
+function RowButton({
+  label,
+  onClick,
+  danger = false,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  danger?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      className={`tap inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
+        danger
+          ? "text-[var(--text-faint)] hover:bg-[var(--danger-soft)] hover:text-[var(--danger)]"
+          : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function FileRow({
+  change,
+  open,
+  onToggle,
+  onOpenFile,
+  onRevert,
+}: {
+  change: FileChange;
+  open: boolean;
+  onToggle: () => void;
+  onOpenFile: () => void;
+  onRevert: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1600);
+    return () => clearTimeout(t);
+  }, [copied]);
+
+  async function copyPatch() {
+    try {
+      await navigator.clipboard.writeText(asPatch(change));
+      setCopied(true);
+    } catch {
+      // Insecure origin or a denied permission. Silent here rather than
+      // alarming: the diff is still on screen to read.
+    }
+  }
 
   return (
     <li className="overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface-1)]">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        aria-label={`${open ? "Hide" : "Show"} the changes to ${change.path}`}
-        className="tap flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm md:text-xs transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)]"
-      >
-        <span
-          className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${KIND_STYLE[change.kind]}`}
+      <div className="flex items-center gap-1 pr-1">
+        <button
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-label={`${open ? "Hide" : "Show"} the changes to ${change.path}`}
+          className="tap flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left text-sm md:text-xs transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)]"
         >
-          {KIND_LABEL[change.kind]}
-        </span>
-        <FileIcon className="h-3.5 w-3.5 shrink-0 text-[var(--text-faint)]" />
-        <span className="min-w-0 flex-1 truncate font-mono text-[var(--text-dim)]" title={change.path}>
-          {name}
-        </span>
-        {/* Counted, not coloured only: a student reading with a screen reader
-            gets the same summary as one glancing at the row. */}
-        <span className="shrink-0 tabular-nums text-[10px] text-[var(--text-faint)]">
-          <span className="text-[var(--success)]">+{change.result.added}</span>{" "}
-          <span className="text-[var(--danger)]">−{change.result.removed}</span>
-          <span className="sr-only">
-            {` ${change.result.added} lines added, ${change.result.removed} lines removed`}
+          <span
+            className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${KIND_STYLE[change.kind]}`}
+          >
+            {KIND_LABEL[change.kind]}
           </span>
-        </span>
-      </button>
+          <FileIcon className="h-3.5 w-3.5 shrink-0 text-[var(--text-faint)]" />
+          {/* The FULL path, not just the file name. In a narrow sidebar the name
+              was all that fit; in a column of its own, "js/shop.js" and
+              "old/shop.js" being indistinguishable is a real hazard. */}
+          <span className="min-w-0 flex-1 truncate font-mono text-[var(--text-dim)]" title={change.path}>
+            {change.path}
+          </span>
+          {/* Counted, not coloured only: a student reading with a screen reader
+              gets the same summary as one glancing at the row. */}
+          <span className="shrink-0 tabular-nums text-[10px] text-[var(--text-faint)]">
+            <span className="text-[var(--success)]">+{change.result.added}</span>{" "}
+            <span className="text-[var(--danger)]">−{change.result.removed}</span>
+            <span className="sr-only">
+              {` ${change.result.added} lines added, ${change.result.removed} lines removed`}
+            </span>
+          </span>
+        </button>
+      </div>
+
       {open && (
-        // Its own scroll container: code lines are wider than this pane will
-        // ever be, and a diff that widens the whole workspace is a diff that
-        // pushes the rail off a phone screen.
-        <div className="max-w-full overflow-x-auto border-t border-[var(--line)] bg-[var(--surface-0)]">
-          <DiffBody result={change.result} />
-        </div>
+        <>
+          {/* Its own scroll container: code lines are wider than this pane will
+              ever be, and a diff that widens the whole workspace is a diff that
+              pushes the rail off a phone screen. */}
+          <div className="max-w-full overflow-x-auto border-t border-[var(--line)] bg-[var(--surface-0)]">
+            <DiffBody result={change.result} maxHeightClass="max-h-[28rem]" />
+          </div>
+          <div className="flex flex-wrap items-center gap-0.5 border-t border-[var(--line)] px-1 py-0.5">
+            {change.kind !== "removed" && (
+              <RowButton label={`Open ${change.path} in the editor`} onClick={onOpenFile}>
+                Open
+              </RowButton>
+            )}
+            <RowButton label={`Copy the diff for ${change.path}`} onClick={() => void copyPatch()}>
+              {copied ? "Copied" : "Copy diff"}
+            </RowButton>
+            {/* Undoing one file rather than the whole checkpoint. History can
+                already travel the whole project back; this is the finer tool,
+                for when one file went wrong and four went right. */}
+            <RowButton label={`Undo the changes to ${change.path}`} onClick={onRevert} danger>
+              Undo this file
+            </RowButton>
+          </div>
+        </>
       )}
     </li>
   );
 }
 
+type Filter = "all" | ChangeKind;
+
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "added", label: "New" },
+  { key: "edited", label: "Edited" },
+  { key: "removed", label: "Deleted" },
+];
+
 export function ChangesPanel() {
   const project = useStudioStore((s) => s.project);
+  const openFile = useStudioStore((s) => s.openFile);
+  const applyOperations = useStudioStore((s) => s.applyOperations);
   const versions = useVersionStore((s) => s.versions);
   const loaded = useVersionStore((s) => s.loaded);
 
   /** Which checkpoint we are comparing against; null means "the newest one". */
   const [pinned, setPinned] = useState<string | null>(null);
+  const [filter, setFilter] = useState<Filter>("all");
+  const [query, setQuery] = useState("");
+  /**
+   * Paths the student has opened, or null while they have not touched a row.
+   *
+   * Null rather than an empty Set so the "one changed file opens itself" rule
+   * below can be DERIVED instead of written by an effect. An effect that calls
+   * setState on every change to `changes` re-renders the panel twice per
+   * keystroke and fights the student the moment they collapse the row it just
+   * opened for them.
+   */
+  const [touched, setTouched] = useState<Set<string> | null>(null);
 
   const baseline = useMemo(() => {
     if (versions.length === 0) return undefined;
@@ -158,6 +270,32 @@ export function ChangesPanel() {
   const changes = useMemo(
     () => (baseline && project ? changesBetween(baseline, project.files) : []),
     [baseline, project],
+  );
+
+  const shown = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return changes.filter(
+      (c) =>
+        (filter === "all" || c.kind === filter) &&
+        (needle === "" || c.path.toLowerCase().includes(needle)),
+    );
+  }, [changes, filter, query]);
+
+  const totals = useMemo(
+    () =>
+      changes.reduce(
+        (acc, c) => ({ added: acc.added + c.result.added, removed: acc.removed + c.result.removed }),
+        { added: 0, removed: 0 },
+      ),
+    [changes],
+  );
+
+  // One changed file, opened for you: clicking to open the only row there is,
+  // every time, is a click that exists for no reason. Derived, so collapsing it
+  // sticks — the moment the student touches anything, their set is the truth.
+  const expanded = useMemo(
+    () => touched ?? (changes.length === 1 ? new Set([changes[0].path]) : new Set<string>()),
+    [touched, changes],
   );
 
   if (!project) {
@@ -180,29 +318,104 @@ export function ChangesPanel() {
     );
   }
 
+  function revert(change: FileChange) {
+    // Expressed as file operations so it goes through the same validation and
+    // the same autosave as anything else that edits the project. A file that
+    // was created since the checkpoint is deleted; anything else is put back to
+    // the text the checkpoint holds.
+    const op: FileOperation =
+      change.kind === "added"
+        ? { type: "delete", path: change.path }
+        : { type: "modify", path: change.path, content: change.before };
+    applyOperations([op]);
+  }
+
+  const allOpen = shown.length > 0 && shown.every((c) => expanded.has(c.path));
+
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="shrink-0 border-b border-[var(--line)] px-2 py-1.5">
-        <label
-          htmlFor="changes-baseline"
-          className="block text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]"
-        >
-          Compared with
-        </label>
-        {/* 16px on phones on purpose: anything smaller makes iOS zoom the whole
-            workspace the moment the picker is touched. */}
-        <select
-          id="changes-baseline"
-          value={baseline.id}
-          onChange={(e) => setPinned(e.target.value)}
-          className="tap mt-0.5 w-full min-w-0 truncate rounded-md border border-[var(--line)] bg-[var(--surface-1)] px-2 py-1.5 text-base md:text-xs text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-        >
-          {[...versions].reverse().map((version, index) => (
-            <option key={version.id} value={version.id}>
-              {index === 0 ? "Latest checkpoint" : version.label} · {when(version.createdAt)}
-            </option>
-          ))}
-        </select>
+      <div className="shrink-0 space-y-1.5 border-b border-[var(--line)] px-2 py-2">
+        <div>
+          <label
+            htmlFor="changes-baseline"
+            className="block text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]"
+          >
+            Compared with
+          </label>
+          {/* 16px on phones on purpose: anything smaller makes iOS zoom the whole
+              workspace the moment the picker is touched. */}
+          <select
+            id="changes-baseline"
+            value={baseline.id}
+            onChange={(e) => setPinned(e.target.value)}
+            className="tap mt-0.5 w-full min-w-0 truncate rounded-md border border-[var(--line)] bg-[var(--surface-1)] px-2 py-1.5 text-base md:text-xs text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          >
+            {[...versions].reverse().map((version, index) => (
+              <option key={version.id} value={version.id}>
+                {index === 0 ? "Latest checkpoint" : version.label} · {when(version.createdAt)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {changes.length > 0 && (
+          <>
+            {/* The totals, up top. "What did that turn actually do?" is usually
+                answered by two numbers before anyone opens a single file. */}
+            <p className="text-[11px] text-[var(--text-faint)]">
+              {changes.length} file{changes.length === 1 ? "" : "s"} ·{" "}
+              <span className="tabular-nums text-[var(--success)]">+{totals.added}</span>{" "}
+              <span className="tabular-nums text-[var(--danger)]">−{totals.removed}</span> · since{" "}
+              {when(baseline.createdAt)}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-1">
+              {FILTERS.map(({ key, label }) => {
+                const count =
+                  key === "all" ? changes.length : changes.filter((c) => c.kind === key).length;
+                if (count === 0 && key !== "all") return null;
+                const on = filter === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setFilter(key)}
+                    aria-pressed={on}
+                    className={`tap rounded-full px-2 py-0.5 text-[11px] transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
+                      on
+                        ? "bg-[var(--surface-3)] font-medium text-[var(--text)]"
+                        : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)]"
+                    }`}
+                  >
+                    {label} <span className="tabular-nums">{count}</span>
+                  </button>
+                );
+              })}
+              <span className="flex-1" />
+              <button
+                type="button"
+                onClick={() =>
+                  setTouched(allOpen ? new Set() : new Set(shown.map((c) => c.path)))
+                }
+                className="tap rounded-md px-2 py-0.5 text-[11px] text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+              >
+                {allOpen ? "Collapse all" : "Expand all"}
+              </button>
+            </div>
+
+            {/* Only worth the row once there are enough files to hunt through. */}
+            {changes.length > 5 && (
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Filter by path…"
+                aria-label="Filter the changed files by path"
+                className="w-full rounded-md border border-[var(--line)] bg-[var(--surface-1)] px-2 py-1.5 text-base md:text-xs text-[var(--text)] placeholder:text-[var(--text-faint)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+              />
+            )}
+          </>
+        )}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-1.5">
@@ -214,18 +427,30 @@ export function ChangesPanel() {
               exactly.
             </span>
           </p>
+        ) : shown.length === 0 ? (
+          <p className="p-1.5 text-xs text-[var(--text-faint)]">
+            No changed file matches that filter.
+          </p>
         ) : (
-          <>
-            <p className="px-1.5 pb-1.5 text-[11px] text-[var(--text-faint)]">
-              {changes.length} file{changes.length === 1 ? "" : "s"} changed since{" "}
-              {when(baseline.createdAt)}.
-            </p>
-            <ul className="space-y-1.5">
-              {changes.map((change) => (
-                <FileRow key={change.path} change={change} />
-              ))}
-            </ul>
-          </>
+          <ul className="space-y-1.5">
+            {shown.map((change) => (
+              <FileRow
+                key={change.path}
+                change={change}
+                open={expanded.has(change.path)}
+                onToggle={() =>
+                  setTouched(() => {
+                    const next = new Set(expanded);
+                    if (next.has(change.path)) next.delete(change.path);
+                    else next.add(change.path);
+                    return next;
+                  })
+                }
+                onOpenFile={() => openFile(change.path)}
+                onRevert={() => revert(change)}
+              />
+            ))}
+          </ul>
         )}
       </div>
     </div>

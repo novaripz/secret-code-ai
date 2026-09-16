@@ -31,6 +31,15 @@ import { validateOperations } from "./validateOperations";
 export type ProjectStreamEvent =
   /** The model has named a file and is writing its contents right now. */
   | { kind: "op_start"; type: FileOperation["type"]; path: string }
+  /**
+   * More of that file's contents just arrived.
+   *
+   * Only the NEW text, never the whole file so far. Re-sending the whole thing
+   * on every chunk would make a 10KB file cost megabytes over the wire — the
+   * stream turns quadratic on exactly the big generations this path exists to
+   * make possible. The client appends.
+   */
+  | { kind: "op_delta"; path: string; delta: string }
   /** That operation is complete and safe to show. */
   | { kind: "op"; op: FileOperation }
   /** The envelope is finished (or the stream ended). Authoritative. */
@@ -65,6 +74,10 @@ class OperationScanner {
   private inString = false;
   private escaped = false;
   private announced = false;
+  /** Path of the object being written, once announced — deltas are keyed on it. */
+  private announcedPath = "";
+  /** How much of the current object's `content` string has already been sent. */
+  private emitted = 0;
   /** Set once a closing brace arrives at depth 0 — the array is finished. */
   private finished = false;
 
@@ -95,12 +108,21 @@ class OperationScanner {
         if (this.depth === 0) {
           this.objectStart = this.cursor;
           this.announced = false;
+          this.announcedPath = "";
+          this.emitted = 0;
         }
         this.depth++;
       } else if (ch === "}") {
         this.depth--;
         if (this.depth === 0 && this.objectStart !== -1) {
           const chunkText = this.raw.slice(this.objectStart, this.cursor + 1);
+          // Narrate before finishing. An object that opened and closed inside a
+          // single chunk never reaches the tail of push(), so without this it
+          // was announced and streamed by nobody: the student saw the file
+          // appear whole at the end, which is the behaviour this path exists to
+          // replace. It showed up only at large chunk sizes, which is why it
+          // survived a test that fed the scanner one character at a time.
+          this.narrate(chunkText, out);
           this.objectStart = -1;
           const op = parseOperation(chunkText);
           if (op) out.push({ kind: "op", op });
@@ -117,16 +139,42 @@ class OperationScanner {
       }
     }
 
-    // Still inside an object: say which file is being written, once we know.
-    if (this.depth > 0 && this.objectStart !== -1 && !this.announced) {
-      const header = readHeader(this.raw.slice(this.objectStart, this.objectStart + HEADER_WINDOW));
-      if (header) {
-        this.announced = true;
-        out.push({ kind: "op_start", ...header });
-      }
+    // Still inside an object: narrate as much of it as has arrived.
+    if (this.depth > 0 && this.objectStart !== -1) {
+      this.narrate(this.raw.slice(this.objectStart), out);
     }
 
     return out;
+  }
+
+  /**
+   * Says which file is being written, and hands over whatever of its contents
+   * has landed since the last time this ran.
+   *
+   * Called from two places and idempotent between them: mid-chunk, while the
+   * object is still open, and again the instant its closing brace arrives. Both
+   * are necessary. The first is what makes code appear as it is typed; the
+   * second is what makes a small file -- one that opened and closed inside a
+   * single chunk -- appear at all.
+   *
+   * Nothing here is predicted. It reads the same partial JSON the scanner is
+   * already walking, so what the student sees is exactly what the model emitted,
+   * decoded and nothing more.
+   */
+  private narrate(objectText: string, out: ProjectStreamEvent[]): void {
+    if (!this.announced) {
+      const header = readHeader(objectText.slice(0, HEADER_WINDOW));
+      if (!header) return;
+      this.announced = true;
+      this.announcedPath = header.path;
+      out.push({ kind: "op_start", ...header });
+    }
+
+    const decoded = readPartialContent(objectText);
+    if (decoded !== undefined && decoded.length > this.emitted) {
+      out.push({ kind: "op_delta", path: this.announcedPath, delta: decoded.slice(this.emitted) });
+      this.emitted = decoded.length;
+    }
   }
 
   /** Finds `"operations": [` and parks the cursor just after the bracket. */
@@ -152,6 +200,53 @@ function parseOperation(text: string): FileOperation | undefined {
   }
   const { valid } = validateOperations([parsed as FileOperation]);
   return valid[0];
+}
+
+/**
+ * As much of the current object's `content` string as can be decoded so far.
+ *
+ * The text arrives as a JSON string body that is, by definition, unfinished:
+ * the closing quote has not been written and the last character may be half of
+ * an escape sequence. So the body is walked with the same escape rules the
+ * scanner uses, the cut is pulled back to the last position that is definitely
+ * not mid-escape, and THAT is what JSON.parse is asked to decode. Parsing the
+ * raw tail instead would throw on roughly every other chunk — a `\` or a
+ * partial `\u00` at the boundary is the normal case, not the edge one.
+ *
+ * Undefined when the object has not reached its `content` key yet, which is
+ * every delete and rename and the first moments of every create.
+ */
+function readPartialContent(text: string): string | undefined {
+  const key = /"content"\s*:\s*"/.exec(text);
+  if (!key) return undefined;
+  const from = key.index + key[0].length;
+
+  let i = from;
+  // The last index that is safe to cut at: never inside an escape sequence.
+  let safe = from;
+  while (i < text.length) {
+    const ch = text[i];
+    if (ch === "\\") {
+      // \uXXXX needs six characters; everything else needs two. If the whole
+      // sequence has not arrived, stop before it rather than inside it.
+      const need = text[i + 1] === "u" ? 6 : 2;
+      if (i + need > text.length) break;
+      i += need;
+      safe = i;
+      continue;
+    }
+    if (ch === '"') break; // The string closed; the object will be parsed whole.
+    i++;
+    safe = i;
+  }
+
+  try {
+    return JSON.parse(`"${text.slice(from, safe)}"`) as string;
+  } catch {
+    // A body we cannot decode is one we do not show. The complete object is
+    // still parsed normally when its closing brace lands.
+    return undefined;
+  }
 }
 
 /**

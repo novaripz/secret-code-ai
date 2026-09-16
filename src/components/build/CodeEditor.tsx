@@ -7,6 +7,7 @@ import { findByPath } from "@/lib/fileSystem";
 import { languageForPath } from "@/lib/paths";
 import { FileIcon, XIcon } from "@/components/icons";
 import { useResolvedTheme } from "./useResolvedTheme";
+import { useLiveWrite } from "./useLiveWrite";
 
 // The editor, and the one pane with no close button: closing the thing you came
 // here to write in would only ever be a mistake, and the other three panes can
@@ -61,6 +62,13 @@ export function CodeEditor() {
   const setActiveTab = useStudioStore((s) => s.setActiveTab);
   const closeTab = useStudioStore((s) => s.closeTab);
   const editFileContent = useStudioStore((s) => s.editFileContent);
+
+  // What Panda is writing right now, if anything. See useLiveWrite for why this
+  // is deliberately NOT the project: nothing below is saved, and the student's
+  // files are untouched until they apply.
+  const livePath = useLiveWrite((s) => s.path);
+  const liveKind = useLiveWrite((s) => s.kind);
+  const liveContent = useLiveWrite((s) => s.content);
 
   const mode = useResolvedTheme();
   const monacoRef = useRef<Monaco | null>(null);
@@ -126,7 +134,61 @@ export function CodeEditor() {
       </div>
 
       <div className="min-h-0 flex-1">
-        {activeFile ? (
+        {livePath ? (
+          // THE FILE, AS IT IS BEING WRITTEN.
+          //
+          // It takes over the editor body rather than opening a tab, and that is
+          // the careful choice: a tab is a thing you own and close, and this is
+          // a thing that appears and then goes away on its own. Opening tabs for
+          // files that may not exist when the turn ends would leave the student
+          // holding half a dozen tabs pointing at nothing.
+          //
+          // Read-only, because typing into it would be typing into a buffer that
+          // is about to be overwritten by the next token.
+          <div className="flex h-full min-h-0 flex-col">
+            <div className="flex shrink-0 items-center gap-2 border-b border-[var(--line)] bg-[var(--surface-0)] px-3 py-1.5">
+              <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[var(--success)]" />
+              <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-[var(--text-dim)]" title={livePath}>
+                {livePath}
+              </span>
+              {/* Said in words as well as shown: "writing" and "rewriting" are
+                  different promises about the student's existing file. */}
+              <span className="shrink-0 text-[10px] uppercase tracking-wide text-[var(--text-faint)]">
+                {liveKind === "create" ? "writing" : liveKind === "modify" ? "rewriting" : liveKind}
+              </span>
+            </div>
+            <div className="min-h-0 flex-1">
+              <Editor
+                path={`live://${livePath}`}
+                language={languageForPath(livePath)}
+                value={liveContent}
+                theme={`panda-${mode}`}
+                beforeMount={beforeMount}
+                loading={<span className="text-sm text-[var(--text-faint)]">Getting the editor ready…</span>}
+                options={{
+                  fontSize: 14,
+                  minimap: { enabled: false },
+                  automaticLayout: true,
+                  tabSize: 2,
+                  readOnly: true,
+                  domReadOnly: true,
+                  scrollBeyondLastLine: false,
+                  smoothScrolling: true,
+                  padding: { top: 12 },
+                  wordWrap: "off",
+                }}
+                onMount={(editor) => {
+                  // Follow the writing. Without this the view sits at line one
+                  // while the interesting part scrolls past below the fold.
+                  editor.onDidChangeModelContent(() => {
+                    const last = editor.getModel()?.getLineCount() ?? 1;
+                    editor.revealLine(last);
+                  });
+                }}
+              />
+            </div>
+          </div>
+        ) : activeFile ? (
           <Editor
             key={activeFile.path}
             path={activeFile.path}
