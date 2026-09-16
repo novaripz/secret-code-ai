@@ -600,3 +600,72 @@ export function getProviderChain(): AiProvider {
   if (configuredLinks().length === 0) throw new AiSetupError(NOT_CONFIGURED_DETAIL);
   return new ProviderChain();
 }
+
+/**
+ * Times each provider on its own, for the diagnostic route.
+ *
+ * The chain answers "who eventually replied", which is the right thing to tell
+ * a student and the wrong thing for working out why a one-line edit takes
+ * thirty seconds. This asks every link the same small project-shaped question
+ * and reports how long each took to its FIRST token — the number the watchdog
+ * actually judges, and the one a slow chain is made of.
+ *
+ * Deliberately not part of any student request path: it costs one model call
+ * per provider, and it exists to be run by hand when something is wrong.
+ */
+export async function probeProviders(): Promise<
+  Array<{
+    provider: string;
+    ok: boolean;
+    msToFirstToken: number | null;
+    msTotal: number;
+    chars: number;
+    error?: string;
+  }>
+> {
+  const links = configuredLinks();
+
+  return Promise.all(
+    links.map(async (link) => {
+      const started = Date.now();
+      let first: number | null = null;
+      let chars = 0;
+
+      try {
+        const stream = link.provider.generateStream({
+          prompt: "Add an empty <p> tag to index.html.",
+          fileTree: "index.html",
+          contextFiles: { "index.html": "<!doctype html><html><body></body></html>" },
+          // Project shape on purpose: this is the path that is slow, and it is
+          // the JSON-mode request that a chat probe would not exercise.
+          chatOnly: false,
+          history: [],
+        }, undefined, { firstTokenTimeoutMs: 30_000, idleTimeoutMs: 30_000 });
+
+        for await (const chunk of stream) {
+          if (first === null) first = Date.now() - started;
+          chars += chunk.length;
+        }
+        return {
+          provider: link.label,
+          ok: true,
+          msToFirstToken: first,
+          msTotal: Date.now() - started,
+          chars,
+        };
+      } catch (err) {
+        return {
+          provider: link.label,
+          ok: false,
+          msToFirstToken: first,
+          msTotal: Date.now() - started,
+          chars,
+          // The provider's own words, which is the point of running this.
+          // Never a key: these are error strings, and the adapters already
+          // keep credentials out of them.
+          error: err instanceof Error ? err.message.slice(0, 300) : String(err).slice(0, 300),
+        };
+      }
+    }),
+  );
+}
