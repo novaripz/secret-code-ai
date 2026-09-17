@@ -56,7 +56,14 @@ export function askPanda(prompt: string): void {
  * controlled field changed — it is the same path a real keystroke takes.
  */
 export function prefillComposer(text: string): boolean {
-  const field = document.querySelector<HTMLTextAreaElement>("[data-agent-composer] textarea, textarea");
+  // Scoped first, and only then anything at all. A comma selector would not do
+  // it: `querySelector` returns the first match in DOCUMENT order, not the
+  // first branch of the selector, and the workspace has another textarea
+  // earlier in the page — which is exactly where the question went the first
+  // time this was tried.
+  const field =
+    document.querySelector<HTMLTextAreaElement>("[data-agent-composer] textarea") ??
+    document.querySelector<HTMLTextAreaElement>("textarea");
   if (!field) return false;
   const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set;
   setter?.call(field, text);

@@ -60,12 +60,24 @@ function Menu({ request, onClose }: { request: ContextMenuRequest; onClose: () =
   // when the menu appeared, and only the menu knows when that was.
   const returnTo = useRef<HTMLElement | null>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
+  // When the menu was opened by a LONG PRESS, the finger is still down. Lifting
+  // it makes the browser synthesise a mousedown at the same point — on our own
+  // backdrop — and the menu closed again before the student ever saw it. So
+  // dismissal ignores anything that arrives in the moment right after opening;
+  // by then the compatibility events are over and a real second tap is a real
+  // second tap.
+  const [armed, setArmed] = useState(false);
 
   useLayoutEffect(() => {
     returnTo.current = document.activeElement as HTMLElement | null;
     const box = menuRef.current?.getBoundingClientRect();
     setPosition(clampToViewport(request.x, request.y, box?.width ?? 200, box?.height ?? 200));
   }, [request.x, request.y]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setArmed(true), 450);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     // Focus lands on the first thing that can actually be chosen, so Enter
@@ -147,12 +159,14 @@ function Menu({ request, onClose }: { request: ContextMenuRequest; onClose: () =
     <div
       className="fixed inset-0 z-[60]"
       role="presentation"
-      onMouseDown={close}
+      onMouseDown={() => {
+        if (armed) close();
+      }}
       onContextMenu={(e) => {
         // A second right-click dismisses rather than stacking another menu on
         // top of this one — and never shows the browser's own menu here.
         e.preventDefault();
-        close();
+        if (armed) close();
       }}
     >
       <div
