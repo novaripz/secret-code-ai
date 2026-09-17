@@ -6,6 +6,7 @@ import {
   MAX_DURATION_S,
   PROJECT_CHAIN_BUDGET_MS,
 } from "@/lib/ai/chain";
+import { LEAK_REPLACEMENT, PromptLeakGuard } from "@/lib/ai/promptLeak";
 import { isSearchConfigured } from "@/lib/ai/search";
 import { ToolSession, type ProgressEvent } from "@/lib/ai/tools";
 import { validateOperations } from "@/lib/ai/validateOperations";
@@ -28,14 +29,66 @@ import {
 
 // This route is the expensive one: every call spends real quota on one of four
 // AI providers, and until now anyone who found the URL could spend all of it.
-// The limits below are per minute, and a signed-in student gets roughly three
-// times what a guest gets — a guest is anonymous, so it is the abuse path, and
-// the numbers are set so that ordinary use (a question, read the answer, ask
-// again) never touches them while a script loop hits the wall in seconds.
-const USER_RULE = { limit: 20, windowMs: 60_000 };
-const GUEST_RULE = { limit: 6, windowMs: 60_000 };
+// The limiter exists for that caller and for no one else. It is not there to
+// pace a conversation, and the numbers below were wrong about that.
+//
+// What went wrong: the guest rule was six a minute — one message every ten
+// seconds — and Panda deliberately offers "continue as guest", so in a
+// classroom most people ARE guests. A student asking five quick questions, or a
+// teacher demoing the tool, spent the minute in under a minute and then got
+// "You're sending messages faster than Panda can answer" twice in a row, with
+// no way to continue. That is the limiter refusing the exact person it was
+// built to protect.
+//
+// The numbers now, and why each one:
+//
+//   burst — what may be sent back to back. Twelve for a guest, twenty for a
+//   signed-in student. Nobody types twelve real questions in a row; this is
+//   sized so that the fastest honest user anyone has watched is still nowhere
+//   near it, including a teacher clicking through a demo and the retry after a
+//   flaky network.
+//
+//   limit — the sustained rate the burst refills at, per minute. Thirty for a
+//   guest is one every two seconds, sustained, forever; sixty for a signed-in
+//   student is one a second. Both are far above human typing and far below what
+//   a loop wants, which is the only line that matters here. A signed-in person
+//   gets the higher one because they have an account that can be dealt with,
+//   while a guest is anonymous and unrevocable.
+//
+// A script gets its burst and is then pinned to the refill rate for as long as
+// it runs, which is the wall. A human never reaches the burst at all.
+const USER_RULE = { limit: 60, windowMs: 60_000, burst: 20 };
+const GUEST_RULE = { limit: 30, windowMs: 60_000, burst: 12 };
+
+// The whole-address ceiling, which exists because a school is one public
+// address: an address is not a person, and counting guests by address alone
+// makes a class of thirty look like one very busy caller.
+//
+// Sized from the class, not from a multiplier. Thirty students each holding a
+// burst of twelve is 360 requests that could in principle land at once, so the
+// burst here is 360 — the moment the teacher says "ask Panda" and the room
+// obeys must not produce a single 429. The sustained 900 a minute is thirty
+// students at the individual guest rate of thirty; a class cannot exceed its
+// own members' limits, so this ceiling never fires for legitimate use, which is
+// the whole requirement.
+//
+// It still bounds the abuse it was added for. Someone rotating device ids to
+// dodge the per-device bucket walks into this one and is capped at fifteen a
+// second — a hard bound on quota burn, and no worse than the thirty real
+// students the address is allowed to contain anyway. Making it tighter than the
+// class it must hold would just be the original bug at a larger scale.
+const GUEST_ADDRESS_CEILING = { limit: 900, windowMs: 60_000, burst: 360 };
+
+// Shown when a counter really does run out, which for a person should now mean
+// a genuine flood on the shared school connection and nothing else. The old
+// wording blamed the student for typing too fast and told them to "try again in
+// a few seconds" without saying whether their message had survived; both were
+// wrong, and the second is the part that made people give up. This says what
+// happened, that nothing was lost, and what to do. The exact number of seconds
+// is in the response's `retryAfter` and the Retry-After header.
 const BUSY_MESSAGE =
-  "You're sending messages faster than Panda can answer. Try again in a few seconds.";
+  "Panda has hit the limit on how many answers it can start at once on this network. " +
+  "Nothing you wrote is lost — wait a few seconds and send it again.";
 
 const LEARNING_MODES = new Set<LearningMode>(["coaching", "study", "review", "answers"]);
 
@@ -239,6 +292,7 @@ export async function POST(req: NextRequest) {
     route: "ai",
     user: USER_RULE,
     guest: GUEST_RULE,
+    guestCeiling: GUEST_ADDRESS_CEILING,
     busyMessage: BUSY_MESSAGE,
   });
   if (!guard.ok) return guard.response;
@@ -405,17 +459,54 @@ export async function POST(req: NextRequest) {
               sentSomething = true;
             }
 
+            // Panda has answered students with verbatim lines of its own
+            // system prompt — twice in one measured run of eight messages. The
+            // guard watches only the opening of the reply and only while that
+            // opening is still verbatim instruction text, so an ordinary reply
+            // streams with nothing added to its first token; see
+            // lib/ai/promptLeak.ts for the thresholds and the trade-off.
+            const leakGuard = new PromptLeakGuard();
+            let leaked = false;
+
             for await (const chunk of chunks) {
               if (closed) break;
               drain();
-              send(framed ? frame({ t: "text", v: chunk }) : chunk);
+              const checked = leakGuard.push(chunk);
+              if (checked.leaked) {
+                // The model is reciting its briefing. Nothing it goes on to
+                // say can repair a reply that began that way, so the turn ends
+                // here with one honest sentence rather than a half-redacted
+                // answer. Nothing has reached the student yet: the guard held
+                // every byte of it back.
+                console.error(
+                  "[api/ai] a reply opened with verbatim system-prompt text and was replaced.",
+                );
+                send(framed ? frame({ t: "text", v: LEAK_REPLACEMENT }) : LEAK_REPLACEMENT);
+                sentSomething = true;
+                leaked = true;
+                break;
+              }
+              if (!checked.text) continue;
+              send(framed ? frame({ t: "text", v: checked.text }) : checked.text);
               sentSomething = true;
+            }
+            if (!leaked) {
+              // A reply short enough to end while it still looked like a line
+              // of the prompt never cleared the thresholds, so it is the
+              // student's answer and it is owed to them.
+              const tail = leakGuard.flush();
+              if (tail) {
+                send(framed ? frame({ t: "text", v: tail }) : tail);
+                sentSomething = true;
+              }
             }
             drain();
 
             // Citations travel as data, never glued into the prose, so the UI
-            // can render them as links and the transcript stays clean.
-            const sources = session?.sources() ?? [];
+            // can render them as links and the transcript stays clean. A
+            // replaced reply cites nothing: those sources belong to an answer
+            // the student never saw.
+            const sources = leaked ? [] : (session?.sources() ?? []);
             if (framed && sources.length > 0) send(frame({ t: "sources", items: sources }));
           } catch (err) {
             // The response has already begun, so the status line is spent.

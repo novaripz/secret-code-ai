@@ -1,15 +1,69 @@
 "use client";
 
 import localforage from "localforage";
+import { accountScope } from "@/store/useAuthStore";
 import type { Project } from "@/types";
 
 // Client-side persistence via IndexedDB (through localforage). Keeps the app
 // fully usable with zero backend config. Firebase sync can be layered on top
 // later (see lib/firebase.ts) without changing this interface.
 
+/**
+ * One object store per account, the same way useAssistantStore, useWatchStore
+ * and useInsightsStore already name theirs. This module used to be the one
+ * place that skipped it, and the result was the exact thing accountScope()
+ * exists to prevent: on a shared classroom machine the second student to sign
+ * in opened /build and saw the first student's projects by name, and could
+ * open, edit and delete them.
+ *
+ * The suffix is sanitised because localforage turns storeName into an
+ * IndexedDB object-store name, and account ids carry characters (the leading
+ * ":" from accountScope(), and the dashes in a UUID) that are better not
+ * spelled into one. Exported so a check can assert two accounts never land on
+ * the same store without having to stand up IndexedDB.
+ */
+export function projectsStoreName(scope: string): string {
+  return `projects${scope.replace(/[^a-zA-Z0-9]/g, "_")}`;
+}
+
+/**
+ * What happens to the projects that are already on disk, and why nothing is
+ * migrated.
+ *
+ * Everything written before this fix lives under the bare storeName
+ * "projects". accountScope() returns "" for a guest, so projectsStoreName("")
+ * is still exactly "projects" — the legacy store IS the guest store. That
+ * matters more than it sounds: the common classroom case is a room where
+ * nobody signs in at all, and for that room this change is a no-op. Every
+ * project stays where it was, under the key it was written with, and opens as
+ * it did yesterday.
+ *
+ * Only a signed-in account starts empty, and that is deliberate. The rejected
+ * alternative was to move the legacy store into the first account that signs
+ * in after the update. On a shared machine nobody can know whose work that is
+ * — it is the pooled output of every student who used the browser — so
+ * "adopt it" means handing one student the rest of the class's projects under
+ * their own name, which is the leak we are fixing, made permanent and
+ * plausible-looking. Copying it into every account instead multiplies the leak
+ * rather than removing it. Deleting it is worse than either: it destroys work
+ * we were only ever asked to stop showing to strangers.
+ *
+ * So the legacy data is left untouched and reachable. Nothing here deletes or
+ * rewrites it; there is deliberately no dropInstance() or clear() in this
+ * module. A student who signed in and finds their old work missing gets it
+ * back by signing out, which returns the app to the exact state the work was
+ * created in. The harm chosen is a signed-in student having to sign out to see
+ * pre-fix projects, over any student ever seeing, editing or deleting
+ * another's. Surfacing an "older projects from before sign-in" entry in the
+ * /build UI would soften that, but it is a change in app/build/page.tsx and
+ * belongs to whoever owns that file.
+ */
 const store = localforage.createInstance({
   name: "ai-code-studio",
-  storeName: "projects",
+  // Read once at module load, which is the convention the other stores follow
+  // and is safe because useAuthStore.adopt() reloads the page whenever the
+  // scope changes — see the comment above adopt().
+  storeName: projectsStoreName(accountScope()),
 });
 
 const INDEX_KEY = "__project_index__";

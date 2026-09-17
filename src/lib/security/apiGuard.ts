@@ -52,8 +52,16 @@ export interface GuardOptions {
   authenticate?: boolean;
   /**
    * The whole-address ceiling for guests, which has to fit a classroom sharing
-   * one school connection. Defaults to twelve times the per-guest rule, which
-   * is roughly a class of thirty working at a normal pace.
+   * one school connection. Defaults to twelve times the per-guest rule in both
+   * sustained rate and burst.
+   *
+   * Twelve is a multiplier, not a headcount: a class of thirty does not send
+   * thirty times a single student's traffic, because at any moment most of them
+   * are reading rather than sending. Routes where the arithmetic matters — the
+   * AI route, where a whole class really can all press send when the teacher
+   * says go — pass an explicit ceiling instead of trusting this default, and
+   * the checks in scripts/checks/rate-limit.test.ts hold that number to a
+   * thirty-student class.
    */
   guestCeiling?: RateLimitRule;
 }
@@ -134,6 +142,7 @@ export async function guardRequest(
     const ceiling = options.guestCeiling ?? {
       limit: rule.limit * 12,
       windowMs: rule.windowMs,
+      burst: (rule.burst ?? rule.limit) * 12,
     };
     const perAddress = checkRateLimit(`${options.route}:ipc:${clientIp(request)}`, ceiling);
     if (!perAddress.ok) return tooMany(options, perAddress);

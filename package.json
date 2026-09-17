@@ -8,8 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "check:ai": "tsx scripts/checks/ai-chain.test.ts",
-    "check": "npm run check:ai && npm run check:files",
-    "check:files": "tsx scripts/checks/project-files.test.ts"
+    "check": "npm run check:ai && npm run check:files && npm run check:leak",
+    "check:files": "tsx scripts/checks/project-files.test.ts",
+    "check:leak": "tsx scripts/checks/prompt-leak.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.19.0",

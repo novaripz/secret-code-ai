@@ -30,10 +30,19 @@ export const runtime = "nodejs";
 // costs the owner the Watch tab for the rest of the day. The in-process cache
 // below already absorbs repeat terms; these limits cover the case where the
 // terms keep changing. Guests are held tighter because a guest is anonymous.
-const WATCH_USER_RULE = { limit: 30, windowMs: 60_000 };
-const WATCH_GUEST_RULE = { limit: 10, windowMs: 60_000 };
+//
+// A burst is spelled out here for the same reason it is on /api/ai: browsing is
+// bursty. Someone landing on the Watch tab and trying four phrasings of the
+// same topic in twenty seconds is normal use, and a flat ten a minute refused
+// them. The sustained rate stays deliberately low, though, because unlike AI
+// quota the YouTube budget is a hard daily number that does not refill until
+// tomorrow — here the limiter really is protecting a scarce resource, not
+// pacing anyone.
+const WATCH_USER_RULE = { limit: 30, windowMs: 60_000, burst: 15 };
+const WATCH_GUEST_RULE = { limit: 15, windowMs: 60_000, burst: 10 };
 const WATCH_BUSY =
-  "You're searching faster than Panda can keep up. Wait a few seconds and try again.";
+  "Panda has hit its limit on video searches for the moment. " +
+  "Wait a few seconds and search again.";
 
 export interface Video {
   id: string;
