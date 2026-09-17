@@ -3,18 +3,43 @@
 import { create } from "zustand";
 import type { ConsoleEntry, FileOperation, Project } from "@/types";
 import {
+  copyNode,
   createFile,
   createFolder,
   deleteNode,
   findByPath,
   renameNode,
+  restoreSubtree,
+  snapshotSubtree,
   updateFileContent,
+  type NodeSnapshot,
 } from "@/lib/fileSystem";
 import { saveProject } from "@/lib/storage";
 
 interface Tab {
   path: string;
   dirty: boolean;
+}
+
+/**
+ * What the last delete took away, kept so it can be put back.
+ *
+ * History (useVersionStore) was already the safety net here, and on paper it
+ * covers a delete — but only on paper. Snapshots fold into the previous one for
+ * ninety seconds, so a file written and then deleted inside that window is
+ * folded out of the only checkpoint that ever held it, and no amount of
+ * scrolling the history brings it back. A student deleting the wrong file
+ * thirty seconds after making it is not an exotic case; it is Tuesday.
+ *
+ * So the delete itself carries its own undo, which does not depend on a timer
+ * having fired. It is in memory only and lasts until the next delete: this is
+ * "I just did that by mistake", not a second version history.
+ */
+interface DeletedSubtree {
+  path: string;
+  snapshot: NodeSnapshot[];
+  /** Tabs that were open on it, so undo puts the student back where they were. */
+  openPaths: string[];
 }
 
 interface StudioState {
@@ -24,6 +49,7 @@ interface StudioState {
   consoleEntries: ConsoleEntry[];
   saving: boolean;
   lastSavedAt: number | null;
+  lastDeleted: DeletedSubtree | null;
 
   setProject: (project: Project) => void;
   openFile: (path: string) => void;
@@ -35,6 +61,10 @@ interface StudioState {
   addFolder: (path: string) => void;
   removeNode: (path: string) => void;
   renamePath: (path: string, newPath: string) => void;
+  /** Copies a file or folder beside itself. Returns the new path, or null if it could not. */
+  duplicateNode: (path: string, newPath: string) => string | null;
+  /** Puts back whatever the last removeNode took. */
+  undoDelete: () => void;
 
   applyOperations: (ops: FileOperation[]) => { applied: FileOperation[]; failed: { op: FileOperation; error: string }[] };
 
@@ -91,13 +121,17 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   consoleEntries: [],
   saving: false,
   lastSavedAt: null,
+  lastDeleted: null,
 
   setProject: (project) => {
     // The outgoing project's unsaved edit is written before the store forgets
     // it exists. Deliberately not awaited: the new project should open now, and
     // the write is already pointed at the right record.
     void flushAutosave();
-    set({ project, tabs: [], activeTab: null, consoleEntries: [] });
+    // The undo goes with the project it belonged to: offering to restore
+    // another project's file into this one would be a data bug wearing a
+    // helpful label.
+    set({ project, tabs: [], activeTab: null, consoleEntries: [], lastDeleted: null });
   },
 
   openFile: (path) =>
@@ -152,11 +186,49 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   removeNode: (path) => {
     const { project } = get();
     if (!project) return;
+    // Taken BEFORE the delete, obviously, but worth saying: this is the only
+    // moment the contents still exist.
+    const snapshot = snapshotSubtree(project, path);
+    const openPaths = get().tabs.filter((t) => t.path === path || t.path.startsWith(`${path}/`)).map((t) => t.path);
     deleteNode(project, path);
     set((s) => ({
       project: { ...project },
-      tabs: s.tabs.filter((t) => !t.path.startsWith(path)),
-      activeTab: s.activeTab && s.activeTab.startsWith(path) ? null : s.activeTab,
+      // Compared as a path segment, not as a string prefix: "styles" must not
+      // close the tab holding "styles-old.css".
+      tabs: s.tabs.filter((t) => !(t.path === path || t.path.startsWith(`${path}/`))),
+      activeTab:
+        s.activeTab && (s.activeTab === path || s.activeTab.startsWith(`${path}/`)) ? null : s.activeTab,
+      lastDeleted: { path, snapshot, openPaths },
+    }));
+    scheduleAutosave(project);
+  },
+
+  duplicateNode: (path, newPath) => {
+    const { project } = get();
+    if (!project) return null;
+    const created = copyNode(project, path, newPath);
+    set({ project: { ...project } });
+    scheduleAutosave(project);
+    return created.path;
+  },
+
+  undoDelete: () => {
+    const { project, lastDeleted } = get();
+    if (!project || !lastDeleted) return;
+    restoreSubtree(project, lastDeleted.snapshot);
+    set((s) => ({
+      project: { ...project },
+      // Reopening the tabs is half the point: the student was working in that
+      // file a second ago and should land back in it, not in an empty editor
+      // wondering whether the undo did anything.
+      tabs: [
+        ...s.tabs,
+        ...lastDeleted.openPaths
+          .filter((p) => !s.tabs.some((t) => t.path === p))
+          .map((p) => ({ path: p, dirty: false })),
+      ],
+      activeTab: lastDeleted.openPaths[0] ?? s.activeTab,
+      lastDeleted: null,
     }));
     scheduleAutosave(project);
   },

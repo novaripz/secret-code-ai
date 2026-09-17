@@ -165,6 +165,66 @@ function retargetSubtreePaths(project: Project, node: FileNode, newPath: string,
   }
 }
 
+/**
+ * A node and everything under it, flattened to plain records.
+ *
+ * This is the shape both "duplicate" and "undo the delete I just did" need: a
+ * copy that survives the original being gone, holding no ids and no parent
+ * links. Ids are deliberately dropped rather than kept — putting a subtree back
+ * under its old ids would collide with anything created in the meantime, and
+ * nothing in the app identifies a file by id anyway; paths are the identity.
+ */
+export interface NodeSnapshot {
+  path: string;
+  kind: "file" | "folder";
+  content?: string;
+}
+
+export function snapshotSubtree(project: Project, path: string): NodeSnapshot[] {
+  const node = findByPath(project, path);
+  if (!node) throw new Error(`Not found: "${path}"`);
+  return collectSubtree(project, node.id).map((n) => ({
+    path: n.path,
+    kind: n.kind,
+    content: n.kind === "file" ? (n.content ?? "") : undefined,
+  }));
+}
+
+/**
+ * Writes a snapshot back into the project. Shallowest path first, so a folder
+ * exists before the files inside it are made — createFile would otherwise
+ * invent the folder itself and the two would race to a different shape.
+ *
+ * Anything that is already there is left alone rather than overwritten: this is
+ * used to undo a delete, and by then the student may have made a new file with
+ * the old name. Clobbering it would turn one recovered mistake into another.
+ */
+export function restoreSubtree(project: Project, snapshot: NodeSnapshot[]): void {
+  const ordered = [...snapshot].sort((a, b) => a.path.split("/").length - b.path.split("/").length);
+  for (const entry of ordered) {
+    if (findByPath(project, entry.path)) continue;
+    if (entry.kind === "folder") createFolder(project, entry.path);
+    else createFile(project, entry.path, entry.content ?? "");
+  }
+  project.updatedAt = Date.now();
+}
+
+/** Copies a node (and its contents, if it is a folder) to a new path. */
+export function copyNode(project: Project, path: string, newPath: string): FileNode {
+  const safeNewPath = assertSafePath(newPath);
+  if (findByPath(project, safeNewPath)) {
+    throw new Error(`Target already exists: "${safeNewPath}"`);
+  }
+  const snapshot = snapshotSubtree(project, path);
+  restoreSubtree(
+    project,
+    snapshot.map((entry) => ({ ...entry, path: `${safeNewPath}${entry.path.slice(path.length)}` })),
+  );
+  const created = findByPath(project, safeNewPath);
+  if (!created) throw new Error(`Could not copy "${path}"`);
+  return created;
+}
+
 export function renameNode(project: Project, path: string, newPath: string): FileNode {
   const node = findByPath(project, path);
   if (!node) throw new Error(`Not found: "${path}"`);

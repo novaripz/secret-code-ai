@@ -1,17 +1,34 @@
 "use client";
 
 import Editor, { type Monaco } from "@monaco-editor/react";
-import { useCallback, useEffect, useRef } from "react";
+import type { editor as MonacoEditor } from "monaco-editor";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useStudioStore } from "@/store/useStudioStore";
 import { findByPath } from "@/lib/fileSystem";
 import { languageForPath } from "@/lib/paths";
-import { FileIcon, XIcon } from "@/components/icons";
+import { FileIcon, SearchIcon, SparkleIcon, XIcon } from "@/components/icons";
 import { useResolvedTheme } from "./useResolvedTheme";
 import { useLiveWrite } from "./useLiveWrite";
+import { askPanda, buildAskPrompt } from "./askPanda";
+import { displayPath } from "./fileMenu";
 
 // The editor, and the one pane with no close button: closing the thing you came
 // here to write in would only ever be a mistake, and the other three panes can
 // already be cleared out of its way.
+//
+// THE RIGHT-CLICK MENU INSIDE THE EDITOR
+//
+// Monaco already has one, and it is a good one — cut, copy, paste, go to
+// definition, the lot. So the entries below are ADDED to it with `addAction`
+// and a `contextMenuGroupId`, rather than a menu of our own drawn on top of
+// Monaco's and fighting it for the same right-click. A second menu would have
+// meant reimplementing find, format and go-to-line by hand and losing whatever
+// Monaco gains next year.
+//
+// Every one of them is also reachable without a right-click: each has a real
+// keybinding, and the toolbar under the tabs carries the three a student
+// actually reaches for on a phone, where there is no right-click at all and
+// Monaco's menu cannot be opened.
 //
 // Monaco ships its own themes, and left alone it stays on whichever one it
 // booted with — which is how you end up with a white editor sitting in a dark
@@ -48,6 +65,26 @@ function defineWorkspaceTheme(monaco: Monaco, mode: "dark" | "light") {
         "editorWidget.border": cssToken("--line", "#2a2a2a"),
         "editorSuggestWidget.background": cssToken("--surface-0", fallback),
         "scrollbarSlider.background": cssToken("--surface-3", "#333333"),
+        // Monaco's right-click menu is drawn by Monaco, from its OWN palette:
+        // leave these out and the menu comes up white on a dark workspace,
+        // which is exactly the drift the rest of this function exists to stop.
+        // Found the hard way — the menu looked fine in the light theme and
+        // like a bug in the other four.
+        "menu.background": cssToken("--surface-0", fallback),
+        "menu.foreground": cssToken("--text-dim", mode === "dark" ? "#b4b4b4" : "#3d3d3d"),
+        "menu.selectionBackground": cssToken("--surface-2", "#262626"),
+        "menu.selectionForeground": cssToken("--text", mode === "dark" ? "#ececec" : "#0d0d0d"),
+        "menu.separatorBackground": cssToken("--line", "#2a2a2a"),
+        "menu.border": cssToken("--line-strong", "#3d3d3d"),
+        // The find widget and the quick-input box (go to line, go to symbol)
+        // are the same story.
+        "input.background": cssToken("--surface-2", "#262626"),
+        "input.foreground": cssToken("--text", mode === "dark" ? "#ececec" : "#0d0d0d"),
+        "input.border": cssToken("--line", "#2a2a2a"),
+        "quickInput.background": cssToken("--surface-0", fallback),
+        "quickInput.foreground": cssToken("--text", mode === "dark" ? "#ececec" : "#0d0d0d"),
+        "list.hoverBackground": cssToken("--surface-2", "#262626"),
+        "list.activeSelectionBackground": cssToken("--surface-3", "#333333"),
       },
     });
   } catch {
@@ -72,6 +109,112 @@ export function CodeEditor() {
 
   const mode = useResolvedTheme();
   const monacoRef = useRef<Monaco | null>(null);
+  const editorRef = useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
+  // Word wrap is off by default because code is written in lines, and on by
+  // choice because a phone is 360px wide and horizontal scrolling inside a
+  // scrolling page is how a student loses their place entirely.
+  const [wrap, setWrap] = useState(false);
+
+  // The Monaco actions below are registered once per mounted editor, so they
+  // read the open file off the store when they run rather than closing over
+  // whatever was open when they were created. Otherwise "copy this file's path"
+  // would copy the path of the file the student had open ten minutes ago.
+  const currentPath = () => useStudioStore.getState().activeTab;
+
+  /** Runs a built-in Monaco command, and says nothing if Monaco never mounted. */
+  const runInEditor = useCallback((commandId: string) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.focus();
+    editor.getAction(commandId)?.run();
+  }, []);
+
+  /** The selection, or the whole file when nothing is selected — which is what a student means by "this". */
+  const selectedText = useCallback(() => {
+    const editor = editorRef.current;
+    const model = editor?.getModel();
+    if (!editor || !model) return "";
+    const selection = editor.getSelection();
+    if (!selection || selection.isEmpty()) return model.getValue();
+    return model.getValueInRange(selection);
+  }, []);
+
+  const ask = useCallback(
+    (kind: "explain" | "fix") => {
+      const path = useStudioStore.getState().activeTab;
+      if (!path) return;
+      askPanda(buildAskPrompt(kind, path, selectedText()));
+    },
+    [selectedText],
+  );
+
+  /**
+   * The app's own entries in Monaco's menu.
+   *
+   * Registered on the editor rather than globally so they disappear with it,
+   * and given keybindings as well as menu positions: the menu is the
+   * discoverable route and the key is the fast one, and neither is the only
+   * one. `navigation` and `9_cutcopypaste` are Monaco's own group ids, so our
+   * entries sit among the built-ins instead of in a lonely section at the
+   * bottom.
+   */
+  const registerActions = useCallback(
+    (editor: MonacoEditor.IStandaloneCodeEditor, monaco: Monaco) => {
+      const add = (
+        id: string,
+        label: string,
+        group: string,
+        order: number,
+        run: () => void,
+        keybindings: number[] = [],
+      ) => {
+        editor.addAction({ id, label, contextMenuGroupId: group, contextMenuOrder: order, keybindings, run });
+      };
+
+      // Panda first, because it is the reason this editor is not Notepad.
+      add("panda.explain", "Ask Panda about this", "panda", 1, () => ask("explain"), [
+        monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyE,
+      ]);
+      add("panda.fix", "Ask Panda to fix this", "panda", 2, () => ask("fix"), [
+        monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF,
+      ]);
+
+      add("panda.format", "Tidy up this file", "1_modification", 1, () =>
+        editor.getAction("editor.action.formatDocument")?.run(),
+      );
+      add("panda.find", "Find in this file", "navigation", 1, () =>
+        editor.getAction("actions.find")?.run(),
+      );
+      add("panda.replace", "Find and replace", "navigation", 2, () =>
+        editor.getAction("editor.action.startFindReplaceAction")?.run(),
+      );
+      add("panda.goToLine", "Go to line…", "navigation", 3, () =>
+        editor.getAction("editor.action.gotoLine")?.run(),
+      );
+      add(
+        "panda.palette",
+        "Find a file or run a command",
+        "navigation",
+        4,
+        () => window.dispatchEvent(new CustomEvent("panda:open-palette")),
+        [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+      );
+      add("panda.copyPath", "Copy this file\u2019s path", "9_cutcopypaste", 5, () => {
+        const path = currentPath();
+        if (!path) return;
+        void navigator.clipboard?.writeText(
+          displayPath(useStudioStore.getState().project?.name ?? "project", path),
+        );
+      });
+      // Ctrl/Cmd-S is muscle memory, and inside Monaco the browser's own
+      // "save this page" dialog would otherwise win. The app autosaves anyway,
+      // so this is reassurance made real rather than a new capability.
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+        void useStudioStore.getState().persist();
+      });
+    },
+    [ask],
+  );
 
   const beforeMount = useCallback((monaco: Monaco) => {
     monacoRef.current = monaco;
@@ -87,6 +230,27 @@ export function CodeEditor() {
     defineWorkspaceTheme(monaco, mode);
     monaco.editor.setTheme(`panda-${mode}`);
   }, [mode]);
+
+  // The same actions, asked for from outside the editor — from the command
+  // palette, which is the route for anyone who never touches a pointer. The
+  // editor is the only thing that can run them, so it listens rather than
+  // exporting a handle and hoping whoever holds it is still mounted.
+  useEffect(() => {
+    function onEditorAction(e: Event) {
+      const id = (e as CustomEvent<{ commandId: string }>).detail?.commandId;
+      if (id) runInEditor(id);
+    }
+    function onAsk(e: Event) {
+      const kind = (e as CustomEvent<{ kind: "explain" | "fix" }>).detail?.kind;
+      if (kind) ask(kind);
+    }
+    window.addEventListener("panda:editor-action", onEditorAction);
+    window.addEventListener("panda:ask-selection", onAsk);
+    return () => {
+      window.removeEventListener("panda:editor-action", onEditorAction);
+      window.removeEventListener("panda:ask-selection", onAsk);
+    };
+  }, [runInEditor, ask]);
 
   const activeFile = project && activeTab ? findByPath(project, activeTab) : undefined;
 
@@ -104,6 +268,16 @@ export function CodeEditor() {
             return (
               <div
                 key={tab.path}
+                title={tab.path}
+                // Middle-click closes, the way it does in a browser and in VS
+                // Code. It is a shortcut, never the only way: the × is right
+                // there and has its own label.
+                onAuxClick={(e) => {
+                  if (e.button === 1) {
+                    e.preventDefault();
+                    closeTab(tab.path);
+                  }
+                }}
                 className={`flex h-full shrink-0 items-center gap-1.5 border-r border-[var(--line)] pr-1.5 ${
                   active ? "bg-[var(--surface-1)]" : "hover:bg-[var(--surface-2)]"
                 }`}
@@ -117,7 +291,17 @@ export function CodeEditor() {
                 >
                   <FileIcon className="h-3.5 w-3.5 shrink-0 text-[var(--text-faint)]" />
                   <span className="max-w-[150px] truncate">{name}</span>
-                  {tab.dirty && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />}
+                  {/* The dirty dot gets a label of its own. It is the only
+                      thing on the tab that says "not saved yet", and a dot
+                      says nothing at all to a screen reader. */}
+                  {tab.dirty && (
+                    <span
+                      title="Not saved yet"
+                      aria-label="Not saved yet"
+                      role="img"
+                      className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]"
+                    />
+                  )}
                 </button>
                 <button
                   onClick={() => closeTab(tab.path)}
@@ -132,6 +316,62 @@ export function CodeEditor() {
           })
         )}
       </div>
+
+      {/* BREADCRUMBS AND THE THREE BUTTONS.
+          The breadcrumb answers "where am I", which a tab strip showing eight
+          files called index.html cannot. The buttons are the phone answer to
+          Monaco's right-click menu: find, tidy, and ask Panda are the three a
+          student actually reaches for, and on a touch screen there is no other
+          way to reach them at all. Everything else stays in the menu and on a
+          key. */}
+      {activeFile && !livePath && (
+        <div className="flex h-8 shrink-0 items-center gap-1 border-b border-[var(--line)] bg-[var(--surface-0)] px-2">
+          <nav aria-label="Where this file lives" className="scroll-x flex min-w-0 flex-1 items-center gap-1">
+            {activeFile.path.split("/").map((segment, index, all) => (
+              <span key={`${segment}-${index}`} className="flex shrink-0 items-center gap-1">
+                {index > 0 && <span aria-hidden className="text-[var(--text-faint)]">/</span>}
+                <span
+                  className={`truncate font-mono text-[11px] ${
+                    index === all.length - 1 ? "text-[var(--text-dim)]" : "text-[var(--text-faint)]"
+                  }`}
+                >
+                  {segment}
+                </span>
+              </span>
+            ))}
+          </nav>
+          <button
+            type="button"
+            onClick={() => runInEditor("actions.find")}
+            title="Find in this file (Ctrl F)"
+            aria-label="Find in this file"
+            className="tap-sq tap-pad inline-flex shrink-0 items-center justify-center rounded p-1 text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          >
+            <SearchIcon className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setWrap((w) => !w)}
+            aria-pressed={wrap}
+            title={wrap ? "Stop wrapping long lines" : "Wrap long lines"}
+            aria-label={wrap ? "Stop wrapping long lines" : "Wrap long lines"}
+            className={`tap-sq tap-pad inline-flex shrink-0 items-center justify-center rounded px-1.5 py-1 font-mono text-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
+              wrap ? "bg-[var(--surface-2)] text-[var(--text)]" : "text-[var(--text-faint)] hover:bg-[var(--surface-2)]"
+            }`}
+          >
+            wrap
+          </button>
+          <button
+            type="button"
+            onClick={() => ask("explain")}
+            title="Ask Panda about the selected code (Ctrl Shift E)"
+            aria-label="Ask Panda about the selected code"
+            className="tap-sq tap-pad inline-flex shrink-0 items-center justify-center rounded p-1 text-[var(--accent)] hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          >
+            <SparkleIcon className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
 
       <div className="min-h-0 flex-1">
         {livePath ? (
@@ -208,8 +448,24 @@ export function CodeEditor() {
               scrollBeyondLastLine: false,
               smoothScrolling: true,
               padding: { top: 12 },
-              wordWrap: "off",
+              wordWrap: wrap ? "on" : "off",
               quickSuggestions: true,
+              // Monaco's own menu is what our actions are added to, so it very
+              // much stays on.
+              contextmenu: true,
+              // ...and it is drawn in the page rather than in a shadow root.
+              // Monaco themes the menu from two directions: the text colour
+              // rides in on a CSS variable, which inherits into a shadow root
+              // fine, but the BACKGROUND comes from a rule Monaco writes into
+              // the document stylesheet, and a document rule cannot reach
+              // inside a shadow root. The result was a white menu with our
+              // grey text on it in all five themes — legible in one of them by
+              // luck. Out of the shadow root, both halves land.
+              useShadowDOM: false,
+            }}
+            onMount={(editor, monaco) => {
+              editorRef.current = editor;
+              registerActions(editor, monaco);
             }}
           />
         ) : (

@@ -7,7 +7,14 @@ import { useDialog } from "@/components/ui/Dialog";
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { useProfileStore } from "@/store/useProfileStore";
 import { createEmptyProject, createFile } from "@/lib/fileSystem";
-import { deleteProject, listProjects, saveProject, type ProjectSummary } from "@/lib/storage";
+import {
+  claimLegacyProject,
+  deleteProject,
+  listLegacyProjects,
+  listProjects,
+  saveProject,
+  type ProjectSummary,
+} from "@/lib/storage";
 import { importProjectFromZip } from "@/lib/zip";
 import { HammerIcon, PlusIcon, TrashIcon, UploadIcon } from "@/components/icons";
 
@@ -103,6 +110,13 @@ export default function BuildPage() {
   const hydrated = useProfileStore((s) => s.hydrated);
 
   const [projects, setProjects] = useState<ProjectSummary[] | null>(null);
+  // Projects made on this browser before anyone signed in. See the comment on
+  // listLegacyProjects: nothing can know whose they are, so the student is
+  // asked rather than guessed at. Empty for guests and for anyone who never
+  // used Panda signed out, which is nearly everyone — this row only appears
+  // for the students it is actually for.
+  const [older, setOlder] = useState<ProjectSummary[]>([]);
+  const [claiming, setClaiming] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState("");
   // Read once per load rather than per render: a list that recomputes "2 min
@@ -116,7 +130,22 @@ export default function BuildPage() {
       setNow(Date.now());
       setProjects(list);
     });
+    void listLegacyProjects().then(setOlder);
   }, []);
+
+  async function handleClaim(summary: ProjectSummary) {
+    setClaiming(summary.id);
+    try {
+      const claimed = await claimLegacyProject(summary.id);
+      if (!claimed) return;
+      // Copied, not moved: the original stays for whoever else used this
+      // browser. So the row leaves this list and joins the one above it.
+      setOlder((prev) => prev.filter((p) => p.id !== summary.id));
+      setProjects((prev) => (prev ? [claimed, ...prev] : [claimed]));
+    } finally {
+      setClaiming(null);
+    }
+  }
 
   async function handleCreate() {
     const name = await dialog.prompt({
@@ -301,6 +330,50 @@ export default function BuildPage() {
                   </ul>
                 );
               })()
+            )}
+
+            {/* WORK MADE BEFORE SIGNING IN.
+                Projects used to be saved without an account attached, so on a
+                shared classroom machine everyone's landed in one pile. They are
+                not moved automatically: nothing can tell whose is whose, and
+                guessing would hand one student the rest of the class's work.
+                The student knows, so the student says — one project at a time,
+                by name. Claiming COPIES, so a wrong guess costs nothing and the
+                original stays for whoever it really belongs to. */}
+            {older.length > 0 && (
+              <section className="mt-10 rounded-2xl border border-dashed border-[var(--line-strong)] p-4">
+                <h2 className="text-sm font-semibold text-[var(--text)]">
+                  Made on this computer before you signed in
+                </h2>
+                <p className="mt-1 max-w-prose text-sm leading-relaxed text-[var(--text-faint)]">
+                  These were saved on this computer without an account, so they might be yours or
+                  they might belong to someone else who used it. Add the ones you made — the
+                  originals stay here either way.
+                </p>
+                <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {older.map((p) => (
+                    <li
+                      key={p.id}
+                      className="flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-0)] px-3 py-2.5"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm text-[var(--text)]">{p.name}</span>
+                        <span className="mt-0.5 block font-mono text-[11px] text-[var(--text-faint)]">
+                          {t("build.edited", { time: humanTime(p.updatedAt) })}
+                        </span>
+                      </span>
+                      <button
+                        onClick={() => void handleClaim(p)}
+                        disabled={claiming !== null}
+                        aria-label={`Add ${p.name} to my projects`}
+                        className="tap shrink-0 rounded-full border border-[var(--line-strong)] px-3 py-1.5 text-xs text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:border-[var(--text-faint)] hover:text-[var(--text)] disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+                      >
+                        {claiming === p.id ? "Adding…" : "This one's mine"}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             )}
           </div>
         </div>

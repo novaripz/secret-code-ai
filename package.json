@@ -8,9 +8,14 @@
     "start": "next start",
     "lint": "eslint",
     "check:ai": "tsx scripts/checks/ai-chain.test.ts",
-    "check": "npm run check:ai && npm run check:files && npm run check:leak",
+    "check": "npm run check:ai && npm run check:files && npm run check:leak && npm run check:limits && npm run check:scope && npm run check:chat && npm run check:envelope && npm run check:menu",
     "check:files": "tsx scripts/checks/project-files.test.ts",
-    "check:leak": "tsx scripts/checks/prompt-leak.test.ts"
+    "check:leak": "tsx scripts/checks/prompt-leak.test.ts",
+    "check:limits": "tsx scripts/checks/rate-limit.test.ts",
+    "check:scope": "tsx scripts/checks/account-scope.test.ts",
+    "check:chat": "tsx scripts/checks/assistant-chat.test.ts",
+    "check:envelope": "tsx scripts/checks/envelope-repair.test.ts",
+    "check:menu": "tsx scripts/checks/context-menu.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.19.0",

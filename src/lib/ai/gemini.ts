@@ -13,6 +13,7 @@ import {
   buildUserTurnText,
   parseAgentResponse,
   systemInstructionFor,
+  studentSafeMessage,
   temperatureFor,
 } from "./turn";
 
@@ -127,7 +128,11 @@ export class GeminiProvider implements AiProvider {
         const result = await chat.sendMessage({ message });
         const text = result.text ?? "";
         // In plain chat the model answers in prose, so there is no JSON to parse.
-        if (req.chatOnly) return { operations: [], message: text.trim() };
+        // The same floor the project path has: a model that answers a chat turn
+        // with a JSON envelope must not have it rendered as prose. Rare here
+        // (nothing asks chat for JSON) but the cost of being wrong is the student
+        // reading our internals, and the call is one function.
+        if (req.chatOnly) return { operations: [], message: studentSafeMessage(text, "") };
         return parseAgentResponse(text);
       } catch (err) {
         lastError = err;

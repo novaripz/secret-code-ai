@@ -9,15 +9,28 @@
 // the second one strands anyone not using a mouse.
 //
 // Rows stay div-with-role rather than real buttons because each one already
-// contains its own buttons (new file, delete) and a button inside a button is
+// contains its own buttons (the ⋯ menu), and a button inside a button is
 // invalid HTML that browsers repair by breaking the layout.
+//
+// THE MENU, AND THE THREE WAYS INTO IT
+//
+// Right-click opens it. So does a long press, because a phone has no second
+// button. So does the ⋯ button on every row, which is always drawn rather than
+// revealed on hover — hover does not exist on a touch screen, and a control
+// that only appears when a mouse is near it is a control half the school
+// cannot see. Shift+F10 and the Menu key open it from the keyboard, and the
+// entries that matter most also answer to their own keys on the focused row
+// (F2, Delete, Ctrl D) and appear in the command palette. Nothing in the menu
+// is only in the menu.
 
 import { useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { FileNode, Project } from "@/types";
-import { getChildren, joinPath } from "@/lib/fileSystem";
+import { getChildren } from "@/lib/fileSystem";
 import { useStudioStore } from "@/store/useStudioStore";
-import { useDialog } from "@/components/ui/Dialog";
+import { ContextMenu, useLongPress, type ContextMenuRequest } from "@/components/build/ContextMenu";
+import { buildEmptyMenu, buildFileMenu, buildFolderMenu, type MenuActionId } from "@/components/build/fileMenu";
+import { useFileActions } from "@/components/build/useFileActions";
 import {
   FolderIcon,
   FolderOpenIcon,
@@ -25,113 +38,181 @@ import {
   ChevronRightIcon,
   PlusFileIcon,
   PlusFolderIcon,
-  TrashIcon,
 } from "@/components/icons";
+import { UndoIcon } from "@/components/build/icons";
+
+/** What a row hands upward when it wants a menu: the node, plus the bits of state only the row knows. */
+interface MenuTarget {
+  node: FileNode;
+  expanded: boolean;
+  collapse: () => void;
+}
+
+function MoreIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="19" cy="12" r="1.8" />
+    </svg>
+  );
+}
 
 function TreeNode({
   project,
   node,
   depth,
   activePath,
+  renamingPath,
+  onRenaming,
+  collapseNonce,
+  onMenu,
 }: {
   project: Project;
   node: FileNode;
   depth: number;
   activePath: string | null;
+  renamingPath: string | null;
+  onRenaming: (path: string | null) => void;
+  /** Bumped by "Collapse all". A counter rather than a boolean, so the second collapse-all also lands. */
+  collapseNonce: number;
+  onMenu: (target: MenuTarget, x: number, y: number) => void;
 }) {
   const { t } = useI18n();
-  const [open, setOpen] = useState(depth < 1);
-  const [renaming, setRenaming] = useState(false);
-  const [draftName, setDraftName] = useState(node.name);
-  const openFile = useStudioStore((s) => s.openFile);
-  const addFile = useStudioStore((s) => s.addFile);
-  const addFolder = useStudioStore((s) => s.addFolder);
-  const removeNode = useStudioStore((s) => s.removeNode);
-  const renamePath = useStudioStore((s) => s.renamePath);
-  const dialog = useDialog();
+  // Open state is stamped with the collapse-all counter it was set under.
+  // "Collapse all" then works by making every folder's stamp stale, which is
+  // one state change at the top instead of an effect in every row reacting to
+  // a prop — and an effect that calls setState on render is exactly what React
+  // now (rightly) refuses.
+  const [openState, setOpenState] = useState({ open: depth < 1, nonce: 0 });
+  const open = openState.nonce === collapseNonce && openState.open;
+  const setOpen = (next: boolean | ((current: boolean) => boolean)) =>
+    setOpenState({ open: typeof next === "function" ? next(open) : next, nonce: collapseNonce });
 
+  // The half-typed name during an inline rename, remembered against the row it
+  // belongs to so that starting a rename picks up the current name without an
+  // effect having to copy it across.
+  const [draft, setDraft] = useState<{ path: string; value: string } | null>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const openFile = useStudioStore((s) => s.openFile);
+  const renamePath = useStudioStore((s) => s.renamePath);
+  const actions = useFileActions();
+
+  const renaming = renamingPath === node.path;
+  const draftName = draft && draft.path === node.path ? draft.value : node.name;
   const children = node.kind === "folder" ? getChildren(project, node.id) : [];
   const isActive = node.kind === "file" && node.path === activePath;
   // "Unsaved" here means the autosave timer has not fired yet. It is a second
   // or so, but a second in which a student can close the tab.
   const isDirty = useStudioStore((s) => s.tabs.some((t) => t.path === node.path && t.dirty));
 
-  async function reportError(err: unknown) {
-    await dialog.alert({
-      title: t("studio.didntWork"),
-      description: err instanceof Error ? err.message : String(err),
-    });
+  function openMenuAt(x: number, y: number) {
+    onMenu({ node, expanded: open, collapse: () => setOpen(false) }, x, y);
   }
 
-  async function commitRename() {
-    setRenaming(false);
+  /** The keyboard's way in, used when there is no pointer to take a coordinate from. */
+  function openMenuFromRow() {
+    const box = rowRef.current?.getBoundingClientRect();
+    openMenuAt((box?.left ?? 0) + 24, (box?.bottom ?? 0));
+  }
+
+  const longPress = useLongPress(openMenuAt);
+
+  function commitRename() {
+    onRenaming(null);
     const trimmed = draftName.trim();
+    setDraft(null);
     if (!trimmed || trimmed === node.name) return;
-    const newPath = joinPath(node.path.split("/").slice(0, -1).join("/"), trimmed);
+    const parent = node.path.split("/").slice(0, -1).join("/");
     try {
-      renamePath(node.path, newPath);
-    } catch (err) {
-      await reportError(err);
+      renamePath(node.path, parent ? `${parent}/${trimmed}` : trimmed);
+    } catch {
+      // The full explanation belongs to the menu's rename, which uses the
+      // dialog; inline renaming just declines and leaves the name as it was
+      // rather than throwing a modal over a half-typed word.
     }
   }
 
-  async function handleNewFile(e: React.MouseEvent) {
-    e.stopPropagation();
-    const name = await dialog.prompt({
-      title: t("studio.newFile"),
-      description: t("studio.insideFolder", { name: node.name }),
-      placeholder: "helpers.js",
-      confirmLabel: t("studio.create"),
-    });
-    if (!name) return;
-    try {
-      addFile(joinPath(node.path, name), "");
-      setOpen(true);
-    } catch (err) {
-      await reportError(err);
+  /** The row-level shortcuts, identical on files and folders so there is one thing to remember. */
+  function onRowKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "F2") {
+      e.preventDefault();
+      onRenaming(node.path);
+    } else if (e.key === "Delete") {
+      e.preventDefault();
+      void actions.remove(node.path);
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "d") {
+      e.preventDefault();
+      void actions.duplicate(node.path);
+    } else if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) {
+      e.preventDefault();
+      openMenuFromRow();
     }
   }
 
-  async function handleNewFolder(e: React.MouseEvent) {
-    e.stopPropagation();
-    const name = await dialog.prompt({
-      title: t("studio.newFolder"),
-      description: t("studio.insideFolder", { name: node.name }),
-      placeholder: "components",
-      confirmLabel: t("studio.create"),
-    });
-    if (!name) return;
-    try {
-      addFolder(joinPath(node.path, name));
-      setOpen(true);
-    } catch (err) {
-      await reportError(err);
-    }
-  }
+  const nameField = (
+    <input
+      autoFocus
+      className="bg-[var(--surface-2)] text-[var(--text)] text-sm px-1 rounded w-full outline-none ring-2 ring-[var(--accent)]"
+      value={draftName}
+      aria-label={`New name for ${node.name}`}
+      onChange={(e) => setDraft({ path: node.path, value: e.target.value })}
+      onBlur={commitRename}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+        if (e.key === "Enter") commitRename();
+        if (e.key === "Escape") {
+          setDraft(null);
+          onRenaming(null);
+        }
+      }}
+      onClick={(e) => e.stopPropagation()}
+    />
+  );
 
-  async function handleDelete(e: React.MouseEvent) {
-    e.stopPropagation();
-    const ok = await dialog.confirm({
-      title: t("studio.deleteNode", { name: node.name }),
-      description: t(node.kind === "folder" ? "studio.deleteFolderBody" : "studio.deleteFileBody"),
-      confirmLabel: t("action.delete"),
-      danger: true,
-    });
-    if (ok) removeNode(node.path);
-  }
+  const moreButton = (
+    <button
+      type="button"
+      title={`More actions for ${node.name}`}
+      aria-label={`More actions for ${node.name}`}
+      aria-haspopup="menu"
+      onClick={(e) => {
+        e.stopPropagation();
+        const box = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        openMenuAt(box.left, box.bottom);
+      }}
+      className="tap-sq tap-pad inline-flex shrink-0 items-center justify-center rounded p-0.5 text-[var(--text-faint)] hover:bg-[var(--surface-3)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+    >
+      <MoreIcon className="w-4 h-4" />
+    </button>
+  );
 
   if (node.kind === "folder") {
     return (
       <div>
         <div
+          ref={rowRef}
           data-tree-row
+          data-path={node.path}
           role="button"
           tabIndex={0}
           aria-expanded={open}
           aria-label={t("studio.folderLabel", { name: node.name })}
           className="group flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-[var(--surface-2)] cursor-pointer select-none text-sm text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)]"
           style={{ paddingLeft: depth * 12 + 6 }}
-          onClick={() => setOpen((o) => !o)}
+          onClick={() => {
+            if (longPress.consumedClick()) return;
+            setOpen((o) => !o);
+          }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openMenuAt(e.clientX, e.clientY);
+          }}
+          onTouchStart={longPress.onTouchStart}
+          onTouchMove={longPress.onTouchMove}
+          onTouchEnd={longPress.onTouchEnd}
+          onTouchCancel={longPress.onTouchCancel}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
@@ -142,6 +223,8 @@ function TreeNode({
             } else if (e.key === "ArrowLeft" && open) {
               e.preventDefault();
               setOpen(false);
+            } else {
+              onRowKeyDown(e);
             }
           }}
         >
@@ -152,37 +235,26 @@ function TreeNode({
             <FolderIcon className="w-4 h-4 shrink-0 text-[var(--accent)]" />
           )}
           {renaming ? (
-            <input
-              autoFocus
-              className="bg-[var(--surface-2)] text-[var(--text)] text-sm px-1 rounded w-full outline-none ring-2 ring-[var(--accent)]"
-              value={draftName}
-              onChange={(e) => setDraftName(e.target.value)}
-              onBlur={commitRename}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") commitRename();
-                if (e.key === "Escape") setRenaming(false);
-              }}
-              onClick={(e) => e.stopPropagation()}
-            />
+            nameField
           ) : (
-            <span className="truncate flex-1" onDoubleClick={(e) => { e.stopPropagation(); setRenaming(true); }}>
+            <span className="truncate flex-1" onDoubleClick={(e) => { e.stopPropagation(); onRenaming(node.path); }}>
               {node.name}
             </span>
           )}
-          <div className="hidden group-hover:flex items-center gap-0.5 shrink-0">
-            <button title={t("studio.newFile")} onClick={handleNewFile} className="tap-sq inline-flex items-center justify-center p-0.5 hover:bg-[var(--surface-3)] rounded">
-              <PlusFileIcon className="w-3.5 h-3.5" />
-            </button>
-            <button title={t("studio.newFolder")} onClick={handleNewFolder} className="tap-sq inline-flex items-center justify-center p-0.5 hover:bg-[var(--surface-3)] rounded">
-              <PlusFolderIcon className="w-3.5 h-3.5" />
-            </button>
-            <button title={t("action.delete")} onClick={handleDelete} className="tap-sq inline-flex items-center justify-center p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)]">
-              <TrashIcon className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          {moreButton}
         </div>
         {open && children.map((child) => (
-          <TreeNode key={child.id} project={project} node={child} depth={depth + 1} activePath={activePath} />
+          <TreeNode
+            key={child.id}
+            project={project}
+            node={child}
+            depth={depth + 1}
+            activePath={activePath}
+            renamingPath={renamingPath}
+            onRenaming={onRenaming}
+            collapseNonce={collapseNonce}
+            onMenu={onMenu}
+          />
         ))}
       </div>
     );
@@ -190,7 +262,9 @@ function TreeNode({
 
   return (
     <div
+      ref={rowRef}
       data-tree-row
+      data-path={node.path}
       role="button"
       tabIndex={0}
       aria-current={isActive ? "true" : undefined}
@@ -201,11 +275,25 @@ function TreeNode({
           : "text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
       }`}
       style={{ paddingLeft: depth * 12 + 22 }}
-      onClick={() => openFile(node.path)}
+      onClick={() => {
+        if (longPress.consumedClick()) return;
+        openFile(node.path);
+      }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openMenuAt(e.clientX, e.clientY);
+      }}
+      onTouchStart={longPress.onTouchStart}
+      onTouchMove={longPress.onTouchMove}
+      onTouchEnd={longPress.onTouchEnd}
+      onTouchCancel={longPress.onTouchCancel}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           openFile(node.path);
+        } else {
+          onRowKeyDown(e);
         }
       }}
     >
@@ -214,20 +302,9 @@ function TreeNode({
       {isActive && <span aria-hidden className="absolute left-0 h-5 w-0.5 rounded-r bg-[var(--accent)]" />}
       <FileIcon className="w-4 h-4 shrink-0 text-[var(--text-faint)]" />
       {renaming ? (
-        <input
-          autoFocus
-          className="bg-[var(--surface-2)] text-[var(--text)] text-sm px-1 rounded w-full outline-none ring-2 ring-[var(--accent)]"
-          value={draftName}
-          onChange={(e) => setDraftName(e.target.value)}
-          onBlur={commitRename}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") commitRename();
-            if (e.key === "Escape") setRenaming(false);
-          }}
-          onClick={(e) => e.stopPropagation()}
-        />
+        nameField
       ) : (
-        <span className="truncate flex-1" onDoubleClick={(e) => { e.stopPropagation(); setRenaming(true); }}>
+        <span className="truncate flex-1" onDoubleClick={(e) => { e.stopPropagation(); onRenaming(node.path); }}>
           {node.name}
         </span>
       )}
@@ -238,13 +315,7 @@ function TreeNode({
           className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]"
         />
       )}
-      <button
-        title={t("action.delete")}
-        onClick={handleDelete}
-        className="tap-sq inline-flex items-center justify-center hidden group-hover:block p-0.5 hover:bg-[var(--surface-3)] rounded text-[var(--danger)] shrink-0"
-      >
-        <TrashIcon className="w-3.5 h-3.5" />
-      </button>
+      {moreButton}
     </div>
   );
 }
@@ -252,30 +323,82 @@ function TreeNode({
 export function FileExplorer({ project, activePath }: { project: Project; activePath: string | null }) {
   const { t } = useI18n();
   const treeRef = useRef<HTMLDivElement>(null);
-  const addFile = useStudioStore((s) => s.addFile);
-  const addFolder = useStudioStore((s) => s.addFolder);
-  const dialog = useDialog();
+  const actions = useFileActions();
+  const lastDeleted = useStudioStore((s) => s.lastDeleted);
   const rootChildren = getChildren(project, project.rootId);
 
-  /** Creates a file or folder at the project root, asking for a name in-app. */
-  async function createAtRoot(kind: "file" | "folder") {
-    const name = await dialog.prompt({
-      title: t(kind === "file" ? "studio.newFile" : "studio.newFolder"),
-      description: t("studio.atTopLevel"),
-      placeholder: kind === "file" ? "index.html" : "images",
-      confirmLabel: t("studio.create"),
-    });
-    if (!name) return;
-    try {
-      if (kind === "file") addFile(name, "");
-      else addFolder(name);
-    } catch (err) {
-      await dialog.alert({
-        title: t("studio.didntWork"),
-        description: err instanceof Error ? err.message : String(err),
-      });
+  const [menu, setMenu] = useState<ContextMenuRequest | null>(null);
+  const [renamingPath, setRenamingPath] = useState<string | null>(null);
+  const [collapseNonce, setCollapseNonce] = useState(0);
+
+  /** One runner for every entry, whichever menu it came from. */
+  function run(id: MenuActionId, target: MenuTarget | null) {
+    const path = target?.node.path ?? "";
+    const container = target ? actions.containerFor(path) : "";
+    switch (id) {
+      case "open":
+        if (target?.node.kind === "file") useStudioStore.getState().openFile(path);
+        break;
+      case "rename":
+        // The inline field, not the dialog, when we are in the tree: the
+        // student can see the name they are changing in its own row.
+        setRenamingPath(path);
+        break;
+      case "duplicate":
+        void actions.duplicate(path);
+        break;
+      case "delete":
+        void actions.remove(path);
+        break;
+      case "copyPath":
+        void actions.copyPath(path);
+        break;
+      case "copyRelativePath":
+        void actions.copyRelativePath(path);
+        break;
+      case "download":
+        void actions.download(path);
+        break;
+      case "newFile":
+        void actions.create("file", container);
+        break;
+      case "newFolder":
+        void actions.create("folder", container);
+        break;
+      case "collapse":
+        target?.collapse();
+        break;
+      case "collapseAll":
+        setCollapseNonce((n) => n + 1);
+        break;
     }
   }
+
+  function openNodeMenu(target: MenuTarget, x: number, y: number) {
+    setMenu({
+      x,
+      y,
+      subject: target.node.name,
+      items:
+        target.node.kind === "folder"
+          ? buildFolderMenu({ expanded: target.expanded })
+          : buildFileMenu(),
+      onRun: (id) => run(id, target),
+    });
+  }
+
+  function openEmptyMenu(x: number, y: number) {
+    setMenu({
+      x,
+      y,
+      subject: project.name,
+      items: buildEmptyMenu(),
+      // No target: "new file" here means the top level of the project.
+      onRun: (id) => run(id, null),
+    });
+  }
+
+  const emptyLongPress = useLongPress(openEmptyMenu);
 
   return (
     <div className="flex flex-col h-full">
@@ -284,17 +407,31 @@ export function FileExplorer({ project, activePath }: { project: Project; active
         <div className="flex items-center gap-1">
           <button
             title={t("studio.newFile")}
-            onClick={() => void createAtRoot("file")}
-            className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
+            aria-label={t("studio.newFile")}
+            onClick={() => void actions.create("file", "")}
+            className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
           >
             <PlusFileIcon className="w-4 h-4" />
           </button>
           <button
             title={t("studio.newFolder")}
-            onClick={() => void createAtRoot("folder")}
-            className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)]"
+            aria-label={t("studio.newFolder")}
+            onClick={() => void actions.create("folder", "")}
+            className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
           >
             <PlusFolderIcon className="w-4 h-4" />
+          </button>
+          <button
+            title="More file actions"
+            aria-label="More file actions"
+            aria-haspopup="menu"
+            onClick={(e) => {
+              const box = (e.currentTarget as HTMLElement).getBoundingClientRect();
+              openEmptyMenu(box.left, box.bottom);
+            }}
+            className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          >
+            <MoreIcon className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -303,6 +440,16 @@ export function FileExplorer({ project, activePath }: { project: Project; active
       <div
         ref={treeRef}
         className="flex-1 overflow-y-auto py-1 px-1"
+        onContextMenu={(e) => {
+          // Only reached when the click missed every row, because rows stop the
+          // event: this is the "empty space" menu.
+          e.preventDefault();
+          openEmptyMenu(e.clientX, e.clientY);
+        }}
+        onTouchStart={emptyLongPress.onTouchStart}
+        onTouchMove={emptyLongPress.onTouchMove}
+        onTouchEnd={emptyLongPress.onTouchEnd}
+        onTouchCancel={emptyLongPress.onTouchCancel}
         onKeyDown={(e) => {
           if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
           const rows = Array.from(
@@ -321,10 +468,44 @@ export function FileExplorer({ project, activePath }: { project: Project; active
           </div>
         ) : (
           rootChildren.map((child) => (
-            <TreeNode key={child.id} project={project} node={child} depth={0} activePath={activePath} />
+            <TreeNode
+              key={child.id}
+              project={project}
+              node={child}
+              depth={0}
+              activePath={activePath}
+              renamingPath={renamingPath}
+              onRenaming={setRenamingPath}
+              collapseNonce={collapseNonce}
+              onMenu={openNodeMenu}
+            />
           ))
         )}
       </div>
+
+      {/* THE WAY BACK FROM A DELETE.
+          Version history covers most mistakes, but it snapshots on a timer and
+          folds nearby snapshots together, so a file made and then deleted in the
+          same couple of minutes can fall through it entirely. This bar does not
+          depend on any timer having fired, and it is a real button — reachable
+          by tab, by thumb, and from the command palette as well. */}
+      {lastDeleted && (
+        <div className="flex shrink-0 items-center gap-2 border-t border-[var(--line)] bg-[var(--surface-1)] px-2 py-1.5">
+          <span className="min-w-0 flex-1 truncate text-[11px] text-[var(--text-dim)]">
+            Deleted {lastDeleted.path.split("/").pop()}
+          </span>
+          <button
+            type="button"
+            onClick={() => actions.undoDelete()}
+            className="tap inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-medium text-[var(--accent-strong)] hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          >
+            <UndoIcon className="h-3.5 w-3.5" />
+            Undo
+          </button>
+        </div>
+      )}
+
+      <ContextMenu request={menu} onClose={() => setMenu(null)} />
     </div>
   );
 }

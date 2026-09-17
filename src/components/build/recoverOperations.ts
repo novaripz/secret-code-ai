@@ -9,9 +9,11 @@
 // of code the student has to read and retype. Nothing is applied, because
 // `operations` came back empty.
 //
-// turn.ts is shared by every surface and is not ours to change, so the repair
-// happens here, on the one client that actually wants file operations. Two
-// recoveries, in order of confidence:
+// Since then turn.ts has grown a mechanical repair pass and a hard floor
+// (`repairJsonText` and `studentSafeMessage`), so a malformed envelope no
+// longer reaches the transcript at all. This file is the layer above that:
+// what turn.ts could not parse even after repair still often CONTAINS work,
+// and this is where it is dug out. Two recoveries, in order of confidence:
 //
 //   1. A truncated or fence-wrapped envelope. The operations that DID arrive
 //      complete are salvaged by scanning the array element by element and
@@ -31,6 +33,7 @@
 
 import type { FileOperation } from "@/types";
 import { validateOperations } from "@/lib/ai/validateOperations";
+import { repairJsonText } from "@/lib/ai/turn";
 
 export interface Recovery {
   /** Safe, validated operations pulled back out of the text. */
@@ -87,8 +90,18 @@ function salvageEnvelope(text: string): Recovery | null {
     try {
       parsed.push(JSON.parse(chunk) as FileOperation);
     } catch {
-      // A complete-looking object that still will not parse is not something
-      // we can second-guess. Drop it rather than repair it.
+      // It was not valid JSON as written. The only repair attempted is the
+      // mechanical one in turn.ts — escaping characters JSON forbids inside a
+      // string, and nothing else — because that is the fault models actually
+      // commit here: a literal newline in `content`. Anything the repair still
+      // cannot parse is dropped rather than guessed at, as before: dropping it
+      // costs one file, while inventing one risks writing half a file over a
+      // good one.
+      try {
+        parsed.push(JSON.parse(repairJsonText(chunk)) as FileOperation);
+      } catch {
+        // Beyond repair.
+      }
     }
   }
 
@@ -143,10 +156,13 @@ function scanObjects(text: string, from: number): string[] {
 
 /** The envelope's own `"message"`, if it landed before the truncation did. */
 function envelopeMessage(text: string): string {
-  const match = text.match(/"message"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  // The body is allowed to run over raw newlines before its closing quote:
+  // that is precisely the envelope this function is reading, one that would
+  // not parse. The repair pass escapes them so JSON.parse can decode the rest.
+  const match = text.match(/"message"\s*:\s*"((?:[^"\\]|\\.|[^"])*?)"\s*[,}]/);
   if (!match) return "";
   try {
-    return JSON.parse(`"${match[1]}"`) as string;
+    return JSON.parse(repairJsonText(`"${match[1]}"`)) as string;
   } catch {
     return "";
   }

@@ -115,3 +115,60 @@ export async function deleteProject(id: string): Promise<void> {
   const index = await getIndex();
   await setIndex(index.filter((p) => p.id !== id));
 }
+
+// ---------------------------------------------------------------------------
+// Work made before sign-in
+// ---------------------------------------------------------------------------
+//
+// The comment above explains why nothing is migrated automatically: on a shared
+// machine the pre-fix store is the pooled output of every student who used the
+// browser, and no code can tell whose project is whose. But the STUDENT can.
+// They know which one they made. So instead of guessing, we show them the old
+// store and let them say.
+//
+// That is the whole design. Nothing moves until a person points at one project
+// and claims it, one at a time, by name. A claim copies rather than moves, so a
+// wrong claim costs nothing and the original stays where the next student will
+// still find it — this is the one place where leaving a duplicate behind is
+// better than being tidy, because the alternative is a student destroying
+// somebody else's only copy by misremembering.
+
+/** The store everything was written to before projects were scoped. */
+function legacyStore() {
+  return localforage.createInstance({ name: "ai-code-studio", storeName: "projects" });
+}
+
+/**
+ * Projects sitting in the pre-sign-in store, for a signed-in student to look
+ * through. Empty for a guest, because for a guest the legacy store IS their
+ * store — offering to copy their own projects into their own store would be
+ * nonsense, and would put a duplicate of everything in front of them.
+ */
+export async function listLegacyProjects(): Promise<ProjectSummary[]> {
+  if (accountScope() === "") return [];
+  try {
+    const index = (await legacyStore().getItem<ProjectSummary[]>(INDEX_KEY)) ?? [];
+    const mine = new Set((await getIndex()).map((p) => p.id));
+    // Anything already claimed is filtered out, so the list shrinks as they
+    // work through it and a second claim cannot make a second copy.
+    return index.filter((p) => !mine.has(p.id)).sort((a, b) => b.updatedAt - a.updatedAt);
+  } catch {
+    // No legacy store on this device, or storage is blocked. Nothing to offer.
+    return [];
+  }
+}
+
+/**
+ * Copy one pre-sign-in project into the signed-in student's own store.
+ *
+ * Deliberately a copy. The original is left for whoever else used this browser,
+ * and a student who claims the wrong thing can simply delete their copy without
+ * having taken anything from anyone.
+ */
+export async function claimLegacyProject(id: string): Promise<Project | undefined> {
+  if (accountScope() === "") return undefined;
+  const project = await legacyStore().getItem<Project>(`project:${id}`);
+  if (!project) return undefined;
+  await saveProject(project);
+  return project;
+}

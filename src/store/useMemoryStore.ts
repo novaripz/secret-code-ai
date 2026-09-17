@@ -2,12 +2,47 @@
 
 import { create } from "zustand";
 import localforage from "localforage";
+import { accountScope } from "./useAuthStore";
 
 // Per-project "working memory" for the AI: a plain-language running summary of
 // what's been built. The user's own profile, modes, and cross-project memory
 // live in useProfileStore — this is only ever about one project.
 
-const memoryStore = localforage.createInstance({ name: "ai-code-studio", storeName: "memory" });
+/**
+ * One object store per account, matching useAssistantStore and useWatchStore.
+ *
+ * This module used to skip scoping entirely: PROFILE_KEY and `buildlog:<id>`
+ * were bare keys in a shared "memory" store, so on a classroom machine the
+ * next student to sign in inherited the previous one's build log — and that
+ * log is not inert data, it is handed to the model as `projectMemory` (see
+ * ChatPanel and AgentPanel), so Panda would cheerfully describe one student's
+ * project to another. Scoping the store rather than each key fixes both
+ * PROFILE_KEY and every buildlog key in one place, and leaves the key names
+ * themselves readable.
+ *
+ * Exported so a check can assert two accounts never share a store without
+ * standing up IndexedDB. Sanitised for the same reason as in lib/storage.ts:
+ * this becomes an IndexedDB object-store name.
+ */
+export function memoryStoreName(scope: string): string {
+  return `memory${scope.replace(/[^a-zA-Z0-9]/g, "_")}`;
+}
+
+/**
+ * Existing build logs are not migrated, for the same reasons set out at length
+ * in lib/storage.ts: accountScope() is "" for a guest, so memoryStoreName("")
+ * is still the original "memory" store and a room where nobody signs in sees
+ * no change at all. Moving the old store into whichever account signs in first
+ * would hand one student the class's pooled memory under their own name, which
+ * is the leak rather than a fix, and deleting it would destroy work. Nothing
+ * here removes or rewrites the legacy store; signing out reaches it.
+ */
+const memoryStore = localforage.createInstance({
+  name: "ai-code-studio",
+  // Read once at module load; useAuthStore.adopt() reloads the page when the
+  // scope changes, so this never goes stale mid-session.
+  storeName: memoryStoreName(accountScope()),
+});
 
 const PROFILE_KEY = "student-profile";
 const MAX_PROFILE_FACTS = 40;

@@ -15,6 +15,8 @@ import { CommandPalette, type Command } from "./CommandPalette";
 import { VersionPanel } from "./VersionPanel";
 import { ChangesPanel } from "./ChangesPanel";
 import { CodeIcon, CommandIcon, DiffIcon, FilesIcon, HistoryIcon, MonitorIcon } from "./icons";
+import { useFileActions } from "./useFileActions";
+import { ASK_EVENT, prefillComposer, type AskDetail } from "./askPanda";
 import {
   clamp,
   MAX_CHAT,
@@ -44,6 +46,8 @@ const RAIL: { key: PanelKey; label: string; Icon: typeof FilesIcon }[] = [
 export function Workspace() {
   const project = useStudioStore((s) => s.project);
   const activeTab = useStudioStore((s) => s.activeTab);
+  const lastDeleted = useStudioStore((s) => s.lastDeleted);
+  const fileActions = useFileActions();
 
   const layout = useWorkspaceLayout();
   const { visible } = layout;
@@ -83,8 +87,38 @@ export function Workspace() {
         setPaletteOpen((open) => !open);
       }
     }
+    // Monaco swallows keys while it has focus, so the editor raises this event
+    // from its own Ctrl/Cmd-K binding rather than the shortcut quietly not
+    // working in the one pane the student spends all day in.
+    function openPalette() {
+      setPaletteOpen(true);
+    }
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("panda:open-palette", openPalette);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("panda:open-palette", openPalette);
+    };
+  }, []);
+
+  // "Ask Panda about this" lands here: the chat is opened first, because the
+  // composer cannot be filled in while it is unmounted, and the fill waits a
+  // frame for that mount to happen.
+  useEffect(() => {
+    function onAsk(e: Event) {
+      const prompt = (e as CustomEvent<AskDetail>).detail?.prompt;
+      if (!prompt) return;
+      // Read straight off the store rather than through the layout object this
+      // render closed over: the listener is registered once and the layout is
+      // rebuilt constantly, and a stale closure here would open a pane that no
+      // longer exists.
+      useWorkspaceLayout.getState().open("chat");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => prefillComposer(prompt));
+      });
+    }
+    window.addEventListener(ASK_EVENT, onAsk);
+    return () => window.removeEventListener(ASK_EVENT, onAsk);
   }, []);
 
   const show = useCallback((key: PanelKey) => layout.open(key), [layout]);
@@ -108,8 +142,45 @@ export function Workspace() {
         },
       },
       { id: "action:reset", label: "Reset the layout", hint: "layout", run: () => layout.reset() },
+
+      // FILE ACTIONS, WITHOUT A POINTER.
+      //
+      // Every one of these is also in the tree's right-click menu. They are
+      // repeated here because the palette is the route that needs no mouse and
+      // no long press, which is the rule this workspace works to: a menu may be
+      // the nicest way to reach an action, never the only one. They name the
+      // current file rather than saying "this file", so the student can see
+      // which one they are about to delete before they press Enter.
+      { id: "file:new", label: "New file…", hint: "files", run: () => void fileActions.create("file", "") },
+      { id: "file:newFolder", label: "New folder…", hint: "files", run: () => void fileActions.create("folder", "") },
+      ...(activeTab
+        ? [
+            { id: "file:rename", label: `Rename ${short(activeTab)}…`, hint: "files", run: () => void fileActions.rename(activeTab) },
+            { id: "file:duplicate", label: `Duplicate ${short(activeTab)}`, hint: "Ctrl D", run: () => void fileActions.duplicate(activeTab) },
+            { id: "file:delete", label: `Delete ${short(activeTab)}`, hint: "files", run: () => void fileActions.remove(activeTab) },
+            { id: "file:copyPath", label: `Copy path of ${short(activeTab)}`, hint: "files", run: () => void fileActions.copyPath(activeTab) },
+            { id: "file:copyRelative", label: `Copy relative path of ${short(activeTab)}`, hint: "files", run: () => void fileActions.copyRelativePath(activeTab) },
+            { id: "file:download", label: `Download ${short(activeTab)}`, hint: "files", run: () => void fileActions.download(activeTab) },
+            { id: "editor:find", label: "Find in this file", hint: "Ctrl F", run: () => editorAction("actions.find") },
+            { id: "editor:replace", label: "Find and replace", hint: "editor", run: () => editorAction("editor.action.startFindReplaceAction") },
+            { id: "editor:goToLine", label: "Go to line…", hint: "editor", run: () => editorAction("editor.action.gotoLine") },
+            { id: "editor:format", label: "Tidy up this file", hint: "editor", run: () => editorAction("editor.action.formatDocument") },
+            { id: "editor:explain", label: "Ask Panda about this", hint: "agent", run: () => askSelection("explain") },
+            { id: "editor:fix", label: "Ask Panda to fix this", hint: "agent", run: () => askSelection("fix") },
+          ]
+        : []),
+      ...(lastDeleted
+        ? [
+            {
+              id: "file:undoDelete",
+              label: `Undo deleting ${short(lastDeleted.path)}`,
+              hint: "files",
+              run: () => fileActions.undoDelete(),
+            },
+          ]
+        : []),
     ],
-    [layout, show],
+    [layout, show, fileActions, activeTab, lastDeleted],
   );
 
   if (!project) return null;
@@ -361,7 +432,9 @@ export function Workspace() {
               style={{ "--pane-w": `${layout.chatWidth}px`, flex: "0 0 auto" } as React.CSSProperties}
             >
               <Pane title="Agent" closeLabel="Close the chat with Panda" onClose={() => layout.close("chat")}>
-                <div className="h-full min-h-0">
+                {/* Marked so "Ask Panda about this" can find THIS composer and
+                    not some other textarea that happens to be on screen. */}
+                <div data-agent-composer className="h-full min-h-0">
                   <AgentPanel />
                 </div>
               </Pane>
@@ -420,4 +493,17 @@ export function Workspace() {
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={commands} />
     </div>
   );
+}
+
+/** Just the file's name, for a command label that has to stay one line on a phone. */
+function short(path: string): string {
+  return path.split("/").pop() ?? path;
+}
+
+function editorAction(commandId: string): void {
+  window.dispatchEvent(new CustomEvent("panda:editor-action", { detail: { commandId } }));
+}
+
+function askSelection(kind: "explain" | "fix"): void {
+  window.dispatchEvent(new CustomEvent("panda:ask-selection", { detail: { kind } }));
 }

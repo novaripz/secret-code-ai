@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { authHeader, authReady, deviceHeader } from "@/lib/security/device";
-import { useAssistantStore } from "@/store/useAssistantStore";
+import { isCutShort, showsText, usableAsHistory, useAssistantStore } from "@/store/useAssistantStore";
 import { useProfileStore } from "@/store/useProfileStore";
 import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
 import { Composer } from "./Composer";
@@ -39,6 +39,19 @@ import { Activity, Sources, type ActivityState } from "./Activity";
  * surface the student happened to be on would be a topic we invented.
  */
 const GENERAL_TOPIC: Topic = { id: "general", label: "General chat" };
+
+/**
+ * What the "Continue" button under a cut-short reply actually asks for.
+ *
+ * English like every other canned prompt in `actionPrompt` — the model is told
+ * separately what language to answer in, and the student sees their own
+ * language in the reply. It names the situation explicitly ("you stopped
+ * partway") because the partial text is now in history: without that sentence
+ * the model's most likely move is to start the whole explanation again, which
+ * is the repetition this fix exists to avoid.
+ */
+const CONTINUE_PROMPT =
+  "You stopped partway through that answer. Carry on from exactly where you stopped — do not start again or repeat what you already wrote.";
 
 export function AssistantChat() {
   const {
@@ -153,8 +166,11 @@ export function AssistantChat() {
       const attachedText = attachmentsToPromptText(outgoing);
       const prompt = [typed, attachedText].filter(Boolean).join("\n\n");
 
-      const history = (useAssistantStore.getState().activeThread?.messages ?? [])
-        .filter((m) => m.content && !m.error)
+      // Partial answers count. They were really shown to the student, so
+      // leaving them out is what made Panda repeat or contradict itself on the
+      // next turn; `usableAsHistory` keeps them and drops only the turns that
+      // never said anything. See the comment on it for the full reasoning.
+      const history = usableAsHistory(useAssistantStore.getState().activeThread?.messages ?? [])
         .slice(-20, -1)
         .map((m) => ({ role: m.role, content: m.content }));
 
@@ -289,7 +305,18 @@ export function AssistantChat() {
         // the indicator comes down here. This is the one path every ending
         // goes through, which is what stops a spinner outliving its stream.
         setActivity(null);
-        finishAssistantMessage(id, failure ?? (received ? undefined : t("error.emptyReply")));
+        // Stopping on purpose is a choice, not an error — the same rule
+        // `streamChat.ts` already applies to the assignment chat, followed here
+        // rather than inventing a second answer to the same question. The
+        // check has to happen in this `finally` and not in the outer `catch`,
+        // because aborting rejects `reader.read()` and this block runs first:
+        // reading `received` alone recorded a student pressing Stop before the
+        // first token as "The reply came back empty." in a red box.
+        const stopped = controller.signal.aborted;
+        finishAssistantMessage(
+          id,
+          failure ?? (received || stopped ? undefined : t("error.emptyReply")),
+        );
 
         // A student who says "my name is Santi, not S" has corrected Panda for
         // every future conversation, not just this one. The model marks the
@@ -319,7 +346,11 @@ export function AssistantChat() {
   const name = profileHydrated ? displayName() : "";
   const empty = messages.length === 0;
   // Actions belong on the newest reply only; older ones are history.
-  const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant" && !m.error);
+  // A cut-short reply still anchors the actions: it is the newest thing Panda
+  // said and it is on screen, so hanging "Explain another way" under the reply
+  // above it would point the student at the wrong paragraph. Only a turn with
+  // no text at all is skipped, since there is nothing there to act on.
+  const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant" && showsText(m));
   const lastAssistantId = lastAssistant?.id;
   const streaming = messages.some((m) => m.streaming);
 
@@ -328,7 +359,11 @@ export function AssistantChat() {
   // stays an empty list, which is also the answer to "what shows mid-stream" —
   // nothing, because a chip about a numbered list is a lie until the list has
   // finished arriving.
-  const finishedReply = lastAssistant && !lastAssistant.streaming ? lastAssistant.content : "";
+  // Cut short counts as unfinished here too: a chip like "Where's that formula
+  // from?" derived from half an explanation asks about something the student
+  // was never actually told.
+  const finishedReply =
+    lastAssistant && !lastAssistant.streaming && !isCutShort(lastAssistant) ? lastAssistant.content : "";
   const followUps: FollowUp[] = useMemo(() => deriveFollowUps(finishedReply), [finishedReply]);
 
   return (
@@ -419,11 +454,16 @@ export function AssistantChat() {
                       </div>
                     )}
 
-                    {m.error ? (
+                    {/* An error no longer hides the text. A reply that broke
+                        mid-stream keeps everything that arrived and gets a
+                        notice underneath; only a turn that failed before
+                        saying anything is shown as a bare error box, because
+                        there it is genuinely all there is. */}
+                    {m.error && !showsText(m) ? (
                       <div className="rounded-2xl border border-[var(--danger)] bg-[var(--danger-soft)] px-4 py-3 text-sm text-[var(--danger)]">
                         {m.error}
                       </div>
-                    ) : m.content ? (
+                    ) : showsText(m) ? (
                       <div
                         className={
                           // --chat-text is the Appearance text-size setting.
@@ -446,6 +486,30 @@ export function AssistantChat() {
                             never woven into the sentence, which is why the
                             route sends them as data in the first place. */}
                         {m.role === "assistant" && sources[m.id] && <Sources items={sources[m.id]} />}
+                        {/* The cut-short notice. Quiet rather than alarming:
+                            what is above it is a real, usable piece of an
+                            answer, and a red box over the top would tell the
+                            student to distrust text that is perfectly good as
+                            far as it goes. "Continue" is the way forward that
+                            matters — the text is already in history, so Panda
+                            can pick the sentence back up instead of making the
+                            student retype the question and read it all again.
+                            A silent auto-retry was rejected: the chain does not
+                            replay words already read, so it would land the
+                            student in the middle of a second, different
+                            explanation with no idea why. */}
+                        {isCutShort(m) && (
+                          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-dim)]">
+                            <span className="min-w-0 flex-1">{m.error}</span>
+                            <button
+                              onClick={() => void send(CONTINUE_PROMPT)}
+                              disabled={loading}
+                              className="tap inline-flex shrink-0 items-center rounded-full border border-[var(--line-strong)] px-3.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-[var(--surface)] disabled:opacity-50 md:text-xs"
+                            >
+                              {t("action.continue")}
+                            </button>
+                          </div>
+                        )}
                         {m.role === "assistant" && !m.streaming && <CopyButton content={m.content} />}
                         {m.role === "assistant" && !m.streaming && m.id === lastAssistantId && (
                           <MessageActions
