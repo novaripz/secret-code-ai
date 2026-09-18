@@ -445,7 +445,6 @@ export function FileExplorer({ project, activePath }: { project: Project; active
         ref={assetInputRef}
         type="file"
         multiple
-        accept="image/*,audio/*,video/*,.woff,.woff2,.ttf,.otf"
         className="hidden"
         onChange={(e) => {
           void actions.addAssets(e.target.files ?? []);
@@ -475,8 +474,8 @@ export function FileExplorer({ project, activePath }: { project: Project; active
             <PlusFolderIcon className="w-4 h-4" />
           </button>
           <button
-            title="Add an image, sound or font"
-            aria-label="Add an image, sound or font"
+            title="Add files — images, sounds, fonts, code, anything"
+            aria-label="Add files to this project"
             onClick={() => assetInputRef.current?.click()}
             className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
           >

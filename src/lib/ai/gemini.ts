@@ -87,6 +87,10 @@ export class GeminiProvider implements AiProvider {
       config: {
         systemInstruction: systemInstructionFor(req),
         temperature: temperatureFor(req),
+        // The same explicit ceiling the OpenAI-compatible adapter sets, and for
+        // the same reason: an unset limit takes the provider's default, and on a
+        // project turn that default is what cut a build off mid-file.
+        maxOutputTokens: req.chatOnly ? 2_048 : 16_384,
         ...(thinkingConfig ? { thinkingConfig } : {}),
         // Only present when web search is configured and this is a chat turn.
         // A non-searching request is exactly the request it was before.

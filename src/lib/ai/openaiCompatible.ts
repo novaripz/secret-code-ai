@@ -310,6 +310,24 @@ export class OpenAiCompatibleProvider implements AiProvider {
       // providers actually buffer under JSON mode could not be measured here
       // (no keys in this environment), so the change that helps whether or not
       // they do is the one that was made. Revisit with real measurements.
+      // HOW LONG THE ANSWER MAY BE.
+      //
+      // Nothing here used to set this, so every provider applied its own
+      // default — and for a project turn that default is what produced "Panda's
+      // reply got cut off part-way through" on a build that was going fine: the
+      // envelope stopped mid-file, the scanner salvaged the operations that had
+      // closed, and the student got a banner instead of their game.
+      //
+      // A project turn writes whole files and needs room for several of them;
+      // prose does not, and a chat reply allowed to run to 16k would sometimes
+      // take it. Both sit under the route's own out-of-time close, so this
+      // cannot become a way to blow the deadline instead.
+      //
+      // Both spellings are sent because the dialect split: `max_tokens` is the
+      // original and `max_completion_tokens` is what newer OpenAI-compatible
+      // endpoints want, and a provider that does not recognise one ignores it.
+      max_tokens: req.chatOnly ? 2_048 : 16_384,
+      max_completion_tokens: req.chatOnly ? 2_048 : 16_384,
       ...(req.chatOnly ? {} : { response_format: { type: "json_object" } }),
       // Absent entirely unless search is live, so nothing changes for the
       // requests that are not searching — which is nearly all of them.

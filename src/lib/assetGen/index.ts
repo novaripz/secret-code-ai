@@ -1,5 +1,5 @@
 import { assetMimeType } from "@/lib/assets";
-import { ICON_ALIASES, ICON_NAMES, ICONS, resolveIconName } from "./icons";
+import { ICON_NAMES, ICONS, resolveIconName } from "./icons";
 import { PALETTES, PALETTE_NAMES, resolveColor } from "./palette";
 import { renderPattern, type PatternKind, type PatternSpec } from "./pattern";
 import { renderShape, type ShapeKind, type ShapeSpec } from "./shapes";
@@ -62,6 +62,31 @@ export const SHAPE_KINDS = [
  * turns the message into the same "this change could not be applied" the other
  * failures use.
  */
+/**
+ * Names that are not in any icon set but have an obvious geometric answer.
+ * A cookie is a circle; a shield-shaped badge is a polygon. Listed rather than
+ * guessed because these are the ones students actually ask for.
+ */
+const FALLBACK_SHAPES: Record<string, ShapeKind> = {
+  cookie: "circle", biscuit: "circle", donut: "circle", pill: "rect",
+  ball: "circle", bubble: "circle", orb: "circle", planet: "circle",
+  badge: "star", sticker: "blob", splat: "blob", cloud: "blob",
+  card: "rect", panel: "rect", button: "rect", tile: "rect",
+  crystal: "polygon", stone: "polygon", rock: "blob", asteroid: "blob",
+};
+
+/** A last-resort shape for a name nothing else matched. */
+function guessShape(name: string): ShapeKind {
+  if (/round|circle|ball|dot|coin|moon|sun/.test(name)) return "circle";
+  if (/square|box|block|card|panel|bar/.test(name)) return "rect";
+  if (/star|spark|shine/.test(name)) return "star";
+  if (/heart|love/.test(name)) return "heart";
+  if (/blob|splat|cloud|slime/.test(name)) return "blob";
+  // A hexagon reads as "a thing" without pretending to be anything specific,
+  // which is the honest answer when we genuinely do not know.
+  return "polygon";
+}
+
 export function generateAsset(
   generator: string,
   path: string,
@@ -81,19 +106,32 @@ export function generateAsset(
     const asked = String(spec.name ?? "").trim().toLowerCase();
     const resolved = resolveIconName(asked);
     const geometry = resolved ? ICONS[resolved] : undefined;
+
+    // AN UNKNOWN NAME MUST NOT FAIL THE OPERATION.
+    //
+    // It used to throw, and a student watching a build saw: "Some of that
+    // didn't work: There is no 'cookie' icon. Try one of: apple, arrow-down,
+    // arrow-left…" — an alphabetical list, in red, in the middle of a game that
+    // was otherwise finished. There is no cookie in any icon set; a cookie is a
+    // circle with dots on it, and a circle is something this can draw.
+    //
+    // So an unresolvable name falls through to the shape generator instead of
+    // stopping the turn. A round thing where a cookie was wanted is a project
+    // that runs and a detail the student can change; a red error is neither.
     if (!geometry) {
-      // The near-misses, not the whole list: 69 names in an error message is
-      // not help, and the model's guess is nearly always a synonym away.
-      const close = [...ICON_NAMES, ...Object.keys(ICON_ALIASES)]
-        .filter((n) => asked.length > 2 && (n.includes(asked) || asked.includes(n)))
-        .slice(0, 6);
-      throw new Error(
-        `There is no "${asked}" icon.` +
-          (close.length > 0
-            ? ` Did you mean: ${close.join(", ")}?`
-            : ` Try one of: ${ICON_NAMES.slice(0, 12).join(", ")}…`),
-      );
+      const fallbackKind = FALLBACK_SHAPES[asked] ?? guessShape(asked);
+      return {
+        content: renderShape({
+          kind: fallbackKind,
+          size: Number(spec.size) || 64,
+          fill: (spec.fill ?? spec.stroke ?? "accent") as string,
+          palette: spec.palette,
+          points: spec.points,
+        } as ShapeSpec),
+        mimeType: "image/svg+xml",
+      };
     }
+
     const palette = spec.palette ? PALETTES[spec.palette] : undefined;
     const size = Math.min(Math.max(Number(spec.size) || 24, 8), 512);
     const color = resolveColor(spec.stroke ?? spec.fill, palette?.accent ?? "currentColor", palette);

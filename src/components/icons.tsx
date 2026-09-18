@@ -8,6 +8,14 @@ export function ChevronRightIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+export function ChevronLeftIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
+      {/* The mirror of ChevronRightIcon above: same triangle, apex on the left. */}
+      <path d="M13 5l-6 5 6 5V5z" />
+    </svg>
+  );
+}
 export function FolderIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" {...props}>

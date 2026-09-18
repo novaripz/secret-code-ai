@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "check:ai": "tsx scripts/checks/ai-chain.test.ts",
-    "check": "npm run check:ai && npm run check:files && npm run check:leak && npm run check:limits && npm run check:scope && npm run check:chat && npm run check:envelope && npm run check:menu && npm run check:assets && npm run check:gen && npm run check:advanced",
+    "check": "npm run check:ai && npm run check:files && npm run check:leak && npm run check:limits && npm run check:scope && npm run check:chat && npm run check:envelope && npm run check:menu && npm run check:assets && npm run check:gen && npm run check:advanced && npm run check:preview",
     "check:files": "tsx scripts/checks/project-files.test.ts",
     "check:leak": "tsx scripts/checks/prompt-leak.test.ts",
     "check:limits": "tsx scripts/checks/rate-limit.test.ts",
@@ -18,7 +18,8 @@
     "check:menu": "tsx scripts/checks/context-menu.test.ts",
     "check:assets": "tsx scripts/checks/assets.test.ts",
     "check:gen": "tsx scripts/checks/asset-gen.test.ts",
-    "check:advanced": "tsx scripts/checks/asset-advanced.test.ts"
+    "check:advanced": "tsx scripts/checks/asset-advanced.test.ts",
+    "check:preview": "tsx scripts/checks/preview.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.19.0",

@@ -157,10 +157,24 @@ const ALIASES: Record<string, string> = {
   find: "search", magnify: "search", lookup: "search",
   bomb: "bomb", explosive: "bomb",
   sword: "sword", weapon: "sword", attack: "sword",
-  defend: "shield", armour: "shield", armor: "shield", block: "shield",
+  defend: "shield", armour: "shield", armor: "shield", parry: "shield",
   goal: "target", aim: "target", objective: "target",
   night: "moon", dark: "moon", day: "sun", light: "sun",
   notification: "bell", alert: "bell", reminder: "bell",
+  // Food and round things, which is what a clicker game asks for and what the
+  // screenshot actually failed on: "there is no cookie icon".
+  ball: "circle", dot: "circle", bubble: "circle", orb: "circle",
+  box: "square", block: "square", tile: "square",
+  food: "apple", fruit: "apple", snack: "apple", slice: "pizza",
+  birthday: "cake", party: "gift", present: "gift", reward: "gift",
+  bag: "gift", inventory: "gift",
+  planet: "circle", world: "map", level: "flag", stage: "flag",
+  speed: "zap", boost: "zap", combo: "flame", streak: "flame",
+  pause: "pause", resume: "play", start: "play", go: "play",
+  quit: "x", exit: "x", back: "arrow-left", next: "arrow-right",
+  up: "arrow-up", down: "arrow-down", left: "arrow-left", right: "arrow-right",
+  score: "award", points: "award", rank: "trophy", best: "trophy",
+  shop: "coins", store: "coins", buy: "coins", upgrade: "sparkles",
 };
 
 /** The set's own name for something, following an alias if there is one. */

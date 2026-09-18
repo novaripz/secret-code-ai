@@ -126,20 +126,53 @@ export function DiffBody({
   );
 }
 
+/** Stored assets are data URLs; their "text" is base64 and means nothing to anyone. */
+function isDataUrl(text: string): boolean {
+  return text.startsWith("data:");
+}
+
+/**
+ * A generated file in one short phrase: what was asked for, not how it is
+ * stored. "star · gold" tells a student what landed; a byte count does not.
+ */
+function describeGenerated(op: FileOperation): string {
+  const spec = (op.spec ?? {}) as Record<string, unknown>;
+  const parts = [
+    op.generator,
+    typeof spec.name === "string" ? spec.name : undefined,
+    typeof spec.kind === "string" ? spec.kind : undefined,
+    typeof spec.preset === "string" ? spec.preset : undefined,
+    typeof spec.melody === "string" ? spec.melody : undefined,
+    typeof spec.chord === "string" ? `${spec.chord} ${spec.chordType ?? "major"}` : undefined,
+  ].filter(Boolean);
+  return parts.join(" · ");
+}
+
 function ActionRow({ op, project }: { op: FileOperation; project: Project | null }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   const previous = project ? (findByPath(project, op.path)?.content ?? "") : "";
   const next = op.type === "delete" ? "" : (op.content ?? "");
-  const canDiff = op.type !== "rename";
+
+  // A GENERATED FILE IS DESCRIBED, NEVER DIFFED.
+  //
+  // A generate op carries a description instead of content, so `next` is empty
+  // and the differ read that as "everything was deleted" — which is how a
+  // student came to see half a megabyte of `data:audio/wav;base64,UklGRhKT…`
+  // rendered as a red removal under a sound that had just been created
+  // successfully. Diffing base64 is meaningless even when it works: nobody can
+  // read it, and a one-character change rewrites the whole line.
+  const generated = op.type === "generate";
+  const canDiff = op.type !== "rename" && !generated;
 
   const result = useMemo(
     () => (open && canDiff ? diffLines(previous, next) : null),
     [open, canDiff, previous, next],
   );
 
-  const lines = next ? next.split("\n").length : 0;
+  // Line count is a property of source, not of a picture or a sound.
+  const lines = generated || isDataUrl(next) ? 0 : next ? next.split("\n").length : 0;
   const name = op.path.split("/").pop() ?? op.path;
   const label = `${t(VERB[op.type])} ${op.path}`;
 
@@ -163,6 +196,13 @@ function ActionRow({ op, project }: { op: FileOperation; project: Project | null
             <span className="text-[var(--text-faint)]"> → {op.newPath.split("/").pop()}</span>
           )}
         </span>
+        {generated && (
+          // What it IS, in the row, because there is nothing to open. This is
+          // the only description the student gets of a file they cannot read.
+          <span className="shrink-0 truncate text-[10px] text-[var(--text-faint)]">
+            {describeGenerated(op)}
+          </span>
+        )}
         {lines > 0 && (
           <span className="shrink-0 tabular-nums text-[var(--text-faint)]">{lines} ln</span>
         )}

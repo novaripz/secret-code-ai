@@ -149,17 +149,28 @@ export function useFileActions() {
           const path = folder ? joinPath(folder, safeName) : safeName;
           const mimeType = assetMimeType(path);
 
-          if (!mimeType) {
-            refused.push(`${file.name} — Panda can't store this kind of file yet.`);
-            continue;
-          }
+          // ANYTHING CAN COME IN.
+          //
+          // This used to refuse every extension that was not a known image,
+          // sound or font — so a dropped .json, .md, .csv, .txt or .py was
+          // turned away with "Panda can't store this kind of file yet", which
+          // was both untrue and the opposite of what a file tree is for.
+          //
+          // A file is now stored as TEXT unless its extension says it is one of
+          // the binary kinds assets.ts knows how to hold. That split is the
+          // whole rule, and it is the right one: text is what the editor can
+          // show and the model can read, and the binary list is exactly the set
+          // the preview can inline. A binary we do not recognise still comes in
+          // — as an asset with a generic type — because refusing to hold a
+          // student's file is worse than holding one we cannot preview.
+          const isText = !mimeType && looksTextual(file);
           if (file.size > MAX_ASSET_BYTES) {
             refused.push(
               `${file.name} — ${humanSize(file.size)}, and the limit for one file is ${humanSize(MAX_ASSET_BYTES)}.`,
             );
             continue;
           }
-          if (file.size > budget) {
+          if (!isText && file.size > budget) {
             refused.push(`${file.name} — this project has no room left for more assets.`);
             continue;
           }
@@ -169,9 +180,12 @@ export function useFileActions() {
           }
 
           try {
-            const dataUrl = await readAsDataUrl(file);
-            addFile(path, dataUrl, mimeType);
-            budget -= file.size;
+            if (isText) {
+              addFile(path, await file.text());
+            } else {
+              addFile(path, await readAsDataUrl(file), mimeType ?? "application/octet-stream");
+              budget -= file.size;
+            }
             added.push(path);
           } catch {
             refused.push(`${file.name} — that file could not be read.`);
@@ -270,4 +284,33 @@ function readAsDataUrl(file: File): Promise<string> {
     reader.onerror = () => reject(reader.error ?? new Error("unreadable"));
     reader.readAsDataURL(file);
   });
+}
+
+/**
+ * Is this a file the editor should show as text?
+ *
+ * Extension first, because it is the only signal available before reading, and
+ * a generous list: anything a student might reasonably open and edit. The
+ * browser's own `type` is consulted as a fallback for the extensionless files
+ * (README, LICENSE, Makefile) that are text by convention.
+ *
+ * Getting this wrong in the text direction shows mojibake in the editor;
+ * getting it wrong in the binary direction hides a readable file behind a
+ * "no preview" panel. Both are recoverable, and neither loses the file, which
+ * is why this can afford to be a heuristic rather than sniffing the bytes.
+ */
+const TEXTUAL = new Set([
+  "txt", "md", "markdown", "json", "jsonc", "csv", "tsv", "xml", "yml", "yaml", "toml", "ini",
+  "html", "htm", "css", "scss", "sass", "less", "js", "mjs", "cjs", "jsx", "ts", "tsx",
+  "py", "rb", "java", "c", "h", "cpp", "hpp", "cs", "go", "rs", "php", "sh", "bash", "zsh",
+  "sql", "graphql", "vue", "svelte", "env", "gitignore", "log", "conf", "properties", "lua", "r",
+]);
+
+function looksTextual(file: File): boolean {
+  const name = file.name.toLowerCase();
+  const dot = name.lastIndexOf(".");
+  const ext = dot === -1 ? "" : name.slice(dot + 1);
+  if (ext && TEXTUAL.has(ext)) return true;
+  if (!ext) return /^(readme|license|licence|makefile|dockerfile|procfile|changelog)$/.test(name);
+  return file.type.startsWith("text/") || file.type === "application/json";
 }

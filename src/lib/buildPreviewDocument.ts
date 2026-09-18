@@ -1,7 +1,56 @@
 import type { Project } from "@/types";
 import { findByPath, listAllFiles } from "@/lib/fileSystem";
-import { assetContentUrl } from "@/lib/assets";
+import { assetContentUrl, listAssets } from "@/lib/assets";
 import { parentPath, resolveAgainst } from "@/lib/paths";
+
+// Clicking a link inside the preview.
+//
+// The preview is a srcdoc document, so it has no URL and no origin: an
+// <a href="about.html"> resolves against about:srcdoc, the browser refuses, and
+// the page simply does not move. A student builds a site with a nav bar and
+// every link in it is dead, with nothing on screen saying why.
+//
+// So local navigation is intercepted and handed to the parent, which rebuilds
+// the document for that page and swaps it in. That is not a hack around the
+// sandbox — it IS the navigation, done by the only party that has the files.
+//
+// External links are left alone but opened by the parent rather than in place:
+// replacing the preview with somebody's website is never what a student meant
+// by clicking a link in their own project, and the sandbox has no allow-popups.
+const NAV_BRIDGE = `
+<script>
+(function () {
+  var send = function (payload) {
+    try { window.parent.postMessage(payload, "*"); } catch (e) {}
+  };
+  var localPage = function (href) {
+    if (!href) return null;
+    if (/^(https?:)?\\/\\//.test(href) || /^(mailto|tel|data|blob|javascript):/i.test(href)) return null;
+    if (href.charAt(0) === "#") return null;
+    return href.split("#")[0].split("?")[0] || null;
+  };
+  document.addEventListener("click", function (e) {
+    var el = e.target;
+    while (el && el.tagName !== "A") el = el.parentElement;
+    if (!el) return;
+    var href = el.getAttribute("href");
+    var page = localPage(href);
+    if (page) {
+      e.preventDefault();
+      send({ __preview: true, navigate: page });
+    } else if (href && /^(https?:)?\\/\\//.test(href)) {
+      e.preventDefault();
+      send({ __preview: true, external: href });
+    }
+  }, true);
+  // A form that posts to another page of the project is navigation too, and a
+  // student's contact form is usually the second page they make.
+  document.addEventListener("submit", function (e) {
+    var page = localPage(e.target && e.target.getAttribute("action"));
+    if (page) { e.preventDefault(); send({ __preview: true, navigate: page }); }
+  }, true);
+})();
+</script>`;
 
 const CONSOLE_BRIDGE = `
 <script>
@@ -98,6 +147,40 @@ function inlineCssUrls(project: Project, fromPath: string, css: string): string 
 }
 
 /**
+ * Replaces exact asset paths written as string literals with their data.
+ *
+ * This is what makes SOUND WORK. `new Audio("sfx/click.wav")` is a constructor
+ * argument, not an attribute, so the attribute rewriter above never sees it —
+ * and a student clicking the button got silence with nothing in the console to
+ * explain it. The same applies to `fetch("data/levels.json")` and to any path
+ * handed to a library rather than written into markup.
+ *
+ * Deliberately an EXACT MATCH against the project's real asset paths rather
+ * than a pattern over anything quoted. A regex for "things that look like a
+ * file path" would rewrite a student's own string constant that happens to
+ * resemble one; matching only paths that actually exist cannot. Longest first,
+ * so "art/ui/star.png" is replaced before "art/ui" could be matched inside it.
+ */
+function inlineAssetStrings(project: Project, html: string): string {
+  const assets = listAssets(project)
+    .map((a) => a.path)
+    .sort((a, b) => b.length - a.length);
+  let out = html;
+  for (const path of assets) {
+    const file = findByPath(project, path);
+    const url = file ? assetContentUrl(file) : undefined;
+    if (!url) continue;
+    // Both quote styles, and the "./" form a student is as likely to write.
+    for (const form of [path, `./${path}`]) {
+      for (const quote of ['"', "'"]) {
+        out = out.split(`${quote}${form}${quote}`).join(`${quote}${url}${quote}`);
+      }
+    }
+  }
+  return out;
+}
+
+/**
  * Builds a self-contained HTML document (for use as an iframe srcdoc) from
  * the project's entry HTML file, inlining local <link>/<script> references
  * so the sandboxed preview needs no network or same-origin access.
@@ -106,7 +189,13 @@ export function buildPreviewDocument(project: Project, entryPath = "index.html")
   html: string;
   entryFound: boolean;
 } {
-  const entry = findByPath(project, entryPath) ?? listAllFiles(project).find((f) => f.path.endsWith("index.html"));
+  // A named page that is missing falls back to the project's entry rather than
+  // showing the empty state: a broken link in a nav bar should not look like a
+  // project with no index.html.
+  const entry =
+    findByPath(project, entryPath) ??
+    findByPath(project, "index.html") ??
+    listAllFiles(project).find((f) => f.path.endsWith(".html"));
   if (!entry || !entry.content) {
     return { html: fallbackDocument(), entryFound: false };
   }
@@ -145,11 +234,13 @@ export function buildPreviewDocument(project: Project, entryPath = "index.html")
   // index.html. Passing the script's own path here would look more careful and
   // would quietly resolve half the references to the wrong place.
   html = inlineAssetRefs(project, entry.path, html);
+  html = inlineAssetStrings(project, html);
 
+  const bridges = CONSOLE_BRIDGE + NAV_BRIDGE;
   if (/<head[^>]*>/i.test(html)) {
-    html = html.replace(/<head([^>]*)>/i, `<head$1>${CONSOLE_BRIDGE}`);
+    html = html.replace(/<head([^>]*)>/i, `<head$1>${bridges}`);
   } else {
-    html = CONSOLE_BRIDGE + html;
+    html = bridges + html;
   }
 
   return { html, entryFound: true };

@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useMemoryStore } from "@/store/useMemoryStore";
 import { buildPreviewDocument } from "@/lib/buildPreviewDocument";
-import { PlayIcon, RefreshIcon, BookIcon } from "@/components/icons";
+import { PlayIcon, RefreshIcon, BookIcon, ChevronLeftIcon } from "@/components/icons";
 
 type Tab = "preview" | "console" | "problems" | "log";
 
@@ -20,28 +20,66 @@ export function BottomPanel() {
   const [tab, setTab] = useState<Tab>("preview");
   const [running, setRunning] = useState(false);
   const [nonce, setNonce] = useState(0);
+  // Which page of the project is on screen, and how we got here.
+  //
+  // The preview is one iframe showing one document, so "navigating" means
+  // rebuilding it for a different entry file. The trail is kept so Back works:
+  // a student who clicks through to a contact page and cannot get back has, as
+  // far as they can tell, broken their own site.
+  const [page, setPage] = useState("index.html");
+  const [trail, setTrail] = useState<string[]>([]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const { html, entryFound } = useMemo(
-    () => (project ? buildPreviewDocument(project) : { html: "", entryFound: false }),
+    () => (project ? buildPreviewDocument(project, page) : { html: "", entryFound: false }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [project, nonce]
+    [project, nonce, page]
   );
 
   useEffect(() => {
     function onMessage(e: MessageEvent) {
       if (!e.data || typeof e.data !== "object" || !e.data.__preview) return;
+
+      // A link inside the preview. The bridge has already decided this is a
+      // local page; all that is left is to remember where we were and swap the
+      // document. Nothing is trusted from the frame beyond a string — the path
+      // is only ever looked up in the project, never fetched.
+      if (typeof e.data.navigate === "string") {
+        const next = e.data.navigate.replace(/^\.?\//, "");
+        setTrail((t) => [...t, page].slice(-20));
+        setPage(next);
+        return;
+      }
+      // An external link. Opened rather than followed in place, because
+      // replacing the student's own project with somebody's website is never
+      // what they meant by clicking a link in it.
+      if (typeof e.data.external === "string") {
+        window.open(e.data.external, "_blank", "noopener,noreferrer");
+        return;
+      }
       pushConsoleEntry({ level: e.data.level ?? "log", text: e.data.text ?? "" });
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [pushConsoleEntry]);
+  }, [pushConsoleEntry, page]);
 
   function run() {
     setRunning(true);
     clearConsole();
+    // Run starts the project from its front door, not from wherever the last
+    // click left it.
+    setPage("index.html");
+    setTrail([]);
     setNonce((n) => n + 1);
     setTab("preview");
+  }
+
+  function goBack() {
+    setTrail((t) => {
+      const previous = t[t.length - 1];
+      if (previous) setPage(previous);
+      return t.slice(0, -1);
+    });
   }
 
   function refresh() {
@@ -81,6 +119,27 @@ export function BottomPanel() {
           ))}
         </div>
         <div className="flex items-center gap-1 py-1">
+          {/* Back, and the page you are on. Only once there is somewhere to go
+              back to — a single-page project should not grow a browser chrome
+              it has no use for. */}
+          {trail.length > 0 && (
+            <>
+              <button
+                onClick={goBack}
+                title={`Back to ${trail[trail.length - 1]}`}
+                aria-label={`Back to ${trail[trail.length - 1]}`}
+                className="tap-sq inline-flex items-center justify-center rounded-md p-1.5 text-[var(--text-dim)] hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+              >
+                <ChevronLeftIcon className="h-3.5 w-3.5" />
+              </button>
+              <span
+                className="mr-1 max-w-[140px] truncate font-mono text-[11px] text-[var(--text-faint)]"
+                title={page}
+              >
+                {page}
+              </span>
+            </>
+          )}
           <button
             onClick={run}
             className="tap flex items-center gap-1 text-sm md:text-xs px-3 py-1.5 rounded-md bg-[var(--success-soft)] text-[var(--success)] hover:brightness-95 font-medium"

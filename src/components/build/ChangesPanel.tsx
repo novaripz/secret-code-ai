@@ -96,6 +96,13 @@ function changesBetween(baseline: Version, files: Record<string, FileNode>): Fil
 }
 
 function make(path: string, kind: ChangeKind, before: string, after: string): FileChange {
+  // An asset is not diffed. Its content is a data URL, so a line diff renders
+  // half a megabyte of base64 as one enormous added line — unreadable, and it
+  // buries the source changes the panel exists to show. The row still appears,
+  // with its counts at zero and a note in place of the diff.
+  if (before.startsWith("data:") || after.startsWith("data:")) {
+    return { path, kind, before, after, result: { rows: [], added: 0, removed: 0, tooLarge: false } };
+  }
   return { path, kind, before, after, result: diffLines(before, after) };
 }
 
@@ -207,7 +214,17 @@ function FileRow({
               ever be, and a diff that widens the whole workspace is a diff that
               pushes the rail off a phone screen. */}
           <div className="max-w-full overflow-x-auto border-t border-[var(--line)] bg-[var(--surface-0)]">
-            <DiffBody result={change.result} maxHeightClass="max-h-[28rem]" />
+            {change.after.startsWith("data:") || change.before.startsWith("data:") ? (
+              <p className="px-3 py-2 text-[11px] text-[var(--text-faint)]">
+                {change.kind === "added"
+                  ? "A picture or sound was added. Open it to see or hear it."
+                  : change.kind === "removed"
+                    ? "A picture or sound was removed."
+                    : "A picture or sound was replaced. Open it to see or hear it."}
+              </p>
+            ) : (
+              <DiffBody result={change.result} maxHeightClass="max-h-[28rem]" />
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-0.5 border-t border-[var(--line)] px-1 py-0.5">
             {change.kind !== "removed" && (
