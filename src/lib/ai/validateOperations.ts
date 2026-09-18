@@ -19,7 +19,7 @@ const VALID_TYPES = new Set(["create", "modify", "delete", "rename", "generate"]
  * growing into the thing it is guarding. assetGen refuses an unknown generator
  * again on its own account, which is the belt to this file's braces.
  */
-const VALID_GENERATORS = new Set(["shape", "sound"]);
+const VALID_GENERATORS = new Set(["shape", "sound", "icon", "pattern"]);
 
 /**
  * Binary asset extensions a model cannot possibly be writing the contents of.

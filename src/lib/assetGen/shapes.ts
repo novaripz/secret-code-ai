@@ -1,3 +1,4 @@
+import { PALETTES, resolveColor } from "./palette";
 // Shapes as real SVG files, with the geometry done properly.
 //
 // Panda can already write an SVG by hand — it is text — and for a rectangle it
@@ -26,6 +27,8 @@ export type ShapeKind =
 
 export interface ShapeSpec {
   kind?: ShapeKind;
+  /** A named palette; fill/stroke may then be "accent", "accent2", "text"… */
+  palette?: string;
   size?: number;
   fill?: string;
   stroke?: string;
@@ -38,22 +41,13 @@ export interface ShapeSpec {
   fill2?: string;
 }
 
-const SAFE_COLOR = /^(#[0-9a-f]{3,8}|[a-z]+|rgb\([\d\s,.%]+\)|rgba\([\d\s,.%]+\)|hsl\([\d\s,.%]+\)|hsla\([\d\s,.%]+\)|none|transparent)$/i;
-
 /**
- * Colours are validated, not escaped.
- *
- * This value is interpolated into an SVG attribute and the result is stored as
- * a project file that the preview inlines into a document. A colour is a short
- * closed grammar, so an allow-list is both easy and total — whereas escaping a
- * free string into markup is the kind of thing that looks fine until someone
- * finds the case it misses. Anything unrecognised falls back rather than
- * failing, because a shape in the wrong colour is a far better outcome for a
- * student than no shape and an error.
+ * Colour resolution lives in palette.ts so the shape, icon and pattern
+ * generators cannot drift apart on what counts as a colour — three copies of
+ * an allow-list is three chances for one of them to be wrong.
  */
-function color(value: string | undefined, fallback: string): string {
-  const trimmed = (value ?? "").trim();
-  return SAFE_COLOR.test(trimmed) ? trimmed : fallback;
+function color(value: string | undefined, fallback: string, paletteName?: string): string {
+  return resolveColor(value, fallback, paletteName ? PALETTES[paletteName] : undefined);
 }
 
 function num(value: number | undefined, fallback: number, min: number, max: number): number {
@@ -79,9 +73,10 @@ function round(n: number): number {
 export function renderShape(spec: ShapeSpec): string {
   const kind = spec.kind ?? "circle";
   const size = num(spec.size, 100, 8, 1000);
-  const fill = color(spec.fill, "#7dd3fc");
-  const fill2 = spec.fill2 ? color(spec.fill2, "") : "";
-  const stroke = color(spec.stroke, "none");
+  const palette = spec.palette ? PALETTES[spec.palette] : undefined;
+  const fill = color(spec.fill, palette?.accent ?? "#7dd3fc", spec.palette);
+  const fill2 = spec.fill2 ? color(spec.fill2, palette?.accent2 ?? "", spec.palette) : "";
+  const stroke = color(spec.stroke, "none", spec.palette);
   const strokeWidth = num(spec.strokeWidth, stroke === "none" ? 0 : 2, 0, size / 4);
 
   const c = size / 2;
