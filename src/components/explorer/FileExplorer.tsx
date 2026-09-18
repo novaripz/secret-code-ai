@@ -76,7 +76,7 @@ function TreeNode({
   onRenaming: (path: string | null) => void;
   /** Bumped by "Collapse all". A counter rather than a boolean, so the second collapse-all also lands. */
   collapseNonce: number;
-  onMenu: (target: MenuTarget, x: number, y: number) => void;
+  onMenu: (target: MenuTarget, x: number, y: number, fromTouch?: boolean) => void;
 }) {
   const { t } = useI18n();
   // Open state is stamped with the collapse-all counter it was set under.
@@ -106,8 +106,8 @@ function TreeNode({
   // or so, but a second in which a student can close the tab.
   const isDirty = useStudioStore((s) => s.tabs.some((t) => t.path === node.path && t.dirty));
 
-  function openMenuAt(x: number, y: number) {
-    onMenu({ node, expanded: open, collapse: () => setOpen(false) }, x, y);
+  function openMenuAt(x: number, y: number, fromTouch = false) {
+    onMenu({ node, expanded: open, collapse: () => setOpen(false) }, x, y, fromTouch);
   }
 
   /** The keyboard's way in, used when there is no pointer to take a coordinate from. */
@@ -116,7 +116,7 @@ function TreeNode({
     openMenuAt((box?.left ?? 0) + 24, (box?.bottom ?? 0));
   }
 
-  const longPress = useLongPress(openMenuAt);
+  const longPress = useLongPress((x, y) => openMenuAt(x, y, true));
 
   function commitRename() {
     onRenaming(null);
@@ -374,10 +374,11 @@ export function FileExplorer({ project, activePath }: { project: Project; active
     }
   }
 
-  function openNodeMenu(target: MenuTarget, x: number, y: number) {
+  function openNodeMenu(target: MenuTarget, x: number, y: number, fromTouch = false) {
     setMenu({
       x,
       y,
+      fromTouch,
       subject: target.node.name,
       items:
         target.node.kind === "folder"
@@ -387,10 +388,11 @@ export function FileExplorer({ project, activePath }: { project: Project; active
     });
   }
 
-  function openEmptyMenu(x: number, y: number) {
+  function openEmptyMenu(x: number, y: number, fromTouch = false) {
     setMenu({
       x,
       y,
+      fromTouch,
       subject: project.name,
       items: buildEmptyMenu(),
       // No target: "new file" here means the top level of the project.
@@ -398,7 +400,18 @@ export function FileExplorer({ project, activePath }: { project: Project; active
     });
   }
 
-  const emptyLongPress = useLongPress(openEmptyMenu);
+  const emptyLongPress = useLongPress((x, y) => openEmptyMenu(x, y, true));
+
+  /**
+   * A touch that started on a row belongs to that row. Touch events bubble, so
+   * without this a long press on a file ran the row's timer AND the empty-space
+   * timer, and the second one to fire replaced the file's menu with the
+   * project's — the menu opened, and it was the wrong menu.
+   */
+  function onEmptyTouchStart(e: React.TouchEvent) {
+    if ((e.target as HTMLElement).closest("[data-tree-row]")) return;
+    emptyLongPress.onTouchStart(e);
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -446,7 +459,7 @@ export function FileExplorer({ project, activePath }: { project: Project; active
           e.preventDefault();
           openEmptyMenu(e.clientX, e.clientY);
         }}
-        onTouchStart={emptyLongPress.onTouchStart}
+        onTouchStart={onEmptyTouchStart}
         onTouchMove={emptyLongPress.onTouchMove}
         onTouchEnd={emptyLongPress.onTouchEnd}
         onTouchCancel={emptyLongPress.onTouchCancel}

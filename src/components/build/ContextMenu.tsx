@@ -36,6 +36,8 @@ export interface ContextMenuRequest {
   subject: string;
   items: MenuItemSpec[];
   onRun: (id: MenuActionId) => void;
+  /** True when a long press opened it, which changes when it may be dismissed. See `armed` below. */
+  fromTouch?: boolean;
 }
 
 /** Keeps the menu inside the window. A menu opened near the bottom edge that renders off-screen is a menu with no items. */
@@ -60,13 +62,16 @@ function Menu({ request, onClose }: { request: ContextMenuRequest; onClose: () =
   // when the menu appeared, and only the menu knows when that was.
   const returnTo = useRef<HTMLElement | null>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
-  // When the menu was opened by a LONG PRESS, the finger is still down. Lifting
-  // it makes the browser synthesise a mousedown at the same point — on our own
-  // backdrop — and the menu closed again before the student ever saw it. So
-  // dismissal ignores anything that arrives in the moment right after opening;
-  // by then the compatibility events are over and a real second tap is a real
-  // second tap.
-  const [armed, setArmed] = useState(false);
+  // WHEN THIS MENU MAY BE DISMISSED.
+  //
+  // A long press opens the menu with the finger still down. Lifting it makes
+  // the browser synthesise a mousedown at the same point — on our own backdrop
+  // — and the menu vanished before the student had seen it, which is how the
+  // whole touch route silently did nothing. So a touch-opened menu does not
+  // listen for a dismissal until the press that opened it has ended and the
+  // compatibility events it drags behind it have gone by. A mouse-opened menu
+  // has no such problem and is dismissible immediately.
+  const [armed, setArmed] = useState(!request.fromTouch);
 
   useLayoutEffect(() => {
     returnTo.current = document.activeElement as HTMLElement | null;
@@ -75,9 +80,19 @@ function Menu({ request, onClose }: { request: ContextMenuRequest; onClose: () =
   }, [request.x, request.y]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setArmed(true), 450);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!request.fromTouch) return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const arm = () => {
+      timer = setTimeout(() => setArmed(true), 350);
+    };
+    window.addEventListener("touchend", arm, { once: true });
+    window.addEventListener("touchcancel", arm, { once: true });
+    return () => {
+      window.removeEventListener("touchend", arm);
+      window.removeEventListener("touchcancel", arm);
+      if (timer) clearTimeout(timer);
+    };
+  }, [request.fromTouch]);
 
   useEffect(() => {
     // Focus lands on the first thing that can actually be chosen, so Enter
