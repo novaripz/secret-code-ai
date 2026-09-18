@@ -56,6 +56,12 @@ export interface AgentRequest {
   projectMemory?: string;
   /** Build studio only: how hard to work on this turn. See BUILD_EFFORT_ADDENDUM. */
   buildEffort?: BuildEffort;
+  /**
+   * The project's real assets, one line each. Never their content — see
+   * lib/assets.ts assetManifest() for why an image's base64 must not reach the
+   * prompt.
+   */
+  assetManifest?: string;
   /** Short plain-language facts about the student, carried across projects. */
   studentProfile?: string;
   /** Optional screenshot the student captured (e.g. of their preview or the whole tab). */

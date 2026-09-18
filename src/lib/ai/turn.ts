@@ -54,6 +54,8 @@ export function buildUserTurnText(req: AgentRequest): string {
       : "",
     req.projectMemory ? `WHAT WE'VE ALREADY BUILT IN THIS PROJECT (working memory):\n${req.projectMemory}` : "",
     `PROJECT FILE TREE:\n${req.fileTree}`,
+    // The assets, as a list rather than as content. See assetManifest().
+    req.assetManifest ? `REAL ASSETS IN THIS PROJECT:\n${req.assetManifest}` : "",
     contextBlock ? `RELEVANT FILE CONTENTS:\n${contextBlock}` : "RELEVANT FILE CONTENTS: (none selected)",
     imageNote(req),
     `STUDENT'S REQUEST:\n${req.prompt}`,

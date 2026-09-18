@@ -1,5 +1,6 @@
 import type { FileNode, Project } from "@/types";
 import { listAllFiles } from "@/lib/fileSystem";
+import { isAssetNode } from "@/lib/assets";
 import { MAX_NOTES_CHARS, PROJECT_NOTES_PATH } from "./projectNotes";
 
 const MAX_FILES = 12;
@@ -154,6 +155,15 @@ export function selectContextFiles(
   }
 
   for (const f of picked.values()) {
+    // AN ASSET NEVER CONTRIBUTES ITS CONTENT.
+    //
+    // An image's content is half a megabyte of base64. It means nothing to a
+    // model, and MAX_CHARS_PER_FILE would still let 8000 characters of it
+    // through — enough to evict the actual source files this selection exists
+    // to choose between, on exactly the projects that have the most going on.
+    // What the model needs in order to write <img src="..."> is the path, and
+    // the path is already in the file tree. assetManifest() says the rest.
+    if (isAssetNode(f)) continue;
     const content = (f.content ?? "").slice(0, MAX_CHARS_PER_FILE);
     if (totalChars + content.length > MAX_TOTAL_CHARS) break;
     result[f.path] = content;

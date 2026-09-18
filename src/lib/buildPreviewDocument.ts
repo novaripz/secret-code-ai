@@ -1,6 +1,7 @@
 import type { Project } from "@/types";
 import { findByPath, listAllFiles } from "@/lib/fileSystem";
-import { normalizePath, parentPath, joinPath } from "@/lib/paths";
+import { isAssetNode } from "@/lib/assets";
+import { parentPath, resolveAgainst } from "@/lib/paths";
 
 const CONSOLE_BRIDGE = `
 <script>
@@ -34,7 +35,63 @@ function resolveLocal(fromPath: string, ref: string): string | undefined {
   const clean = ref.split("#")[0].split("?")[0];
   if (!clean) return undefined;
   const base = clean.startsWith("/") ? "" : parentPath(fromPath);
-  return normalizePath(joinPath(base, clean));
+  // resolveAgainst rather than joinPath+normalizePath: normalizePath leaves
+  // ".." in place on purpose (see its neighbour in paths.ts), so a reference
+  // like "../art/x.png" used to resolve to the literal "css/../art/x.png" and
+  // match no file at all.
+  return resolveAgainst(base, clean);
+}
+
+/**
+ * The data URL for a local asset reference, or undefined if it is not one.
+ *
+ * This is what makes a picture actually appear. The preview is a srcdoc iframe
+ * with no server and no origin, so `<img src="logo.png">` resolves against
+ * about:blank and fails silently — the student sees a broken-image icon and
+ * concludes the tool cannot do images. Since the asset is already stored as a
+ * data URL, swapping the reference for the content costs nothing and needs no
+ * network, which is also what keeps the sandbox closed.
+ */
+function assetUrl(project: Project, fromPath: string, ref: string): string | undefined {
+  const resolved = resolveLocal(fromPath, ref);
+  if (!resolved) return undefined;
+  const file = findByPath(project, resolved);
+  if (!file || file.kind !== "file" || !isAssetNode(file)) return undefined;
+  return file.content;
+}
+
+/**
+ * Rewrites every local asset reference in a chunk of HTML.
+ *
+ * Attribute-based rather than tag-based: `src` covers img, audio, video,
+ * source, embed and track in one rule, and `poster` and `href` on an icon link
+ * are the two that carry an asset but are not called src. Quotes are required
+ * in the pattern, which is the cheap way to avoid mangling an unquoted
+ * attribute we cannot parse confidently.
+ */
+function inlineAssetRefs(project: Project, fromPath: string, html: string): string {
+  return html.replace(
+    /\b(src|poster|href)\s*=\s*("|')([^"']+)\2/gi,
+    (whole, attr: string, quote: string, ref: string) => {
+      const url = assetUrl(project, fromPath, ref);
+      return url ? `${attr}=${quote}${url}${quote}` : whole;
+    },
+  );
+}
+
+/**
+ * The same job for CSS `url(...)`, which is how a background image or a
+ * @font-face gets in. Run over stylesheet text after it is inlined, so a
+ * reference is resolved relative to the CSS file that wrote it rather than to
+ * the HTML that included it — `url(../img/bg.png)` inside css/app.css means
+ * something different from the same string in index.html, and getting that
+ * wrong silently loads nothing.
+ */
+function inlineCssUrls(project: Project, fromPath: string, css: string): string {
+  return css.replace(/url\(\s*("|'|)([^"')]+)\1\s*\)/gi, (whole, quote: string, ref: string) => {
+    const url = assetUrl(project, fromPath, ref);
+    return url ? `url(${quote}${url}${quote})` : whole;
+  });
 }
 
 /**
@@ -60,7 +117,7 @@ export function buildPreviewDocument(project: Project, entryPath = "index.html")
     if (!resolved) return tag;
     const file = findByPath(project, resolved);
     if (!file || file.kind !== "file") return tag;
-    return `<style data-inlined-from="${resolved}">\n${file.content ?? ""}\n</style>`;
+    return `<style data-inlined-from="${resolved}">\n${inlineCssUrls(project, resolved, file.content ?? "")}\n</style>`;
   });
 
   html = html.replace(/<script\s+([^>]*)src=["']([^"']+)["']([^>]*)>\s*<\/script>/gi, (tag, pre, src, post) => {
@@ -72,6 +129,19 @@ export function buildPreviewDocument(project: Project, entryPath = "index.html")
     const isModule = /type=["']module["']/i.test(attrs);
     return `<script${isModule ? ' type="module"' : ""} data-inlined-from="${resolved}">\n${file.content ?? ""}\n</script>`;
   });
+
+  // Assets last, and over the whole document rather than over the markup alone.
+  //
+  // Running it after the script blocks are inlined is deliberate, not an
+  // accident of ordering: a game that does `sprite.src = "cookie.png"` in
+  // JavaScript needs that string rewritten too, and by this point that string
+  // is sitting in the document. The base path is the ENTRY's, which is correct
+  // for both cases — a browser resolves an attribute and a runtime `.src`
+  // assignment against the document's URL, never against the script's — so
+  // "cookie.png" written inside js/main.js means the same file it would mean in
+  // index.html. Passing the script's own path here would look more careful and
+  // would quietly resolve half the references to the wrong place.
+  html = inlineAssetRefs(project, entry.path, html);
 
   if (/<head[^>]*>/i.test(html)) {
     html = html.replace(/<head([^>]*)>/i, `<head$1>${CONSOLE_BRIDGE}`);

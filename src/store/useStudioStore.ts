@@ -57,7 +57,7 @@ interface StudioState {
   setActiveTab: (path: string) => void;
 
   editFileContent: (path: string, content: string) => void;
-  addFile: (path: string, content?: string) => void;
+  addFile: (path: string, content?: string, mimeType?: string) => void;
   addFolder: (path: string) => void;
   removeNode: (path: string) => void;
   renamePath: (path: string, newPath: string) => void;
@@ -167,10 +167,10 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     scheduleAutosave(project);
   },
 
-  addFile: (path, content = "") => {
+  addFile: (path, content = "", mimeType) => {
     const { project } = get();
     if (!project) return;
-    createFile(project, path, content);
+    createFile(project, path, content, mimeType);
     set({ project: { ...project } });
     scheduleAutosave(project);
   },

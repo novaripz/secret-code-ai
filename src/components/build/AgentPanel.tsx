@@ -6,6 +6,7 @@ import { useStudioStore } from "@/store/useStudioStore";
 import { useChatStore } from "@/store/useChatStore";
 import { useMemoryStore } from "@/store/useMemoryStore";
 import { useProfileStore } from "@/store/useProfileStore";
+import { assetManifest } from "@/lib/assets";
 import { selectContextFiles } from "@/lib/ai/contextSelection";
 import { projectFileTreeText } from "@/lib/fileSystem";
 import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
@@ -246,6 +247,7 @@ export function AgentPanel() {
             history,
             explainMode: modes.explainMode,
             buildEffort: modes.buildEffort,
+          assetManifest: assetManifest(project),
             projectMemory: projectMemorySummary(),
             studentProfile: memoryBlock(),
             images: outgoing

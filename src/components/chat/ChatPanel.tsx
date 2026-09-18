@@ -7,6 +7,7 @@ import { useStudioStore } from "@/store/useStudioStore";
 import { useChatStore } from "@/store/useChatStore";
 import { useMemoryStore } from "@/store/useMemoryStore";
 import { useProfileStore } from "@/store/useProfileStore";
+import { assetManifest } from "@/lib/assets";
 import { selectContextFiles } from "@/lib/ai/contextSelection";
 import { projectFileTreeText } from "@/lib/fileSystem";
 import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
@@ -96,6 +97,7 @@ export function ChatPanel() {
           history,
           explainMode: modes.explainMode,
           projectMemory: projectMemorySummary(),
+          assetManifest: assetManifest(project),
           studentProfile: memoryBlock(),
           images: outgoing
             .filter((a) => a.kind === "image" && a.base64 && a.mimeType)

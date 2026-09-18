@@ -9,8 +9,20 @@ export interface FileNode {
   /** Full path from project root, e.g. "src/components/Button.tsx". Always forward-slash separated, no leading slash. */
   path: string;
   parentId: string | null;
-  /** Only present for kind === "file" */
+  /**
+   * Only present for kind === "file".
+   *
+   * Source files hold their text. An asset (image, audio, video, font) holds a
+   * complete data URL, which is why this stays a string for both — see
+   * lib/assets.ts for why that was chosen over a separate binary field.
+   */
   content?: string;
+  /**
+   * Set only on assets, and only ever alongside a data-URL `content`. Absent on
+   * every source file, so its presence is not what identifies an asset —
+   * isAssetNode() reads the content, because the content is the truth.
+   */
+  mimeType?: string;
   createdAt: number;
   updatedAt: number;
 }

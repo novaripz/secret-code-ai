@@ -37,6 +37,18 @@ export function PlusFileIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+export function ImageIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
+      <rect x="2.5" y="4" width="15" height="12" rx="1.5" />
+      {/* The hill-and-sun mark rather than a camera: this is what is IN the
+          file, and the camera icon is already spoken for by "take a photo" in
+          the composer. */}
+      <path d="M2.5 13l4-4 3.5 3.5L13 9l4.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12.5" cy="7.5" r="1.25" />
+    </svg>
+  );
+}
 export function PlusFolderIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>

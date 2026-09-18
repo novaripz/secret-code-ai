@@ -5,6 +5,13 @@ import { useI18n } from "@/lib/i18n";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useDialog } from "@/components/ui/Dialog";
 import { findByPath } from "@/lib/fileSystem";
+import {
+  MAX_ASSET_BYTES,
+  MAX_PROJECT_ASSET_BYTES,
+  assetMimeType,
+  humanSize,
+  totalAssetBytes,
+} from "@/lib/assets";
 import { fileName, joinPath, parentPath } from "@/lib/paths";
 import { displayPath, duplicatePath } from "./fileMenu";
 
@@ -114,6 +121,75 @@ export function useFileActions() {
         }
       },
 
+      /**
+       * Bring real files in: images, audio, video, fonts.
+       *
+       * Everything a student drops is read here rather than in the component
+       * that happened to receive the drop, so the file tree's drop target, the
+       * explorer's Add button and the command palette all get the same limits
+       * and the same refusals. The rules are deliberately said out loud to the
+       * student rather than silently skipping a file:
+       *
+       *  - the extension must be one we can store and inline (lib/assets.ts
+       *    keeps the list, and it excludes anything executable on purpose);
+       *  - one file has a size cap, and the project has a smaller-than-you-
+       *    think total, because this all lives in a browser database on a
+       *    school laptop that thirty students share;
+       *  - an existing path is never silently overwritten.
+       */
+      async addAssets(files: FileList | File[], folder = "") {
+        if (!project) return [] as string[];
+        const incoming = Array.from(files);
+        const added: string[] = [];
+        const refused: string[] = [];
+        let budget = MAX_PROJECT_ASSET_BYTES - totalAssetBytes(project);
+
+        for (const file of incoming) {
+          const safeName = fileName(file.name.replace(/[^\w.\- ]+/g, "_"));
+          const path = folder ? joinPath(folder, safeName) : safeName;
+          const mimeType = assetMimeType(path);
+
+          if (!mimeType) {
+            refused.push(`${file.name} — Panda can't store this kind of file yet.`);
+            continue;
+          }
+          if (file.size > MAX_ASSET_BYTES) {
+            refused.push(
+              `${file.name} — ${humanSize(file.size)}, and the limit for one file is ${humanSize(MAX_ASSET_BYTES)}.`,
+            );
+            continue;
+          }
+          if (file.size > budget) {
+            refused.push(`${file.name} — this project has no room left for more assets.`);
+            continue;
+          }
+          if (findByPath(project, path)) {
+            refused.push(`${file.name} — there is already a file called that.`);
+            continue;
+          }
+
+          try {
+            const dataUrl = await readAsDataUrl(file);
+            addFile(path, dataUrl, mimeType);
+            budget -= file.size;
+            added.push(path);
+          } catch {
+            refused.push(`${file.name} — that file could not be read.`);
+          }
+        }
+
+        if (refused.length > 0) {
+          await dialog.alert({
+            title: added.length > 0 ? "Some files were not added" : "That didn't work",
+            description: refused.join("\n"),
+          });
+        }
+        // The last one opens, so a drop is visibly a thing that happened rather
+        // than a row appearing somewhere in a tree the student was not looking at.
+        if (added.length > 0) openFile(added[added.length - 1]);
+        return added;
+      },
+
       async duplicate(path: string) {
         if (!project) return;
         try {
@@ -177,3 +253,21 @@ export function useFileActions() {
 }
 
 export type FileActions = ReturnType<typeof useFileActions>;
+
+/**
+ * A File as a data URL.
+ *
+ * FileReader rather than arrayBuffer() + manual base64: the browser's own
+ * encoder is correct about the MIME type and about large inputs, and hand-rolled
+ * base64 over a 2MB buffer is a stack overflow waiting for the one student with
+ * a big photo (String.fromCharCode.apply on a long array is the classic way to
+ * hit it).
+ */
+function readAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ""));
+    reader.onerror = () => reject(reader.error ?? new Error("unreadable"));
+    reader.readAsDataURL(file);
+  });
+}

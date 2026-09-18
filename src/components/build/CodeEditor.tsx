@@ -9,6 +9,8 @@ import { languageForPath } from "@/lib/paths";
 import { FileIcon, SearchIcon, SparkleIcon, XIcon } from "@/components/icons";
 import { useResolvedTheme } from "./useResolvedTheme";
 import { useLiveWrite } from "./useLiveWrite";
+import { AssetView } from "./AssetView";
+import { isAssetNode } from "@/lib/assets";
 import { askPanda, buildAskPrompt } from "./askPanda";
 import { displayPath } from "./fileMenu";
 
@@ -428,6 +430,11 @@ export function CodeEditor() {
               />
             </div>
           </div>
+        ) : activeFile && isAssetNode(activeFile) ? (
+          // An asset is shown, not edited. Monaco given a data URL renders half
+          // a megabyte of base64 on a single line and locks the tab laying it
+          // out, and nothing about that tells the student what the file is.
+          <AssetView node={activeFile} />
         ) : activeFile ? (
           <Editor
             key={activeFile.path}

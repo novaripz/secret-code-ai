@@ -9,6 +9,38 @@ export function normalizePath(path: string): string {
     .join("/");
 }
 
+/**
+ * Resolves a reference against the directory it was written in, collapsing
+ * ".." — and clamping at the project root, so nothing can climb out.
+ *
+ * DELIBERATELY SEPARATE FROM normalizePath, which must keep leaving ".."
+ * alone. assertSafePath detects traversal by looking for a ".." segment in a
+ * normalized path; teaching normalizePath to collapse them would make
+ * "../../etc/passwd" normalize to "etc/passwd" and sail through the very check
+ * that exists to stop it. Resolving a reference and validating a stored path
+ * are two different jobs and only one of them may fold "..".
+ *
+ * This is the resolving half, used by the preview so that `url(../art/x.png)`
+ * inside css/app.css finds art/x.png. Until now nothing folded "..", so every
+ * relative reference that stepped up a directory silently resolved to a path no
+ * file had — a stylesheet, a script or an image that simply never loaded, with
+ * nothing on screen to say why.
+ */
+export function resolveAgainst(fromDir: string, ref: string): string {
+  const out: string[] = [];
+  for (const seg of `${fromDir}/${ref}`.replace(/\\/g, "/").split("/")) {
+    if (seg === "" || seg === ".") continue;
+    if (seg === "..") {
+      // pop(), never a "/.." that escapes: at the root this simply stays there,
+      // which is what a browser does with a file: URL at the top of a tree.
+      out.pop();
+      continue;
+    }
+    out.push(seg);
+  }
+  return out.join("/");
+}
+
 const INVALID_CHARS = /[<>:"|?*]/;
 
 /**

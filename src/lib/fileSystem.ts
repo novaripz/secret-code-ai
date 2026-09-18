@@ -75,7 +75,14 @@ export function ensureFolderPath(project: Project, folderPath: string): string {
   return parentId;
 }
 
-export function createFile(project: Project, path: string, content = ""): FileNode {
+export function createFile(
+  project: Project,
+  path: string,
+  content = "",
+  // Set only for assets, and only alongside a data-URL content. Optional so
+  // every existing caller -- and there are many -- keeps working unchanged.
+  mimeType?: string,
+): FileNode {
   const safePath = assertSafePath(path);
   if (findByPath(project, safePath)) {
     throw new Error(`File already exists: "${safePath}"`);
@@ -91,6 +98,7 @@ export function createFile(project: Project, path: string, content = ""): FileNo
     path: safePath,
     parentId,
     content,
+    ...(mimeType ? { mimeType } : {}),
     createdAt: now,
     updatedAt: now,
   };

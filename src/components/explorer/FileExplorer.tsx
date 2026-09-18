@@ -38,6 +38,7 @@ import {
   ChevronRightIcon,
   PlusFileIcon,
   PlusFolderIcon,
+  ImageIcon,
 } from "@/components/icons";
 import { UndoIcon } from "@/components/build/icons";
 
@@ -330,6 +331,11 @@ export function FileExplorer({ project, activePath }: { project: Project; active
   const [menu, setMenu] = useState<ContextMenuRequest | null>(null);
   const [renamingPath, setRenamingPath] = useState<string | null>(null);
   const [collapseNonce, setCollapseNonce] = useState(0);
+  const assetInputRef = useRef<HTMLInputElement>(null);
+  // Counted rather than boolean: dragenter/dragleave fire for every child
+  // element the pointer crosses, so a plain flag flickers off the moment the
+  // cursor moves between two rows inside the same drop zone.
+  const [dragDepth, setDragDepth] = useState(0);
 
   /** One runner for every entry, whichever menu it came from. */
   function run(id: MenuActionId, target: MenuTarget | null) {
@@ -414,9 +420,43 @@ export function FileExplorer({ project, activePath }: { project: Project; active
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div
+      className="flex flex-col h-full"
+      // Dropping a file anywhere in the panel adds it. The whole panel rather
+      // than a dedicated strip, because a student dragging a picture aims at
+      // "the files" and not at a target they have to discover first.
+      onDragEnter={(e) => {
+        if (!e.dataTransfer.types.includes("Files")) return;
+        e.preventDefault();
+        setDragDepth((d) => d + 1);
+      }}
+      onDragOver={(e) => {
+        if (e.dataTransfer.types.includes("Files")) e.preventDefault();
+      }}
+      onDragLeave={() => setDragDepth((d) => Math.max(0, d - 1))}
+      onDrop={(e) => {
+        if (!e.dataTransfer.files?.length) return;
+        e.preventDefault();
+        setDragDepth(0);
+        void actions.addAssets(e.dataTransfer.files);
+      }}
+    >
+      <input
+        ref={assetInputRef}
+        type="file"
+        multiple
+        accept="image/*,audio/*,video/*,.woff,.woff2,.ttf,.otf"
+        className="hidden"
+        onChange={(e) => {
+          void actions.addAssets(e.target.files ?? []);
+          // Cleared so choosing the same file twice still fires a change.
+          e.target.value = "";
+        }}
+      />
       <div className="flex items-center justify-between px-3 py-2.5 border-b border-[var(--line)]">
-        <span className="text-xs font-semibold tracking-wide text-[var(--text-faint)] uppercase">{t("studio.yourFiles")}</span>
+        <span className="text-xs font-semibold tracking-wide text-[var(--text-faint)] uppercase">
+          {dragDepth > 0 ? "Drop to add" : t("studio.yourFiles")}
+        </span>
         <div className="flex items-center gap-1">
           <button
             title={t("studio.newFile")}
@@ -433,6 +473,14 @@ export function FileExplorer({ project, activePath }: { project: Project; active
             className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
           >
             <PlusFolderIcon className="w-4 h-4" />
+          </button>
+          <button
+            title="Add an image, sound or font"
+            aria-label="Add an image, sound or font"
+            onClick={() => assetInputRef.current?.click()}
+            className="tap-sq inline-flex items-center justify-center p-1 hover:bg-[var(--surface-2)] rounded text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          >
+            <ImageIcon className="w-4 h-4" />
           </button>
           <button
             title="More file actions"

@@ -130,6 +130,7 @@ interface RequestBody {
   chatOnly?: boolean;
   projectMemory?: string;
   buildEffort?: string;
+  assetManifest?: string;
   studentProfile?: string;
   image?: ImageAttachment;
   images?: ImageAttachment[];
@@ -313,6 +314,11 @@ export async function POST(req: NextRequest) {
         : undefined,
     chatOnly: body.chatOnly === true,
     projectMemory: typeof body.projectMemory === "string" ? body.projectMemory.slice(0, 4000) : undefined,
+    // Bounded like every other client-supplied block. A project with hundreds
+    // of assets must not be able to push the source files out of the prompt
+    // with its own filing cabinet.
+    assetManifest:
+      typeof body.assetManifest === "string" ? body.assetManifest.slice(0, 4000) : undefined,
     // Validated against the known set rather than passed through: this string
     // becomes a key into BUILD_EFFORT_ADDENDUM, and an unknown one would index
     // to undefined and concatenate "undefined" into the system prompt.

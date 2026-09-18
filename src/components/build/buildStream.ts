@@ -74,6 +74,8 @@ export interface BuildStreamRequest {
   explainMode?: boolean;
   /** How hard to work on this turn. See BUILD_EFFORT_ADDENDUM. */
   buildEffort?: string;
+  /** One line per real asset. Never asset content — see lib/assets.ts. */
+  assetManifest?: string;
   projectMemory?: string;
   studentProfile?: string;
   images?: { data: string; mimeType: string }[];
