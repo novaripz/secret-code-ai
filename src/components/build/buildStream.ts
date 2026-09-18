@@ -14,7 +14,7 @@
 import { authHeader, authReady, deviceHeader } from "@/lib/security/device";
 import type { FileOperation } from "@/types";
 
-const TYPES = new Set<FileOperation["type"]>(["create", "modify", "delete", "rename"]);
+const TYPES = new Set<FileOperation["type"]>(["create", "modify", "delete", "rename", "generate"]);
 
 /**
  * What a student reads when the clock ended the turn.
@@ -91,6 +91,16 @@ function asOperation(value: unknown): FileOperation | undefined {
     path: op.path,
     content: typeof op.content === "string" ? op.content : undefined,
     newPath: typeof op.newPath === "string" ? op.newPath : undefined,
+    // A generate op carries its description instead of content. Dropping these
+    // two would let the operation arrive looking complete and then fail at
+    // apply time with nothing to generate from — the server has already
+    // validated and flattened them, so what arrives here is a plain object of
+    // scalars.
+    generator: typeof op.generator === "string" ? op.generator : undefined,
+    spec:
+      op.spec && typeof op.spec === "object" && !Array.isArray(op.spec)
+        ? (op.spec as Record<string, unknown>)
+        : undefined,
   };
 }
 

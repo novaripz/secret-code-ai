@@ -10,6 +10,7 @@ const TYPE_STYLE: Record<FileOperation["type"], string> = {
   modify: "bg-[var(--warn-soft)] text-[var(--warn)]",
   delete: "bg-[var(--danger-soft)] text-[var(--danger)]",
   rename: "bg-[var(--accent-soft)] text-[var(--accent-strong)]",
+  generate: "bg-[var(--success-soft)] text-[var(--success)]",
 };
 
 const TYPE_LABEL: Record<FileOperation["type"], string> = {
@@ -17,6 +18,7 @@ const TYPE_LABEL: Record<FileOperation["type"], string> = {
   modify: "changed",
   delete: "removed",
   rename: "renamed",
+  generate: "generated",
 };
 
 function OperationRow({ op }: { op: FileOperation }) {

@@ -40,6 +40,11 @@ const VERB: Record<FileOperation["type"], StringKey> = {
   modify: "studio.opEdited",
   delete: "studio.opDeleted",
   rename: "studio.opRenamed",
+  // A generated asset reads as its own verb rather than as "created": the
+  // student did not write this file and neither, exactly, did Panda -- it was
+  // drawn from a description, and saying so is how they know they can ask for
+  // it again differently.
+  generate: "studio.opGenerated",
 };
 
 /** Each verb gets a colour it keeps everywhere in the workspace. */
@@ -48,6 +53,7 @@ const VERB_STYLE: Record<FileOperation["type"], string> = {
   modify: "bg-[var(--warn-soft)] text-[var(--warn)]",
   delete: "bg-[var(--danger-soft)] text-[var(--danger)]",
   rename: "bg-[var(--accent-soft)] text-[var(--accent-strong)]",
+  generate: "bg-[var(--success-soft)] text-[var(--success)]",
 };
 
 /**

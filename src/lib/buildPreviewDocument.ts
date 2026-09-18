@@ -1,6 +1,6 @@
 import type { Project } from "@/types";
 import { findByPath, listAllFiles } from "@/lib/fileSystem";
-import { isAssetNode } from "@/lib/assets";
+import { assetContentUrl } from "@/lib/assets";
 import { parentPath, resolveAgainst } from "@/lib/paths";
 
 const CONSOLE_BRIDGE = `
@@ -56,8 +56,11 @@ function assetUrl(project: Project, fromPath: string, ref: string): string | und
   const resolved = resolveLocal(fromPath, ref);
   if (!resolved) return undefined;
   const file = findByPath(project, resolved);
-  if (!file || file.kind !== "file" || !isAssetNode(file)) return undefined;
-  return file.content;
+  if (!file || file.kind !== "file") return undefined;
+  // assetContentUrl, not file.content: a .svg is stored as text and has to be
+  // encoded to be loadable here. Checking isAssetNode alone silently skipped
+  // every generated shape.
+  return assetContentUrl(file);
 }
 
 /**

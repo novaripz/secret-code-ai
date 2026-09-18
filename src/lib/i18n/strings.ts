@@ -348,6 +348,7 @@ export const en = {
   "studio.writingCount": "Writing {path} ({index} of {total})",
   "studio.working": "Panda is working… {seconds}s",
   "studio.opCreated": "created",
+  "studio.opGenerated": "generated",
   "studio.opEdited": "edited",
   "studio.opDeleted": "deleted",
   "studio.opRenamed": "renamed",

@@ -8,7 +8,21 @@ export interface ValidationResult {
   errors: string[];
 }
 
-const VALID_TYPES = new Set(["create", "modify", "delete", "rename"]);
+const VALID_TYPES = new Set(["create", "modify", "delete", "rename", "generate"]);
+
+/**
+ * The generators this will let through, and the cap on a description.
+ *
+ * Named here rather than imported from lib/assetGen so the validator stays a
+ * pure, dependency-free gate: this module's whole job is to distrust what the
+ * model sent, and a gate that imports the thing it is guarding has a habit of
+ * growing into the thing it is guarding. assetGen refuses an unknown generator
+ * again on its own account, which is the belt to this file's braces.
+ */
+const VALID_GENERATORS = new Set(["shape", "sound"]);
+
+/** A shape or a sound is a handful of numbers. Anything larger is not a spec. */
+const MAX_SPEC_KEYS = 24;
 
 /**
  * Defense-in-depth validation of AI-proposed file operations before they are
@@ -40,6 +54,33 @@ export function validateOperations(ops: FileOperation[]): ValidationResult {
         if (!op.newPath) throw new Error(`"rename" on "${path}" is missing newPath.`);
         const newPath = assertSafePath(op.newPath);
         valid.push({ type: "rename", path, newPath });
+      } else if (op.type === "generate") {
+        if (typeof op.generator !== "string" || !VALID_GENERATORS.has(op.generator)) {
+          throw new Error(`"generate" on "${path}" asks for an unknown generator.`);
+        }
+        // The spec reaches a renderer that interpolates values into SVG, so it
+        // is bounded and flattened here: only plain scalars, no nesting, no
+        // functions, nothing that could smuggle structure past the renderer's
+        // own per-field validation.
+        const spec: Record<string, string | number | boolean> = {};
+        if (op.spec !== undefined) {
+          if (typeof op.spec !== "object" || op.spec === null || Array.isArray(op.spec)) {
+            throw new Error(`"generate" on "${path}" has a spec that is not a plain object.`);
+          }
+          const entries = Object.entries(op.spec as Record<string, unknown>);
+          if (entries.length > MAX_SPEC_KEYS) {
+            throw new Error(`"generate" on "${path}" has far too many settings.`);
+          }
+          for (const [key, value] of entries) {
+            const t = typeof value;
+            if (t === "string" || t === "number" || t === "boolean") {
+              spec[key] = value as string | number | boolean;
+            }
+            // Anything else is dropped rather than refused: a stray null in a
+            // spec should cost the student a default, not the whole file.
+          }
+        }
+        valid.push({ type: "generate", path, generator: op.generator, spec });
       }
     } catch (err) {
       errors.push(err instanceof Error ? err.message : String(err));

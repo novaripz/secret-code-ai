@@ -15,6 +15,7 @@ import {
   type NodeSnapshot,
 } from "@/lib/fileSystem";
 import { saveProject } from "@/lib/storage";
+import { generateAsset } from "@/lib/assetGen";
 
 interface Tab {
   path: string;
@@ -270,6 +271,19 @@ export const useStudioStore = create<StudioState>((set, get) => ({
           if (findByPath(project, op.path)) deleteNode(project, op.path);
         } else if (op.type === "rename") {
           if (op.newPath) renameNode(project, op.path, op.newPath);
+        } else if (op.type === "generate") {
+          // The generator runs HERE, at apply time, not when the operation was
+          // proposed. That is what makes a generated asset honest: the student
+          // approved a described file, and the bytes are made from that exact
+          // description at the moment they said yes. Generating early and
+          // holding the result would mean the thing applied could drift from
+          // the thing shown.
+          const made = generateAsset(op.generator ?? "", op.path, op.spec ?? {});
+          if (findByPath(project, op.path)) {
+            updateFileContent(project, op.path, made.content);
+          } else {
+            createFile(project, op.path, made.content, made.mimeType);
+          }
         }
         applied.push(op);
       } catch (err) {

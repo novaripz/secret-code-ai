@@ -41,12 +41,22 @@ export interface Project {
 export type ChatRole = "user" | "assistant" | "system";
 
 export interface FileOperation {
-  type: "create" | "modify" | "delete" | "rename";
+  /**
+   * "generate" makes a real asset — an SVG shape or a WAV sound — from a small
+   * description, because the model emits text and those are bytes. It is an
+   * operation rather than a side channel so a generated file is proposed,
+   * diffed and approved exactly like every other change.
+   */
+  type: "create" | "modify" | "delete" | "rename" | "generate";
   path: string;
   /** New content for create/modify */
   content?: string;
   /** New path for rename */
   newPath?: string;
+  /** generate only: which generator to run. See lib/assetGen. */
+  generator?: string;
+  /** generate only: the description handed to that generator. */
+  spec?: Record<string, unknown>;
 }
 
 export interface AgentResponse {

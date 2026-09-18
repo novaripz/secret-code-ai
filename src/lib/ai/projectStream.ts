@@ -55,7 +55,7 @@ export type ProjectStreamEvent =
 /** How much of the current object to look at when guessing its header. */
 const HEADER_WINDOW = 4_000;
 
-const TYPES = new Set<FileOperation["type"]>(["create", "modify", "delete", "rename"]);
+const TYPES = new Set<FileOperation["type"]>(["create", "modify", "delete", "rename", "generate"]);
 
 /**
  * Walks the `"operations": [ ... ]` array across chunk boundaries.

@@ -99,6 +99,35 @@ export function isAssetNode(node: Pick<FileNode, "content" | "mimeType">): boole
   return typeof node.content === "string" && node.content.startsWith("data:");
 }
 
+/**
+ * A URL that will actually load this file, for either kind of asset.
+ *
+ * SVG is the awkward one and it is awkward for a good reason: it is TEXT, so a
+ * generated or hand-written .svg is stored as markup like any other source file
+ * — editable, diffable, a few hundred bytes — and isAssetNode() correctly says
+ * it is not a data-URL asset. But the preview still has to turn
+ * `<img src="art/star.svg">` into something an iframe with no server can load.
+ *
+ * This was found by rendering the output in a browser rather than reading it:
+ * every generated shape came back BROKEN because the preview only inlined files
+ * whose content already began with "data:". Encoding here keeps the file text
+ * on disk and makes it loadable at the point of use.
+ *
+ * encodeURIComponent rather than base64: an SVG is text, the result stays
+ * readable in the generated document, and it avoids a base64 round trip on
+ * every preview rebuild. The "#" must be escaped by hand because it is legal in
+ * SVG markup and terminates a data URL.
+ */
+export function assetContentUrl(node: Pick<FileNode, "content" | "mimeType" | "path">): string | undefined {
+  const content = node.content;
+  if (typeof content !== "string" || content.length === 0) return undefined;
+  if (content.startsWith("data:")) return content;
+  if (extensionOf(node.path ?? "") === "svg") {
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(content)}`;
+  }
+  return undefined;
+}
+
 /** Bytes an asset really occupies, derived from its base64 length. */
 export function assetByteSize(dataUrl: string): number {
   const comma = dataUrl.indexOf(",");
@@ -125,12 +154,15 @@ export interface AssetEntry {
 /** Every asset in the project, for the explorer, the export and the prompt. */
 export function listAssets(project: Project): AssetEntry[] {
   return listAllFiles(project)
-    .filter((f) => f.kind === "file" && isAssetNode(f))
+    // A text .svg counts: it is referenceable exactly like a stored asset, and
+    // leaving it off the manifest would mean the model generated a star and
+    // then did not know it had one.
+    .filter((f) => f.kind === "file" && (isAssetNode(f) || extensionOf(f.path) === "svg"))
     .map((f) => ({
       path: f.path,
       mimeType: f.mimeType ?? assetMimeType(f.path) ?? "application/octet-stream",
       family: familyOf(f.mimeType ?? assetMimeType(f.path)),
-      bytes: assetByteSize(f.content ?? ""),
+      bytes: isAssetNode(f) ? assetByteSize(f.content ?? "") : (f.content ?? "").length,
     }))
     .sort((a, b) => a.path.localeCompare(b.path));
 }
