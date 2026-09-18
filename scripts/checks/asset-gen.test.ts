@@ -12,6 +12,7 @@ import { renderSamples, renderWav } from "../../src/lib/assetGen/sound";
 import { renderShape } from "../../src/lib/assetGen/shapes";
 import { validateOperations } from "../../src/lib/ai/validateOperations";
 import { assetByteSize, isAssetNode } from "../../src/lib/assets";
+import { parseAgentResponse } from "../../src/lib/ai/turn";
 
 let failures = 0;
 function ok(name: string, condition: boolean, detail = ""): void {
@@ -120,6 +121,30 @@ const nested = validateOperations([
 ] as never);
 ok("only scalars reach the generator",
    Object.keys(nested.valid[0].spec as object).length === 1, JSON.stringify(nested.valid[0].spec));
+
+console.log("\nthe generator survives the whole round trip");
+
+// This is the seam that broke in production. The streamed op frames carried the
+// right generator, and then the authoritative envelope -- whose operations
+// replace everything streamed -- was parsed by a mapper that copied only type,
+// path, content and newPath. The validator then refused every generated asset
+// as "unknown generator", blaming the model for a field this side had dropped.
+const envelope = JSON.stringify({
+  operations: [
+    { type: "generate", path: "art/heart.svg", generator: "shape", spec: { kind: "heart", fill: "red" } },
+    { type: "generate", path: "sfx/jump.wav", generator: "sound", spec: { preset: "jump" } },
+  ],
+  message: "Added a heart and a jump sound.",
+});
+const parsed = parseAgentResponse(envelope);
+ok("parsing keeps the generator", parsed.operations.every((o) => typeof o.generator === "string"),
+   JSON.stringify(parsed.operations.map((o) => o.generator)));
+ok("and keeps the spec", (parsed.operations[0].spec as Record<string, unknown>)?.kind === "heart");
+const revalidated = validateOperations(parsed.operations);
+ok("so the validator accepts what the model actually sent",
+   revalidated.valid.length === 2 && revalidated.errors.length === 0, revalidated.errors.join(" | "));
+ok("and the files really generate",
+   revalidated.valid.every((o) => generateAsset(o.generator!, o.path, o.spec ?? {}).content.length > 0));
 
 console.log("\na fabricated binary file is refused");
 

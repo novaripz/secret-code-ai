@@ -362,6 +362,18 @@ export function parseAgentResponse(raw: string): AgentResponse {
       path: String(op.path ?? ""),
       content: typeof op.content === "string" ? op.content : undefined,
       newPath: typeof op.newPath === "string" ? op.newPath : undefined,
+      // A generate operation carries its description instead of content.
+      // Dropping these was silent and total: the streamed op frames showed the
+      // right generator, and then this -- the AUTHORITATIVE envelope, the one
+      // whose operations replace everything streamed -- handed the validator an
+      // operation with no generator at all, which it correctly refused as
+      // "unknown generator". Every generated asset was thrown away at the last
+      // step, with an error message that pointed at the model rather than here.
+      generator: typeof op.generator === "string" ? op.generator : undefined,
+      spec:
+        op.spec && typeof op.spec === "object" && !Array.isArray(op.spec)
+          ? (op.spec as Record<string, unknown>)
+          : undefined,
     }));
   const message = typeof obj.message === "string" ? obj.message : "";
   return {
