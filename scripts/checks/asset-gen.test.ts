@@ -121,6 +121,29 @@ const nested = validateOperations([
 ok("only scalars reach the generator",
    Object.keys(nested.valid[0].spec as object).length === 1, JSON.stringify(nested.valid[0].spec));
 
+console.log("\na fabricated binary file is refused");
+
+// Production answered "add a settings gear icon and a click sound" with
+// `create art/settings.png` and `create sfx/click.mp3` — plausible paths,
+// invented contents, and a page that loads a broken image and a silent button.
+// The prompt now forbids it; this is the part that enforces it.
+const fabricated = validateOperations([
+  { type: "create", path: "art/settings.png", content: "<!-- icon -->" },
+  { type: "create", path: "sfx/click.mp3", content: "" },
+] as never);
+ok("an invented png is refused", fabricated.valid.length === 0, fabricated.errors.join(" | "));
+ok("and the message says what to do instead", /generated|\.svg|\.wav/.test(fabricated.errors.join(" ")));
+
+// The two legitimate ways a binary file does arrive must still work.
+const uploaded = validateOperations([
+  { type: "create", path: "art/logo.png", content: "data:image/png;base64,iVBORw0KGgo=" },
+] as never);
+ok("a real data URL still writes", uploaded.valid.length === 1);
+const handwritten = validateOperations([
+  { type: "create", path: "art/icon.svg", content: "<svg xmlns='http://www.w3.org/2000/svg'></svg>" },
+] as never);
+ok("and a hand-written svg still writes, because svg is text", handwritten.valid.length === 1);
+
 console.log("\nend to end, the file lands as a usable asset");
 
 const svgFile = generateAsset("shape", "art/heart.svg", { kind: "heart", fill: "red" });

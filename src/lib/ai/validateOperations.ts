@@ -21,6 +21,21 @@ const VALID_TYPES = new Set(["create", "modify", "delete", "rename", "generate"]
  */
 const VALID_GENERATORS = new Set(["shape", "sound"]);
 
+/**
+ * Binary asset extensions a model cannot possibly be writing the contents of.
+ *
+ * Enforced here rather than left to the prompt, because the prompt asked
+ * politely and production still answered a request for an icon and a sound with
+ * `create art/settings.png` and `create sfx/click.mp3` — plausible paths,
+ * fabricated contents. The student gets files with the right names that load as
+ * a broken image and a silent button: a bug with no visible cause, which is
+ * the worst kind for someone learning.
+ *
+ * SVG is deliberately absent. It is text, so writing one by hand is legitimate
+ * and often the best answer.
+ */
+const UNWRITABLE_BINARY = /\.(png|jpe?g|gif|webp|avif|bmp|ico|mp3|wav|ogg|m4a|aac|mp4|webm|woff2?|ttf|otf)$/i;
+
 /** A shape or a sound is a handful of numbers. Anything larger is not a spec. */
 const MAX_SPEC_KEYS = 24;
 
@@ -46,6 +61,15 @@ export function validateOperations(ops: FileOperation[]): ValidationResult {
       if (op.type === "create" || op.type === "modify") {
         if (typeof op.content !== "string") {
           throw new Error(`"${op.type}" on "${path}" is missing content.`);
+        }
+        // A data URL is a real asset arriving by an ordinary write, which is
+        // how an upload and a generated sound both land. Anything else aimed at
+        // a binary extension is invented content.
+        if (UNWRITABLE_BINARY.test(path) && !op.content.startsWith("data:")) {
+          throw new Error(
+            `"${path}" cannot be written as text — an image or sound has to be generated ` +
+              `(a .svg shape or a .wav sound) or added by the student.`,
+          );
         }
         valid.push({ type: op.type, path, content: op.content });
       } else if (op.type === "delete") {
