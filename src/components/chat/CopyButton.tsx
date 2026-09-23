@@ -46,8 +46,6 @@ export function CopyButton({ content, variant = "reply" }: { content: string; va
   const [state, setState] = useState<State>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // A reply can be copied and then the thread cleared or navigated away from
-  // while the timer is still pending; setting state on the way out warns.
   // A pending timer outliving the component would call setState on something
   // that is gone, which React warns about and which happens every time a
   // student copies and then immediately navigates away.
@@ -87,7 +85,7 @@ export function CopyButton({ content, variant = "reply" }: { content: string; va
           aria-live="polite"
           // Sized to the 44px touch target even though the mark inside is
           // small: a control a thumb cannot reliably hit is decoration.
-          className={`tap flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] motion-reduce:transition-none ${
+          className={`tap-sq flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] motion-reduce:transition-none ${
             state === "failed" ? "text-[var(--danger)]" : "text-[var(--text-faint)] hover:text-[var(--text)]"
           }`}
         >
