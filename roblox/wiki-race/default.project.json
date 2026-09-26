@@ -1,0 +1,58 @@
+{
+  "name": "WikiRace",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "WikiRaceShared": {
+        "$path": "src/shared"
+      }
+    },
+    "ServerScriptService": {
+      "WikiRaceServer": {
+        "$path": "src/server"
+      }
+    },
+    "ServerStorage": {
+      "WikiData": {
+        "$path": "src/wikidata"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "WikiRaceClient": {
+          "$path": "src/client"
+        }
+      }
+    },
+    "Players": {
+      "$properties": {
+        "CharacterAutoLoads": false
+      }
+    },
+    "StarterGui": {
+      "$properties": {
+        "ResetPlayerGuiOnSpawn": false
+      }
+    },
+    "Workspace": {
+      "Baseplate": {
+        "$className": "Part",
+        "$properties": {
+          "Anchored": true,
+          "Size": [
+            512,
+            2,
+            512
+          ],
+          "Position": [
+            0,
+            -10,
+            0
+          ],
+          "Transparency": 1,
+          "CanCollide": true
+        }
+      }
+    }
+  }
+}
