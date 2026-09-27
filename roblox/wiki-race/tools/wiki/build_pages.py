@@ -12,7 +12,7 @@ from classify import SENTENCE_BLOCK, TITLE_BLOCK
 import emoji_map
 import exclusions
 
-HERE = os.path.dirname(os.path.abspath(__file__))  
+HERE = os.path.dirname(os.path.abspath(__file__))  # working files live next to this script
 REPO_DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "src", "wikidata")
 OUT = os.path.join(HERE, "out")
 os.makedirs(OUT, exist_ok=True)
