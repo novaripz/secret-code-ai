@@ -45,14 +45,11 @@ return function(t, H)
 			{ title = "John F. Kennedy", category = "Person", aliases = { "JFK" }, summary = "A president." }
 		)
 		table.insert(poisoned, { title = "Jacob Elordi", category = "Actor", summary = "Actor." })
-		table.insert(
-			poisoned,
-			{
-				title = "Armin Arlert",
-				category = "Fictional Character",
-				summary = "A character in [[Attack on Titan]].",
-			}
-		)
+		table.insert(poisoned, {
+			title = "Armin Arlert",
+			category = "Fictional Character",
+			summary = "A character in [[Attack on Titan]].",
+		})
 		table.insert(poisoned, {
 			title = "The 35th President",
 			category = "Person",
@@ -126,6 +123,46 @@ return function(t, H)
 		end
 	end)
 
+	t.test("brainrot corner and imported encyclopedia are wired in", function()
+		t.ok(#graph.ids >= 8000, "expected the imported encyclopedia, got " .. #graph.ids)
+		local skibidi = graph:resolve("Skibidi")
+		t.ok(skibidi and graph:inMain(skibidi), "Skibidi Toilet reachable")
+		local meme = graph.nodes[graph:resolve("Internet meme")]
+		t.ok(table.find(meme.related, graph:resolve("Brainrot")), "patch added See also link")
+		local taiga = repo:payload(graph:resolve("Taiga"))
+		t.eq(taiga.source, "wikipedia", "imported page carries attribution")
+		t.ok(repo:payload(skibidi).funny.caption, "meme card data")
+	end)
+
+	t.test("photos come from reviewed atlas tiles, people never get one", function()
+		local ImageService = H.server("Services/ImageService")
+		ImageService.resolved[1] = "rbxassetid://123"
+		local photoRepo =
+			WikiRepository.new(pages, { photos = ImageService.photos, photoResolver = ImageService.resolve })
+		local count, first = 0, nil
+		for title, photo in ImageService.photos do
+			count += 1
+			if photo.atlas == 1 and photo.slot == 6 then
+				first = title
+			end
+		end
+		t.ok(count > 3000, "photo manifest loaded")
+		local payload = photoRepo:payload(photoRepo.graph:resolve(first))
+		t.eq(payload.photo.image, "rbxassetid://123")
+		t.eq(payload.photo.x, 256, "slot 6 → column 2")
+		t.eq(payload.photo.y, 256, "slot 6 → row 2")
+		t.ok(payload.photo.credit:find("Wikimedia Commons", 1, true))
+		for title in ImageService.photos do
+			local id = photoRepo.graph:resolve(title)
+			local category = id and photoRepo.graph.nodes[id].category
+			t.ok(
+				category ~= "Person" and category ~= "Actor" and category ~= "Musician" and category ~= "Athlete",
+				title
+			)
+		end
+		ImageService.resolved[1] = nil
+	end)
+
 	t.test("redirects resolve to canonical pages", function()
 		t.eq(graph:resolve("USA"), "united_states")
 		t.eq(graph:resolve("soccer"), "association_football")
@@ -163,6 +200,9 @@ return function(t, H)
 		local target = "pizza"
 		local distances = graph:distancesTo(target)
 		for id, d in distances do
+			if not graph:inMain(id) then
+				continue
+			end
 			if d >= 1 and d <= 3 then
 				local ok = generator:validate({ start = id, target = target }, "SuperEasy")
 				t.ok(not ok, "accepted a start " .. d .. " links away")

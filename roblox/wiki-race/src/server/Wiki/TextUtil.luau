@@ -93,28 +93,20 @@ local FOLD = {
 }
 
 -- Lowercases ASCII and folds common Latin accents. Other characters are kept as-is.
+-- Implemented with native gsub passes (2-byte UTF-8 letters, then the 3-byte quotes and
+-- dashes) because the whole wiki text is normalized at server start.
 function TextUtil.fold(text: string): string
-	local out = table.create(#text)
-	for _, codepoint in utf8.codes(text) do
-		local char = utf8.char(codepoint)
-		local folded = FOLD[char]
-		if folded then
-			table.insert(out, folded)
-		elseif codepoint < 128 then
-			table.insert(out, string.lower(char))
-		else
-			table.insert(out, char)
-		end
+	local folded = string.lower(text)
+	if string.find(folded, "[\128-\255]") then
+		folded = string.gsub(folded, "[\194-\223][\128-\191]", FOLD)
+		folded = string.gsub(folded, "\226\128[\147-\157]", FOLD)
 	end
-	return table.concat(out)
+	return folded
 end
 
 -- Folds, then turns anything that isn't a-z/0-9 into single spaces.
 function TextUtil.normalize(text: string): string
-	local ok, folded = pcall(TextUtil.fold, text)
-	if not ok then
-		folded = string.lower(text)
-	end
+	local folded = TextUtil.fold(text)
 	folded = folded:gsub("'", "")
 	folded = folded:gsub("[^%w]+", " ")
 	folded = folded:gsub("^%s+", ""):gsub("%s+$", "")

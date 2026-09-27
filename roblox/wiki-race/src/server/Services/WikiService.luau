@@ -7,13 +7,19 @@ local Config = require(ReplicatedStorage:WaitForChild("WikiRaceShared").Config)
 local Wiki = script.Parent.Parent.Wiki
 local WikiRepository = require(Wiki.WikiRepository)
 local ChallengeGenerator = require(Wiki.ChallengeGenerator)
+local ImageService = require(script.Parent.ImageService)
 
 local WikiService = {}
 
 function WikiService.init()
 	local started = os.clock()
 	local pages = WikiRepository.collectPages(ServerStorage:WaitForChild("WikiData"))
-	local repo = WikiRepository.new(pages, { images = Config.PageImages })
+	ImageService.init()
+	local repo = WikiRepository.new(pages, {
+		images = Config.PageImages,
+		photos = ImageService.photos,
+		photoResolver = ImageService.resolve,
+	})
 	WikiService.repo = repo
 	WikiService.graph = repo.graph
 	WikiService.generator = ChallengeGenerator.new(repo.graph)

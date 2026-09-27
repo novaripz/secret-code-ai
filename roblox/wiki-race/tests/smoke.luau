@@ -28,6 +28,11 @@ local function advance(seconds)
 end
 
 -- Server ----------------------------------------------------------------------------------
+-- Pretend every photo atlas was uploaded so the photo branch of the infobox renders too.
+local ImageService = H.server("Services/ImageService")
+for index = 1, 300 do
+	ImageService.resolved[index] = "rbxassetid://" .. (1000 + index)
+end
 H.runScript(H.services.ServerScriptService.WikiRaceServer.Main)
 advance(0.5)
 local me = Fake.addPlayer(501, "Tester")
@@ -262,6 +267,56 @@ advance(0.4)
 Fake.click(Fake.findButton(App.overlay, "Close"))
 advance(0.3)
 log("free roam: link, search, random, category")
+
+-- Pictures in the top-right infobox: a reviewed photo tile, the meme-card toggle, brainrot cards.
+local function pageById(title)
+	local payload = WikiService.repo:payload(WikiService.graph:resolve(title))
+	return { ok = payload ~= nil, data = Fake.serialize(payload, "page") }
+end
+local function imageIn(frame)
+	for _, child in frame:GetChildren() do
+		if child.ClassName == "ImageLabel" then
+			return child
+		end
+	end
+	return nil
+end
+local function findNamed(root, name)
+	return Fake.findAll(root, function(node)
+		return node.Name == name
+	end)[1]
+end
+local photoPage = pageById("Kangaroo")
+check(photoPage and photoPage.ok and photoPage.data.photo, "Kangaroo has a photo tile")
+free.browser:setPage(photoPage.data)
+advance(0.5)
+local picture = findNamed(free.browser.frame, "Picture")
+check(picture, "infobox picture frame")
+local tile = imageIn(picture)
+check(
+	tile and tile.ImageRectSize.X == 256 and tile.ImageRectSize.Y == 256 and tile.Image:find("rbxassetid", 1, true),
+	"photo drawn from its atlas tile"
+)
+local toggle = picture:FindFirstChild("PictureToggle")
+check(toggle, "photo/meme toggle button")
+Fake.click(toggle)
+advance(0.3)
+picture = findNamed(free.browser.frame, "Picture")
+check(picture and not imageIn(picture), "meme card replaces the photo")
+Fake.click(picture:FindFirstChild("PictureToggle"))
+advance(0.3)
+local brainrot = pageById("Tralalero Tralala")
+free.browser:setPage(brainrot.data)
+advance(0.5)
+picture = findNamed(free.browser.frame, "Picture")
+local captions = {}
+for _, d in picture:GetDescendants() do
+	if d:IsA("TextLabel") then
+		captions[d.Text] = true
+	end
+end
+check(captions["TRA LA LA"] and captions["🦈"], "brainrot meme card with its own caption")
+log("infobox pictures: photo tile, meme toggle, brainrot card")
 
 -- Solo race from the current page (after the Server Rig window has expired)
 advance(90)

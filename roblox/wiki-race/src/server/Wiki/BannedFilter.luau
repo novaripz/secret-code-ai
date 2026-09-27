@@ -71,6 +71,10 @@ function BannedFilter.scrubMarkup(markup: string?, bannedTargets, report): strin
 		return ""
 	end
 	bannedTargets = bannedTargets or {}
+	-- Fast path: a chunk with no banned mention or link anywhere is kept verbatim.
+	if not markupIsDirty(markup, bannedTargets) then
+		return markup
+	end
 	local kept = {}
 	for _, sentence in TextUtil.splitSentences(markup) do
 		if markupIsDirty(sentence, bannedTargets) then

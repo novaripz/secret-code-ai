@@ -179,7 +179,7 @@ return {
 		title = "Claude Monet",
 		category = "Person",
 		fame = 2,
-		emoji = "🪷",
+		emoji = "🌸",
 		tags = { "Painters", "French people" },
 		aliases = { "Monet" },
 		summary = "**Claude Monet** was a French painter and founder of [[Impressionism]], famous for his paintings of water lilies in his garden.",

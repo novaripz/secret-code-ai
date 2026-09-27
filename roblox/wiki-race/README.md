@@ -2,8 +2,8 @@
 
 Start on one wiki page. Reach another. Only by clicking links. Beat everyone else.
 
-A complete, UI-only multiplayer Roblox game written entirely in Luau: a 729-page encyclopedia
-graph, an in-game wiki browser, server-authoritative races with a hot/cold meter, lobbies,
+A complete, UI-only multiplayer Roblox game written entirely in Luau: an ~8,400-page encyclopedia
+(hand-written pages, ~7,700 kid-safe Wikipedia articles and a whole brainrot/meme corner), an in-game wiki browser, server-authoritative races with a hot/cold meter, lobbies,
 rounds, timers, scoring, a podium ceremony, persistent stats, world records, leaderboards,
 achievements, ranks, cosmetics, game passes, developer products and the **Server Rig** chaos
 button.
@@ -31,10 +31,35 @@ To rebuild the place after editing source: `rojo build default.project.json -o b
 | Create developer products **Server Rig** (199), **Rig a Player** (49), **500/1,500/5,000 Wiki Coins** and paste IDs into `Config.Products` | Creator Hub → Monetization → Developer Products |
 | Upload the 31 generated sounds in `assets/sounds/*.ogg` (bulk import in Asset Manager works) and paste the IDs into `Config.Sounds` | Asset Manager / Creator Hub |
 | Optional: create badges and paste IDs into `Config.Badges` | Creator Hub → Badges |
-| Optional: upload page images and map page ids → `rbxassetid://…` in `Config.PageImages` | Creator Hub → Decals |
+| Upload the page photos: `python tools/images/upload_atlases.py --api-key KEY --user-id ID` (see below) | Open Cloud API key |
 
 Until sounds are uploaded, a few sounds bundled with the Roblox client are used as fallbacks.
-Pages without an image show a generated category card (emoji + color).
+
+## Pictures (top-right of every page)
+
+Every page has a picture in its infobox, in the top-right corner like Wikipedia:
+
+- **Photos** — real lead images from Wikimedia Commons, packed 16 per 1024×1024 atlas in
+  `assets/images/` (credits in `assets/images/CREDITS.md`). Every photo was visually reviewed;
+  photos of real people are never used. Roblox can only show images uploaded to Roblox, so run
+  `tools/images/upload_atlases.py` once with an Open Cloud API key (Assets read+write) from the
+  account/group that owns the game. It writes `src/server/Images/AssetIds.luau`; rebuild the place.
+- **Meme cards** — every page (and every page before photos are uploaded) can show a generated
+  funny picture: the page's emoji with googly eyes, a silly hat, sparkles and a meme caption.
+  Brainrot pages have hand-made cards (Tralalero Tralala's shark + sneakers, "DOP DOP YES YES"…).
+  The 🤪 / 📷 button on the picture flips between photo and meme card.
+
+## The wiki
+
+- ~730 hand-written pages, 51 **brainrot** pages (Skibidi Toilet, Italian brainrot characters,
+  rizz, sigma, aura, 6-7, Roblox hits like Steal a Brainrot and Grow a Garden, famous meme animals,
+  made-up "funny recipes") and ~7,700 imported Wikipedia articles (Level-4 Vital Articles).
+- **Nothing graphic:** unsafe subject areas (war, crime, medicine/anatomy, sexuality, drugs,
+  alcohol, religion-as-scripture, horror…) are excluded; a manual review list removes individual
+  titles; every sentence is filtered for violence/adult/drug words; pages that lose too much are
+  dropped entirely; all photos are human-reviewed. The banned-subject filter runs on top.
+- Imported text is from Wikipedia (CC BY-SA 4.0) and each imported page says so at the bottom.
+  The pipeline lives in `tools/wiki/` and can be re-run.
 
 ## How a race works
 
@@ -96,7 +121,8 @@ default.project.json        Rojo project (→ ReplicatedStorage / ServerScriptSe
 build/WikiRace.rbxlx        Ready-to-open place file
 assets/sounds/              Generated sound effects (tools/generate_sounds.py)
 src/shared/                 Config, Difficulty, Temperature, Categories, Catalog, Achievements, Ranks, Net, Format, Signal
-src/wikidata/               The encyclopedia: one module per domain, each returns a list of pages (server-only)
+src/wikidata/               The encyclopedia: hand-written domains, Brainrot, Vital/ (imported) — server-only
+src/server/Images/          Photo manifest (title → atlas tile) and uploaded asset ids
 src/server/
   Main.server.luau          Boot order
   Wiki/                     TextUtil, BannedFilter, WikiGraph (BFS + SCC), WikiRepository, ChallengeGenerator
@@ -108,11 +134,11 @@ src/client/
   Main.client.luau          Wires server pushes → UI, boot with retry
   Core/                     Net, Store, Sound
   UI/                       App shell, Kit (components), Theme + Themes, Anim, Fx
-  UI/Components/            WikiBrowser, FlowText (inline links), TemperatureMeter, PlayerList
+  UI/Components/            WikiBrowser, FlowText (inline links), FunnyCard (meme pictures), TemperatureMeter, PlayerList
   UI/Screens/               Menu, Lobbies, LobbyRoom, Race, FreeRoam, Profile, Shop, Leaderboards, Settings
   UI/Overlays/              Reveal, RoundResults, FinalResults, Chaos, ChaosMenu, Announcer
 tests/                      Luau test suites, graph report and a headless end-to-end smoke test
-tools/                      Sound generator, Luau test runner source
+tools/                      Sound generator, wiki import pipeline, photo atlas + upload tools, Luau test runner
 ```
 
 ## Wiki data format
@@ -133,8 +159,12 @@ else needs to change.
 	infobox = { { "Origin", "[[Naples]]" } },
 	related = { "Pasta" },                  -- "See also" links (also graph edges)
 	image = nil,                            -- optional rbxassetid://
+	funny = { layers = { "🍕", "😎" }, caption = "CHEF'S KISS" }, -- optional meme card
 }
 ```
+
+A record `{ patch = "Pizza", related = { "Skibidi Spaghetti" } }` adds "See also" links to an
+existing page instead of creating one.
 
 `[[Target]]` / `[[Target|label]]` become clickable links (edges) when the target page exists,
 otherwise plain text. Run `tests/graph_report.luau` after editing to see unresolved links,
@@ -159,7 +189,7 @@ distances, only the meter state. Profiles are session-locked to prevent cross-se
 The tests run on a tiny Luau host (`tools/luaurun`, built with `cargo build --release`):
 
 ```
-luaurun tests/run.luau .           # 32 unit/simulation tests (graph, generator rules, banned filter,
+luaurun tests/run.luau .           # 33 unit/simulation tests (graph, generator rules, banned filter,
                                    #  navigation, scoring, full Match simulation incl. Server Rig)
 luaurun tests/graph_report.luau .  # wiki health + generation stats per difficulty
 luaurun tests/smoke.luau .         # headless end-to-end: real server + real client on a fake engine,

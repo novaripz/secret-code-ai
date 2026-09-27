@@ -63,11 +63,62 @@ function WikiRepository.collectPages(folder: Instance)
 	return pages
 end
 
+-- Splits `{ patch = "Title", related = {...} }` records out of the page list and merges their
+-- "See also" entries into the page they name (by title or redirect). Module tables are never
+-- mutated: patched pages are shallow copies. Patches naming a missing page are ignored.
+function WikiRepository.applyPatches(rawPages)
+	local pages, patches = {}, {}
+	for _, page in rawPages do
+		if type(page) == "table" and type(page.patch) == "string" then
+			table.insert(patches, page)
+		else
+			table.insert(pages, page)
+		end
+	end
+	if #patches == 0 then
+		return pages, 0
+	end
+	local byName = {}
+	for index, page in pages do
+		if type(page) == "table" and type(page.title) == "string" then
+			byName[TextUtil.normalize(page.title)] = byName[TextUtil.normalize(page.title)] or index
+		end
+	end
+	for index, page in pages do
+		if type(page) == "table" then
+			for _, alias in page.aliases or {} do
+				byName[TextUtil.normalize(alias)] = byName[TextUtil.normalize(alias)] or index
+			end
+		end
+	end
+	local applied = 0
+	local copied = {}
+	for _, patch in patches do
+		local index = byName[TextUtil.normalize(patch.patch)]
+		if index then
+			if not copied[index] then
+				copied[index] = true
+				pages[index] = table.clone(pages[index])
+				pages[index].related = table.clone(pages[index].related or {})
+			end
+			for _, title in patch.related or {} do
+				if not table.find(pages[index].related, title) then
+					table.insert(pages[index].related, title)
+				end
+			end
+			applied += 1
+		end
+	end
+	return pages, applied
+end
+
 function WikiRepository.new(rawPages, options)
 	options = options or {}
 	local self = setmetatable({}, WikiRepository)
 
-	local cleaned, report = BannedFilter.cleanPages(rawPages)
+	local patchedPages, patchCount = WikiRepository.applyPatches(rawPages)
+	local cleaned, report = BannedFilter.cleanPages(patchedPages)
+	report.patches = patchCount
 	local graph = WikiGraph.build(cleaned, options)
 
 	-- Defensive audit: anything that still mentions a banned subject is dropped and the graph
@@ -94,6 +145,8 @@ function WikiRepository.new(rawPages, options)
 
 	self.graph = graph
 	self.filterReport = report
+	-- Optional: function(node) → photo payload ({ image, offset, size, credit }) or nil.
+	self.photoResolver = options.photoResolver
 	self._payloads = {}
 	self._payloadOrder = {}
 	self:_buildSearchIndex()
@@ -169,8 +222,19 @@ function WikiRepository:preview(id: string)
 		emoji = node.emoji,
 		category = node.category,
 		image = node.image,
+		photo = self:photo(node),
+		funny = node.funny,
 		blurb = firstSentence(plainText(node.summary), 180),
 	}
+end
+
+-- The page's uploaded photo (atlas tile), or nil while not uploaded/resolved yet.
+function WikiRepository:photo(node)
+	if not node.photo or not self.photoResolver then
+		return nil
+	end
+	local ok, result = pcall(self.photoResolver, node)
+	return ok and result or nil
 end
 
 function WikiRepository:_history(id: string, node)
@@ -196,6 +260,8 @@ end
 function WikiRepository:payload(id: string)
 	local cached = self._payloads[id]
 	if cached then
+		-- Photos resolve asynchronously after boot, so they are attached on every request.
+		cached.photo = self:photo(self.graph.nodes[id])
 		return cached
 	end
 	local graph = self.graph
@@ -232,6 +298,10 @@ function WikiRepository:payload(id: string)
 		categories = categories,
 		emoji = node.emoji,
 		image = node.image,
+		photo = self:photo(node),
+		funny = node.funny,
+		description = node.description,
+		source = node.source,
 		aliases = node.aliases,
 		summary = node.summary,
 		sections = node.sections,
@@ -259,7 +329,7 @@ end
 function WikiRepository:search(query: string, limit: number?)
 	limit = limit or 12
 	local normalized = TextUtil.normalize(query or "")
-	if normalized == "" or #normalized > 60 then
+	if normalized == "" or #normalized > 60 or BannedFilter.isBanned(normalized) then
 		return {}
 	end
 	local best = {}

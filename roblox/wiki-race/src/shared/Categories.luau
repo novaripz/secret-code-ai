@@ -40,6 +40,7 @@ Categories.Defs = {
 	["Mythology"] = { group = "Culture", emoji = "🐉", color = Color3.fromRGB(180, 83, 9) },
 	["Object"] = { group = "Everyday", emoji = "📦", color = Color3.fromRGB(100, 116, 139) },
 	["Concept"] = { group = "Ideas", emoji = "💭", color = Color3.fromRGB(71, 85, 105) },
+	["Meme"] = { group = "Internet", emoji = "🤪", color = Color3.fromRGB(217, 70, 239) },
 }
 
 Categories.Fallback = { group = "Misc", emoji = "📄", color = Color3.fromRGB(100, 116, 139) }
@@ -62,6 +63,8 @@ Categories.PairTemplates = {
 	{ weight = 2, from = { "History", "Event" }, to = { "Food", "Video Game", "Animal", "Music" } },
 	{ weight = 2, from = { "Object", "Concept" }, to = { "Person", "Athlete", "Musician", "Landmark" } },
 	{ weight = 2, from = { "Vehicle", "Engineering" }, to = { "Art", "Mythology", "Music", "Food" } },
+	{ weight = 3, from = { "Meme" }, to = { "Science", "History", "Country", "Mathematics", "Space" } },
+	{ weight = 2, from = { "Science", "History", "Mathematics", "Book" }, to = { "Meme" } },
 }
 
 function Categories.get(category: string?)

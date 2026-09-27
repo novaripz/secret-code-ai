@@ -234,7 +234,7 @@ return {
 		title = "Earthquake",
 		category = "Geography",
 		fame = 2,
-		emoji = "🫨",
+		emoji = "🌋",
 		tags = { "Natural disasters" },
 		summary = "An **earthquake** is a sudden shaking of the ground caused by rocks slipping along faults in [[Earth]]'s crust.",
 		sections = {
@@ -355,7 +355,7 @@ return {
 		title = "Coral reef",
 		category = "Geography",
 		fame = 2,
-		emoji = "🪸",
+		emoji = "🐠",
 		tags = { "Marine ecosystems" },
 		aliases = { "Coral reefs", "Coral" },
 		summary = "A **coral reef** is an underwater structure built by colonies of tiny animals called corals. Reefs cover less than 1% of the [[Ocean|ocean]] floor but shelter a quarter of all sea life.",

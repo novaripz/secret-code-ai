@@ -390,7 +390,7 @@ return {
 		title = "Oxygen",
 		category = "Science",
 		fame = 2,
-		emoji = "🫧",
+		emoji = "💧",
 		tags = { "Chemical elements" },
 		summary = "**Oxygen** is a chemical element that makes up about 21% of the air. Animals breathe it and plants release it during [[Photosynthesis|photosynthesis]].",
 		sections = {

@@ -12,6 +12,7 @@ local Kit = require(UI.Kit)
 local Theme = require(UI.Theme)
 local Anim = require(UI.Anim)
 local FlowText = require(script.Parent.FlowText)
+local FunnyCard = require(script.Parent.FunnyCard)
 local Sound = require(UI.Parent.Core.Sound)
 local Store = require(UI.Parent.Core.Store)
 
@@ -627,53 +628,85 @@ function WikiBrowser:_layout()
 	})
 	heading.Position = UDim2.fromOffset(10, iy)
 	iy += 30
-	local imageHeight = narrow and 120 or 160
-	local imageFrame
-	if page.image then
-		imageFrame = Kit.make("ImageLabel", {
-			Image = page.image,
-			ScaleType = Enum.ScaleType.Crop,
-			BackgroundColor3 = categoryInfo.color,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, -20, 0, imageHeight),
-			Position = UDim2.fromOffset(10, iy),
-			Parent = infobox,
-		}, { Kit.corner() })
-	else
-		imageFrame = Kit.make("Frame", {
-			BackgroundColor3 = categoryInfo.color,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, -20, 0, imageHeight),
-			Position = UDim2.fromOffset(10, iy),
-			Parent = infobox,
-		}, { Kit.corner() })
-		local gradient = Instance.new("UIGradient")
-		gradient.Color = ColorSequence.new(categoryInfo.color, categoryInfo.color:Lerp(Color3.new(0, 0, 0), 0.45))
-		gradient.Rotation = 60
-		gradient.Parent = imageFrame
-		Kit.make("TextLabel", {
-			BackgroundTransparency = 1,
-			Text = page.emoji or categoryInfo.emoji,
-			TextScaled = true,
-			Size = UDim2.fromScale(0.5, 0.62),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromScale(0.5, 0.5),
-			Font = Enum.Font.GothamBold,
-			TextColor3 = Color3.new(1, 1, 1),
-			Parent = imageFrame,
-		})
+	-- Picture: the page's uploaded photo (a tile of a sprite atlas) or a generated meme card.
+	-- The little button flips between them; the choice sticks for the session.
+	local imageHeight = narrow and 150 or math.min(infoboxWidth - 20, 230)
+	local imageFrame = Kit.make("Frame", {
+		Name = "Picture",
+		BackgroundColor3 = categoryInfo.color,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, -20, 0, imageHeight),
+		Position = UDim2.fromOffset(10, iy),
+		Parent = infobox,
+	}, { Kit.corner() })
+	local caption
+	local function drawPicture()
+		for _, child in imageFrame:GetChildren() do
+			if not child:IsA("UICorner") then
+				child:Destroy()
+			end
+		end
+		local photo = page.photo
+		local showPhoto = (photo ~= nil or page.image ~= nil) and not WikiBrowser.preferFunny
+		if showPhoto and photo then
+			Kit.make("ImageLabel", {
+				Image = photo.image,
+				ImageRectOffset = Vector2.new(photo.x, photo.y),
+				ImageRectSize = Vector2.new(photo.size, photo.size),
+				ScaleType = Enum.ScaleType.Crop,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1),
+				Parent = imageFrame,
+			}, { Kit.corner() })
+		elseif showPhoto then
+			Kit.make("ImageLabel", {
+				Image = page.image,
+				ScaleType = Enum.ScaleType.Crop,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1),
+				Parent = imageFrame,
+			}, { Kit.corner() })
+		else
+			FunnyCard.render(imageFrame, page)
+		end
+		if photo or page.image then
+			local flip = Instance.new("TextButton")
+			flip.Name = "PictureToggle"
+			flip.AnchorPoint = Vector2.new(1, 0)
+			flip.Position = UDim2.new(1, -6, 0, 6)
+			flip.Size = UDim2.fromOffset(30, 30)
+			flip.BackgroundColor3 = Color3.new(0, 0, 0)
+			flip.BackgroundTransparency = 0.35
+			flip.Text = showPhoto and "🤪" or "📷"
+			flip.TextScaled = true
+			flip.ZIndex = 8
+			flip.Parent = imageFrame
+			Kit.corner().Parent = flip
+			flip.Activated:Connect(function()
+				Sound.play("boing")
+				WikiBrowser.preferFunny = not WikiBrowser.preferFunny
+				drawPicture()
+			end)
+		end
+		if caption then
+			caption.Text = (showPhoto and photo and photo.credit) and ("📷 " .. photo.credit)
+				or (showPhoto and page.category or ("🤪 Meme card · " .. page.category))
+		end
 	end
+	drawPicture()
 	iy += imageHeight + 6
-	local caption = Kit.text({
+	caption = Kit.text({
 		text = page.category,
 		style = "tiny",
 		tone = "textFaint",
 		align = Enum.TextXAlignment.Center,
-		Size = UDim2.new(1, -20, 0, 16),
+		Size = UDim2.new(1, -20, 0, 28),
 		Parent = infobox,
 	})
+	caption.TextWrapped = true
 	caption.Position = UDim2.fromOffset(10, iy)
-	iy += 22
+	drawPicture()
+	iy += 34
 	local labelWidth = math.floor((infoboxWidth - 20) * 0.38)
 	for _, row in page.infobox do
 		local label = Kit.text({
@@ -740,6 +773,15 @@ function WikiBrowser:_layout()
 		for _, runs in section.paragraphs do
 			paragraph(runs)
 		end
+	end
+	if page.source == "wikipedia" then
+		paragraph({
+			{
+				t = 'Text adapted from the Wikipedia article "'
+					.. page.title
+					.. '" (CC BY-SA 4.0) and shortened for Wiki Race. Photos from Wikimedia Commons.',
+			},
+		})
 	end
 	local bottom = math.max(ay, narrow and ay or (y + iy))
 
