@@ -2,8 +2,8 @@
 
 Start on one wiki page. Reach another. Only by clicking links. Beat everyone else.
 
-A complete, UI-only multiplayer Roblox game written entirely in Luau: an ~8,400-page encyclopedia
-(hand-written pages, ~7,700 kid-safe Wikipedia articles and a whole brainrot/meme corner), an in-game wiki browser, server-authoritative races with a hot/cold meter, lobbies,
+A complete, UI-only multiplayer Roblox game written entirely in Luau: an ~11,000-page encyclopedia
+(hand-written pages, ~10,200 kid-safe Wikipedia articles and a whole brainrot/meme corner), an in-game wiki browser, server-authoritative races with a hot/cold meter, lobbies,
 rounds, timers, scoring, a podium ceremony, persistent stats, world records, leaderboards,
 achievements, ranks, cosmetics, game passes, developer products and the **Server Rig** chaos
 button.
@@ -53,7 +53,7 @@ Every page has a picture in its infobox, in the top-right corner like Wikipedia:
 
 - ~730 hand-written pages, 51 **brainrot** pages (Skibidi Toilet, Italian brainrot characters,
   rizz, sigma, aura, 6-7, Roblox hits like Steal a Brainrot and Grow a Garden, famous meme animals,
-  made-up "funny recipes") and ~7,700 imported Wikipedia articles (Level-4 Vital Articles).
+  made-up "funny recipes") and ~10,200 imported Wikipedia articles (Level-4 Vital Articles plus ~2,500 more niche, heavily linked ones: towns, regions, languages, peoples and landmarks around the world). Race targets show a 💡 25-word hint (the first 25 words of the article).
 - **Nothing graphic:** unsafe subject areas (war, crime, medicine/anatomy, sexuality, drugs,
   alcohol, religion-as-scripture, horror…) are excluded; a manual review list removes individual
   titles; every sentence is filtered for violence/adult/drug words; pages that lose too much are

@@ -110,7 +110,18 @@ function Race.new(App)
 		truncate = true,
 		wrap = false,
 		Size = UDim2.new(1, -56, 0, 26),
-		Position = UDim2.fromOffset(50, 24),
+		Position = UDim2.fromOffset(50, 20),
+		Parent = targetCard,
+	})
+	-- 25-word hint (first words of the target article); tap the card to read it all.
+	self.targetHint = Kit.text({
+		text = "",
+		style = "tiny",
+		tone = "textDim",
+		truncate = true,
+		wrap = false,
+		Size = UDim2.new(1, -56, 0, 14),
+		Position = UDim2.fromOffset(50, 42),
 		Parent = targetCard,
 	})
 	Kit.hoverable(targetCard, function()
@@ -415,7 +426,7 @@ function Race:showTargetInfo()
 		build = function(body)
 			Kit.chip(target.category, nil, { Parent = body })
 			Kit.text({
-				text = target.blurb or "",
+				text = "💡 " .. (target.hint or target.blurb or ""),
 				style = "body",
 				tone = "textDim",
 				Size = UDim2.new(1, 0, 0, 0),
@@ -437,6 +448,7 @@ function Race:setTarget(preview)
 	self.round.target = preview
 	self.targetTitle.Text = preview.title
 	self.targetEmoji.Text = preview.emoji or "🎯"
+	self.targetHint.Text = "💡 " .. (preview.hint or "tap for info")
 	Store.rememberTitle(preview.id, preview.title)
 end
 

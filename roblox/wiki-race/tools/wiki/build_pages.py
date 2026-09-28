@@ -12,7 +12,7 @@ from classify import SENTENCE_BLOCK, TITLE_BLOCK
 import emoji_map
 import exclusions
 
-HERE = os.path.dirname(os.path.abspath(__file__))  # working files live next to this script
+HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "src", "wikidata")
 OUT = os.path.join(HERE, "out")
 os.makedirs(OUT, exist_ok=True)
@@ -392,6 +392,11 @@ def luau_str(s):
 
 def main():
     cand = json.load(open(os.path.join(HERE, "candidates.json")))
+    # Extra, more niche pages: the most-linked articles that aren't Vital Articles.
+    extra_path = os.path.join(HERE, "extra_titles.json")
+    if os.path.exists(extra_path):
+        for t in json.load(open(extra_path)):
+            cand.setdefault(t, {"category": "Concept", "top": "Extra", "path": ["More articles"]})
     hand = load_handwritten()
     leads = {}
     redirect_of = {}
@@ -457,6 +462,31 @@ def main():
             print("ERR", t, e, file=sys.stderr)
         if i % 1000 == 0:
             print("converted", i, file=sys.stderr)
+
+    GUESS = [(r"\b(city|town|capital|municipality|village|commune|port)\b", "City"),
+             (r"\b(country|state|province|region|island|river|lake|mountain|sea|desert|county|district)\b", "Geography"),
+             (r"\b(species|genus|family of|animal|bird|fish|mammal|insect)\b", "Animal"),
+             (r"\b(plant|tree|flower|fruit)\b", "Plant"), (r"\b(dish|food|cuisine|sauce|bread|drink)\b", "Food"),
+             (r"\b(company|corporation|brand)\b", "Company"), (r"\b(organi[sz]ation|university|agency)\b", "Organization"),
+             (r"\b(language|dialect)\b", "Concept"), (r"\b(sport|game)\b", "Sport"),
+             (r"\b(novel|book|poem)\b", "Book"), (r"\b(film)\b", "Film"), (r"\b(song|album|music)\b", "Music"),
+             (r"\b(dynasty|empire|kingdom|period)\b", "History"), (r"\b(building|temple|palace|bridge|museum|park)\b", "Landmark"),
+             (r"\b(planet|star|galaxy|moon)\b", "Space"), (r"\b(chemical|element|physics|biology|scientific)\b", "Science"),
+             (r"\b(mathematic\w*|theorem)\b", "Mathematics"), (r"\b(born|singer|actor|writer|politician|scientist|artist|player)\b", "Person")]
+    RELIGION = re.compile(r"\b(religio\w*|buddhis\w*|hindu\w*|judaism|islam\w*|christian\w*|protestant\w*|catholic\w*|orthodox|church|deity|god|goddess|sect|scripture)\b", re.I)
+    for t in list(imported):
+        info = imported[t]["info"]
+        if info.get("top") != "Extra" or t not in converted:
+            continue
+        desc = (converted[t]["description"] or "") + " " + t
+        if RELIGION.search(desc):
+            report["extra religion skip"] += 1
+            del imported[t]
+            continue
+        for pattern, cat in GUESS:
+            if re.search(pattern, desc, re.I):
+                info["category"] = cat
+                break
 
     # Drop imported pages that are mostly blocked or too thin.
     for t in list(imported):

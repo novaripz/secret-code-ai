@@ -17,7 +17,7 @@ return {
 				"Pacino started acting in theater, ranging from underground to off-Broadway and out-of-town productions to [[Broadway theatre|Broadway]]. He won two Tony Awards for Best Featured Actor in a Play for Does a Tiger Wear a Necktie? (1969) and Best Actor in a Play for The Basic Training of Pavlo Hummel (1977). He also played \"Teach\" in Off-Broadway, Broadway, and [[West End theatre|West End]] productions of David Mamet's American Buffalo (1981–1984), starred in multiple productions of [[Oscar Wilde]]'s Salome (1992, 2003, 2006), and earned a third Tony Award nomination for portraying Shylock in The Merchant of Venice (2010), a role he played in the 2004 feature film adaptation. After garnering acclaim for his first lead film role in The Panic in Needle Park (1971), Pacino was cast as Michael Corleone in The Godfather (1972), reprising the role in its two sequels (1974, 1990). He was nominated for Academy Awards for the first two films.",
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Marlon Brando", "Gregory Peck" },
 		infobox = {
 			{ "Born", "25 April 1940" },
 			{ "Birthplace", "New York City, U.S." },
@@ -39,13 +39,13 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Delon achieved critical acclaim for his roles in films such as Women Are Weak (1959), Purple Noon (1960), Rocco and His Brothers (1960), L'Eclisse (1962), The Leopard (1963), Any Number Can Win (1963), The Black Tulip (1964), The Last Adventure (1967), Le Samouraï (1967), The Girl on a Motorcycle (1968), La Piscine (1969), Le Cercle Rouge (1970), Un flic (1972), and Monsieur Klein (1976). Over the course of his career, Delon worked with many directors, including Luchino Visconti, [[Jean-Luc Godard]], Jean-Pierre Melville, [[Michelangelo Antonioni]], Louis Malle, [[Agnès Varda]], and Joseph Losey. Delon received many film and entertainment awards throughout his career. In 1985, he won the César Award for Best Actor for his performance in Notre histoire (1984). In 1991, he became a member of France's Legion of Honour.",
+				"Delon achieved critical acclaim for his roles in films such as Women Are Weak (1959), Purple Noon (1960), Rocco and His Brothers (1960), L'Eclisse (1962), The Leopard (1963), Any Number Can Win (1963), The Black Tulip (1964), The Last Adventure (1967), Le Samouraï (1967), The Girl on a Motorcycle (1968), La Piscine (1969), Le Cercle Rouge (1970), Un flic (1972), and Monsieur Klein (1976). Over the course of his career, Delon worked with many directors, including Luchino Visconti, [[Jean-Luc Godard]], Jean-Pierre Melville, [[Michelangelo Antonioni]], Louis Malle, [[Agnès Varda]], and Joseph Losey. Delon received many film and entertainment awards throughout his career. In 1985, he won the César Award for Best Actor for his performance in Notre histoire (1984). In 1991, he became a member of France's [[Legion of Honour]].",
 			},
 		},
-		related = { "Julie Andrews", "Vivien Leigh" },
+		related = { "Vivien Leigh", "Julie Andrews" },
 		infobox = {
 			{ "Born", "8 November 1935" },
-			{ "Birthplace", "Sceaux, France" },
+			{ "Birthplace", "Sceaux, [[French Third Republic|France]]" },
 			{ "Died", "18 August 2024" },
 			{ "Citizenship", "France, Switzerland" },
 			{ "Occupation", "Actor, film producer, screenwriter, singer, businessman" },
@@ -60,17 +60,17 @@ return {
 		source = "wikipedia",
 		description = "Indian actor (born 1942)",
 		tags = { "Actors", "Asia" },
-		summary = '**Amitabh Bachchan** is an Indian actor, playback singer, and producer who primarily works in Hindi cinema. Widely considered one of the greatest, most accomplished and commercially successful actors in the [[Cinema of India|history of Indian cinema]], he has starred in over 200 films. Bachchan has been called "the Angry Young Man", the Shahenshah of Bollywood, Sadi ke Mahanayak, Bollywood\'s Star of the Millennium, or simply Big B. His dominance in the Indian film industry during the 1970s–80s led the French director [[François Truffaut]] to describe him as a "one-man industry". He is a recipient of several accolades including seven National Film Awards and seventeen Filmfare Awards & one South Filmfare award.',
+		summary = '**Amitabh Bachchan** is an Indian actor, playback singer, and producer who primarily works in Hindi cinema. Widely considered one of the greatest, most accomplished and commercially successful actors in the [[Cinema of India|history of Indian cinema]], he has starred in over 200 films. Bachchan has been called "the Angry Young Man", [[King of Kings|the Shahenshah]] of Bollywood, Sadi ke Mahanayak, Bollywood\'s Star of the Millennium, or simply Big B. His dominance in the Indian film industry during the 1970s–80s led the French director [[François Truffaut]] to describe him as a "one-man industry". He is a recipient of several accolades including seven National Film Awards and seventeen Filmfare Awards & one South Filmfare award.',
 		sections = {
 			{
 				"Overview",
-				'Bachchan was born in [[Prayagraj|Allahabad]] (now Prayagraj), and he was educated at Sherwood College, Nainital, Uttarakhand and Kirori Mal College, University of Delhi. His film career started in 1969 as a voice narrator in Mrinal Sen\'s film Bhuvan Shome and first gained popularity in the early-1970s, with films, such as Anand, Zanjeer, Namak Haraam and Roti Kapda Aur Makaan. He achieved greater stardom in later years, being dubbed as "Angry Young Man" for several of his on-screen roles in Hindi films. He consistently starred in a number of top-grossing Hindi films from the mid-1970s to the 1980s, such as Deewaar, [[Sholay]], Kabhi Kabhie, Hera Pheri, Amar Akbar Anthony, Parvarish, Trishul, Don, Muqaddar Ka Sikandar, Kasme Vaade, Suhaag, Kaala Patthar, Dostana, Naseeb, Lawaaris, Namak Halaal, Khud-Daar, Coolie, Andhaa Kanoon, Sharaabi and Mard.',
+				'Bachchan was born in [[Prayagraj|Allahabad]] (now Prayagraj), and he was educated at Sherwood College, Nainital, [[Uttarakhand]] and Kirori Mal College, University of Delhi. His film career started in 1969 as a voice narrator in Mrinal Sen\'s film Bhuvan Shome and first gained popularity in the early-1970s, with films, such as Anand, Zanjeer, Namak Haraam and Roti Kapda Aur Makaan. He achieved greater stardom in later years, being dubbed as "Angry Young Man" for several of his on-screen roles in Hindi films. He consistently starred in a number of top-grossing Hindi films from the mid-1970s to the 1980s, such as Deewaar, [[Sholay]], Kabhi Kabhie, Hera Pheri, Amar Akbar Anthony, Parvarish, Trishul, Don, Muqaddar Ka Sikandar, Kasme Vaade, Suhaag, Kaala Patthar, Dostana, Naseeb, Lawaaris, Namak Halaal, Khud-Daar, Coolie, Andhaa Kanoon, Sharaabi and Mard.',
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Marlon Brando", "Elizabeth Taylor" },
 		infobox = {
 			{ "Born", "11 October 1942" },
-			{ "Education", "Kirori Mal College, University of Delhi (B.Sc)" },
+			{ "Education", "Kirori Mal College, University of Delhi ([[Bachelor of Science|B.Sc]])" },
 			{ "Occupation", "Actor, film producer, television presenter" },
 			{ "Years active", "1969–present" },
 			{ "Family", "Bachchan family" },
@@ -84,14 +84,14 @@ return {
 		source = "wikipedia",
 		description = "British actress (1929–1993)",
 		tags = { "Europe", "United Kingdom" },
-		summary = "Recognised as a film and fashion icon, she was ranked by the American Film Institute as the third-greatest female screen legend from the Classical Hollywood cinema. She was inducted into the International Best Dressed Hall of Fame and is one of only a few entertainers who have won competitive Academy, Emmy, Grammy and Tony Awards.",
+		summary = "Recognised as a film and fashion icon, she was ranked by the [[American Film Institute]] as the [[AFI's 100 Years...100 Stars|third-greatest female screen legend]] from the [[Classical Hollywood cinema]]. She was inducted into the International Best Dressed Hall of Fame and is one of only a few entertainers who have won competitive Academy, Emmy, Grammy and Tony Awards.",
 		sections = {
 			{
 				"Overview",
-				"Born into an aristocratic family in Ixelles, Brussels, Hepburn spent parts of her childhood in Belgium, the United Kingdom and the Netherlands. She attended boarding school in Kent from 1936 to 1939. Hepburn returned to the Netherlands at the outbreak of the [[World War II|Second World War]]. She studied [[Ballet|ballet]] at the Arnhem Conservatory during the war. By 1944, Hepburn was performing ballet to raise money to support the resistance. She studied with Sonia Gaskell in Amsterdam from 1945 to 1948 and then with Marie Rambert in London. Hepburn began performing as a chorus girl in [[West End theatre|West End]] musicals and later made minor appearances in several films. She rose to stardom in the romantic comedy Roman Holiday (1953) alongside [[Gregory Peck]], for which she became the first actress to win an [[Academy Awards|Academy Award]], a Golden Globe Award and a BAFTA Award for the same performance.",
+				"Born into an aristocratic family in Ixelles, Brussels, Hepburn spent parts of her childhood in Belgium, the United Kingdom and the Netherlands. She attended boarding school in [[Kent]] from 1936 to 1939. Hepburn returned to the Netherlands at the outbreak of the [[World War II|Second World War]]. She studied [[Ballet|ballet]] at the Arnhem Conservatory during the war. By 1944, Hepburn was performing ballet to raise money to support the resistance. She studied with Sonia Gaskell in Amsterdam from 1945 to 1948 and then with Marie Rambert in London. Hepburn began performing as a chorus girl in [[West End theatre|West End]] musicals and later made minor appearances in several films. She rose to stardom in the romantic comedy Roman Holiday (1953) alongside [[Gregory Peck]], for which she became the first actress to win an [[Academy Awards|Academy Award]], a Golden Globe Award and a BAFTA Award for the same performance.",
 			},
 		},
-		related = { "Julie Andrews", "Vivien Leigh" },
+		related = { "Vivien Leigh", "Julie Andrews" },
 		infobox = {
 			{ "Born", "4 May 1929" },
 			{ "Birthplace", "Ixelles, Brussels, Belgium" },
@@ -110,14 +110,14 @@ return {
 		description = "American actress (1908–1989)",
 		tags = { "Actors", "United States" },
 		aliases = { "Ruth Elizabeth", "Bette", "Davis" },
-		summary = '**Ruth Elizabeth** "**Bette**" **Davis** was an American actress of film, television, and theater. Regarded as one of the greatest actresses in Hollywood history, she was noted for her willingness to play unsympathetic, sardonic characters and was known for her performances in a range of film genres, from contemporary crime melodramas to historical and period films and occasional comedies, although her greatest successes were her roles in romantic dramas. She won the Academy Award for Best Actress twice, was the first person to accrue ten Academy Award nominations (and one write-in) for acting, and was the first woman to receive a Lifetime Achievement Award from the American Film Institute.',
+		summary = '**Ruth Elizabeth** "**Bette**" **Davis** was an American actress of film, television, and theater. Regarded as one of the greatest actresses in Hollywood history, she was noted for her willingness to play unsympathetic, sardonic characters and was known for her performances in a range of film genres, from contemporary crime melodramas to historical and period films and occasional comedies, although her greatest successes were her roles in romantic dramas. She won the Academy Award for Best Actress twice, was the first person to accrue ten Academy Award nominations (and one write-in) for acting, and was the first woman to receive a Lifetime Achievement Award from the [[American Film Institute]].',
 		sections = {
 			{
 				"Overview",
-				"After appearing in [[Broadway theatre|Broadway]] plays, Davis moved to Hollywood in 1930, but her early films for Universal Studios were unsuccessful. She joined Warner Bros. in 1932 and had her critical breakthrough playing a vulgar waitress in Of Human Bondage (1934). Contentiously, she was not among the three nominees for the Academy Award for Best Actress that year, and she won it the following year for her performance in Dangerous (1935). In 1936, due to poor film offers, she attempted to free herself from her contract, and although she lost a well-publicized legal case, it marked the beginning of the most successful period of her career. Until the late 1940s, she was one of American cinema's most celebrated leading ladies.",
+				"After appearing in [[Broadway theatre|Broadway]] plays, Davis moved to [[Hollywood, Los Angeles|Hollywood]] in 1930, but her early films for [[Universal Pictures|Universal Studios]] were unsuccessful. She joined Warner Bros. in 1932 and had her critical breakthrough playing a vulgar waitress in Of Human Bondage (1934). Contentiously, she was not among the three nominees for the Academy Award for Best Actress that year, and she won it the following year for her performance in Dangerous (1935). In 1936, due to poor film offers, she attempted to free herself from her contract, and although she lost a well-publicized legal case, it marked the beginning of the most successful period of her career. Until the late 1940s, she was one of American cinema's most celebrated leading ladies.",
 			},
 		},
-		related = { "Isadora Duncan", "Clint Eastwood" },
+		related = { "Marlon Brando", "Gregory Peck" },
 		infobox = {
 			{ "Born", "5 April 1908" },
 			{ "Birthplace", "Lowell, Massachusetts, U.S." },
@@ -129,37 +129,23 @@ return {
 	{
 		title = "Bob Fosse",
 		category = "Actor",
-		fame = 1,
+		fame = 3,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "American choreographer, dancer, and director (1927–1987)",
 		tags = { "Dancers and choreographers", "Other dance" },
 		aliases = { "Robert Louis Fosse" },
-		summary = "**Robert Louis Fosse** was an American choreographer, dancer, actor, filmmaker, and stage director. He is known for his work on stage and screen, and was arguably the most influential figure in the field of [[Jazz dance|jazz dance]] in the twentieth century. He received numerous accolades including an Academy Award, a BAFTA Award, three Primetime Emmy Awards, nine Tony Awards, and the Palme d'Or.",
+		summary = "**Robert Louis Fosse** was an American choreographer, dancer, actor, filmmaker, and stage director. He is known for his work on stage and screen, and was arguably the most influential figure in the field of [[Jazz dance|jazz dance]] in the twentieth century. He received numerous accolades including an Academy Award, a BAFTA Award, three Primetime Emmy Awards, nine Tony Awards, and the [[Palme d'Or]].",
 		sections = {
 			{
 				"Overview",
 				"His career began as an actor in the musical productions Call Me Mister (1947), Billion Dollar Baby (1951), and Pal Joey (1952). He transitioned into directing and choreographing musical works, winning Tony Awards for choreographing The Pajama Game (1954), Damn Yankees (1955), Redhead (1959), Little Me (1963), Sweet Charity (1966), Pippin (1972), Dancin' (1978), and Big Deal (1986), and for directing Pippin. He worked on Bells Are Ringing (1956), New Girl in Town (1958), How to Succeed in Business Without Really Trying (1961), and Chicago (1975). In film, he played Hortensio in the MGM musical Kiss Me Kate (1953) and his directorial debut was in the musical Sweet Charity (1969). He won the Academy Award for Best Director for the musical drama Cabaret (1972).",
 			},
 		},
-		related = {
-			"Al Pacino",
-			"Cary Grant",
-			"Fred Astaire",
-			"Ginger Rogers",
-			"Humphrey Bogart",
-			"Jackie Chan",
-			"Josephine Baker",
-			"Lillian Gish",
-			"Marlene Dietrich",
-			"Martha Graham",
-			"Robert De Niro",
-			"Setsuko Hara",
-			"Sidney Poitier",
-		},
+		related = { "Josephine Baker" },
 		infobox = {
 			{ "Born", "23 June 1927" },
-			{ "Birthplace", "[[Chicago]], Illinois, U.S." },
+			{ "Birthplace", "[[Chicago]], [[Illinois]], U.S." },
 			{ "Died", "23 September 1987" },
 			{ "Occupation", "Choreographer, dancer, director, filmmaker, actor" },
 			{ "Years active", "1947–1987" },
@@ -173,14 +159,14 @@ return {
 		source = "wikipedia",
 		description = "British-American actor (1904–1986)",
 		tags = { "Actors", "United States" },
-		summary = "**Cary Grant** was an English-American actor. Known for his blended British and American accent, debonair demeanor, lighthearted approach to acting, and sense of comic timing, he was one of classic Hollywood's definitive leading men. He was named the second-greatest male star of the Golden Age of Hollywood by the American Film Institute in 1999.",
+		summary = "**Cary Grant** was an English-American actor. Known for his blended British and American accent, debonair demeanor, lighthearted approach to acting, and sense of comic timing, he was one of classic Hollywood's definitive leading men. He was named the [[AFI's 100 Years...100 Stars|second-greatest male star]] of the Golden Age of Hollywood by the [[American Film Institute]] in 1999.",
 		sections = {
 			{
 				"Overview",
-				"He became attracted to theatre at a young age when he visited the Bristol Hippodrome. At 16, he went as a stage performer with the Pender Troupe for a tour of the United States. After a series of successful performances in New York City, he decided to stay there. He established a name for himself in vaudeville in the 1920s and toured the United States before moving to Hollywood in the early 1930s. Grant initially appeared in crime films and dramas, such as Blonde Venus (1932) and She Done Him Wrong (1933), but later gained renown for his performances in romantic screwball comedies such as The Awful Truth (1937), Bringing Up Baby (1938), His Girl Friday (1940), and The Philadelphia Story (1940). These pictures are frequently cited among the greatest comedy films of all time.",
+				"He became attracted to theatre at a young age when he visited the Bristol Hippodrome. At 16, he went as a stage performer with the Pender Troupe for a tour of the United States. After a series of successful performances in New York City, he decided to stay there. He established a name for himself in [[Vaudeville|vaudeville]] in the 1920s and toured the United States before moving to Hollywood in the early 1930s. Grant initially appeared in crime films and dramas, such as Blonde Venus (1932) and She Done Him Wrong (1933), but later gained renown for his performances in romantic screwball comedies such as The Awful Truth (1937), Bringing Up Baby (1938), His Girl Friday (1940), and The Philadelphia Story (1940). These pictures are frequently cited among the greatest comedy films of all time.",
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Al Pacino", "James Stewart", "Meryl Streep", "Toshiro Mifune" },
 		infobox = {
 			{ "Born", "18 January 1904" },
 			{ "Birthplace", "Horfield, Bristol, England" },
@@ -198,14 +184,14 @@ return {
 		description = "American actor (1901–1960)",
 		tags = { "Actors", "United States" },
 		aliases = { "William Clark Gable", "King of Hollywood" },
-		summary = '**William Clark Gable** (February 1, 1901 – November 16, 1960) was an American actor often referred to as the "**King of Hollywood**". He appeared in more than 60 motion pictures across a variety of genres during a 37-year career, three decades of which he spent as a leading man. In 1999, the American Film Institute ranked Gable as the seventh-greatest male screen legend of classical Hollywood cinema.',
+		summary = '**William Clark Gable** (February 1, 1901 – November 16, 1960) was an American actor often referred to as the "**King of Hollywood**". He appeared in more than 60 motion pictures across a variety of [[Film genre|genres]] during a 37-year career, three decades of which he spent as a leading man. In 1999, the [[American Film Institute]] ranked Gable as the [[AFI\'s 100 Years...100 Stars|seventh-greatest male screen legend]] of [[Classical Hollywood cinema|classical Hollywood cinema]].',
 		sections = {
 			{
 				"Overview",
 				"Gable won the Academy Award for Best Actor for his role in [[Frank Capra]]'s It Happened One Night (1934) and earned nominations in the same category for portraying Fletcher Christian in Frank Lloyd's Mutiny on the Bounty (1935) and Rhett Butler in Victor Fleming's [[Gone with the Wind (film)|Gone with the Wind]] (1939). For his comedic performances in George Seaton's Teacher's Pet (1958) and Walter Lang's But Not for Me (1959), Gable received nominations for the Golden Globe Award for Best Actor in a Motion Picture – Musical or Comedy. His other notable films include William A. Wellman's Call of the Wild (1935), George Sidney's Key to the City (1950), and [[John Ford]]'s Mogambo (1953). His final onscreen role was as an aging cowboy in John Huston's The Misfits (1961).",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Marlon Brando", "Gregory Peck" },
 		infobox = {
 			{ "Born", "1 February 1901" },
 			{ "Birthplace", "Cadiz, Ohio, U.S." },
@@ -217,34 +203,20 @@ return {
 	{
 		title = "Clint Eastwood",
 		category = "Actor",
-		fame = 1,
+		fame = 3,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "American actor and filmmaker (born 1930)",
 		tags = { "Actors", "United States" },
 		aliases = { "Clinton Eastwood Jr." },
-		summary = '**Clinton Eastwood Jr.** is an American retired actor and filmmaker. After achieving success in the [[Western (genre)|Western]] TV series Rawhide, Eastwood rose to international fame with his role as the "Man with No Name" in Sergio Leone\'s Dollars Trilogy of spaghetti Westerns during the mid-1960s and as antihero cop Harry Callahan in the five Dirty Harry films throughout the 1970s and 1980s. These roles, among others, have made Eastwood an enduring cultural icon of masculinity. Elected in 1986, Eastwood served for two years as the mayor of Carmel-by-the-Sea, California.',
+		summary = '**Clinton Eastwood Jr.** is an American retired actor and filmmaker. After achieving success in the [[Western (genre)|Western]] TV series Rawhide, Eastwood rose to international fame with his role as the "Man with No Name" in Sergio Leone\'s Dollars Trilogy of spaghetti Westerns during the mid-1960s and as antihero cop Harry Callahan in the five Dirty Harry films throughout the 1970s and 1980s. These roles, among others, have made Eastwood an enduring [[Cultural icon|cultural icon]] of masculinity. Elected in 1986, Eastwood served for two years as the mayor of Carmel-by-the-Sea, California.',
 		sections = {
 			{
 				"Overview",
 				"Eastwood's greatest commercial successes are the adventure comedy Every Which Way but Loose (1978) and its action comedy sequel Any Which Way You Can (1980). Other popular Eastwood films include the Westerns Hang 'Em High (1968), The Outlaw Josey Wales (1976) and Pale Rider (1985), the action-war film Where Eagles Dare (1968), the prison film Escape from Alcatraz (1979), the war film Heartbreak Ridge (1986), the action film In the Line of Fire (1993), and the romantic drama The Bridges of Madison County (1995). More recent works include Gran Torino (2008), The Mule (2018), and Cry Macho (2021). Since 1967, Eastwood's company Malpaso Productions has produced all but four of his American films. An Academy Award nominee for Best Actor, Eastwood won Best Director and Best Picture for his Western film Unforgiven (1992) and his sports drama Million Dollar Baby (2004).",
 			},
 		},
-		related = {
-			"Bette Davis",
-			"Elizabeth Taylor",
-			"Gregory Peck",
-			"Greta Garbo",
-			"Jack Nicholson",
-			"John Wayne",
-			"Katharine Hepburn",
-			"Marcello Mastroianni",
-			"Mary Pickford",
-			"Rajinikanth",
-			"Rudolph Valentino",
-			"Shirley Temple",
-			"Toshiro Mifune",
-		},
+		related = { "Clark Gable", "John Wayne", "Rajinikanth" },
 		infobox = {
 			{ "Born", "31 May 1930" },
 			{ "Birthplace", "[[San Francisco]], California, U.S." },
@@ -255,20 +227,20 @@ return {
 	{
 		title = "Elizabeth Taylor",
 		category = "Actor",
-		fame = 3,
+		fame = 2,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "British and American actress (1932–2011)",
 		tags = { "Actors", "United States" },
 		aliases = { "Dame Elizabeth Rosemond Taylor" },
-		summary = "**Dame Elizabeth Rosemond Taylor** (February 27, 1932 – March 23, 2011) was a British and American actress. She began her career as a child actress in the early 1940s and was one of the most popular stars of classical Hollywood cinema in the 1950s. She then became the world's highest-paid movie star in the 1960s, remaining a well-known public figure for the rest of her life. In 1999, the American Film Institute ranked her seventh on its list of the greatest female screen legends.",
+		summary = "**Dame Elizabeth Rosemond Taylor** (February 27, 1932 – March 23, 2011) was a British and American actress. She began her career as a child actress in the early 1940s and was one of the most popular stars of [[Classical Hollywood cinema|classical Hollywood cinema]] in the 1950s. She then became the world's highest-paid movie star in the 1960s, remaining a well-known public figure for the rest of her life. In 1999, the [[American Film Institute]] ranked her seventh on its list of the [[AFI's 100 Years...100 Stars|greatest female screen legends]].",
 		sections = {
 			{
 				"Overview",
-				"Born in London to socially prominent American parents, Taylor moved with her family to Los Angeles in 1939 at the age of seven. She made her acting debut with a minor role in the Universal Pictures film There's One Born Every Minute (1942), but the studio ended her contract after a year. She was then signed by MGM and became a popular teen star after appearing in National Velvet (1944). She transitioned to mature roles in the 1950s, starring in the comedy Father of the Bride (1950) and receiving critical acclaim for her performance in the drama A Place in the Sun (1951). One of MGM's most bankable stars, she starred in the historical adventure epic Ivanhoe (1952) with Robert Taylor and Joan Fontaine. Taylor resented the studio's control and many casting choices. Taylor wished to end her career in the early 1950s but began receiving more enjoyable roles. The epic drama Giant (1956) followed.",
+				"Born in London to socially prominent American parents, Taylor moved with her family to Los Angeles in 1939 at the age of seven. She made her acting debut with a minor role in the [[Universal Pictures]] film There's One Born Every Minute (1942), but the studio ended her contract after a year. She was then signed by [[Metro-Goldwyn-Mayer|MGM]] and became a popular teen star after appearing in National Velvet (1944). She transitioned to mature roles in the 1950s, starring in the comedy Father of the Bride (1950) and receiving critical acclaim for her performance in the drama A Place in the Sun (1951). One of MGM's most bankable stars, she starred in the historical adventure epic Ivanhoe (1952) with Robert Taylor and Joan Fontaine. Taylor resented the studio's control and many casting choices. Taylor wished to end her career in the early 1950s but began receiving more enjoyable roles. The epic drama Giant (1956) followed.",
 			},
 		},
-		related = { "Isadora Duncan", "Clint Eastwood" },
+		related = { "Amitabh Bachchan", "Jack Nicholson", "Lillian Gish", "Robert De Niro" },
 		infobox = {
 			{ "Born", "27 February 1932" },
 			{ "Birthplace", "London, England" },
@@ -281,7 +253,7 @@ return {
 	{
 		title = "Fred Astaire",
 		category = "Actor",
-		fame = 2,
+		fame = 3,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "American dancer and actor (1899–1987)",
@@ -290,10 +262,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				'As a dancer, he drew influences from many sources, including tap, classical dance, and the elevated style of Vernon and Irene Castle. His trademark style greatly influenced the American Smooth style of [[Ballroom dance|ballroom dance]]. He called his eclectic approach "outlaw style", a following of an unpredictable and instinctive muse. Astaire had a long dancing partnership with [[Ginger Rogers]], with whom he co-starred in ten Hollywood musicals during the classic age of Hollywood cinema, including Top Hat (1935), Swing Time (1936), and Shall We Dance (1937). Astaire\'s fame grew in films like Holiday Inn (1942), Easter Parade (1948), The Band Wagon (1953), Funny Face (1957), and Silk Stockings (1957).',
+				'As a dancer, he drew influences from many sources, including tap, classical dance, and the elevated style of Vernon and Irene Castle. His trademark style greatly influenced the American Smooth style of [[Ballroom dance|ballroom dance]]. He called his eclectic approach "outlaw style", a following of an unpredictable and instinctive muse. Astaire had a long dancing partnership with [[Ginger Rogers]], with whom he co-starred in ten Hollywood musicals during the [[Classical Hollywood cinema|classic age of Hollywood cinema]], including Top Hat (1935), Swing Time (1936), and Shall We Dance (1937). Astaire\'s fame grew in films like Holiday Inn (1942), Easter Parade (1948), The Band Wagon (1953), Funny Face (1957), and Silk Stockings (1957).',
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Martha Graham" },
 		infobox = {
 			{ "Born", "10 May 1899" },
 			{ "Birthplace", "Omaha, Nebraska, U.S." },
@@ -315,10 +287,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Born in Latrobe, Pennsylvania, Rogers earned a bachelor's degree in music from Rollins College in 1951. He began his television career at [[NBC]] in [[New York City]], returning to [[Pittsburgh]] in 1953 to work for children's programming at NET (later PBS) television station WQED. He graduated from Pittsburgh Theological Seminary with a bachelor's degree in divinity in 1962 and became a Presbyterian minister in 1963. He attended the University of Pittsburgh's Graduate School of Child Development, where he began his thirty-year collaboration with child psychologist Margaret McFarland. He also helped develop the children's shows The Children's Corner (1955) for WQED in Pittsburgh and Misterogers (1963) in Canada for the Canadian Broadcasting Corporation. In 1968, he returned to Pittsburgh and adapted the format of his Canadian series to create Mister Rogers' Neighborhood.",
+				"Born in Latrobe, Pennsylvania, Rogers earned a bachelor's degree in music from Rollins College in 1951. He began his television career at [[NBC]] in [[New York City]], returning to [[Pittsburgh]] in 1953 to work for children's programming at NET (later [[PBS]]) television station WQED. He graduated from Pittsburgh Theological Seminary with a bachelor's degree in divinity in 1962 and became a Presbyterian minister in 1963. He attended the [[University of Pittsburgh]]'s Graduate School of Child Development, where he began his thirty-year collaboration with child psychologist Margaret McFarland. He also helped develop the children's shows The Children's Corner (1955) for WQED in Pittsburgh and Misterogers (1963) in Canada for the Canadian Broadcasting Corporation. In 1968, he returned to Pittsburgh and adapted the format of his Canadian series to create Mister Rogers' Neighborhood.",
 			},
 		},
-		related = { "Theodor W. Adorno", "Émile Durkheim" },
+		related = { "Theodor W. Adorno", "Karl Marx" },
 		infobox = {
 			{ "Born", "20 March 1928" },
 			{ "Birthplace", "Latrobe, Pennsylvania, U.S." },
@@ -337,20 +309,20 @@ return {
 		description = "American actor, dancer, singer and director (1912–1996)",
 		tags = { "Dancers and choreographers", "Other dance" },
 		aliases = { "Eugene Curran Kelly" },
-		summary = '**Eugene Curran Kelly** (August 23, 1912 – February 2, 1996) was an American dancer, actor, singer, director and choreographer. He was known for his energetic and athletic dancing style. Kelly sought to create a new form of American dance accessible to the general public, which he called "dance for the common man". He starred in, choreographed, and, with Stanley Donen, co-directed some of the best-regarded musical films of the 1940s and 1950s.',
+		summary = '**Eugene Curran Kelly** (August 23, 1912 – February 2, 1996) was an American dancer, actor, singer, director and choreographer. He was known for his energetic and athletic dancing style. Kelly sought to create a new form of American dance accessible to the general public, which he called "dance for the common man". He starred in, choreographed, and, with Stanley Donen, co-directed some of the best-regarded [[Musical film|musical films]] of the 1940s and 1950s.',
 		sections = {
 			{
 				"Overview",
 				"Kelly is best known for his performances in An American in Paris (1951), which won the Academy Award for Best Picture and [[Singin' in the Rain]] (1952), which he and Donen directed and choreographed. He received a nomination for the Academy Award for Best Actor for his role as Joseph \"Joe\" Bradley\" in Anchors Aweigh (1945). Kelly's director debut was On the Town (1949), which he co-directed with Donen and also played the lead role. Later in the 1950s, as musicals waned in popularity, he starred in Brigadoon (1954) and It's Always Fair Weather (1955), the last film he directed with Donen. His solo directorial debut was Invitation to the Dance (1956), one of the last MGM musicals, which was a commercial failure. Kelly made his film debut in For Me and My Gal (1942) with [[Judy Garland]], with whom he also appeared in The Pirate (1948) and Summer Stock (1950).",
 			},
 		},
-		related = { "Isadora Duncan", "Izumo no Okuni" },
+		related = { "Ginger Rogers", "Isadora Duncan" },
 		infobox = {
 			{ "Born", "23 August 1912" },
 			{ "Birthplace", "[[Pittsburgh]], Pennsylvania, U.S." },
 			{ "Died", "2 February 1996" },
 			{ "Citizenship", "American (Irish citizenship granted late in life)" },
-			{ "Education", "University of Pittsburgh" },
+			{ "Education", "[[University of Pittsburgh]]" },
 			{ "Occupation", "Dancer, actor, singer, director, choreographer" },
 			{ "Years active", "1931–1994" },
 		},
@@ -387,14 +359,14 @@ return {
 		source = "wikipedia",
 		description = "American actress, singer, and dancer (1911–1995)",
 		tags = { "Dancers and choreographers", "Other dance" },
-		summary = "**Ginger Rogers** was an American actress, dancer, and singer during the Golden Age of Hollywood. She won an Academy Award for Best Actress for her starring role in Kitty Foyle (1940), and performed during the 1930s in RKO's musical films with [[Fred Astaire]]. Her career continued on stage, radio, and television throughout much of the 20th century.",
+		summary = "**Ginger Rogers** was an American actress, dancer, and singer during the [[Classical Hollywood cinema|Golden Age]] of Hollywood. She won an Academy Award for Best Actress for her starring role in Kitty Foyle (1940), and performed during the 1930s in RKO's [[Musical film|musical films]] with [[Fred Astaire]]. Her career continued on stage, radio, and television throughout much of the 20th century.",
 		sections = {
 			{
 				"Overview",
-				"Rogers was born in Independence, Missouri, and raised in Kansas City. She and her family moved to Fort Worth, Texas, when she was nine years old. In 1925, she won a Charleston dance contest that helped her launch a successful vaudeville career. After that, she gained recognition as a [[Broadway theatre|Broadway]] actress for her stage debut in Girl Crazy. This led to a contract with Paramount Pictures, which ended after five films. Rogers had her first successful film roles as a supporting actress in 42nd Street (1933) and Gold Diggers of 1933 (1933). In the 1930s, Rogers's nine films with Fred Astaire are credited with revolutionizing the musical genre and gave RKO Pictures some of its biggest successes: The Gay Divorcee (1934), Top Hat (1935) and Swing Time (1936). But after two commercial failures with Astaire, she turned her focus to dramatic and comedy films.",
+				"Rogers was born in Independence, Missouri, and raised in Kansas City. She and her family moved to Fort Worth, Texas, when she was nine years old. In 1925, she won a Charleston dance contest that helped her launch a successful [[Vaudeville|vaudeville]] career. After that, she gained recognition as a [[Broadway theatre|Broadway]] actress for her stage debut in Girl Crazy. This led to a contract with [[Paramount Pictures]], which ended after five films. Rogers had her first successful film roles as a supporting actress in 42nd Street (1933) and Gold Diggers of 1933 (1933). In the 1930s, Rogers's nine films with Fred Astaire are credited with revolutionizing the musical genre and gave [[RKO Pictures]] some of its biggest successes: The Gay Divorcee (1934), Top Hat (1935) and Swing Time (1936). But after two commercial failures with Astaire, she turned her focus to dramatic and comedy films.",
 			},
 		},
-		related = { "Isadora Duncan", "Izumo no Okuni" },
+		related = { "Gene Kelly", "Martha Graham" },
 		infobox = {
 			{ "Born", "16 July 1911" },
 			{ "Birthplace", "Independence, Missouri, U.S." },
@@ -407,20 +379,20 @@ return {
 	{
 		title = "Gregory Peck",
 		category = "Actor",
-		fame = 2,
+		fame = 1,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "American actor (1916–2003)",
 		tags = { "Actors", "United States" },
 		aliases = { "Eldred Gregory Peck" },
-		summary = "**Eldred Gregory Peck** (April 5, 1916 – June 12, 2003) was an American actor. He was one of the most popular film stars from the 1940s to the 1970s. In 1999, the American Film Institute named Peck the 12th-greatest male star of Classic Hollywood Cinema.",
+		summary = "**Eldred Gregory Peck** (April 5, 1916 – June 12, 2003) was an American actor. He was one of the most popular film stars from the 1940s to the 1970s. In 1999, the [[American Film Institute]] named Peck the [[AFI's 100 Years...100 Stars|12th-greatest male star of Classic Hollywood Cinema]].",
 		sections = {
 			{
 				"Overview",
 				"After studying at the Neighborhood Playhouse with Sanford Meisner, Peck began appearing in stage productions, acting in more than 50 plays and three [[Broadway theatre|Broadway]] productions. He first gained critical success in The Keys of the Kingdom (1944), a John M. Stahl–directed drama that earned him his first Academy Award nomination. He starred in a series of successful films, including romantic-drama The Valley of Decision (1945), [[Alfred Hitchcock]]'s Spellbound (1945) and family film The Yearling (1946). He encountered lukewarm commercial reviews at the end of the 1940s, his performances including The Paradine Case (1947) and The Great Sinner (1948). Peck reached global recognition in the 1950s and 1960s, appearing back-to-back in the book-to-film adaptation of Captain Horatio Hornblower (1951) and biblical drama David and Bathsheba (1951).",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Bette Davis", "Jackie Chan", "Mary Pickford", "Setsuko Hara" },
 		infobox = {
 			{ "Born", "5 April 1916" },
 			{ "Birthplace", "[[San Diego]], California, U.S." },
@@ -438,14 +410,14 @@ return {
 		source = "wikipedia",
 		description = "Swedish and American actress (1905–1990)",
 		tags = { "Actors", "Europe" },
-		summary = "**Greta Garbo** was a Swedish and American film actress. She was a leading star during Hollywood's [[Silent film|silent]] and early golden eras. Regarded as one of the greatest screen actresses of all time, she is known for her melancholic and somber screen persona, her film portrayals of [[Tragedy|tragic]] characters, and her subtle and understated performances. In 1999, the American Film Institute ranked Garbo fifth on its list of the greatest female stars of classic Hollywood cinema.",
+		summary = "**Greta Garbo** was a Swedish and American film actress. She was a leading star during Hollywood's [[Silent film|silent]] and early [[Classical Hollywood cinema|golden eras]]. Regarded as one of the greatest screen actresses of all time, she is known for her melancholic and somber screen persona, her film portrayals of [[Tragedy|tragic]] characters, and her subtle and understated performances. In 1999, the [[American Film Institute]] ranked Garbo fifth on its list of the [[AFI's 100 Years...100 Stars|greatest female stars of classic Hollywood cinema]].",
 		sections = {
 			{
 				"Overview",
-				"Garbo launched her career with a supporting role in the 1924 Swedish film The Saga of Gösta Berling. Her performance caught the attention of [[Louis B. Mayer]], chief executive of Metro-Goldwyn-Mayer (MGM), who brought her to Hollywood in 1925. She stirred interest with her first American silent film, Torrent (1926). Garbo's performance in Flesh and the Devil (1926), her third movie in the United States, made her an international star. In 1928, Garbo starred in A Woman of Affairs, which catapulted her to MGM's highest box-office star, surpassing the long-reigning [[Lillian Gish]]. Other well-known Garbo films from the silent era are The Mysterious Lady (1928), The Single Standard (1929), and The Kiss (1929).",
+				"Garbo launched her career with a supporting role in the 1924 Swedish film The Saga of Gösta Berling. Her performance caught the attention of [[Louis B. Mayer]], chief executive of [[Metro-Goldwyn-Mayer]] (MGM), who brought her to Hollywood in 1925. She stirred interest with her first American silent film, Torrent (1926). Garbo's performance in Flesh and the Devil (1926), her third movie in the United States, made her an international star. In 1928, Garbo starred in A Woman of Affairs, which catapulted her to MGM's highest box-office star, surpassing the long-reigning [[Lillian Gish]]. Other well-known Garbo films from the silent era are The Mysterious Lady (1928), The Single Standard (1929), and The Kiss (1929).",
 			},
 		},
-		related = { "Isadora Duncan", "Clint Eastwood" },
+		related = { "Ingrid Bergman", "Sophia Loren" },
 		infobox = {
 			{ "Born", "18 September 1905" },
 			{ "Birthplace", "Södermalm, Stockholm, Sweden" },
@@ -469,10 +441,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				'Houdini first attracted notice in vaudeville in the United States and then as Harry "Handcuff" Houdini on a tour of Europe, where he challenged police forces to keep him locked up. Soon he extended his repertoire to include chains, ropes slung from skyscrapers, straitjackets under water, and having to escape from and hold his breath inside a sealed milk can with water in it. In 1904, thousands watched as Houdini tried to escape from special handcuffs commissioned by London\'s Daily Mirror, keeping them in suspense for an hour. Another stunt saw him buried alive and only just able to claw himself to the surface, emerging in a state of near-breakdown. While many suspected that these escapes were faked, Houdini presented himself as the scourge of fake spiritualists, pursuing a personal crusade to expose their fraudulent methods.',
+				'Houdini first attracted notice in [[Vaudeville|vaudeville]] in the United States and then as Harry "Handcuff" Houdini on a tour of Europe, where he challenged police forces to keep him locked up. Soon he extended his repertoire to include chains, ropes slung from skyscrapers, straitjackets under water, and having to escape from and hold his breath inside a sealed milk can with water in it. In 1904, thousands watched as Houdini tried to escape from special handcuffs commissioned by London\'s Daily Mirror, keeping them in suspense for an hour. Another stunt saw him buried alive and only just able to claw himself to the surface, emerging in a state of near-breakdown. While many suspected that these escapes were faked, Houdini presented himself as the scourge of fake spiritualists, pursuing a personal crusade to expose their fraudulent methods.',
 			},
 		},
-		related = { "Django Reinhardt", "Laurel and Hardy" },
+		related = { "Hiroshige", "Samuel Goldwyn" },
 		infobox = {
 			{ "Born", "24 March 1874" },
 			{ "Birthplace", "[[Budapest]], Austria-Hungary" },
@@ -490,14 +462,14 @@ return {
 		description = "American actor (1899–1957)",
 		tags = { "Actors", "United States" },
 		aliases = { "Humphrey DeForest Bogart", "Bogie" },
-		summary = "**Humphrey DeForest Bogart**, nicknamed **Bogie**, was an American actor. Often known for his leading roles as both gangsters and detectives in film noirs, his performances in classic Hollywood cinema made him an American cultural icon. He won an Academy Award and was honored with a star on the Hollywood Walk of Fame in 1960.",
+		summary = "**Humphrey DeForest Bogart**, nicknamed **Bogie**, was an American actor. Often known for his leading roles as both gangsters and detectives in film noirs, his performances in classic Hollywood cinema made him an American [[Cultural icon|cultural icon]]. He won an Academy Award and was honored with a star on the [[Hollywood Walk of Fame]] in 1960.",
 		sections = {
 			{
 				"Overview",
 				"Bogart started his career on stage, and made his Broadway debut in 1922. He acted in 16 plays where he often took in supporting roles, regularly portraying gangsters, and was praised for his work in the play The Petrified Forest (1936). He made his feature film debut the pre-code film A Devil with Women (1930) and took early roles in the dramas Dead End (1937), Angels with Dirty Faces (1938) and Dark Victory (1939). His rose to stardom in 1941 taking leading roles in two film noirs playing a career criminal High Sierra and Sam Spade in The Maltese Falcon. He went on to win the Academy Award for Best Actor for his portrayal of a rough steamboat captain in the adventure film The African Queen (1951). He was Oscar-nominated for playing a nightclub owner in the romantic drama [[Casablanca (film)|Casablanca]] (1942) and as a unstable captain in the military drama The Caine Mutiny (1954).",
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Amitabh Bachchan", "Jackie Chan", "Lillian Gish", "Setsuko Hara" },
 		infobox = {
 			{ "Born", "25 December 1899" },
 			{ "Birthplace", "[[New York City]], U.S." },
@@ -521,7 +493,7 @@ return {
 				"Born in Stockholm to a Swedish father and German mother, Bergman began her acting career in Swedish and German films. Her introduction to the U.S. audience came in the English-language remake of Intermezzo (1939). Known for her naturally luminous beauty, she starred in [[Casablanca (film)|Casablanca]] (1942) as Ilsa Lund. Bergman's notable performances in the 1940s include the dramas For Whom the Bell Tolls (1943), Gaslight (1944), The Bells of St. Mary's (1945), and Joan of Arc (1948), all of which earned her nominations for the Academy Award for Best Actress; she won for Gaslight. She made three films with [[Alfred Hitchcock]]: Spellbound (1945), Notorious (1946), and Under Capricorn (1949).",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Greta Garbo", "Madhubala", "Marcello Mastroianni", "Marlene Dietrich", "Rudolph Valentino" },
 		infobox = {
 			{ "Born", "29 August 1915" },
 			{ "Birthplace", "[[Stockholm]], Sweden" },
@@ -533,28 +505,14 @@ return {
 	{
 		title = "Isadora Duncan",
 		category = "Actor",
-		fame = 1,
+		fame = 2,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "American dancer and choreographer (1877–1927)",
 		tags = { "Dancers and choreographers", "Other dance" },
 		aliases = { "Angela Isadora Duncan" },
 		summary = "**Angela Isadora Duncan** (May 26, 1877, or May 27, 1878 – September 14, 1927) was an American-born dancer and choreographer, who was a pioneer of modern contemporary dance and performed to great acclaim throughout Europe and the United States. Born and raised in California, she lived and danced in Western Europe, the U.S., and Soviet Russia from the age of 22. She died when her scarf became entangled in the wheel and axle of the car in which she was travelling in [[Nice]], France.",
-		related = {
-			"Al Pacino",
-			"Cary Grant",
-			"Fred Astaire",
-			"Gene Kelly",
-			"Humphrey Bogart",
-			"Jackie Chan",
-			"Josephine Baker",
-			"Lillian Gish",
-			"Marlene Dietrich",
-			"Martha Graham",
-			"Rajinikanth",
-			"Rudolph Valentino",
-			"Sidney Poitier",
-		},
+		related = { "Josephine Baker" },
 		infobox = {
 			{ "Born", "26 May 1877" },
 			{ "Birthplace", "[[San Francisco]], California, U.S." },
@@ -567,7 +525,7 @@ return {
 	{
 		title = "Izumo no Okuni",
 		category = "Actor",
-		fame = 2,
+		fame = 3,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "Creator of kabuki theatre",
@@ -579,21 +537,7 @@ return {
 				"Few concrete details are known about her life; born near Izumo Province, Okuni worked as a miko for several years at the Izumo Grand Shrine until gaining popularity for her dramatised dance performances, which onlookers gave the name of kabuki. Okuni continued to perform kabuki with her theatrical troupe until her retirement and disappearance sometime around 1610. She is believed to have died sometime around 1613.",
 			},
 		},
-		related = {
-			"Amitabh Bachchan",
-			"Clark Gable",
-			"Gene Kelly",
-			"Ginger Rogers",
-			"Ingrid Bergman",
-			"James Stewart",
-			"Judy Garland",
-			"Madhubala",
-			"Marlon Brando",
-			"Meryl Streep",
-			"Robert De Niro",
-			"Setsuko Hara",
-			"Sophia Loren",
-		},
+		related = { "Gene Kelly" },
 		infobox = {
 			{ "Born", "c. 1578" },
 			{ "Birthplace", "Izumo Province" },
@@ -617,7 +561,7 @@ return {
 				"Nicholson won Academy Awards for Best Actor for playing Randle McMurphy in One Flew Over the Cuckoo's Nest (1975) and an author with OCD in As Good as It Gets (1997), as well as for Best Supporting Actor for playing an aging playboy in Terms of Endearment (1983). He received further Oscar nominations for Easy Rider (1969), Five Easy Pieces (1970), The Last Detail (1973), Chinatown (1974), Reds (1981), Prizzi's Honor (1985), Ironweed (1987), A Few Good Men (1992), and About Schmidt (2002). Nicholson made his film debut in Roger Corman's The Cry Baby Killer (1958).",
 			},
 		},
-		related = { "Isadora Duncan", "Clint Eastwood" },
+		related = { "Marlon Brando", "Elizabeth Taylor" },
 		infobox = {
 			{ "Born", "22 April 1937" },
 			{ "Birthplace", "Neptune City, New Jersey, U.S." },
@@ -634,17 +578,17 @@ return {
 		description = "Hong Kong actor and martial artist (born 1954)",
 		tags = { "Actors", "Asia" },
 		aliases = { "Chan Kong-sang", "Fang Shilong", "Sing Lung" },
-		summary = "**Chan Kong-sang**, also known as **Fang Shilong** and known professionally as **Jackie Chan** and **Sing Lung**, is a Hong Kong [[Martial arts|martial artist]], [[Actor|actor]] and [[Filmmaking|filmmaker]], known for his slapstick, acrobatic fighting style, comic timing, and innovative stunts, which he typically performs himself. With a film career spanning eight decades, he is regarded as one of the most iconic and influential martial artists in the history of cinema. Films in which he has appeared have grossed over $6 billion worldwide.",
+		summary = "**Chan Kong-sang**, also known as **Fang Shilong** and known professionally as **Jackie Chan** and **Sing Lung**, is a Hong Kong [[Martial arts|martial artist]], [[Actor|actor]] and [[Filmmaking|filmmaker]], known for his slapstick, acrobatic fighting style, comic timing, and innovative stunts, which he typically performs himself. With a film career spanning eight decades, he is regarded as one of the most [[Cultural icon|iconic]] and influential martial artists in the history of cinema. Films in which he has appeared have grossed over $6 billion worldwide.",
 		sections = {
 			{
 				"Overview",
 				"Starting as one of the Seven Little Fortunes at the China Drama Academy, where he was trained in acrobatics, martial arts and acting, Chan entered the Hong Kong film industry as a stuntman before making the transition to acting. His breakthrough came with the action comedy Snake in the Eagle's Shadow (1978). He made his directorial debut with The Fearless Hyena (1979), which was a box office success. Throughout the 1980s, he was part of the \"Three Dragons\" along with Sammo Hung and Yuen Biao; the three starred in six Hong Kong films together. Project A (1983) saw the official formation of the Jackie Chan Stunt Team and established Chan's signature style of elaborate, dangerous stunts combined with martial arts and slapstick humor, a style he further developed in a more modern setting with Wheels on Meals (1984) and Police Story (1985).",
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Gregory Peck", "Marlon Brando" },
 		infobox = {
 			{ "Born", "7 April 1954" },
-			{ "Birthplace", "British Hong Kong" },
+			{ "Birthplace", "[[British Hong Kong]]" },
 			{ "Years active", "1959–present" },
 		},
 	},
@@ -664,12 +608,12 @@ return {
 				"Born and raised in Indiana, Pennsylvania, Stewart started acting while at [[Princeton University]]. After graduating, he began a career as a stage actor, making his [[Broadway theatre|Broadway]] debut in 1932 in the play Carry Nation. He later starred in Capra's political comedy Mr. Smith Goes to Washington (1939), and Ernst Lubitsch's romantic comedy The Shop Around the Corner (1940), Stewart went on to receive the Academy Award for Best Actor for his performance in the George Cukor romantic comedy The Philadelphia Story (1940). After returning home from [[World War II]], he went on to star in Capra's It's a Wonderful Life (1946), which was a critical and commercial disappointment upon its release, but has since become a beloved classic after its copyright expired in the early 1970s.",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Gregory Peck", "Marlon Brando" },
 		infobox = {
 			{ "Born", "20 May 1908" },
 			{ "Birthplace", "Indiana, Pennsylvania, U.S." },
 			{ "Died", "2 July 1997" },
-			{ "Education", "[[Princeton University]] (AB)" },
+			{ "Education", "[[Princeton University]] ([[Bachelor of Arts|AB]])" },
 			{ "Occupation", "Actor military officer" },
 			{ "Years active", "1932–1991" },
 		},
@@ -686,15 +630,15 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Moreau began playing small roles in films in 1949, later achieving prominence with a starring role in Louis Malle's Elevator to the Gallows (1958). She was most prolific during the 1960s, winning the Cannes Film Festival Award for Best Actress for Seven Days... Seven Nights (1960) and the BAFTA Award for Best Foreign Actress for Viva Maria! (1965), with additional prominent roles in La Notte (1961), Jules et Jim (1962), La baie des anges (1963), Le journal d'une femme de chambre (1964) and Mademoiselle (1966). Moreau worked as a director on several films beginning with 1976's Lumière. She continued to act into the 2010s, winning the César Award for Best Actress for The Old Lady Who Walked in the Sea (1992) and receiving several lifetime achievement awards, including a BAFTA Fellowship in 1996, a Cannes Golden Palm in 2003, and another César Award in 2008.",
+				"Moreau began playing small roles in films in 1949, later achieving prominence with a starring role in Louis Malle's Elevator to the Gallows (1958). She was most prolific during the 1960s, winning the Cannes Film Festival Award for Best Actress for Seven Days... Seven Nights (1960) and the BAFTA Award for Best Foreign Actress for Viva Maria! (1965), with additional prominent roles in La Notte (1961), Jules et Jim (1962), La baie des anges (1963), Le journal d'une femme de chambre (1964) and Mademoiselle (1966). Moreau worked as a director on several films beginning with 1976's Lumière. She continued to act into the 2010s, winning the César Award for Best Actress for The Old Lady Who Walked in the Sea (1992) and receiving several lifetime achievement awards, including a [[BAFTA Fellowship]] in 1996, a Cannes Golden Palm in 2003, and another César Award in 2008.",
 			},
 		},
-		related = { "Julie Andrews", "Vivien Leigh" },
+		related = { "Vivien Leigh", "Julie Andrews" },
 		infobox = {
 			{ "Born", "23 January 1928" },
 			{ "Birthplace", "[[Paris]], France" },
 			{ "Died", "31 July 2017" },
-			{ "Education", "Conservatoire de Paris" },
+			{ "Education", "[[Conservatoire de Paris]]" },
 			{ "Occupation", "Actress screenwriter film director" },
 			{ "Years active", "1947–2015" },
 		},
@@ -715,7 +659,7 @@ return {
 				"During the 1930s Gielgud was a stage star in the West End and on [[Broadway theatre|Broadway]], appearing in new works and classics. He began a parallel career as a director, and set up his own company at the Queen's Theatre, London. He was regarded by many as the finest Hamlet of his era, and was also known for high comedy roles such as John Worthing in [[The Importance of Being Earnest]]. In the 1950s Gielgud feared that his career was threatened when he was convicted and fined for a homosexual offence, but his colleagues and the public supported him loyally. When plays began to supersede traditional West End productions in the later 1950s he found no new suitable stage roles, and for several years he was best known in the theatre for his one-man Shakespeare show The Ages of Man. From the late 1960s he found new plays that suited him, by authors including Alan Bennett, David Storey and Harold Pinter.",
 			},
 		},
-		related = { "Julie Andrews", "Vivien Leigh" },
+		related = { "Vivien Leigh", "Julie Andrews" },
 	},
 	{
 		title = "John Wayne",
@@ -726,14 +670,14 @@ return {
 		description = "American actor (1907–1979)",
 		tags = { "Actors", "United States" },
 		aliases = { "Marion Robert Morrison" },
-		summary = '**Marion Robert Morrison** (May 26, 1907 – June 11, 1979), known professionally as **John Wayne**, was an American actor. Nicknamed "**Duke**", he became a popular icon through his starring roles in films which were produced during Hollywood\'s Golden Age, especially in Western and war movies. His career flourished from the silent film era of the 1920s to the American New Wave in the 1970s, as he appeared in a total of 179 film and television productions. He was among the top box-office draws for three decades, and appeared with many other important Hollywood stars of his era. In 1999, the American Film Institute selected Wayne as one of the greatest male stars of classic American cinema.',
+		summary = "**Marion Robert Morrison** (May 26, 1907 – June 11, 1979), known professionally as **John Wayne**, was an American actor. Nicknamed \"**Duke**\", he became a popular icon through his starring roles in films which were produced during Hollywood's Golden Age, especially in Western and war movies. His career flourished from the silent film era of the 1920s to the American New Wave in the 1970s, as he appeared in a total of 179 film and television productions. He was among the top box-office draws for three decades, and appeared with many other important Hollywood stars of his era. In 1999, the [[American Film Institute]] selected Wayne as one of the [[AFI's 100 Years...100 Stars|greatest male stars]] of classic American cinema.",
 		sections = {
 			{
 				"Overview",
-				"Wayne was born in Winterset, Iowa, but grew up in Southern California. After losing his football scholarship to the University of Southern California due to a bodysurfing accident, he began working for the Fox Film Corporation. He appeared mostly in small parts, but gained a leading role in Raoul Walsh's Western The Big Trail (1930), an early widescreen film epic that was a box-office failure. He played leading roles in numerous B movies during the 1930s, most of them Westerns, without becoming a major name. [[John Ford]]'s Stagecoach (1939) made Wayne a mainstream star, and he starred in 142 motion pictures altogether. According to biographer Ronald Davis, \"John Wayne personified for millions the nation's frontier heritage\".",
+				"Wayne was born in Winterset, Iowa, but grew up in [[Southern California]]. After losing his football scholarship to the University of Southern California due to a bodysurfing accident, he began working for the Fox Film Corporation. He appeared mostly in small parts, but gained a leading role in Raoul Walsh's Western The Big Trail (1930), an early widescreen film epic that was a box-office failure. He played leading roles in numerous B movies during the 1930s, most of them Westerns, without becoming a major name. [[John Ford]]'s Stagecoach (1939) made Wayne a mainstream star, and he starred in 142 motion pictures altogether. According to biographer Ronald Davis, \"John Wayne personified for millions the nation's frontier heritage\".",
 			},
 		},
-		related = { "Isadora Duncan", "Clint Eastwood" },
+		related = { "Gregory Peck", "Marlon Brando" },
 		infobox = {
 			{ "Born", "26 May 1907" },
 			{ "Birthplace", "Winterset, Iowa, U.S." },
@@ -757,7 +701,7 @@ return {
 				'During her early career, Baker was among the most celebrated performers to headline the revues of the in [[Paris]]. Her performance in its 1927 revue caused a sensation in the city. Her costume, consisting only of a short skirt of artificial bananas and a beaded necklace, became an iconic image and a symbol both of the Jazz Age and the Roaring Twenties. Baker was celebrated by artists and intellectuals of the era, who variously dubbed her the "Black Venus", the "Black Pearl", the "Bronze Venus", and the "Creole Goddess". Born in St. Louis, Missouri, she renounced her U.S. citizenship and became a French national after her marriage to French industrialist Jean Lion in 1937. She adopted 12 children, whom she referred to as the Rainbow Tribe, and raised them in France.',
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Ginger Rogers", "Isadora Duncan" },
 		infobox = {
 			{ "Born", "3 June 1906" },
 			{ "Birthplace", "[[St. Louis]], Missouri, U.S." },
@@ -775,14 +719,14 @@ return {
 		source = "wikipedia",
 		description = "American actress and singer (1922–1969)",
 		tags = { "Actors", "United States" },
-		summary = "**Judy Garland** was an American actress, singer, and vaudevillian whose career spanned four decades. She is known for her artistic range and strong contralto voice, working in a variety of genres including musicals, comedies, and dramas. Her career and personal life, marked by both public fascination and private struggle, made her a cultural icon.",
+		summary = "**Judy Garland** was an American actress, singer, and vaudevillian whose career spanned four decades. She is known for her artistic range and strong contralto voice, working in a variety of genres including [[Musical film|musicals]], comedies, and [[Drama (film and television)|dramas]]. Her career and personal life, marked by both public fascination and private struggle, made her a cultural icon.",
 		sections = {
 			{
 				"Overview",
-				"Garland began her career at the age of two, performing with her two older sisters as a vaudeville act called The Gumm Sisters. In 1935, aged 13, she signed a contract with Metro-Goldwyn-Mayer (MGM) and was initially cast in supporting roles in ensemble musicals such as Broadway Melody of 1938 (1937) and Thoroughbreds Don't Cry (1937). She achieved international recognition for her portrayal of Dorothy Gale in the musical film [[The Wizard of Oz]] (1939). She followed this with leading roles in MGM musicals including Meet Me in St. Louis (1944), Easter Parade (1948), and Summer Stock (1950). She expanded her range with dramatic performances in A Star Is Born (1954) and Judgment at Nuremberg (1961), both of which earned her Academy Award nominations. Garland's music career was kickstarted with her signature song \"Over the Rainbow\" from The Wizard of Oz.",
+				"Garland began her career at the age of two, performing with her two older sisters as a [[Vaudeville|vaudeville]] act called The Gumm Sisters. In 1935, aged 13, she signed a contract with [[Metro-Goldwyn-Mayer]] (MGM) and was initially cast in supporting roles in ensemble musicals such as Broadway Melody of 1938 (1937) and Thoroughbreds Don't Cry (1937). She achieved international recognition for her portrayal of Dorothy Gale in the musical film [[The Wizard of Oz]] (1939). She followed this with leading roles in MGM musicals including Meet Me in St. Louis (1944), Easter Parade (1948), and Summer Stock (1950). She expanded her range with dramatic performances in A Star Is Born (1954) and Judgment at Nuremberg (1961), both of which earned her Academy Award nominations. Garland's music career was kickstarted with her signature song \"Over the Rainbow\" from The Wizard of Oz.",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Marlon Brando", "Gregory Peck" },
 		infobox = {
 			{ "Born", "10 June 1922" },
 			{ "Birthplace", "Grand Rapids, Minnesota, U.S." },
@@ -795,13 +739,13 @@ return {
 	{
 		title = "Julie Andrews",
 		category = "Actor",
-		fame = 1,
+		fame = 2,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "English actress, singer and author (born 1935)",
 		tags = { "Europe", "United Kingdom" },
 		aliases = { "Dame Julie Andrews" },
-		summary = "**Dame Julie Andrews** is an English actress, singer, author and theater director. Her accolades include an [[Academy Awards|Academy Award]], a British Academy Film Award, three Emmy Awards, three Grammy Awards, seven Golden Globe Awards and nominations for three Tony Awards. She was made a Dame (DBE) by Queen Elizabeth II in the 2000 New Year Honours.",
+		summary = "**Dame Julie Andrews** is an English actress, singer, author and theater director. Her accolades include an [[Academy Awards|Academy Award]], a British Academy Film Award, three Emmy Awards, three Grammy Awards, seven Golden Globe Awards and nominations for three Tony Awards. She was made a Dame (DBE) by Queen [[Elizabeth II]] in the 2000 New Year Honours.",
 		sections = {
 			{
 				"Overview",
@@ -838,16 +782,16 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Raised in Connecticut by progressive parents, Hepburn began to act while at Bryn Mawr College. Favorable reviews of her work on [[Broadway theatre|Broadway]] brought her to the attention of Hollywood. Her early years in film brought her international fame, including an Academy Award for Best Actress for her third film, Morning Glory (1933), but this was followed by a series of commercial failures culminating in the critically lauded box office failure Bringing Up Baby (1938). Hepburn made a comeback by buying out [[Studio system|her contract]] with RKO Radio Pictures and acquiring the film rights to The Philadelphia Story, which she sold on the condition that she be the star. That comedy film was a box office success and landed her a third Academy Award nomination. In the 1940s, she was contracted to Metro-Goldwyn-Mayer, where her career focused on an alliance with Spencer Tracy.",
+				"Raised in Connecticut by progressive parents, Hepburn began to act while at Bryn Mawr College. Favorable reviews of her work on [[Broadway theatre|Broadway]] brought her to the attention of Hollywood. Her early years in film brought her international fame, including an Academy Award for Best Actress for her third film, Morning Glory (1933), but this was followed by a series of commercial failures culminating in the critically lauded box office failure Bringing Up Baby (1938). Hepburn made a comeback by buying out [[Studio system|her contract]] with RKO Radio Pictures and acquiring the film rights to The Philadelphia Story, which she sold on the condition that she be the star. That comedy film was a box office success and landed her a third Academy Award nomination. In the 1940s, she was contracted to [[Metro-Goldwyn-Mayer]], where her career focused on an alliance with Spencer Tracy.",
 			},
 		},
-		related = { "Isadora Duncan", "Clint Eastwood" },
+		related = { "Jack Nicholson", "Judy Garland", "Robert De Niro" },
 		infobox = {
 			{ "Born", "12 May 1907" },
 			{ "Birthplace", "Hartford, Connecticut, U.S." },
 			{ "Died", "29 June 2003" },
 			{ "Occupation", "Actress" },
-			{ "Education", "Bryn Mawr College (BA)" },
+			{ "Education", "Bryn Mawr College ([[Bachelor of Arts|BA]])" },
 			{ "Years active", "1928–1995" },
 		},
 	},
@@ -863,10 +807,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Before becoming a team, both had well-established film careers. Stan Laurel had been a vaudeville performer on European and American stages before joining the film industry in 1917; he was primarily a comedian but was also a talented writer and director. Oliver Hardy entered the film business as a theater projectionist, and became an actor in 1913. They first appeared together in 1921—purely by chance—in the short film The Lucky Dog, but did not encounter each other again until 1925, when both were working at the Hal Roach film studio. They officially became a team in 1927 when they appeared in the silent short Putting Pants on Philip. They remained with Roach until 1940, and then appeared in eight B movie comedies for 20th Century-Fox and Metro-Goldwyn-Mayer from 1941 to 1945.",
+				"Before becoming a team, both had well-established film careers. Stan Laurel had been a [[Vaudeville|vaudeville]] performer on European and American stages before joining the film industry in 1917; he was primarily a comedian but was also a talented writer and director. Oliver Hardy entered the film business as a theater projectionist, and became an actor in 1913. They first appeared together in 1921—purely by chance—in the short film The Lucky Dog, but did not encounter each other again until 1925, when both were working at the Hal Roach film studio. They officially became a team in 1927 when they appeared in the silent short Putting Pants on Philip. They remained with Roach until 1940, and then appeared in eight B movie comedies for 20th Century-Fox and [[Metro-Goldwyn-Mayer]] from 1941 to 1945.",
 			},
 		},
-		related = { "J. P. Morgan", "Leland Stanford" },
+		related = { "Jakob Fugger", "Theodor W. Adorno" },
 		infobox = {
 			{ "Genre", "Slapstick, comedy" },
 		},
@@ -887,7 +831,7 @@ return {
 				"Olivier's family had no theatrical connections, but his father, a clergyman, decided that his son should become an actor. After attending a drama school in London, Olivier learned his craft in a succession of acting jobs during the late 1920s. In 1930 he had his first important [[West End theatre|West End]] success in Noël Coward's Private Lives, and he appeared in his first film. In 1935 he played in a celebrated production of Romeo and Juliet alongside Gielgud and Peggy Ashcroft, and by the end of the decade he was an established star. In the 1940s, together with Richardson and John Burrell, Olivier was the co-director of the Old Vic, building it into a highly respected company. There his most celebrated roles included [[William Shakespeare|Shakespeare]]'s Richard III and [[Sophocles]]'s Oedipus.",
 			},
 		},
-		related = { "Julie Andrews", "Vivien Leigh" },
+		related = { "Vivien Leigh", "Julie Andrews" },
 		infobox = {
 			{ "Born", "22 May 1907" },
 			{ "Birthplace", "Dorking, Surrey, England" },
@@ -906,14 +850,14 @@ return {
 		description = "American actress (1893–1993)",
 		tags = { "Actors", "United States" },
 		aliases = { "Lillian Diana Gish" },
-		summary = '**Lillian Diana Gish** (October 14, 1893 – February 27, 1993) was an American actress best known for her work in movies of the silent era. Her film-acting career spanned 75 years, from 1912, in [[Silent film|silent film]] shorts, to 1987. Gish was dubbed the "First Lady of the Screen" by Vanity Fair in 1927 and is credited with pioneering fundamental film performance techniques. In 1999, the American Film Institute ranked Gish as the 17th-greatest female movie star of classical Hollywood cinema.',
+		summary = '**Lillian Diana Gish** (October 14, 1893 – February 27, 1993) was an American actress best known for her work in movies of the silent era. Her film-acting career spanned 75 years, from 1912, in [[Silent film|silent film]] shorts, to 1987. Gish was dubbed the "First Lady of the Screen" by [[Vanity Fair (magazine)|Vanity Fair]] in 1927 and is credited with pioneering fundamental film performance techniques. In 1999, the [[American Film Institute]] ranked Gish as [[AFI\'s 100 Years...100 Stars|the 17th-greatest female movie star]] of [[Classical Hollywood cinema|classical Hollywood cinema]].',
 		sections = {
 			{
 				"Overview",
 				"Having acted on stage with her sister as a child, Gish was a prominent film star from 1912 into the 1920s, being particularly associated with the films of director D. W. Griffith. This included her leading role in the highest-grossing film of the silent era, Griffith's The Birth of a Nation (1915). Her other major films and performances from the silent era included Intolerance (1916), Broken Blossoms (1919), Way Down East (1920), Orphans of the Storm (1921), The White Sister (1923), La Bohème (1926), and The Wind (1928). At the dawn of the sound era, she returned to the stage and appeared in film occasionally, with roles in the Western Duel in the Sun (1946) and the thriller The Night of the Hunter (1955). She was nominated for the Academy Award for Best Supporting Actress for Duel in the Sun.",
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Marlon Brando", "Elizabeth Taylor" },
 		infobox = {
 			{ "Born", "14 October 1893" },
 			{ "Birthplace", "Springfield, Ohio, U.S." },
@@ -935,13 +879,13 @@ return {
 		sections = {
 			{
 				"Overview",
-				"The larger-than-life, conservative petit bourgeois characters he played, who typically kissed up to authority while persecuting their subordinates, particularly resonated with the changing Western societies of the 1960s and drove him to success. However, in his private life, de Funès was a notoriously shy and reserved man, and a devout Catholic. Louis de Funès remains to this day the most bankable actor in French cinema history. He enjoys widespread international recognition: in addition to his immense fame in the French-speaking world, he remains a household name throughout most of continental Europe including the former [[Eastern Bloc]], the former Soviet Union, as well as [[Iran]], [[Turkey]], and [[Israel]]. Despite this international popularity, de Funès remains an obscure figure in the English-speaking world.",
+				"The larger-than-life, conservative petit bourgeois characters he played, who typically kissed up to authority while persecuting their subordinates, particularly resonated with the changing Western societies of the 1960s and drove him to success. However, in his private life, de Funès was a notoriously shy and reserved man, and a devout Catholic. Louis de Funès remains to this day the most bankable actor in French cinema history. He enjoys widespread international recognition: in addition to his immense fame in the French-speaking world, he remains a household name throughout most of [[Continental Europe|continental Europe]] including the former [[Eastern Bloc]], the former Soviet Union, as well as [[Iran]], [[Turkey]], and [[Israel]]. Despite this international popularity, de Funès remains an obscure figure in the English-speaking world.",
 			},
 		},
-		related = { "J. P. Morgan", "Leland Stanford" },
+		related = { "Jakob Fugger", "Theodor W. Adorno" },
 		infobox = {
 			{ "Born", "31 July 1914" },
-			{ "Birthplace", "Courbevoie, France" },
+			{ "Birthplace", "Courbevoie, [[French Third Republic|France]]" },
 			{ "Died", "27 January 1983" },
 			{ "Years active", "1945–1982" },
 			{ "Occupation", "Actor, comedian" },
@@ -956,14 +900,14 @@ return {
 		description = "American actress (1911–1989)",
 		tags = { "Entertainers", "Comedians" },
 		aliases = { "Lucille Désirée Ball" },
-		summary = "**Lucille Désirée Ball** (August 6, 1911 – April 26, 1989) was an American comedian, actress, producer, and studio executive. She was recognized by [[Time (magazine)|Time]] in 2020 as one of the most influential women of the 20th century for her work in all four of these areas. She was nominated for 13 Primetime Emmy Awards, winning five, and was the recipient of several other accolades, such as the Golden Globe Cecil B. DeMille Award and two stars on the Hollywood Walk of Fame. Additionally, she posthumously received the Presidential Medal of Freedom by President George H. W. Bush in 1989.",
+		summary = "**Lucille Désirée Ball** (August 6, 1911 – April 26, 1989) was an American comedian, actress, producer, and studio executive. She was recognized by [[Time (magazine)|Time]] in 2020 as one of the most influential women of the 20th century for her work in all four of these areas. She was nominated for 13 Primetime Emmy Awards, winning five, and was the recipient of several other accolades, such as the Golden Globe Cecil B. DeMille Award and two stars on the [[Hollywood Walk of Fame]]. Additionally, she posthumously received the [[Presidential Medal of Freedom]] by President George H. W. Bush in 1989.",
 		sections = {
 			{
 				"Overview",
-				"Ball's career began in 1929 when she landed work as a model. Shortly thereafter, she began her performing career on [[Broadway theatre|Broadway]] using the stage name Diane (or Dianne) Belmont. She later appeared in films in the 1930s and 1940s as a contract player for RKO Radio Pictures, being cast as a chorus girl or in similar roles, with lead roles in B-pictures and supporting roles in A-pictures. During this time, she met Cuban bandleader Desi Arnaz, and they eloped in November 1940. In the 1950s, Ball ventured into television, where she and Arnaz created the sitcom I Love Lucy. She gave birth to their first child, Lucie, in 1951, followed by Desi Arnaz Jr. in 1953. They divorced in March 1960, and she married comedian Gary Morton in 1961. Ball produced and starred in the Broadway musical Wildcat from 1960 to 1961.",
+				"Ball's career began in 1929 when she landed work as a model. Shortly thereafter, she began her performing career on [[Broadway theatre|Broadway]] using the stage name Diane (or Dianne) Belmont. She later appeared in films in the 1930s and 1940s as a contract player for [[RKO Pictures|RKO Radio Pictures]], being cast as a chorus girl or in similar roles, with lead roles in B-pictures and supporting roles in A-pictures. During this time, she met Cuban bandleader Desi Arnaz, and they eloped in November 1940. In the 1950s, Ball ventured into television, where she and Arnaz created the sitcom I Love Lucy. She gave birth to their first child, Lucie, in 1951, followed by Desi Arnaz Jr. in 1953. They divorced in March 1960, and she married comedian Gary Morton in 1961. Ball produced and starred in the Broadway musical Wildcat from 1960 to 1961.",
 			},
 		},
-		related = { "J. P. Morgan", "Leland Stanford" },
+		related = { "Jakob Fugger", "Theodor W. Adorno" },
 		infobox = {
 			{ "Born", "6 August 1911" },
 			{ "Birthplace", "Jamestown, New York, U.S." },
@@ -988,7 +932,7 @@ return {
 				"Born in [[Delhi]], Madhubala migrated with her family to Bombay (now Mumbai) in her childhood. Her family's financial hardships led her to pursue a screen career as a child artiste, starting at the age of nine with Basant in 1942. She progressed to leading roles with the drama Neel Kamal (1947). Many of her early films received a lukewarm response, but her performances in Lal Dupatta (1948) and the gothic film Mahal (1949) established her as a leading lady of Hindi cinema. By the early 1950s, she had become one of India's highest-paid film stars, with commercially successful films such as Baadal and Tarana (both 1951). Despite a mixed critical reception to many of her performances, Madhubala remained popular and sought more substantial acting roles.",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Marlon Brando", "Elizabeth Taylor" },
 		infobox = {
 			{ "Born", "14 February 1933" },
 			{ "Birthplace", "[[Delhi]], [[British Raj|British India]]" },
@@ -1007,7 +951,7 @@ return {
 		tags = { "Entertainers", "Hosts and performers" },
 		aliases = { "Bip the Clown" },
 		summary = '**Marcel Marceau** was a French [[Mime artist|mime artist]] and actor most famous for his stage persona, "**Bip the Clown**". He referred to mime as the "art of silence", performing professionally worldwide for more than 60 years.',
-		related = { "J. P. Morgan", "Leland Stanford" },
+		related = { "Jakob Fugger", "Theodor W. Adorno" },
 		infobox = {
 			{ "Born", "22 March 1923" },
 			{ "Birthplace", "[[Strasbourg]], France" },
@@ -1034,10 +978,10 @@ return {
 				"Born in Fontana Liri (province of Frosinone, Lazio, [[Italy|IT]]) and raised in [[Turin]] and [[Rome]], Mastroianni made his film debut in 1939 at the age of 14, but did not seriously pursue acting until the 1950s, when he made his critical and commercial breakthrough in the caper comedy Big Deal on Madonna Street (1959). He became an international celebrity through his collaborations with director [[Federico Fellini]], first as a disillusioned tabloid columnist in La Dolce Vita (1960), then as a creatively-stifled filmmaker in 8½ (1963). Despite international acclaim, Mastroianni largely shunned Hollywood, and remained a quintessentially Italian thespian for the majority of his career.",
 			},
 		},
-		related = { "Isadora Duncan", "Clint Eastwood" },
+		related = { "Ingrid Bergman", "Sophia Loren" },
 		infobox = {
 			{ "Born", "26 September 1924" },
-			{ "Birthplace", "Fontana Liri, Lazio, Kingdom of Italy" },
+			{ "Birthplace", "Fontana Liri, Lazio, [[Kingdom of Italy]]" },
 			{ "Died", "19 December 1996" },
 			{ "Occupation", "Actor" },
 			{ "Years active", "1938–1996" },
@@ -1046,7 +990,7 @@ return {
 	{
 		title = "Marius Petipa",
 		category = "Actor",
-		fame = 1,
+		fame = 2,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "French-Russian ballet dancer and choreographer (1818–1910)",
@@ -1059,24 +1003,10 @@ return {
 				"Petipa is noted for his long career as Premier maître de ballet (First Ballet Master) of the St. Petersburg Imperial Theatres, making him Ballet Master and principal choreographer of the Imperial Ballet (today known as the Mariinsky Ballet), a position he held from 1871 until 1903. Petipa created over fifty ballets, some of which have survived in versions either faithful to, inspired by, or reconstructed from his originals. He is most noted for The Pharaoh's Daughter (1862); Don Quixote (1869); La Bayadère (1877); Le Talisman (1889); The Sleeping Beauty (1890); [[The Nutcracker]] (choreographed jointly with Lev Ivanov) (1892); Le Réveil de Flore (1894); La Halte de cavalerie (1896); Raymonda (1898); Les Saisons (1900), and Les Millions d'Arlequin (a.k.a. Harlequinade) (1900). Petipa also revived a substantial number of works created by other choreographers.",
 			},
 		},
-		related = {
-			"Amitabh Bachchan",
-			"Clark Gable",
-			"George Balanchine",
-			"Gregory Peck",
-			"Ingrid Bergman",
-			"James Stewart",
-			"Judy Garland",
-			"Madhubala",
-			"Marlon Brando",
-			"Meryl Streep",
-			"Mikhail Baryshnikov",
-			"Rudolf Nureyev",
-			"Sophia Loren",
-		},
+		related = { "George Balanchine", "Mikhail Baryshnikov", "Rudolf Nureyev" },
 		infobox = {
 			{ "Born", "11 March 1818" },
-			{ "Birthplace", "[[Marseille]], France" },
+			{ "Birthplace", "[[Marseille]], [[Bourbon Restoration in France|France]]" },
 			{ "Died", "14 July 1910" },
 			{ "Field", "Ballet, choreography" },
 		},
@@ -1090,14 +1020,14 @@ return {
 		description = "German and American actress (1901–1992)",
 		tags = { "Actors", "Europe" },
 		aliases = { "Marie Magdalene", "Marlene", "Dietrich" },
-		summary = '**Marie Magdalene** "**Marlene**" **Dietrich** was a German and American actress and singer whose career spanned nearly seven decades. In 1920s Berlin, she performed on the stage and in [[Silent film|silent films]]. Her performance as Lola Lola in Josef von Sternberg\'s The Blue Angel (1930) brought her international acclaim and a contract with Paramount Pictures. Dietrich starred in many Hollywood films, including six roles directed by Sternberg: Morocco (1930) (her only Academy Award nomination), Dishonored (1931), Shanghai Express and Blonde Venus (both 1932), The Scarlet Empress (1934), and The Devil Is a Woman (1935). Throughout [[World War II]], she was a high-profile entertainer in the United States.',
+		summary = '**Marie Magdalene** "**Marlene**" **Dietrich** was a German and American actress and singer whose career spanned nearly seven decades. In 1920s Berlin, she performed on the stage and in [[Silent film|silent films]]. Her performance as Lola Lola in Josef von Sternberg\'s The Blue Angel (1930) brought her international acclaim and a contract with [[Paramount Pictures]]. Dietrich starred in many Hollywood films, including six roles directed by Sternberg: Morocco (1930) (her only Academy Award nomination), Dishonored (1931), Shanghai Express and Blonde Venus (both 1932), The Scarlet Empress (1934), and The Devil Is a Woman (1935). Throughout [[World War II]], she was a high-profile entertainer in the United States.',
 		sections = {
 			{
 				"Overview",
-				"Although she delivered notable performances in several post-war films, including [[Billy Wilder]]'s A Foreign Affair (1948), [[Alfred Hitchcock]]'s Stage Fright (1950), Billy Wilder's Witness for the Prosecution (1957), [[Orson Welles]]'s Touch of Evil (1958), and Stanley Kramer's Judgment at Nuremberg (1961), she spent most of the 1950s to the 1970s touring the world as a marquee live-show performer. Dietrich was known for her humanitarian efforts during World War II, housing German and French exiles, providing financial support and advocating their American citizenship. For her work on improving morale on the front lines during the war, she received various honors from the United States, France, Belgium, and Israel. In 1999, the American Film Institute named Dietrich the ninth greatest female screen legend of classic Hollywood cinema.",
+				"Although she delivered notable performances in several post-war films, including [[Billy Wilder]]'s A Foreign Affair (1948), [[Alfred Hitchcock]]'s Stage Fright (1950), Billy Wilder's Witness for the Prosecution (1957), [[Orson Welles]]'s Touch of Evil (1958), and Stanley Kramer's Judgment at Nuremberg (1961), she spent most of the 1950s to the 1970s touring the world as a marquee live-show performer. Dietrich was known for her humanitarian efforts during World War II, housing German and French exiles, providing financial support and advocating their American citizenship. For her work on improving morale on the front lines during the war, she received various honors from the United States, France, Belgium, and Israel. In 1999, the [[American Film Institute]] named Dietrich the ninth [[AFI's 100 Years...100 Stars|greatest female screen legend]] of classic Hollywood cinema.",
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Ingrid Bergman", "Sophia Loren" },
 		infobox = {
 			{ "Born", "27 December 1901" },
 			{ "Birthplace", "Schöneberg, German Empire" },
@@ -1110,7 +1040,7 @@ return {
 	{
 		title = "Marlon Brando",
 		category = "Actor",
-		fame = 3,
+		fame = 1,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "American actor (1924–2004)",
@@ -1120,10 +1050,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Brando came under the influence of Stella Adler and Stanislavski's system in the 1940s. He began his career on stage, where he was lauded for adeptly interpreting his characters. He made his [[Broadway theatre|Broadway]] debut in the play I Remember Mama (1944) and won Theater World Awards for his performances in Candida and Truckline Cafe (1946). He returned to Broadway as Stanley Kowalski in the [[Tennessee Williams]] play A Streetcar Named Desire (1947), a role he reprised in the 1951 film adaptation directed by [[Elia Kazan]]. He was also Oscar-nominated for playing Stanley Kowalski in A Streetcar Named Desire (1951), Emiliano Zapata in Viva Zapata! (1952), Mark Antony in Julius Caesar (1953), an air force pilot in Sayonara (1957), an American expatriate in Last Tango in Paris (1973), and a lawyer in A Dry White Season (1989).",
+				"Brando came under the influence of Stella Adler and Stanislavski's system in the 1940s. He began his career on stage, where he was lauded for adeptly interpreting his characters. He made his [[Broadway theatre|Broadway]] debut in the play I Remember Mama (1944) and won Theater World Awards for his performances in Candida and Truckline Cafe (1946). He returned to Broadway as Stanley Kowalski in the [[Tennessee Williams]] play A Streetcar Named Desire (1947), a role he reprised in the 1951 film adaptation directed by [[Elia Kazan]]. He was also Oscar-nominated for playing Stanley Kowalski in A Streetcar Named Desire (1951), Emiliano Zapata in Viva Zapata! (1952), [[Mark Antony]] in Julius Caesar (1953), an air force pilot in Sayonara (1957), an American [[Expatriate|expatriate]] in Last Tango in Paris (1973), and a lawyer in A Dry White Season (1989).",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Bette Davis", "Judy Garland", "Meryl Streep" },
 		infobox = {
 			{ "Born", "3 April 1924" },
 			{ "Birthplace", "Omaha, Nebraska, U.S." },
@@ -1144,10 +1074,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Graham danced and taught for over seventy years. She was the first dancer to perform at the [[White House]], travel abroad as a cultural ambassador, and receive the highest civilian award of the US: the Presidential Medal of Freedom with Distinction. In her lifetime she received honors including the Key to the City of Paris and Japan's Imperial Order of the Precious Crown.",
+				"Graham danced and taught for over seventy years. She was the first dancer to perform at the [[White House]], travel abroad as a cultural ambassador, and receive the highest civilian award of the US: the [[Presidential Medal of Freedom|Presidential Medal of Freedom with Distinction]]. In her lifetime she received honors including the Key to the City of Paris and Japan's Imperial Order of the Precious Crown.",
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Ginger Rogers", "Isadora Duncan" },
 		infobox = {
 			{ "Born", "11 May 1894" },
 			{ "Birthplace", "[[Pittsburgh]], [[Pennsylvania]], U.S." },
@@ -1164,17 +1094,17 @@ return {
 		source = "wikipedia",
 		description = "American comedy team (1905–1949)",
 		tags = { "Entertainers", "Comedians" },
-		summary = "The **Marx Brothers** were an American comedy troupe who achieved success in vaudeville, on [[Broadway theatre|Broadway]], and in 13 motion pictures. The five brothers were Chico Marx, Harpo Marx, Groucho Marx, Gummo Marx, and Zeppo Marx, though Gummo and Zeppo both left the group over time, leaving Chico, Harpo, and Groucho as a trio.",
+		summary = "The **Marx Brothers** were an American comedy troupe who achieved success in [[Vaudeville|vaudeville]], on [[Broadway theatre|Broadway]], and in 13 motion pictures. The five brothers were Chico Marx, Harpo Marx, Groucho Marx, Gummo Marx, and Zeppo Marx, though Gummo and Zeppo both left the group over time, leaving Chico, Harpo, and Groucho as a trio.",
 		sections = {
 			{
 				"Overview",
-				"They are considered by critics, scholars and fans to be among the greatest and most influential comedians of the 20th century, a recognition underscored by the American Film Institute (AFI) selecting five of their thirteen feature films to be among the top 100 comedy films (with two in the top fifteen) and including them as the only group of performers on AFI's 100 Years...100 Stars list of the 25 greatest male stars of Classical Hollywood cinema. Their performing lives, heavily influenced by their mother, Minnie Marx, started with Groucho on stage at age 14, in 1905. He was joined, in succession, by Gummo and Harpo. Chico started a separate vaudeville act in 1911, and joined his brothers in 1912. Zeppo replaced Gummo when the latter joined the army in [[World War I]].",
+				"They are considered by critics, scholars and fans to be among the greatest and most influential comedians of the 20th century, a recognition underscored by the [[American Film Institute]] (AFI) selecting five of their thirteen feature films to be among the top 100 comedy films (with two in the top fifteen) and including them as the only group of performers on [[AFI's 100 Years...100 Stars]] list of the 25 greatest male stars of Classical Hollywood cinema. Their performing lives, heavily influenced by their mother, Minnie Marx, started with Groucho on stage at age 14, in 1905. He was joined, in succession, by Gummo and Harpo. Chico started a separate vaudeville act in 1911, and joined his brothers in 1912. Zeppo replaced Gummo when the latter joined the army in [[World War I]].",
 			},
 		},
-		related = { "J. P. Morgan", "Leland Stanford" },
+		related = { "Jakob Fugger", "Theodor W. Adorno" },
 		infobox = {
 			{ "Birthplace", "New York, U.S." },
-			{ "Medium", "Film, [[Broadway theatre|Broadway]], vaudeville" },
+			{ "Medium", "Film, [[Broadway theatre|Broadway]], [[Vaudeville|vaudeville]]" },
 			{ "Genre", "Word play, slapstick, musical comedy, deadpan" },
 		},
 	},
@@ -1191,10 +1121,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				'She was a significant figure in the development of film acting and is credited with having defined the type in cinema, a persona that also earned her the nickname "America\'s Sweetheart". In 1919, she co-founded United Artists alongside [[Charlie Chaplin]], Douglas Fairbanks, and D. W. Griffith, and was also one of the 36 founders of the Academy of Motion Picture Arts and Sciences in 1927. She was awarded the second Academy Award for Best Actress for her first sound film role in Coquette (1929) and received an Academy Honorary Award in 1976 in consideration of her contributions to American cinema. In 1999, the American Film Institute named Pickford as the 24th-greatest female star of Classical Hollywood Cinema.',
+				"She was a significant figure in the development of film acting and is credited with having defined the type in cinema, a persona that also earned her the nickname \"America's Sweetheart\". In 1919, she co-founded United Artists alongside [[Charlie Chaplin]], Douglas Fairbanks, and D. W. Griffith, and was also one of the 36 founders of the [[Academy of Motion Picture Arts and Sciences]] in 1927. She was awarded the second Academy Award for Best Actress for her first sound film role in Coquette (1929) and received an Academy Honorary Award in 1976 in consideration of her contributions to American cinema. In 1999, the [[American Film Institute]] named Pickford as the [[AFI's 100 Years...100 Stars|24th-greatest female star]] of [[Classical Hollywood cinema|Classical Hollywood Cinema]].",
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Gregory Peck", "Marlon Brando" },
 		infobox = {
 			{ "Born", "8 April 1892" },
 			{ "Birthplace", "[[Toronto]], [[Ontario]], Canada" },
@@ -1213,18 +1143,18 @@ return {
 		description = "American actress (born 1949)",
 		tags = { "Actors", "United States" },
 		aliases = { "Mary Louise", "Meryl", "Streep" },
-		summary = '**Mary Louise** "**Meryl**" **Streep** is an American actress. Widely regarded by peers and critics as the greatest actress of her generation, and by many as the greatest of all time, she is recognized as one of the most versatile performers in cinema, noted for her technical precision, nuanced emotional depth, command of dialects, and professional longevity. Streep is an alumna of Vassar College and the Yale School of Drama, holding a Bachelor of Arts and a Master of Fine Arts. Her artistic process often includes refining her characters\' dialogue so that their motivations possess a psychological depth and agency that transcend traditional archetypes.',
+		summary = '**Mary Louise** "**Meryl**" **Streep** is an American actress. Widely regarded by peers and critics as the greatest actress of her generation, and by many as the greatest of all time, she is recognized as one of the most versatile performers in cinema, noted for her technical precision, nuanced emotional depth, command of dialects, and professional longevity. Streep is an alumna of Vassar College and the Yale School of Drama, holding a [[Bachelor of Arts]] and a Master of Fine Arts. Her artistic process often includes refining her characters\' dialogue so that their motivations possess a psychological depth and agency that transcend traditional archetypes.',
 		sections = {
 			{
 				"Overview",
 				"Beyond her creative work, she is a prominent advocate for [[Gender equality|gender parity]], labor protections, and a challenge to the influence of the male gaze in film criticism and production. Streep began her professional stage career in 1975 in Trelawny of the Wells and earned a Tony Award nomination the following year for 27 Wagons Full of Cotton. She transitioned to film in Julia (1977), followed by her first Academy Award nomination for The Deer Hunter (1978). For Kramer vs. Kramer (1979), she won her first Oscar after advocating to rewrite her character's courtroom testimony, shifting the role from a secondary antagonist to a portrayal focused on a woman's autonomy. She became a leading actress of the 1980s with performances in The French Lieutenant's Woman (1981), Sophie's Choice (1982), Out of Africa (1985), and A Cry in the Dark (1988), for which she received the Best Actress Award at Cannes.",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Marlon Brando", "Gregory Peck" },
 		infobox = {
 			{ "Born", "22 June 1949" },
 			{ "Birthplace", "Summit, New Jersey, U.S." },
-			{ "Education", "Vassar College (AB), [[Yale University]] (MFA)" },
+			{ "Education", "Vassar College ([[Bachelor of Arts|AB]]), [[Yale University]] (MFA)" },
 			{ "Occupation", "Actress" },
 			{ "Years active", "1975–present" },
 		},
@@ -1266,15 +1196,15 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Monty Python's Flying Circus was loosely structured as a sketch show, but its innovative stream of consciousness approach and Gilliam's animation skills pushed the boundaries of what was acceptable in style and content. A self-contained comedy unit, the Pythons had creative control that allowed them to experiment with form and content, discarding rules of television comedy. They followed their television work by making the films Monty Python and the Holy Grail (1975), Life of Brian (1979), and The Meaning of Life (1983). Their influence on British comedy has been apparent for years, while it has coloured the work of the early editions of Saturday Night Live through to absurdist trends in television comedy. At the 41st British Academy Film Awards in 1988, Monty Python received the BAFTA Award for Outstanding British Contribution to Cinema.",
+				"Monty Python's Flying Circus was loosely structured as a sketch show, but its innovative [[Stream of consciousness|stream of consciousness]] approach and Gilliam's animation skills pushed the boundaries of what was acceptable in style and content. A self-contained comedy unit, the Pythons had creative control that allowed them to experiment with form and content, discarding rules of television comedy. They followed their television work by making the films Monty Python and the Holy Grail (1975), Life of Brian (1979), and The Meaning of Life (1983). Their influence on British comedy has been apparent for years, while it has coloured the work of the early editions of Saturday Night Live through to absurdist trends in television comedy. At the 41st British Academy Film Awards in 1988, Monty Python received the BAFTA Award for Outstanding British Contribution to Cinema.",
 			},
 		},
-		related = { "J. P. Morgan", "Leland Stanford" },
+		related = { "Jakob Fugger", "Theodor W. Adorno" },
 		infobox = {
 			{ "Medium", "Television film theatre literature audio" },
 			{
 				"Genre",
-				"[[Satire]], surreal humour, black comedy, wordplay, wit, sketch comedy, [[Surrealism|surrealism]]",
+				"[[Satire]], surreal humour, [[Dark humor|black comedy]], wordplay, wit, sketch comedy, [[Surrealism|surrealism]]",
 			},
 		},
 	},
@@ -1291,14 +1221,14 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Winfrey was born into poverty in rural Mississippi to a single teenage mother and later raised in inner-city Milwaukee. Winfrey was then sent to live with the man she calls her father, Vernon Winfrey, a barber in [[Nashville, Tennessee]], and landed a job in radio while still in high school. By 19, she was a co-anchor for the local evening news. Winfrey's often emotional, extemporaneous delivery eventually led to her transfer to the daytime talk show arena, and after boosting a third-rated local Chicago talk show to first place, she launched her own production company. Credited with creating a more intimate, confessional form of media communication, Winfrey popularized and revolutionized the tabloid talk show genre pioneered by Phil Donahue. By the mid-1990s, Winfrey had reinvented her show with a focus on literature, self-improvement, mindfulness, and spirituality.",
+				"Winfrey was born into poverty in rural [[Mississippi]] to a single teenage mother and later raised in inner-city Milwaukee. Winfrey was then sent to live with the man she calls her father, Vernon Winfrey, a barber in [[Nashville, Tennessee]], and landed a job in radio while still in high school. By 19, she was a co-anchor for the local evening news. Winfrey's often emotional, extemporaneous delivery eventually led to her transfer to the daytime talk show arena, and after boosting a third-rated local Chicago talk show to first place, she launched her own production company. Credited with creating a more intimate, confessional form of media communication, Winfrey popularized and revolutionized the tabloid talk show genre pioneered by Phil Donahue. By the mid-1990s, Winfrey had reinvented her show with a focus on literature, self-improvement, mindfulness, and spirituality.",
 			},
 		},
-		related = { "J. P. Morgan", "Leland Stanford" },
+		related = { "Jakob Fugger", "Theodor W. Adorno" },
 		infobox = {
 			{ "Born", "29 January 1954" },
 			{ "Birthplace", "Kosciusko, Mississippi, U.S." },
-			{ "Education", "Tennessee State University (BA)" },
+			{ "Education", "Tennessee State University ([[Bachelor of Arts|BA]])" },
 			{ "Years active", "1973–present" },
 		},
 	},
@@ -1318,7 +1248,7 @@ return {
 				"O'Toole started his training at the Royal Academy of Dramatic Art (RADA) in London and began working in the theatre, gaining recognition as a [[William Shakespeare|Shakespearean]] actor at the Bristol Old Vic and with the English Stage Company. In 1959, he made his [[West End theatre|West End]] debut in The Long and the Short and the Tall, and played the title role in [[Hamlet]] in the National Theatre's first production in 1963. Excelling on stage, O'Toole was known for his \"hellraiser\" lifestyle off-stage. He received a nomination for the Laurence Olivier Award for Best Comedy Performance for his portrayal of Jeffrey Bernard in the play Jeffrey Bernard Is Unwell (1990). Making his film debut in 1959, O'Toole received his first Academy Award for Best Actor nomination for portraying T. E. Lawrence in the historical epic Lawrence of Arabia (1962).",
 			},
 		},
-		related = { "Julie Andrews", "Vivien Leigh" },
+		related = { "Vivien Leigh", "Julie Andrews" },
 		infobox = {
 			{ "Born", "2 August 1932" },
 			{ "Birthplace", "[[Leeds]], West Riding of Yorkshire, England" },
@@ -1342,13 +1272,13 @@ return {
 		sections = {
 			{
 				"Overview",
-				"The Government of India honoured him with the Padma Bhushan in 2000 and the Padma Vibhushan in 2016, India's third and second highest civilian honours respectively, the Dadasaheb Phalke Award in 2019, the highest Indian award in the field of cinema, and the IFFI Satyajit Ray Lifetime Achievement Award for his contributions to world cinema. Following his debut in K. Balachander's 1975 Tamil drama Apoorva Raagangal, Rajinikanth's acting career commenced with a brief phase of portraying antagonistic characters in Tamil films. By the end of the decade, he had worked in all South Indian film industries and established a career in Tamil cinema. He then played dual roles in the action thriller Billa (1980), a remake of the Hindi film Don (1978). It was his biggest commercial success to that point, earned him stardom and gave him the action hero image.",
+				"The [[Government of India]] honoured him with the [[Padma Bhushan]] in 2000 and the [[Padma Vibhushan]] in 2016, India's third and second highest civilian honours respectively, the Dadasaheb Phalke Award in 2019, the highest Indian award in the field of cinema, and the IFFI Satyajit Ray Lifetime Achievement Award for his contributions to world cinema. Following his debut in K. Balachander's 1975 Tamil drama Apoorva Raagangal, Rajinikanth's acting career commenced with a brief phase of portraying antagonistic characters in Tamil films. By the end of the decade, he had worked in all South Indian film industries and established a career in Tamil cinema. He then played dual roles in the action thriller Billa (1980), a remake of the Hindi film Don (1978). It was his biggest commercial success to that point, earned him stardom and gave him the action hero image.",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Ingrid Bergman", "Marlon Brando" },
 		infobox = {
 			{ "Born", "12 December 1950" },
-			{ "Birthplace", "Bangalore, Mysore State, India" },
+			{ "Birthplace", "[[Bengaluru|Bangalore]], Mysore State, India" },
 			{ "Education", "Adyar Film Institute" },
 			{ "Occupation", "[[Actor]], film producer, screenwriter, playback singer" },
 			{ "Years active", "1975–present" },
@@ -1370,7 +1300,7 @@ return {
 				"De Niro studied acting at HB Studio, Stella Adler Conservatory, and Lee Strasberg's Actors Studio. He won the Academy Award for Best Supporting Actor for his role as Vito Corleone in the crime drama The Godfather Part II (1974), becoming the first male to win for an Italian-language performance. Six years later, he won the Academy Award for Best Actor for his portrayal of Jake LaMotta in the biopic drama Raging Bull (1980). He was further Oscar-nominated for his performances in Taxi Driver (1976), The Deer Hunter (1978), Awakenings (1990), Cape Fear (1991), Silver Linings Playbook (2012), and Killers of the Flower Moon (2023), while also earning a nomination for Best Picture for producing The Irishman (2019). He directed and acted in both the crime drama A Bronx Tale (1993) and the spy film The Good Shepherd (2006).",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Marlon Brando", "Elizabeth Taylor" },
 		infobox = {
 			{ "Born", "17 August 1943" },
 			{ "Birthplace", "New York City, [[New York (state)|New York]], U.S." },
@@ -1398,7 +1328,10 @@ return {
 		infobox = {
 			{ "Born", "17 March 1938" },
 			{ "Birthplace", "Near [[Lake Baikal]], Russian SFSR, USSR" },
-			{ "Citizenship", "Soviet Union (until 1961) Stateless (1961–1982) Austria (from 1982)" },
+			{
+				"Citizenship",
+				"Soviet Union (until 1961) [[Statelessness|Stateless]] (1961–1982) Austria (from 1982)",
+			},
 			{ "Died", "6 January 1993" },
 			{ "Education", "Kirov Ballet School" },
 			{ "Occupation", "Dancer, choreographer, ballet director" },
@@ -1421,7 +1354,7 @@ return {
 				"Despite a career that lasted only a few years at its peak, Valentino's influence on popular culture was profound. In 1925, he established a film award recognizing artistic achievement, the Rudolph Valentino Medal, which was a precursor to the [[Academy Awards|Academy Award]]. His sudden death in 1926 at the age of 31 from complications of peritonitis following surgery for appendicitis and gastric ulcers triggered mass public mourning, cementing his status as a legendary figure of [[History of film|early cinema]]. Valentino's life has depicted in several biographical films: Valentino (1951), The Legend of Valentino (1975), and Valentino (1977). From 1972 to 2006, his legacy was further commemorated through the annual Rudolph Valentino Award, presented in Italy in recognition of acting achievement.",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Ingrid Bergman", "Sophia Loren" },
 		infobox = {
 			{ "Born", "6 May 1895" },
 			{ "Birthplace", "Castellaneta, Italy" },
@@ -1445,7 +1378,7 @@ return {
 				"At the height of her world fame, Bernhardt commissioned the first lithographic theater poster created by the then-unknown artist Alphonse Mucha for the play she was starring in and directing: Gismonda. Bernhardt was delighted with the result, gave him a contract for six more posters, and Mucha became one of the more sought-after artists of this period for his [[Art Nouveau]] style.",
 			},
 		},
-		related = { "Julie Andrews", "Vivien Leigh" },
+		related = { "Vivien Leigh", "Julie Andrews" },
 		infobox = {
 			{ "Born", "22 October 1844" },
 			{ "Birthplace", "Paris, France" },
@@ -1470,7 +1403,7 @@ return {
 				"Connery is also known for his work with directors such as [[Alfred Hitchcock]], Sidney Lumet and John Huston. He also acted in Robin and Marian (1976), A Bridge Too Far (1977), Time Bandits (1981), Highlander, The Name of the Rose (both 1986), Indiana Jones and the Last Crusade (1989), The Hunt for Red October (1990), Dragonheart, The Rock (both 1996) and Finding Forrester (2000). His final film roles were The League of Extraordinary Gentlemen (2003) and Sir Billi (2012). Connery received numerous accolades. For his role in The Untouchables (1987), he received the Academy Award for Best Supporting Actor (making him the first Scottish actor to win a major Oscar) and the Golden Globe Award for Best Supporting Actor – Motion Picture. In the same year, Connery received the BAFTA Award for Best Actor in a Leading Role for his role in The Name of the Rose.",
 			},
 		},
-		related = { "Julie Andrews", "Vivien Leigh" },
+		related = { "Vivien Leigh", "Julie Andrews" },
 		infobox = {
 			{ "Born", "25 August 1930" },
 			{ "Birthplace", "[[Edinburgh]], Scotland" },
@@ -1488,7 +1421,7 @@ return {
 		description = "Japanese actress (1920–2015)",
 		tags = { "Actors", "Asia" },
 		summary = "**Setsuko Hara** was a Japanese actress. She is best known for her performances in [[Yasujirō Ozu]]'s films Late Spring (1949), [[Tokyo Story]] (1953) and Tokyo Twilight (1957), amongst many others, and for working extensively with director Mikio Naruse. She is widely considered to be one of the greatest Japanese film actresses of all time.",
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Ingrid Bergman", "Sophia Loren" },
 		infobox = {
 			{ "Born", "17 June 1920" },
 			{ "Birthplace", "[[Yokohama]], Kanagawa, Japan" },
@@ -1514,11 +1447,11 @@ return {
 				"Temple began her film career in 1931 when she was three years old and became well known for her performance in Bright Eyes, released in 1934. She won a special Juvenile Academy Award in February 1935 for her outstanding contribution as a juvenile performer in motion pictures during 1934 and continued to appear in popular films through the remainder of the 1930s, although her subsequent films became less popular as she grew older. She appeared in her last film, A Kiss for Corliss, in 1949. Temple joined the Junior League of Palo Alto, California, in 1959 and shortly thereafter began a new chapter of public service, perhaps using a combination of her stardom and her leadership training to advocate for important causes.",
 			},
 		},
-		related = { "Isadora Duncan", "Clint Eastwood" },
+		related = { "Clark Gable", "John Wayne", "Rajinikanth" },
 		infobox = {
 			{ "Country", "Czechoslovakia" },
 			{ "Born", "23 April 1928" },
-			{ "Birthplace", "Santa Monica, California, U.S." },
+			{ "Birthplace", "[[Santa Monica, California]], U.S." },
 			{ "Died", "10 February 2014" },
 			{ "Occupation", "Actress, singer, dancer, politician, diplomat" },
 		},
@@ -1531,14 +1464,14 @@ return {
 		source = "wikipedia",
 		description = "Bahamian-American actor, filmmaker, diplomat and author  (1927–2022)",
 		tags = { "Actors", "United States" },
-		summary = '**Sidney Poitier** was a Bahamian-American actor, film director, activist, and diplomat. In 1964, he was the first black actor and first Bahamian to win the Academy Award for Best Actor. Among his other accolades are two competitive Golden Globe Awards, a BAFTA Award and a Grammy Award, in addition to nominations for two Emmy Awards and a Tony Award. In 1999, he was ranked number 22 among the "American Film Institute\'s 100 Stars". Poitier was one of the last surviving stars from the Golden Age of Hollywood.',
+		summary = "**Sidney Poitier** was a Bahamian-American actor, film director, activist, and diplomat. In 1964, he was the first black actor and first Bahamian to win the Academy Award for Best Actor. Among his other accolades are two competitive Golden Globe Awards, a BAFTA Award and a Grammy Award, in addition to nominations for two Emmy Awards and a Tony Award. In 1999, he was ranked number 22 among the \"[[AFI's 100 Years...100 Stars|American Film Institute's 100 Stars]]\". Poitier was one of the last surviving stars from the Golden Age of Hollywood.",
 		sections = {
 			{
 				"Overview",
-				"Poitier's family lived in [[The Bahamas|the Bahamas]], then still a Crown colony, but he was born in Miami, Florida, while they were visiting, which granted him U.S. citizenship. He grew up in the Bahamas, but moved back to Miami at age 15, and to New York City when he was 16. He joined the American Negro Theatre, gaining his breakthrough film role as a high school student in the film Blackboard Jungle (1955). Poitier gained fame for his leading roles in films such as The Defiant Ones (1958), for which he won the Silver Bear for Best Actor and became the first African American to be nominated for an Academy Award for Best Actor. In 1964, he won the Academy Award and the Golden Globe for Best Actor for Lilies of the Field (1963). Poitier broke ground playing strong leading African American male roles in films such as Porgy and Bess (1959), A Raisin in the Sun (1961), and A Patch of Blue (1965).",
+				"Poitier's family lived in [[The Bahamas|the Bahamas]], then still a [[Crown colony]], but he was born in Miami, Florida, while they were visiting, which granted him U.S. citizenship. He grew up in the Bahamas, but moved back to Miami at age 15, and to New York City when he was 16. He joined the American Negro Theatre, gaining his breakthrough film role as a high school student in the film Blackboard Jungle (1955). Poitier gained fame for his leading roles in films such as The Defiant Ones (1958), for which he won the Silver Bear for Best Actor and became the first African American to be nominated for an Academy Award for Best Actor. In 1964, he won the Academy Award and the Golden Globe for Best Actor for Lilies of the Field (1963). Poitier broke ground playing strong leading African American male roles in films such as Porgy and Bess (1959), A Raisin in the Sun (1961), and A Patch of Blue (1965).",
 			},
 		},
-		related = { "Isadora Duncan", "Bob Fosse" },
+		related = { "Al Pacino", "James Stewart", "Mary Pickford", "Toshiro Mifune" },
 		infobox = {
 			{ "Born", "20 February 1927" },
 			{ "Birthplace", "Miami, Florida, U.S." },
@@ -1550,7 +1483,7 @@ return {
 	{
 		title = "Sophia Loren",
 		category = "Actor",
-		fame = 3,
+		fame = 2,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "Italian actress (born 1934)",
@@ -1560,13 +1493,13 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Encouraged to enroll in acting lessons after entering a beauty pageant, Loren began her film career at age 16 in 1950. She appeared in several bit parts and minor roles in the early part of the decade, until her five-picture contract with Paramount in 1956 launched her international career. Her film appearances around this time include The Pride and the Passion, Houseboat, and It Started in Naples. Loren's performance as Cesira in the film Two Women (1960), directed by [[Vittorio De Sica]], won her the Academy Award for Best Actress, making her the first performer to ever win an Oscar for a non-English-language performance.",
+				"Encouraged to enroll in acting lessons after entering a beauty pageant, Loren began her film career at age 16 in 1950. She appeared in several bit parts and minor roles in the early part of the decade, until her five-picture contract with [[Paramount Pictures|Paramount]] in 1956 launched her international career. Her film appearances around this time include The Pride and the Passion, Houseboat, and It Started in Naples. Loren's performance as Cesira in the film Two Women (1960), directed by [[Vittorio De Sica]], won her the Academy Award for Best Actress, making her the first performer to ever win an Oscar for a non-English-language performance.",
 			},
 		},
-		related = { "Isadora Duncan", "Marius Petipa" },
+		related = { "Greta Garbo", "Madhubala", "Marcello Mastroianni", "Marlene Dietrich", "Rudolph Valentino" },
 		infobox = {
 			{ "Born", "20 September 1934" },
-			{ "Birthplace", "[[Rome]], Kingdom of Italy" },
+			{ "Birthplace", "[[Rome]], [[Kingdom of Italy]]" },
 			{ "Years active", "1950–2020" },
 			{ "Occupation", "Actress" },
 			{ "Citizenship", "Italy, France" },
@@ -1587,7 +1520,7 @@ return {
 				"Although he amassed more than 180 screen credits, Mifune is best known for his 16 collaborations with director [[Akira Kurosawa]]. He also portrayed Miyamoto Musashi in Hiroshi Inagaki's Samurai Trilogy (1954–1956), Lord Toranaga in the [[NBC]] television miniseries Shōgun, and Admiral Isoroku Yamamoto in three different films. In 1962, he established Mifune Productions, achieving success with large-scale works including The Sands of Kurobe (1968) and Samurai Banners (1969). He also starred in his directorial debut Legacy of the 500,000 (1963). Following his performance in the 1965 film Red Beard, which won him the Best Actor at the Venice Film Festival for a second time, Mifune turned to roles abroad. Mifune died of organ failure on 24 December 1997. In 1999, he was inducted into the Martial Arts History Museum Hall of Fame.",
 			},
 		},
-		related = { "Isadora Duncan", "Clint Eastwood" },
+		related = { "Ingrid Bergman", "Sophia Loren" },
 		infobox = {
 			{ "Born", "1 April 1920" },
 			{ "Birthplace", "[[Qingdao]], Shandong, China" },
@@ -1606,24 +1539,10 @@ return {
 		tags = { "Dancers and choreographers", "Ballet" },
 		aliases = { "Vaslav", "Vatslav Nijinsky" },
 		summary = "**Vaslav** or **Vatslav Nijinsky** (12 March 1889/1890 – 8 April 1950) was a Russian ballet dancer and [[Choreography|choreographer]] of Polish ancestry. He is regarded as the greatest male dancer of the early 20th century. He is often associated with the Ballets Russes and its impresario Sergei Diaghilev, for which he choreographed such influential ballets as L'après-midi d'un faune (1912), [[The Rite of Spring|Le Sacre du Printemps]] (1913), Jeux (1913), and Till Eulenspiegel (1916). He was celebrated for his virtuosity and for the depth and intensity of his characterizations. He could dance en pointe, a rare skill among male dancers at the time, and was admired for his seemingly gravity-defying leaps.",
-		related = {
-			"Bette Davis",
-			"Elizabeth Taylor",
-			"George Balanchine",
-			"Greta Garbo",
-			"Jack Nicholson",
-			"John Wayne",
-			"Katharine Hepburn",
-			"Marcello Mastroianni",
-			"Mary Pickford",
-			"Mikhail Baryshnikov",
-			"Rudolf Nureyev",
-			"Shirley Temple",
-			"Toshiro Mifune",
-		},
+		related = { "George Balanchine", "Mikhail Baryshnikov", "Rudolf Nureyev" },
 		infobox = {
 			{ "Born", "12 March 1889/1890" },
-			{ "Birthplace", "Kiev, Russian Empire" },
+			{ "Birthplace", "[[Kyiv|Kiev]], Russian Empire" },
 			{ "Died", "8 April 1950 (aged 60–61)" },
 			{ "Occupation", "Ballet dancer, [[Choreography|choreographer]]" },
 			{ "Years active", "1908–1917" },
@@ -1632,7 +1551,7 @@ return {
 	{
 		title = "Vivien Leigh",
 		category = "Actor",
-		fame = 1,
+		fame = 2,
 		emoji = "🎭",
 		source = "wikipedia",
 		description = "British actress (1913–1967)",
@@ -1642,7 +1561,7 @@ return {
 		sections = {
 			{
 				"Overview",
-				"For the latter role, she also won the Volpi Cup for Best Actress, and later won a Tony Award for her work in the [[Broadway theatre|Broadway]] musical version of Tovarich (1963). Despite her fame as a screen actress, Leigh was primarily a stage performer. During her 30-year career, she played roles ranging from the heroines of Noël Coward and [[George Bernard Shaw]] comedies to classic Shakespearean characters such as Ophelia, [[Cleopatra]], Juliet and Lady Macbeth. Later in life, she performed as a character actress in a few films. Although her career had periods of inactivity, in 1999 the American Film Institute (AFI) ranked Leigh as the 16th-greatest female movie star of classic Hollywood cinema. Widely lauded for her beauty, Leigh felt that her physical attributes sometimes prevented her from being taken seriously as an actress.",
+				"For the latter role, she also won the Volpi Cup for Best Actress, and later won a Tony Award for her work in the [[Broadway theatre|Broadway]] musical version of Tovarich (1963). Despite her fame as a screen actress, Leigh was primarily a stage performer. During her 30-year career, she played roles ranging from the heroines of Noël Coward and [[George Bernard Shaw]] comedies to classic Shakespearean characters such as Ophelia, [[Cleopatra]], Juliet and Lady Macbeth. Later in life, she performed as a character actress in a few films. Although her career had periods of inactivity, in 1999 the [[American Film Institute]] (AFI) ranked Leigh as the [[AFI's 100 Years...100 Stars|16th-greatest female movie star]] of classic Hollywood cinema. Widely lauded for her beauty, Leigh felt that her physical attributes sometimes prevented her from being taken seriously as an actress.",
 			},
 		},
 		related = {
@@ -1671,11 +1590,11 @@ return {
 		source = "wikipedia",
 		description = "Burrowing mammal native to Africa",
 		tags = { "Vertebrates", "Mammals" },
-		summary = "The **aardvark** is a medium-sized, burrowing, nocturnal mammal native to [[Africa]]. The aardvark is the only living member of the genus Orycteropus, the family Orycteropodidae and the order Tubulidentata.",
+		summary = "The **aardvark** is a medium-sized, burrowing, [[Nocturnal animal|nocturnal]] mammal native to [[Africa]]. The aardvark is [[Monotypic taxon|the only living member]] of the genus Orycteropus, the family Orycteropodidae and the order Tubulidentata.",
 		sections = {
 			{
 				"Overview",
-				"The aardvark is an afrotherian, a clade that also includes [[Elephant|elephants]], manatees, and hyraxes. It is found over much of the southern two-thirds of the African continent, avoiding areas that are mainly rocky. A nocturnal feeder, the aardvark subsists on ants and termites (myrmecophagy) by using its sharp claws and powerful legs to dig the insects out of their hills, and its long snout to sniff out food. It digs a burrow in which to live and rear its young.",
+				"The aardvark is an afrotherian, a [[Clade|clade]] that also includes [[Elephant|elephants]], manatees, and hyraxes. It is found over much of the southern two-thirds of the African continent, avoiding areas that are mainly rocky. A nocturnal feeder, the aardvark subsists on ants and termites (myrmecophagy) by using its sharp claws and powerful legs to dig the insects out of their hills, and its long [[Proboscis|snout]] to sniff out food. It digs a burrow in which to live and rear its young.",
 			},
 		},
 		infobox = {
@@ -1692,13 +1611,14 @@ return {
 		description = "Extinct paraphyletic class of fishes",
 		tags = { "Vertebrates", "Fishes" },
 		aliases = { "Acanthodians" },
-		summary = "**Acanthodii** or **acanthodians** is an extinct class of [[Gnathostomata|gnathostomes]] (jawed [[Fish|fishes]]). They are currently considered to represent a paraphyletic grade of various fish lineages basal to extant [[Chondrichthyes]], which includes living [[Shark|sharks]], rays, and [[Chimaera|chimaeras]]. Acanthodians possess a mosaic of features shared with both [[Osteichthyes|osteichthyans]] (bony fish) and chondrichthyans (cartilaginous fish). In general body shape, they were similar to modern sharks, but their epidermis was covered with tiny rhomboid platelets like the scales of holosteians (gars, bowfins).",
+		summary = "**Acanthodii** or **acanthodians** is an extinct class of [[Gnathostomata|gnathostomes]] (jawed [[Fish|fishes]]). They are currently considered to represent a [[Paraphyly|paraphyletic]] grade of various fish lineages [[Basal (phylogenetics)|basal]] to [[Neontology|extant]] [[Chondrichthyes]], which includes living [[Shark|sharks]], [[Batomorphi|rays]], and [[Chimaera|chimaeras]]. Acanthodians possess a mosaic of features shared with both [[Osteichthyes|osteichthyans]] (bony fish) and chondrichthyans (cartilaginous fish). In general body shape, they were similar to modern sharks, but their epidermis was covered with tiny rhomboid platelets like the scales of holosteians (gars, bowfins).",
 		sections = {
 			{
 				"Overview",
-				'The popular name "**spiny sharks**" is because they were superficially shark-shaped, with a streamlined body, paired fins, a strongly upturned tail, and stout, largely immovable bony spines supporting all the fins except the tail—hence, "spiny sharks". However, acanthodians are not true sharks; their close relation to modern cartilaginous fish can lead them to be considered "stem-sharks". Acanthodians had a cartilaginous skeleton, but their fins had a wide, bony base and were reinforced on their anterior margin with a dentine spine. As a result, fossilized spines and scales are often all that remains of these fishes in ancient [[Sedimentary rock|sedimentary rocks]]. The earliest acanthodians were marine, but during the Devonian, freshwater species became predominant. Acanthodians have been divided into four orders: Acanthodiformes, Climatiiformes, Diplacanthiformes, and Ischnacanthiformes.',
+				'The popular name "**spiny sharks**" is because they were superficially shark-shaped, with a streamlined body, paired [[Fish fin|fins]], a strongly upturned tail, and stout, largely immovable bony spines supporting all the fins except the tail—hence, "spiny sharks". However, acanthodians are not true sharks; their close relation to modern cartilaginous fish can lead them to be considered "stem-sharks". Acanthodians had a cartilaginous [[Skeleton|skeleton]], but their fins had a wide, bony base and were reinforced on their anterior margin with a dentine spine. As a result, fossilized spines and scales are often all that remains of these fishes in ancient [[Sedimentary rock|sedimentary rocks]]. The earliest acanthodians were marine, but during the [[Devonian]], freshwater species became predominant. Acanthodians have been divided into four orders: Acanthodiformes, Climatiiformes, Diplacanthiformes, and Ischnacanthiformes.',
 			},
 		},
+		related = { "Coelacanth" },
 	},
 	{
 		title = "Accipiter",
@@ -1708,11 +1628,11 @@ return {
 		source = "wikipedia",
 		description = "Genus of birds",
 		tags = { "Birds", "Accipitriformes and Falconiformes" },
-		summary = "**Accipiter** is a genus of [[Bird of prey|birds of prey]] in the family Accipitridae. Some species are called sparrowhawks, but there are many sparrowhawks in other genera such as Tachyspiza.",
+		summary = "**Accipiter** is a [[Genus|genus]] of [[Bird of prey|birds of prey]] in the family Accipitridae. Some species are called sparrowhawks, but there are many sparrowhawks in other genera such as Tachyspiza.",
 		sections = {
 			{
 				"Overview",
-				'These birds are slender with short, broad, rounded wings and a long tail which helps them maneuver in flight. Females tend to be larger than males. They often ambush their prey, mainly small birds and mammals, capturing them after a short chase. The typical flight pattern is a series of flaps followed by a short glide. They are commonly found in wooded or shrubby areas. The genus Accipiter was introduced by the French zoologist Mathurin Jacques Brisson in 1760. The type species is the Eurasian sparrowhawk (Accipiter nisus). The name is [[Latin]] for "hawk", from accipere, "to grasp".',
+				'These birds are slender with short, broad, rounded wings and a long tail which helps them maneuver in flight. Females tend to be larger than males. They often ambush their prey, mainly small birds and mammals, capturing them after a short chase. The typical flight pattern is a series of flaps followed by a short glide. They are commonly found in wooded or shrubby areas. The [[Genus|genus]] Accipiter was introduced by the French zoologist [[Mathurin Jacques Brisson]] in 1760. The type species is the Eurasian sparrowhawk (Accipiter nisus). The name is [[Latin]] for "hawk", from accipere, "to grasp".',
 			},
 		},
 		related = { "Peregrine falcon", "Falcon" },
@@ -1728,15 +1648,15 @@ return {
 		source = "wikipedia",
 		description = "Class of ray-finned bony fishes",
 		tags = { "Vertebrates", "Fishes" },
-		aliases = { "Ray-finned fish", "Actinopterygians" },
-		summary = "**Actinopterygii**, members of which are known as **ray-finned fish** or **actinopterygians**, is a class of [[Osteichthyes|bony fish]] that constitutes nearly 99% of the over 30,000 living [[Species|species]] of [[Fish|fish]]. The vast majority of extant actinopterygian species are teleosts, and by species count they dominate the subphylum Vertebrata, comprising over 50% of all living vertebrates. They are the most abundant nektonic aquatic animals and are ubiquitous throughout freshwater, brackish and [[Ocean|marine]] environments from the deep sea to subterranean waters to the highest mountain streams. Extant species can range in size from Paedocypris, at 8 mm, to the giant sunfish, at 2700 kg, and the giant oarfish, at 8 m (or possibly 11 m).",
+		aliases = { "Actinopterygians", "Ray-finned fish" },
+		summary = "**Actinopterygii**, members of which are known as **ray-finned fish** or **actinopterygians**, is a [[Class (taxonomy)|class]] of [[Osteichthyes|bony fish]] that constitutes nearly 99% of the over 30,000 living [[Species|species]] of [[Fish|fish]]. The vast majority of [[Neontology|extant]] actinopterygian species are [[Teleost|teleosts]], and by species count they dominate the [[Subphylum|subphylum]] Vertebrata, comprising over 50% of all living vertebrates. They are the most abundant nektonic [[Aquatic animal|aquatic animals]] and are ubiquitous throughout [[Fresh water|freshwater]], [[Brackish water|brackish]] and [[Ocean|marine]] environments from the [[Deep sea|deep sea]] to subterranean waters to the highest mountain streams. Extant species can range in size from Paedocypris, at 8 mm, to the giant sunfish, at 2700 kg, and the giant oarfish, at 8 m (or possibly 11 m).",
 		sections = {
 			{
 				"Overview",
-				"The largest ever known ray-finned fish, the extinct Leedsichthys from the [[Jurassic]], is estimated to have grown to 16.5 m. Ray-finned fish are so called because of their lightly built fins made of webbings of skin supported by radially extended thin bony spines called lepidotrichia, as opposed to the bulkier, fleshy fins of the sister clade [[Sarcopterygii]] (lobe-finned fish). Resembling folding fans, the actinopterygian fins can easily change shape, orientation and wetted area, providing superior thrust-to-weight ratios per movement compared to sarcopterygian and chondrichthyian fins. The fin rays attach directly to the proximal or basal skeletal elements, the radials, which represent the articulation between these fins and the internal skeleton (e.g., pelvic and pectoral girdles).",
+				"The largest ever known ray-finned fish, the extinct Leedsichthys from the [[Jurassic]], is estimated to have grown to 16.5 m. Ray-finned fish are so called because of their lightly built [[Fish fin|fins]] made of webbings of [[Skin|skin]] supported by radially extended thin bony spines called lepidotrichia, as opposed to the bulkier, fleshy fins of the [[Sister group|sister]] [[Clade|clade]] [[Sarcopterygii]] (lobe-finned fish). Resembling folding fans, the actinopterygian fins can easily change shape, orientation and wetted area, providing superior thrust-to-weight ratios per movement compared to sarcopterygian and chondrichthyian fins. The fin rays attach directly to the proximal or basal skeletal elements, the radials, which represent the articulation between these fins and the internal skeleton (e.g., pelvic and pectoral girdles).",
 			},
 		},
-		related = { "Coral reef fish", "Oarfish" },
+		related = { "Ophidiiformes" },
 		infobox = {
 			{ "Scientific name", "Actinopterygii" },
 		},
@@ -1748,14 +1668,14 @@ return {
 		emoji = "🐍",
 		source = "wikipedia",
 		tags = { "Vertebrates", "Reptiles" },
-		summary = "The species is extremely widespread, and thus can be found throughout much of [[Europe]], and as far as [[East Asia]]. There are three recognised subspecies.",
+		summary = "The species is extremely widespread, and thus can be found throughout much of [[Europe]], and as far as [[East Asia]]. There are three recognised [[Subspecies|subspecies]].",
 		sections = {
 			{
 				"Overview",
-				"Known by a host of common names including **common adder** and **common viper**, the adder has been the subject of much folklore in Britain and other European countries. It is not regarded as especially dangerous; the snake is not aggressive and usually bites only when really provoked, stepped on, or picked up. The specific name, berus, is Neo-Latin and was at one time used to refer to a snake, possibly the grass snake, Natrix natrix. The common adder is found in different terrains, [[Habitat|habitat]] complexity being essential for different aspects of its behaviour. It feeds on small [[Mammal|mammals]], [[Bird|birds]], [[Lizard|lizards]], and [[Amphibian|amphibians]], and in some cases on [[Spider|spiders]], worms, and [[Insect|insects]]. The common adder, like most other vipers, is ovoviviparous, giving birth to live young. Females breed once every two or three years and litters are usually born in late summer to early autumn in the Northern Hemisphere.",
+				"Known by a host of common names including **common adder** and **common viper**, the adder has been the subject of much folklore in Britain and other European countries. It is not regarded as especially dangerous; the snake is not aggressive and usually bites only when really provoked, stepped on, or picked up. The specific name, berus, is [[Neo-Latin]] and was at one time used to refer to a snake, possibly the grass snake, Natrix natrix. The common adder is found in different terrains, [[Habitat|habitat]] complexity being essential for different aspects of its behaviour. It feeds on small [[Mammal|mammals]], [[Bird|birds]], [[Lizard|lizards]], and [[Amphibian|amphibians]], and in some cases on [[Spider|spiders]], worms, and [[Insect|insects]]. The common adder, like most other vipers, is ovoviviparous, giving birth to live young. Females breed once every two or three years and litters are usually born in late summer to early autumn in the Northern Hemisphere.",
 			},
 		},
-		related = { "Caiman" },
+		related = { "Turtle" },
 		infobox = {
 			{ "Scientific name", "Vipera berus" },
 			{ "Conservation status", "Least Concern" },
@@ -1774,10 +1694,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Its unpredictable temperament may be part of the reason that the African buffalo has never been domesticated and has no domesticated descendants, unlike the wild yak and wild water buffalo, which are the ancestors of the [[Yak|domestic yak]] and [[Water buffalo|water buffalo]], respectively. Natural predators of adult African buffaloes include [[Lion|lions]], African wild dogs, spotted hyenas, and Nile crocodiles. As one of the Big Five game animals, the **Cape buffalo** (Syncerus caffer caffer), the largest subspecies native to eastern and southern Africa, is a sought-after trophy in hunting.",
+				"Its unpredictable temperament may be part of the reason that the African buffalo has never been [[Domestication|domesticated]] and has no domesticated descendants, unlike the wild yak and wild water buffalo, which are the ancestors of the [[Yak|domestic yak]] and [[Water buffalo|water buffalo]], respectively. Natural predators of adult African buffaloes include [[Lion|lions]], African wild dogs, [[Spotted hyena|spotted hyenas]], and Nile crocodiles. As one of the Big Five game animals, the **Cape buffalo** (Syncerus caffer caffer), the largest subspecies native to eastern and southern Africa, is a sought-after trophy in hunting.",
 			},
 		},
-		related = { "Red deer", "Antelope" },
+		related = { "Antelope" },
 		infobox = {
 			{ "Scientific name", "Syncerus caffer" },
 			{ "Conservation status", "Near Threatened" },
@@ -1799,7 +1719,7 @@ return {
 				"African honey bees were first introduced to [[Brazil]] in 1956 to increase honey production, but 26 swarms with their queens escaped from their experimental apiary in 1957. Since then, the hybrid has spread throughout South America and arrived in North America in 1985. Hives were found in southern [[Texas]], [[United States]], in 1990. Africanized honey bees are typically much more defensive, react to disturbances faster, and chase people farther than other varieties of honey bees, up to 400 m.",
 			},
 		},
-		related = { "Wasp", "Hymenoptera" },
+		related = { "Wasp", "Bumblebee" },
 	},
 	{
 		title = "Agkistrodon piscivorus",
@@ -1809,8 +1729,8 @@ return {
 		source = "wikipedia",
 		description = "Species of reptile",
 		tags = { "Vertebrates", "Reptiles" },
-		summary = "It is one of the world's few semiaquatic vipers (along with the Florida cottonmouth), and is native to the Southeastern United States. When threatened, it may respond by coiling its body and displaying its fangs. Individuals may bite when feeling threatened or being handled in any way. It tends to be found in or near water, particularly in slow-moving and shallow lakes, streams, and marshes. It is a capable swimmer, and like several species of snakes, is known to occasionally enter bays and estuaries and swim between barrier islands and the mainland.",
-		related = { "Lizard", "Caiman" },
+		summary = "It is one of the world's few [[Semiaquatic|semiaquatic]] vipers (along with the Florida cottonmouth), and is native to the [[Southeastern United States]]. When threatened, it may respond by coiling its body and displaying its fangs. Individuals may bite when feeling threatened or being handled in any way. It tends to be found in or near water, particularly in slow-moving and shallow lakes, streams, and marshes. It is a capable swimmer, and like several species of snakes, is known to occasionally enter bays and estuaries and swim between barrier islands and the mainland.",
+		related = { "Lizard", "Turtle" },
 		infobox = {
 			{ "Scientific name", "Agkistrodon piscivorus" },
 			{ "Conservation status", "Least Concern" },
@@ -1825,18 +1745,18 @@ return {
 		description = "Paraphyletic infraphylum of fish",
 		tags = { "Vertebrates", "Agnatha" },
 		aliases = { "Jawless fish" },
-		summary = "**Agnatha** or **jawless fish** is a paraphyletic infraphylum of [[Animal|animals]] in the subphylum Vertebrata of the phylum Chordata, characterized by the lack of jaws. The group consists of both living (cyclostomes such as [[Hagfish|hagfishes]] and [[Lamprey|lampreys]]) and [[Extinction|extinct]] clades (e.g. conodonts and cephalaspidomorphs, among others). They are sister to vertebrates with jaws known as gnathostomes, who [[Evolution|evolved]] from jawless ancestors during the early Silurian by developing folding articulations in the first pairs of gill arches.",
+		summary = "**Agnatha** or **jawless fish** is a [[Paraphyly|paraphyletic]] infraphylum of [[Animal|animals]] in the [[Subphylum|subphylum]] Vertebrata of the [[Phylum|phylum]] Chordata, characterized by the lack of jaws. The group consists of both [[Neontology|living]] (cyclostomes such as [[Hagfish|hagfishes]] and [[Lamprey|lampreys]]) and [[Extinction|extinct]] [[Clade|clades]] (e.g. [[Conodont|conodonts]] and cephalaspidomorphs, among others). They are [[Sister group|sister]] to vertebrates with jaws known as gnathostomes, who [[Evolution|evolved]] from jawless ancestors during the early [[Silurian]] by developing folding articulations in the first pairs of gill arches.",
 		sections = {
 			{
 				"Overview",
-				"Molecular data, both from rRNA and from mtDNA as well as embryological data, strongly supports the hypothesis that both groups of living agnathans, [[Hagfish|hagfishes]] and [[Lamprey|lampreys]], are more closely related to each other than to [[Gnathostomata|jawed fish]], forming the superclass Cyclostomi. The oldest fossil agnathans appeared in the [[Cambrian]]. Living jawless fish comprise about 120 [[Species|species]] in total. Hagfish are considered members of the subphylum Vertebrata, because they secondarily lost vertebrae; before this event was inferred from molecular and developmental data, the Craniata hypothesis was accepted (and is still sometimes used as a strictly morphological descriptor) to reference hagfish plus vertebrates.",
+				"Molecular data, both from rRNA and from mtDNA as well as [[Embryology|embryological]] data, strongly supports the hypothesis that both groups of living agnathans, [[Hagfish|hagfishes]] and [[Lamprey|lampreys]], are more closely related to each other than to [[Gnathostomata|jawed fish]], forming the [[Class (taxonomy)|superclass]] Cyclostomi. The oldest fossil agnathans appeared in the [[Cambrian]]. Living jawless fish comprise about 120 [[Species|species]] in total. Hagfish are considered members of the [[Subphylum|subphylum]] Vertebrata, because they secondarily lost vertebrae; before this event was inferred from molecular and developmental data, the Craniata hypothesis was accepted (and is still sometimes used as a strictly morphological descriptor) to reference hagfish plus vertebrates.",
 			},
 		},
 	},
 	{
 		title = "Alaska pollock",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐟",
 		source = "wikipedia",
 		description = "Species of fish",
@@ -1846,10 +1766,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"It is a semi-pelagic schooling fish widely distributed in the North Pacific, with largest concentrations found in the eastern [[Bering Sea]].",
+				"It is a semi-[[Pelagic zone|pelagic]] [[Shoaling and schooling|schooling]] fish widely distributed in the North Pacific, with largest concentrations found in the eastern [[Bering Sea]].",
 			},
 		},
-		related = { "Cichlid", "Tilapia" },
+		related = { "Barracuda", "Mahi-mahi", "Turbot" },
 		infobox = {
 			{ "Scientific name", "Gadus chalcogrammus" },
 			{ "Conservation status", "Near Threatened" },
@@ -1858,20 +1778,20 @@ return {
 	{
 		title = "Albatross",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "👪",
 		source = "wikipedia",
 		description = "Family of large seabirds",
 		tags = { "Birds", "Procellariiformes" },
 		aliases = { "Albatrosses", "Diomedeidae" },
-		summary = "**Albatrosses**, of the biological family **Diomedeidae**, are large [[Seabird|seabirds]] related to the procellariids, storm petrels, and diving petrels in the order [[Procellariiformes]] (the tubenoses). They range widely in the [[Southern Ocean]] and the North [[Pacific Ocean|Pacific]]. They are absent from the North [[Atlantic Ocean|Atlantic]], although [[Fossil|fossil]] remains of short-tailed albatross show they lived there up to the Pleistocene, and occasional vagrants are found. Generally, the group depends on cold water currents for their foraging and nesting grounds.",
+		summary = "**Albatrosses**, of the biological [[Family (taxonomy)|family]] **Diomedeidae**, are large [[Seabird|seabirds]] related to the procellariids, storm petrels, and diving petrels in the order [[Procellariiformes]] (the tubenoses). They range widely in the [[Southern Ocean]] and the North [[Pacific Ocean|Pacific]]. They are absent from the North [[Atlantic Ocean|Atlantic]], although [[Fossil|fossil]] remains of short-tailed albatross show they lived there up to the [[Pleistocene]], and occasional vagrants are found. Generally, the group depends on cold water currents for their foraging and nesting grounds.",
 		sections = {
 			{
 				"Overview",
-				"The geographically outlying genus Phoebastria which includes 3 North Pacific species and an equatorial (Galapagos) species exploits the California, Alaska, Oyashio and Humboldt [[Ocean current|currents]], nesting on major oceanic islands near those currents. Great albatrosses are among the largest of flying birds, with wingspans reaching up to 2.5–3.5 m and bodies over 1 m in length. The albatrosses are usually regarded as falling into four genera, but disagreement exists over the number of [[Species|species]]. Albatrosses are highly efficient in the air, using dynamic soaring and slope soaring to cover great distances with little exertion. They feed on [[Squid|squid]], [[Fish|fish]], and [[Krill|krill]] by either scavenging, surface seizing, or diving. Albatrosses are colonial, nesting for the most part on remote oceanic islands, often with several species nesting together.",
+				"The geographically outlying genus Phoebastria which includes 3 North Pacific species and an equatorial (Galapagos) species exploits the California, Alaska, Oyashio and Humboldt [[Ocean current|currents]], nesting on major oceanic islands near those currents. Great albatrosses are among the largest of flying birds, with wingspans reaching up to 2.5–3.5 m and bodies over 1 m in length. The albatrosses are usually regarded as falling into four [[Genus|genera]], but disagreement exists over the number of [[Species|species]]. Albatrosses are highly efficient in the air, using dynamic soaring and slope soaring to cover great distances with little exertion. They feed on [[Squid|squid]], [[Fish|fish]], and [[Krill|krill]] by either scavenging, surface seizing, or diving. Albatrosses are colonial, nesting for the most part on remote oceanic islands, often with several species nesting together.",
 			},
 		},
-		related = { "Galliformes", "Bird of prey" },
+		related = { "Hornbill" },
 		infobox = {
 			{ "Scientific name", "Diomedeidae" },
 		},
@@ -1879,14 +1799,14 @@ return {
 	{
 		title = "Alligator snapping turtle",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐢",
 		source = "wikipedia",
 		description = "Species of turtle",
 		tags = { "Vertebrates", "Reptiles" },
 		aliases = { "Macrochelys temminckii" },
-		summary = "The **alligator snapping turtle** (**Macrochelys temminckii**) is a large [[Species|species]] of [[Turtle|turtle]] in the family Chelydridae. They are the largest freshwater turtle in North America. The species is endemic to freshwater [[Habitat|habitats]] in the [[United States]]. M. temminckii is one of the heaviest living freshwater turtles in the world. It is often associated with, but not closely related to, the [[Common snapping turtle|common snapping turtle]], which is in the genus Chelydra. The specific epithet temminckii is in honor of Dutch zoologist Coenraad Jacob Temminck.",
-		related = { "Lizard", "Caiman" },
+		summary = "The **alligator snapping turtle** (**Macrochelys temminckii**) is a large [[Species|species]] of [[Turtle|turtle]] in the [[Family (taxonomy)|family]] Chelydridae. They are the largest freshwater turtle in North America. The species is [[Endemism|endemic]] to freshwater [[Habitat|habitats]] in the [[United States]]. M. temminckii is one of the heaviest living freshwater turtles in the world. It is often associated with, but not closely related to, the [[Common snapping turtle|common snapping turtle]], which is in the genus Chelydra. The specific epithet temminckii is in honor of Dutch zoologist Coenraad Jacob Temminck.",
+		related = { "Lizard" },
 		infobox = {
 			{ "Scientific name", "Macrochelys temminckii" },
 			{ "Conservation status", "Endangered" },
@@ -1900,14 +1820,14 @@ return {
 		source = "wikipedia",
 		description = "Genus of theropod dinosaur",
 		tags = { "Reptiles", "Dinosaurs and prehistoric reptiles" },
-		summary = "**Allosaurus** is a genus of [[Theropoda|theropod]] dinosaur that lived 155 to 143 million years ago during the late [[Jurassic]] [[Geologic time scale|period]] (latest Oxfordian to latest Tithonian [[Geologic time scale|ages]]). The first fossil remains that could definitively be ascribed to this genus were described in 1877 by Othniel C. Marsh. The genus has a very complicated [[Taxonomy (biology)|taxonomy]] and includes at least three valid [[Species|species]], the best known of which is A. fragilis. The bulk of Allosaurus remains come from North America's Morrison Formation, with material also known from the Alcobaça, Bombarral, and Lourinhã formations in Portugal.",
+		summary = "**Allosaurus** is a [[Genus|genus]] of [[Theropoda|theropod]] dinosaur that lived 155 to 143 million years ago during the late [[Jurassic]] [[Geologic time scale|period]] (latest Oxfordian to latest Tithonian [[Geologic time scale|ages]]). The first fossil remains that could definitively be ascribed to this [[Genus|genus]] were described in 1877 by [[Othniel Charles Marsh|Othniel C. Marsh]]. The genus has a very complicated [[Taxonomy (biology)|taxonomy]] and includes at least three valid [[Species|species]], the best known of which is A. fragilis. The bulk of Allosaurus remains come from North America's Morrison Formation, with material also known from the Alcobaça, Bombarral, and Lourinhã formations in Portugal.",
 		sections = {
 			{
 				"Overview",
 				'It was known for over half of the 20th century as Antrodemus, but a study of the abundant remains from the Cleveland-Lloyd Dinosaur Quarry returned the name "Allosaurus" to prominence. As one of the first well-known theropod dinosaurs, it has long attracted attention outside of paleontological circles. Allosaurus was a large bipedal predator for its time. Its skull was light, robust, and equipped with dozens of sharp, serrated teeth. It averaged 8.5 m in length for A. fragilis, with the largest specimens estimated as being 9.7 m long. Relative to the large and powerful legs, its three-fingered hands were small and the body was balanced by a long, muscular tail. It is classified in the family Allosauridae.',
 			},
 		},
-		related = { "Iguanodon", "Plesiosaur", "Stegosaurus", "Triceratops" },
+		related = { "Iguanodon" },
 		infobox = {
 			{ "Scientific name", "Allosaurus" },
 		},
@@ -1922,9 +1842,9 @@ return {
 		tags = { "Cats", "Cattle" },
 		aliases = { "Brahman" },
 		summary = "The **Brahman** or **American Brahman** is an American breed of zebuine-taurine hybrid beef cattle. It was bred in the United States from 1885 using cattle originating in India, imported at various times from the United Kingdom, India, and Brazil. These were mainly Gir, Guzerá and Nelore stock, with some Indu-Brasil, Krishna Valley and Ongole. It has been exported to many countries, particularly in the [[Tropics|tropics]]; in Australia it is the most numerous breed of cattle. It has been used in the creation of numerous taurine-indicine hybrids, some of which – such as the Brangus and Brahmousin – are established as separate breeds.",
-		related = { "Mule", "Herding dog" },
+		related = { "Arabian horse", "Mule" },
 		infobox = {
-			{ "Conservation status", "FAO (2007): not at risk" },
+			{ "Conservation status", "[[Food and Agriculture Organization|FAO]] (2007): not at risk" },
 			{ "Country", "United States" },
 		},
 	},
@@ -1941,10 +1861,9 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Its [[Habitat|historical range]] circa 9000 BC is referred to as the great bison belt, a tract of rich [[Grassland|grassland]] spanning from Alaska south to the [[Gulf of Mexico]], and east to the Atlantic Seaboard (nearly to the Atlantic tidewater in some areas), as far north as [[New York (state)|New York]], south to Georgia, and according to some sources, further south to northern [[Florida]], with sightings in North Carolina near Buffalo Ford on the Catawba River as late as 1750. Two subspecies or ecotypes have been described: the plains bison (B. b. bison), smaller and with a more rounded hump; and the wood bison (B. b. athabascae), the larger of the two and having a taller, square hump. There has been a proposal to divide the plains bison into subspecies of northern (B. b. montanae) and southern (B. b. bison), but this proposal has limited scientific support.",
+				"Its [[Habitat|historical range]] circa 9000 BC is referred to as the great bison belt, a tract of rich [[Grassland|grassland]] spanning from [[Alaska]] south to the [[Gulf of Mexico]], and east to the Atlantic Seaboard (nearly to the Atlantic tidewater in some areas), as far north as [[New York (state)|New York]], south to [[Georgia (U.S. state)|Georgia]], and according to some sources, further south to northern [[Florida]], with sightings in [[North Carolina]] near Buffalo Ford on the Catawba River as late as 1750. Two subspecies or ecotypes have been described: the plains bison (B. b. bison), smaller and with a more rounded hump; and the wood bison (B. b. athabascae), the larger of the two and having a taller, square hump. There has been a proposal to divide the plains bison into subspecies of northern (B. b. montanae) and southern (B. b. bison), but this proposal has limited scientific support.",
 			},
 		},
-		related = { "Gaur" },
 		infobox = {
 			{ "Scientific name", "Bison bison" },
 			{ "Conservation status", "Near Threatened" },
@@ -1959,11 +1878,11 @@ return {
 		description = "Species of amphibian",
 		tags = { "Vertebrates", "Amphibians" },
 		aliases = { "Lithobates catesbeianus", "Bullfrog" },
-		summary = "The **American bullfrog** (**Lithobates catesbeianus**), often simply known as the **bullfrog** in [[Canada]] and the [[United States]], is a [[Species|species]] of large frog in the family [[Ranidae]] (true frogs). The species is native to eastern [[North America]]. It typically inhabits large permanent water bodies such as [[Swamp|swamps]], [[Pond|ponds]], and [[Lake|lakes]]. The bullfrog can also be found in manmade habitats such as pools, koi ponds, [[Canal|canals]], ditches, reservoirs and culverts. The bullfrog gets its common name from the sound the male makes during the breeding season, which sounds similar to a bull bellowing. It is a generalist carnivore, consuming a wide variety of prey.",
+		summary = "The **American bullfrog** (**Lithobates catesbeianus**), often simply known as the **bullfrog** in [[Canada]] and the [[United States]], is a [[Species|species]] of large frog in the [[Family (taxonomy)|family]] [[Ranidae]] (true frogs). The species is native to eastern [[North America]]. It typically inhabits large permanent water bodies such as [[Swamp|swamps]], [[Pond|ponds]], and [[Lake|lakes]]. The bullfrog can also be found in manmade habitats such as pools, koi ponds, [[Canal|canals]], ditches, reservoirs and culverts. The bullfrog gets its [[Common name|common name]] from the sound the male makes during the breeding season, which sounds similar to a bull bellowing. It is a generalist carnivore, consuming a wide variety of prey.",
 		sections = {
 			{
 				"Overview",
-				"In turn, it is eaten by predators such as [[Crocodile|alligators]], snakes, and birds. The bullfrog is large and is commonly eaten by humans throughout its range, especially in the southern [[United States]] where it is plentiful. Its use as a food source has led to the bullfrog being introduced outside of its native range. The bullfrog has been introduced in more than 40 countries and many continents including the Western United States, [[Caribbean|the Caribbean]], [[South America]], [[Western Europe]], [[Belgium]], [[Italy]], [[Spain]], [[Greece]], [[China]], [[Japan]], [[South Korea]], [[Malaysia]], [[Southeast Asia]], and more. In these places it is considered an [[Invasive species|invasive species]] due to its voracious appetite and the large number of eggs it produces, which has a negative effect on native amphibians, certain insects and other fauna.",
+				"In turn, it is eaten by predators such as [[Crocodile|alligators]], snakes, and birds. The bullfrog is large and is commonly eaten by humans throughout its range, especially in the southern [[United States]] where it is plentiful. Its use as a food source has led to the bullfrog being [[Introduced species|introduced]] outside of its native range. The bullfrog has been introduced in more than 40 countries and many continents including the [[Western United States]], [[Caribbean|the Caribbean]], [[South America]], [[Western Europe]], [[Belgium]], [[Italy]], [[Spain]], [[Greece]], [[China]], [[Japan]], [[South Korea]], [[Malaysia]], [[Southeast Asia]], and more. In these places it is considered an [[Invasive species|invasive species]] due to its voracious appetite and the large number of eggs it produces, which has a negative effect on native amphibians, certain insects and other fauna.",
 			},
 		},
 		related = { "Amphibian", "Frog" },
@@ -1981,14 +1900,14 @@ return {
 		description = "Species of bird",
 		tags = { "Birds", "Passerida" },
 		aliases = { "Turdus migratorius" },
-		summary = "The **American robin** (**Turdus migratorius**) is a migratory bird of the true thrush genus and Turdidae, the wider [[Thrush (bird)|thrush]] family. The American robin is widely distributed throughout North America, wintering from southern Canada to central Mexico and along the Pacific coast.",
+		summary = "The **American robin** (**Turdus migratorius**) is a [[Bird migration|migratory bird]] of the true thrush genus and Turdidae, the wider [[Thrush (bird)|thrush]] family. The American robin is widely distributed throughout North America, wintering from southern Canada to central Mexico and along the Pacific coast.",
 		sections = {
 			{
 				"Overview",
 				"According to the Partners in Flight database (2019), the American robin is the most abundant landbird in North America (with 370million individuals), ahead of [[Red-winged blackbird|red-winged blackbirds]], introduced [[Common starling|European starlings]], mourning doves and house finches. It has seven subspecies. The species is active mostly during the day and assembles in large flocks at night. Its diet consists of invertebrates (such as beetle [[Larva|grubs]], earthworms, and caterpillars), fruits, and berries. It is one of the earliest bird species to lay its eggs, beginning to breed shortly after returning to its summer range from its winter range. The robin's nest consists of long coarse grass, twigs, paper, and feathers and is smeared with mud and often cushioned with grass or other soft materials. It is among the earliest birds to sing at dawn, and its song consists of several discrete units that are repeated.",
 			},
 		},
-		related = { "Galliformes", "Bird of prey" },
+		related = { "Sunbird", "Finch" },
 		infobox = {
 			{ "Scientific name", "Turdus migratorius" },
 			{ "Conservation status", "Least Concern" },
@@ -2003,14 +1922,14 @@ return {
 		description = "Class of ectothermic tetrapods",
 		tags = { "Vertebrates", "Amphibians" },
 		aliases = { "Amphibians", "Amphibia" },
-		summary = "**Amphibians** are ectothermic, anamniotic, [[Tetrapod|four-limbed]] [[Vertebrate|vertebrate]] [[Animal|animals]] that constitute the class **Amphibia**. In its broadest sense, it is a paraphyletic group encompassing all [[Tetrapod|tetrapods]], but excluding the amniotes (tetrapods with an amniotic membrane, such as modern [[Reptile|reptiles]], [[Bird|birds]] and [[Mammal|mammals]]). All extant (living) amphibians belong to the monophyletic subclass Lissamphibia, with three living orders: Anura ([[Frog|frogs]] and toads), Urodela ([[Salamander|salamanders]]), and Gymnophiona ([[Caecilian|caecilians]]).",
+		summary = "**Amphibians** are ectothermic, anamniotic, [[Tetrapod|four-limbed]] [[Vertebrate|vertebrate]] [[Animal|animals]] that constitute the [[Class (taxonomy)|class]] **Amphibia**. In its broadest sense, it is a [[Paraphyly|paraphyletic]] group encompassing all [[Tetrapod|tetrapods]], but excluding the [[Amniote|amniotes]] (tetrapods with an amniotic membrane, such as modern [[Reptile|reptiles]], [[Bird|birds]] and [[Mammal|mammals]]). All [[Neontology|extant]] (living) amphibians belong to the [[Monophyly|monophyletic]] subclass Lissamphibia, with three living [[Order (taxonomy)|orders]]: Anura ([[Frog|frogs]] and toads), Urodela ([[Salamander|salamanders]]), and Gymnophiona ([[Caecilian|caecilians]]).",
 		sections = {
 			{
 				"Overview",
-				"Evolved to be mostly semiaquatic, amphibians have adapted to inhabit a wide variety of [[Habitat|habitats]], with most species living in freshwater, [[Wetland|wetland]] or terrestrial ecosystems (such as riparian woodland, fossorial and even arboreal habitats). Their life cycle typically starts out as aquatic [[Larva|larvae]] with gills known as [[Tadpole|tadpoles]], but some species have developed behavioural adaptations to bypass this. Young amphibians generally undergo [[Metamorphosis|metamorphosis]] from an aquatic larval form with gills to an air-breathing adult form with lungs. Amphibians use their skin as a secondary respiratory interface, and some small terrestrial [[Salamander|salamanders]] and frogs even lack lungs and rely entirely on their skin. They are superficially similar to [[Reptile|reptiles]] like [[Lizard|lizards]], but unlike reptiles and other amniotes, require access to water bodies to breed.",
+				"Evolved to be mostly [[Semiaquatic|semiaquatic]], amphibians have adapted to inhabit a wide variety of [[Habitat|habitats]], with most species living in [[Freshwater ecosystem|freshwater]], [[Wetland|wetland]] or [[Terrestrial ecosystem|terrestrial ecosystems]] (such as riparian woodland, fossorial and even [[Arboreal locomotion|arboreal]] habitats). Their [[Biological life cycle|life cycle]] typically starts out as [[Aquatic animal|aquatic]] [[Larva|larvae]] with [[Gill|gills]] known as [[Tadpole|tadpoles]], but some species have developed behavioural adaptations to bypass this. Young amphibians generally undergo [[Metamorphosis|metamorphosis]] from an aquatic larval form with gills to an air-breathing adult form with [[Lung|lungs]]. Amphibians use their skin as a secondary respiratory interface, and some small terrestrial [[Salamander|salamanders]] and frogs even lack lungs and rely entirely on their skin. They are superficially similar to [[Reptile|reptiles]] like [[Lizard|lizards]], but unlike reptiles and other [[Amniote|amniotes]], require access to water bodies to breed.",
 			},
 		},
-		related = { "American bullfrog", "Leptodactylidae", "Ranidae" },
+		related = { "American bullfrog", "Leptodactylidae" },
 		infobox = {
 			{ "Scientific name", "Amphibia" },
 		},
@@ -2024,14 +1943,14 @@ return {
 		description = "Family of fishes",
 		tags = { "Fishes", "Clupeiformes" },
 		aliases = { "Anchovies", "Engraulidae" },
-		summary = "**Anchovies** are small, common forage fish of the family **Engraulidae**. Most species are found in marine waters, but several will enter brackish water, and some in South America are restricted to fresh water.",
+		summary = "**Anchovies** are small, common [[Forage fish|forage fish]] of the [[Family (taxonomy)|family]] **Engraulidae**. Most species are found in marine waters, but several will enter [[Brackish water|brackish water]], and some in South America are restricted to fresh water.",
 		sections = {
 			{
 				"Overview",
-				"More than 140 species are placed in 16 genera; they are found in the Atlantic, Indian and Pacific Oceans, and in the [[Black Sea]] and the [[Mediterranean Sea]]. Anchovies are usually classified as oily fish.",
+				"More than 140 species are placed in 16 [[Genus|genera]]; they are found in the Atlantic, Indian and Pacific Oceans, and in the [[Black Sea]] and the [[Mediterranean Sea]]. Anchovies are usually classified as oily fish.",
 			},
 		},
-		related = { "Tiger shark", "Salmonidae" },
+		related = { "Bichir", "Ilish" },
 		infobox = {
 			{ "Scientific name", "Engraulidae" },
 		},
@@ -2052,7 +1971,7 @@ return {
 				"Throughout its history, it has been known for its prowess as a war horse, and was prized by the nobility. The breed was used as a tool of diplomacy by the Spanish government, and kings across Europe rode and owned Spanish horses. Exports of Andalusians from Spain were restricted until the 1960s, but the breed has since spread throughout the world, despite its low population. In 2010, more than 185,000 registered Andalusians existed worldwide. Strongly built, and compact yet elegant, Andalusians have long, thick manes and tails. Their most common coat color is gray, although they can be found in many other colors. They are known for their intelligence, sensitivity, and docility. A sub-strain within the breed known as the Carthusian, is considered by breeders to be the purest strain of Andalusian, though no genetic evidence for this claim is known.",
 			},
 		},
-		related = { "Mule", "Herding dog" },
+		related = { "Arabian horse", "Thoroughbred" },
 		infobox = {
 			{ "Country", "Spain" },
 		},
@@ -2060,22 +1979,104 @@ return {
 	{
 		title = "Anglerfish",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐟",
 		source = "wikipedia",
 		description = "Bony fish with a natural lure",
 		tags = { "Vertebrates", "Fishes" },
 		aliases = { "Lophiiformes" },
-		summary = 'The **anglerfish** are ray-finned fish in the order **Lophiiformes**. Both the order\'s common and scientific name comes from the characteristic mode of predation, in which a modified dorsal fin ray acts as a lure for prey (akin to a human [[Angling|angler]], and likened to a crest or "lophos"). The modified fin ray, with the very tip being the **esca** and the length of the structure the **illicium**, is adapted to attract specific prey items across the families of anglerfish by using different luring methods.',
+		summary = 'The **anglerfish** are [[Actinopterygii|ray-finned fish]] in the order **Lophiiformes**. Both the order\'s [[Common name|common]] and scientific name comes from the characteristic mode of predation, in which a modified dorsal [[Fish fin|fin ray]] acts as a lure for prey (akin to a human [[Angling|angler]], and likened to a crest or "lophos"). The modified fin ray, with the very tip being the **esca** and the length of the structure the **illicium**, is adapted to attract specific prey items across the families of anglerfish by using different luring methods.',
 		sections = {
 			{
 				"Overview",
 				"Anglerfish occur worldwide. The majority are bottom-dwellers, being demersal fish, while the aberrant deep-sea anglerfish are pelagic, (mostly) living high in the water column. Some live in the [[Deep-sea fish|deep sea]] (such as the deep-sea anglerfish and sea toads), while others live in shallower waters, such as the frogfishes and some batfishes. Anglerfish are of some commercial value, with some species being of interest to [[Aquarium|aquaria]]. But the lophiid anglerfish (marketed as monkfish, goosefish, or simply angler) are much more valued for their meat, which is considered a delicacy throughout their range.",
 			},
 		},
-		related = { "Osteichthyes", "Chondrichthyes" },
+		related = { "Oarfish" },
 		infobox = {
 			{ "Scientific name", "Lophiiformes" },
+		},
+	},
+	{
+		title = "Animal cognition",
+		category = "Animal",
+		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "none",
+		tags = { "More articles" },
+		summary = "**Animal cognition** encompasses the [[Cognition|mental]] capacities of non-human [[Animal|animals]], including insect cognition. The study of animal conditioning and learning used in this field was developed from comparative psychology. It has also been strongly influenced by research in [[Ethology|ethology]], behavioral ecology, and [[Evolutionary psychology|evolutionary psychology]]; the alternative name cognitive ethology is sometimes used. Many behaviors associated with the term animal intelligence are also subsumed within animal cognition.",
+		sections = {
+			{
+				"Overview",
+				"Researchers have examined animal [[Cognition|cognition]] in [[Mammal|mammals]] (especially primates, cetaceans, elephants, [[Bear|bears]], dogs, cats, pigs, horses, [[Cattle|cattle]], raccoons and rodents), birds (including [[Parrot|parrots]], fowl, [[Corvidae|corvids]] and pigeons), [[Reptile|reptiles]] (lizards, crocodilians, [[Snake|snakes]], and [[Turtle|turtles]]), [[Fish|fish]] and [[Invertebrate|invertebrates]] (including cephalopods, spiders and insects).",
+			},
+		},
+	},
+	{
+		title = "Animal communication",
+		category = "Animal",
+		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Transfer of information from animal to animal",
+		tags = { "More articles" },
+		summary = '**Animal communication** is the transfer of information from one or a group of animals (sender or senders) to one or more other animals (receiver or receivers) that affects the current or future behavior of the receivers. Information may be sent intentionally, as in a courtship display, or unintentionally, as in the transfer of scent from the predator to prey with kairomones. Information may be transferred to an "audience" of several receivers. Animal communication is a rapidly growing area of study in disciplines including [[Ethology|animal behavior]], sociology, neurology, and [[Animal cognition|animal cognition]].',
+		sections = {
+			{
+				"Overview",
+				'When the information from the sender changes the behavior of a receiver, the information is referred to as a "signal". Signalling theory predicts that for a signal to be maintained in the population, both the sender and receiver should usually receive some benefit from the interaction. Signal production by senders and the perception and subsequent response of receivers are thought to coevolve. Signals often involve multiple mechanisms, e.g., both visual and auditory, and for a signal to be understood, the coordinated behavior of both sender and receiver requires careful study.',
+			},
+		},
+		related = { "George Shaw (biologist)" },
+	},
+	{
+		title = "Animal echolocation",
+		category = "Animal",
+		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Method used by several animal species to determine location using sound",
+		tags = { "More articles" },
+		aliases = { "Echolocation", "Bio sonar" },
+		summary = "**Echolocation**, also called **bio sonar**, is a biological active sonar used by several [[Animal|animal]] groups, both in the air and underwater. Echolocating animals emit calls and listen to the echoes of those calls that return from various objects near them. They use these echoes to locate and identify the objects. Echolocation is used for navigation, [[Foraging|foraging]], and [[Predation|hunting prey]].",
+		sections = {
+			{
+				"Overview",
+				"Echolocation calls can be frequency modulated (FM, varying in pitch during the call) or constant frequency (CF). FM offers precise range discrimination to localize the prey, at the cost of reduced operational range. CF allows both the prey's velocity and its movements to be detected by means of the [[Doppler effect]]. FM may be best for close, cluttered environments, while CF may be better in open environments or for hunting while perched. Echolocating animals include [[Mammal|mammals]], especially odontocetes (toothed whales) and some [[Bat|bat]] species, and, using simpler forms, species in other groups such as [[Shrew|shrews]]. A few bird species in two cave-dwelling bird groups echolocate, namely cave swiftlets and the oilbird. Some prey animals that are hunted by echolocating bats take active countermeasures to avoid capture.",
+			},
+		},
+	},
+	{
+		title = "Animal product",
+		category = "Animal",
+		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Material derived from non-human animal body",
+		tags = { "More articles" },
+		summary = "An **animal product** is any material derived from the body of a non-human [[Animal|animal]] or their excretions.",
+		sections = {
+			{
+				"Overview",
+				"The word animals includes all species in the [[Kingdom (taxonomy)|biological kingdom]] Animalia, except humans. This includes, for example, tetrapods, arthropods, and mollusks. Generally, products made from decomposed animals, such as [[Petroleum|petroleum]], or crops grown in soil [[Fertilizer|fertilized]] with animal remains or manure are not characterized as animal products. Increased production and consumption over the past 50 years has led to widespread environmental and animal welfare impacts. These range from being linked to 80% of Amazonian deforestation to the welfare implications of using chick culling shredders on live day old-chicks for 7 billion of them each year. Several popular diet patterns prohibit the inclusion of some categories of animal products and may also limit the conditions of when other animal products may be permitted.",
+			},
+		},
+	},
+	{
+		title = "Animal rights",
+		category = "Animal",
+		fame = 3,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Rights belonging to animals",
+		tags = { "More articles" },
+		summary = "**Animal rights** is the [[Philosophy|philosophy]] according to which many or all sentient animals have moral worth independent of their [[Utilitarianism|utility]] to humans, and their most basic interests—such as avoiding [[Suffering|suffering]]—should be afforded the same consideration as similar interests of [[Human|human beings]]. The argument from marginal cases is often used to reach this conclusion. This argument holds that if human beings such as infants, senile people, and the [[Cognition|cognitively]] disabled are granted moral status and negative rights, then nonhuman animals must be granted the same moral consideration, since animals do not lack any known morally relevant characteristic that marginal-case humans have.",
+		sections = {
+			{
+				"Overview",
+				'Broadly speaking, and particularly in popular discourse, the term "animal rights" is often used synonymously with "animal protection" or "animal liberation". Like [[Human rights|human rights]], animal rights center on the notion of [[Freedom|freedom]]. Many animal rights advocates oppose assigning moral value and fundamental protections on the basis of species membership alone. They consider this idea, known as speciesism, a prejudice as irrational as any other, and hold that animals should not be considered property or used as food, clothing, entertainment, or beasts of burden merely because they are not human. Cultural traditions such as Jainism, Taoism, Hinduism, Buddhism, Shinto, and animism also espouse varying forms of animal rights.',
+			},
 		},
 	},
 	{
@@ -2087,13 +2088,14 @@ return {
 		description = "Phylum of segmented worms",
 		tags = { "Invertebrates, others", "Lophotrochozoa" },
 		aliases = { "Annelids", "Segmented worms", "Annelida" },
-		summary = "**Annelids**, also known as **segmented worms**, are animals that comprise the phylum **Annelida**. The phylum contains over 22,000 extant [[Species|species]], including ragworms, [[Earthworm|earthworms]], and [[Leech|leeches]]. The species exist in and have adapted to various ecologies – some in marine environments as distinct as tidal zones and hydrothermal vents, others in fresh water, and yet others in moist terrestrial environments.",
+		summary = "**Annelids**, also known as **segmented worms**, are animals that comprise the [[Phylum|phylum]] **Annelida**. The phylum contains over 22,000 extant [[Species|species]], including ragworms, [[Earthworm|earthworms]], and [[Leech|leeches]]. The species exist in and have adapted to various ecologies – some in marine environments as distinct as tidal zones and [[Hydrothermal vent|hydrothermal vents]], others in [[Fresh water|fresh water]], and yet others in moist terrestrial environments.",
 		sections = {
 			{
 				"Overview",
-				'Annelids are bilaterally symmetrical, triploblastic, coelomate, [[Invertebrate|invertebrate]] organisms. They also have parapodia for locomotion. Most textbooks still use the traditional division into [[Polychaete|Polychaetes]] (almost all marine), Oligochaetes (which include earthworms) and [[Leech|Hirudinea]] ([[Leech|leech]]-like species). Cladistic research since 1997 has radically changed this scheme, viewing leeches as a sub-group of oligochaetes and oligochaetes as a sub-group of polychaetes. In addition, the Pogonophora, Echiura and Sipuncula, previously regarded as separate phyla, are now regarded as sub-groups of polychaetes. Annelids are considered members of the Lophotrochozoa, a "super-phylum" of protostomes that also includes [[Mollusca|molluscs]], brachiopods, and nemerteans. The basic annelid form consists of multiple segments called metameres.',
+				'Annelids are bilaterally symmetrical, triploblastic, coelomate, [[Invertebrate|invertebrate]] organisms. They also have parapodia for locomotion. Most textbooks still use the traditional division into [[Polychaete|Polychaetes]] (almost all marine), Oligochaetes (which include earthworms) and [[Leech|Hirudinea]] ([[Leech|leech]]-like species). [[Cladistics|Cladistic]] research since 1997 has radically changed this scheme, viewing leeches as a sub-group of oligochaetes and oligochaetes as a sub-group of polychaetes. In addition, the Pogonophora, Echiura and Sipuncula, previously regarded as separate phyla, are now regarded as sub-groups of polychaetes. Annelids are considered members of the Lophotrochozoa, a "super-phylum" of protostomes that also includes [[Mollusca|molluscs]], brachiopods, and nemerteans. The basic annelid form consists of multiple [[Segmentation (biology)|segments]] called metameres.',
 			},
 		},
+		related = { "Bryozoa" },
 		infobox = {
 			{ "Scientific name", "Annelida" },
 		},
@@ -2107,11 +2109,11 @@ return {
 		description = "Passerine bird family found across subtropical and tropical Central and South America",
 		tags = { "Birds", "Tyranni" },
 		aliases = { "Antbirds", "Thamnophilidae" },
-		summary = "The **antbirds** are a large [[Passerine|passerine]] bird family, **Thamnophilidae**, found across subtropical and tropical Central and South America, from Mexico to Argentina. There are more than 230 species, known variously as antshrikes, antwrens, antvireos, fire-eyes, bare-eyes and bushbirds. They are related to the antthrushes and antpittas (family Formicariidae), the tapaculos, the gnateaters and the [[Ovenbird (family)|ovenbirds]]. Despite some species' common names, this family is not closely related to the [[Wren|wrens]], vireos or [[Shrike|shrikes]].",
+		summary = "The **antbirds** are a large [[Passerine|passerine]] bird [[Family (taxonomy)|family]], **Thamnophilidae**, found across subtropical and tropical Central and South America, from Mexico to Argentina. There are more than 230 species, known variously as antshrikes, antwrens, antvireos, fire-eyes, bare-eyes and bushbirds. They are related to the antthrushes and antpittas (family Formicariidae), the tapaculos, the gnateaters and the [[Ovenbird (family)|ovenbirds]]. Despite some species' common names, this family is not closely related to the [[Wren|wrens]], vireos or [[Shrike|shrikes]].",
 		sections = {
 			{
 				"Overview",
-				"Antbirds are generally small birds with rounded wings and strong legs. Some species communicate warnings to rivals by exposing white feather patches on their backs or shoulders. Most have heavy bills, which in many species are hooked at the tip. Most species live in forests, although a few are found in other habitats. Insects and other [[Arthropod|arthropods]] form the most important part of their diet, although small vertebrates are occasionally taken. Most species feed in the understory and midstory of the forest, although a few feed in the canopy and a few on the ground. Many join mixed-species feeding flocks, and a few species are core members. To various degrees, around eighteen species specialise in following swarms of army ants to eat the small [[Invertebrate|invertebrates]] flushed by the ants, and many others may feed in this way opportunistically. Antbirds are monogamous, mate for life, and defend territories.",
+				"Antbirds are generally small birds with rounded wings and strong legs. Some species communicate warnings to rivals by exposing white feather patches on their backs or shoulders. Most have heavy [[Beak|bills]], which in many species are hooked at the tip. Most species live in forests, although a few are found in other habitats. Insects and other [[Arthropod|arthropods]] form the most important part of their diet, although small vertebrates are occasionally taken. Most species feed in the understory and midstory of the forest, although a few feed in the canopy and a few on the ground. Many join mixed-species feeding flocks, and a few species are core members. To various degrees, around eighteen species specialise in following swarms of army ants to eat the small [[Invertebrate|invertebrates]] flushed by the ants, and many others may feed in this way opportunistically. Antbirds are monogamous, mate for life, and defend [[Territory (animal)|territories]].",
 			},
 		},
 		related = { "Galliformes", "Bird of prey" },
@@ -2122,7 +2124,7 @@ return {
 	{
 		title = "Anteater",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐾",
 		source = "wikipedia",
 		description = "Mammals known for eating ants and termites",
@@ -2142,16 +2144,16 @@ return {
 	{
 		title = "Antelope",
 		category = "Animal",
-		fame = 1,
+		fame = 2,
 		emoji = "🐾",
 		source = "wikipedia",
 		description = "Group of even-toed ruminants",
 		tags = { "Mammals", "Artiodactyla" },
-		summary = "An **antelope** is any of the extant or recently extinct species of the [[Ruminant|ruminant]] artiodactyl family [[Bovidae]], which are indigenous to most of [[Africa]], [[India]], the [[Middle East]], [[Central Asia]], and a small area of [[Russia]]. Antelopes do not form a monophyletic group, as some antelopes are more closely related to other bovid groups, such as bovines, [[Goat|goats]], and [[Sheep|sheep]], than to other antelopes.",
+		summary = "An **antelope** is any of the extant or recently extinct species of the [[Ruminant|ruminant]] artiodactyl family [[Bovidae]], which are indigenous to most of [[Africa]], [[India]], the [[Middle East]], [[Central Asia]], and a small area of [[Russia]]. Antelopes do not form a [[Monophyly|monophyletic]] group, as some antelopes are more closely related to other bovid groups, such as bovines, [[Goat|goats]], and [[Sheep|sheep]], than to other antelopes.",
 		sections = {
 			{
 				"Overview",
-				'A stricter grouping, known as the **true antelopes**, includes only the genera [[Gazelle|Gazella]], Nanger, Eudorcas, and Antilope. One [[North America|North American]] mammal, the [[Pronghorn|pronghorn]] or "pronghorn antelope", is colloquially referred to as the "American antelope", despite the fact that it belongs to a different family (Antilocapridae) than the true Old-World antelopes; pronghorn are the sole extant member of a lineage that once included many species which went extinct in the prehistoric period. Although antelopes are sometimes misidentified as "deer" (cervids), the groups are only distantly related. While antelopes are found in abundance in Africa, there is only one living African deer species: the Barbary stag of North Africa. By comparison, numerous deer species are found in regions of the world with few or no antelope species present, such as throughout [[Southeast Asia]], [[Europe]] and all of the Americas.',
+				'A stricter grouping, known as the **true antelopes**, includes only the [[Genus|genera]] [[Gazelle|Gazella]], Nanger, Eudorcas, and Antilope. One [[North America|North American]] mammal, the [[Pronghorn|pronghorn]] or "pronghorn antelope", is colloquially referred to as the "American antelope", despite the fact that it belongs to a different family (Antilocapridae) than the true Old-World antelopes; pronghorn are the sole extant member of a lineage that once included many species which went extinct in the prehistoric period. Although antelopes are sometimes misidentified as "deer" (cervids), the groups are only distantly related. While antelopes are found in abundance in Africa, there is only one living African deer species: the Barbary stag of North Africa. By comparison, numerous deer species are found in regions of the world with few or no antelope species present, such as throughout [[Southeast Asia]], [[Europe]] and all of [[Americas|the Americas]].',
 			},
 		},
 	},
@@ -2164,11 +2166,11 @@ return {
 		description = "Superfamily of primates",
 		tags = { "Mammals", "Primates" },
 		aliases = { "Apes", "Hominoidea" },
-		summary = "**Apes**, collectively **Hominoidea**, are a superfamily of Old World simians native to [[Sub-Saharan Africa|sub-Saharan Africa]] and [[Southeast Asia]]. They were more widespread in Africa, Asia, and Europe in prehistory, and, including humans, are found globally. Apes are more closely related to [[Old World monkey|Old World monkeys]] (family Cercopithecidae) than to the [[New World monkey|New World monkeys]] (Platyrrhini), with both Old World monkeys and apes placed in the clade Catarrhini. Apes do not have tails due to a mutation of the TBXT gene.",
+		summary = "**Apes**, collectively **Hominoidea**, are a [[Family (taxonomy)|superfamily]] of [[Old World]] simians native to [[Sub-Saharan Africa|sub-Saharan Africa]] and [[Southeast Asia]]. They were more widespread in Africa, Asia, and Europe in prehistory, and, including humans, are found globally. Apes are more closely related to [[Old World monkey|Old World monkeys]] (family Cercopithecidae) than to the [[New World monkey|New World monkeys]] (Platyrrhini), with both Old World monkeys and apes placed in the [[Clade|clade]] Catarrhini. Apes do not have tails due to a mutation of the TBXT gene.",
 		sections = {
 			{
 				"Overview",
-				"In traditional and non-scientific use, the term ape can include tailless primates taxonomically considered Cercopithecidae (such as the Barbary ape and black ape), and is thus not equivalent to the scientific taxon Hominoidea. There are two extant branches of the superfamily Hominoidea: the [[Gibbon|gibbons]], or lesser apes; and the hominids, or great apes. The family Hylobatidae, the lesser apes, include four genera and a total of 20 species of gibbon, including the lar gibbon and the siamang, all native to [[Asia]]. They are highly arboreal and bipedal on the ground. They have lighter bodies and smaller social groups than great apes. The family Hominidae (hominids), the great apes, includes four genera comprising three extant species of [[Orangutan|orangutans]], two extant species of [[Gorilla|gorillas]], two extant species of chimpanzees, and [[Human|humans]]. Except for gorillas and humans, hominoids are agile climbers of trees.",
+				"In traditional and non-scientific use, the term ape can include tailless primates taxonomically considered Cercopithecidae (such as the Barbary ape and black ape), and is thus not equivalent to the scientific [[Taxon|taxon]] Hominoidea. There are two [[Neontology|extant]] branches of the superfamily Hominoidea: the [[Gibbon|gibbons]], or lesser apes; and the hominids, or great apes. The family Hylobatidae, the lesser apes, include four genera and a total of 20 species of gibbon, including the lar gibbon and the siamang, all native to [[Asia]]. They are highly [[Arboreal locomotion|arboreal]] and bipedal on the ground. They have lighter bodies and smaller social groups than great apes. The family [[Hominidae]] (hominids), the great apes, includes four genera comprising three extant species of [[Orangutan|orangutans]], two extant species of [[Gorilla|gorillas]], two extant species of [[Pan (genus)|chimpanzees]], and [[Human|humans]]. Except for gorillas and humans, hominoids are agile climbers of trees.",
 			},
 		},
 		infobox = {
@@ -2184,16 +2186,48 @@ return {
 		description = "Superfamily of insects",
 		tags = { "Insects and other hexapods", "Hemiptera (true bugs)" },
 		aliases = { "Aphids", "Aphididae" },
-		summary = "**Aphids** are small sap-sucking [[Insect|insects]] in the family **Aphididae** of the order [[Hemiptera]]. Common names include **greenfly** and **blackfly**, although individuals within a species can vary widely in color. The group includes the fluffy white woolly aphids. A typical life cycle involves flightless females giving live birth to female [[Nymph (biology)|nymphs]]—who may also be already pregnant, an adaptation scientists call telescoping generations—without the involvement of males. [[Developmental biology|Maturing]] rapidly, females breed profusely so that the number of these insects multiplies quickly. Winged females may develop later in the season, allowing the insects to colonize new plants.",
+		summary = "**Aphids** are small sap-sucking [[Insect|insects]] in the [[Taxonomic rank|family]] **Aphididae** of the order [[Hemiptera]]. Common names include **greenfly** and **blackfly**, although individuals within a species can vary widely in color. The group includes the fluffy white woolly aphids. A typical life cycle involves flightless females giving live birth to female [[Nymph (biology)|nymphs]]—who may also be already pregnant, an adaptation scientists call telescoping generations—without the involvement of males. [[Developmental biology|Maturing]] rapidly, females breed profusely so that the number of these insects multiplies quickly. Winged females may develop later in the season, allowing the insects to colonize new plants.",
 		sections = {
 			{
 				"Overview",
-				"The life cycle of some species involves an alternation between two species of host plants, for example between an annual crop and a woody plant. Some species feed on only one type of plant, while others are generalists, colonizing many plant groups. About 5,000 species of aphid have been described, all included in the family Aphididae. Around 400 of these are found on [[Crop|food]] and fiber crops, and many are serious pests of [[Agriculture|agriculture]] and [[Forestry|forestry]], as well as an annoyance for gardeners. So-called dairying [[Ant|ants]] have a mutualistic relationship with aphids, tending them for their honeydew and protecting them from predators. Aphids are among the most destructive insect pests on cultivated plants in temperate regions.",
+				"The life cycle of some species involves an alternation between two species of host plants, for example between an annual crop and a [[Woody plant|woody plant]]. Some species feed on only one type of plant, while others are generalists, colonizing many plant groups. About 5,000 species of aphid have been described, all included in the family Aphididae. Around 400 of these are found on [[Crop|food]] and fiber crops, and many are serious pests of [[Agriculture|agriculture]] and [[Forestry|forestry]], as well as an annoyance for gardeners. So-called dairying [[Ant|ants]] have a [[Mutualism (biology)|mutualistic]] relationship with aphids, tending them for their honeydew and protecting them from [[Predation|predators]]. Aphids are among the most destructive insect pests on cultivated plants in temperate regions.",
 			},
 		},
-		related = { "Grasshopper", "Tettigoniidae" },
+		related = { "Cricket (insect)", "Tettigoniidae" },
 		infobox = {
 			{ "Scientific name", "Aphidoidea" },
+		},
+	},
+	{
+		title = "Aposematism",
+		category = "Animal",
+		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Honest signalling of an animal's defences",
+		tags = { "More articles" },
+		summary = "**Aposematism** is the advertising by an animal, whether terrestrial or marine, to potential [[Predation|predators]] that it is not worth attacking or eating. These advertising signals may take the form of conspicuous [[Animal coloration|coloration]], [[Sound|sounds]], odours, or other [[Perception|perceivable]] characteristics. Aposematic signals are beneficial for both predator and prey, because both avoid potential harm.",
+		sections = {
+			{
+				"Overview",
+				"The term was coined in 1877 by Edward Bagnall Poulton for [[Alfred Russel Wallace]]'s concept of **warning coloration**. Aposematism is exploited in Müllerian mimicry, wherein species with strong defences evolve to resemble one another. By mimicking similarly coloured species the warning signal to predators is shared, causing the predators to learn more quickly at less cost. A genuine aposematic signal that a species actually possesses chemical or physical defences is not the only way to deter predators. In Batesian mimicry, a mimicking species resembles an aposematic model closely enough to share the protection, while many species have bluffing deimatic displays that may startle a predator long enough to enable an otherwise undefended prey to escape.",
+			},
+		},
+	},
+	{
+		title = "Aquatic animal",
+		category = "Animal",
+		fame = 1,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Animal living mostly or entirely in water",
+		tags = { "More articles" },
+		summary = "An **aquatic animal** is any [[Animal|animal]], whether [[Vertebrate|vertebrate]] or [[Invertebrate|invertebrate]], that lives in a [[Body of water|body of water]] for all or most of its [[Biological life cycle|lifetime]]. Aquatic animals generally conduct aquatic respiration by extracting dissolved oxygen in water via specialised respiratory [[Organ (biology)|organs]] called [[Gill|gills]], through the skin or across enteral mucosae, although some are secondarily aquatic animals (e.g. marine reptiles and [[Marine mammal|marine mammals]]) [[Evolution|evolved]] from terrestrial ancestors that re-[[Adaptation|adapted]] to aquatic environments, in which case they actually use [[Lung|lungs]] to [[Breathing|breathe]] [[Atmosphere of Earth|air]] and are essentially holding their breath when living in water.",
+		sections = {
+			{
+				"Overview",
+				"Some species of [[Gastropod|gastropod]] [[Mollusca|mollusc]], such as the eastern emerald sea slug, are even capable of kleptoplastic [[Photosynthesis|photosynthesis]] via endosymbiosis with ingested yellow-green algae. Almost all aquatic animals reproduce in water, either oviparously or viviparously, and many species routinely [[Fish migration|migrate]] between different water bodies during their [[Biological life cycle|life cycle]]. Some animals have fully aquatic life stages (typically as [[Egg|eggs]] and [[Larva|larvae]]), while as adults they become [[Terrestrial animal|terrestrial]] or semi-aquatic after undergoing [[Metamorphosis|metamorphosis]]. Such examples include [[Amphibian|amphibians]] such as [[Frog|frogs]], many flying insects such as mosquitoes, mayflies, [[Dragonfly|dragonflies]], damselflies and caddisflies, as well as some species of [[Cephalopod|cephalopod]] [[Mollusca|molluscs]] such as the algae octopus (whose larvae are completely [[Plankton|planktonic]], but adults are highly terrestrial).",
+			},
 		},
 	},
 	{
@@ -2205,11 +2239,11 @@ return {
 		description = "Neotropical genus of macaws",
 		tags = { "Birds", "Psittaciformes" },
 		aliases = { "Ara" },
-		summary = "**Ara** is a Neotropical genus of macaws with eight extant species and at least two extinct species. The genus name was coined by French naturalist Bernard Germain de Lacépède in 1799. It gives its name to and is part of the Arini, or tribe of Neotropical parrots. The genus name Ara is derived from the Tupi word ará, an onomatopoeia of the sound a macaw makes.",
+		summary = "**Ara** is a [[Neotropical realm|Neotropical]] genus of macaws with eight [[Neontology|extant]] species and at least two [[Extinction|extinct]] species. The genus name was coined by French naturalist [[Bernard Germain de Lacépède]] in 1799. It gives its name to and is part of the Arini, or tribe of Neotropical parrots. The genus name Ara is derived from the Tupi word ará, an onomatopoeia of the sound a macaw makes.",
 		sections = {
 			{
 				"Overview",
-				"The Ara macaws are large striking parrots with long tails, long narrow wings and vividly coloured plumage. They all have a characteristic bare face patch around the eyes. Males and females have similar plumage. Many of its members are popular in the pet trade, and bird smuggling is a threat to several species.",
+				"The Ara macaws are large striking parrots with long tails, long narrow wings and vividly coloured [[Plumage|plumage]]. They all have a characteristic bare face patch around the eyes. Males and females have similar plumage. Many of its members are popular in the pet trade, and bird smuggling is a threat to several species.",
 			},
 		},
 		related = { "Galliformes", "Bird of prey" },
@@ -2233,7 +2267,7 @@ return {
 				"Today, Arabian bloodlines are found in almost every modern breed of riding horse. The Arabian developed in a [[Desert|desert]] climate and was prized by the nomadic Bedouin people, often being brought inside the family tent for shelter and protection from theft. [[Selective breeding]] for traits, including an ability to form a cooperative relationship with humans, created a horse breed that is good-natured, quick to learn, and willing to please. The Arabian also developed the high spirit and alertness needed in a horse used for raiding and war. This combination of willingness and sensitivity requires modern Arabian horse owners to handle their horses with competence and respect. The Arabian is a versatile breed. Arabians dominate the discipline of endurance riding and compete today in many other fields of [[Equestrianism|equestrian]] sport. They are one of the top ten most popular horse breeds in the world.",
 			},
 		},
-		related = { "Mule", "Herding dog" },
+		related = { "Andalusian horse", "Friesian horse", "Mastiff", "Spitz" },
 		infobox = {
 			{ "Country", "Developed in the Middle East, including the [[Arabian Peninsula]]" },
 			{ "Weight", "800 to 1000 lbs" },
@@ -2242,17 +2276,17 @@ return {
 	{
 		title = "Arachnid",
 		category = "Animal",
-		fame = 1,
+		fame = 2,
 		emoji = "🐾",
 		source = "wikipedia",
 		description = "Class of arthropods",
 		tags = { "Arthropods", "Arachnids" },
 		aliases = { "Arachnids", "Arachnida" },
-		summary = "**Arachnids** are [[Arthropod|arthropods]] in the class **Arachnida** of the subphylum [[Chelicerata]]. Arachnida includes, among others, [[Spider|spiders]], [[Scorpion|scorpions]], ticks, mites, [[Pseudoscorpion|pseudoscorpions]], harvestmen, camel spiders, whip spiders and vinegaroons.",
+		summary = "**Arachnids** are [[Arthropod|arthropods]] in the [[Class (taxonomy)|class]] **Arachnida** of the subphylum [[Chelicerata]]. Arachnida includes, among others, [[Spider|spiders]], [[Scorpion|scorpions]], ticks, mites, [[Pseudoscorpion|pseudoscorpions]], harvestmen, camel spiders, whip spiders and vinegaroons.",
 		sections = {
 			{
 				"Overview",
-				"Adult arachnids have eight legs attached to the cephalothorax. In some species the frontmost pair of legs has converted to a sensory function, while in others, different appendages can grow large enough to take on the appearance of extra pairs of legs. Almost all extant arachnids are terrestrial, living mainly on land. However, some inhabit freshwater environments and, with the exception of the pelagic zone, marine environments as well. They comprise over 110,000 named [[Species|species]], of which 51,000 are species of spiders. The term is derived from the [[Ancient Greek|Greek]] word (aráchnē, 'spider'), from the myth of the hubristic human weaver Arachne, who was turned into a spider.",
+				"Adult arachnids have eight legs attached to the cephalothorax. In some species the frontmost pair of legs has converted to a sensory function, while in others, different appendages can grow large enough to take on the appearance of extra pairs of legs. Almost all [[Neontology|extant]] arachnids are [[Terrestrial animal|terrestrial]], living mainly on land. However, some inhabit freshwater environments and, with the exception of the [[Pelagic zone|pelagic zone]], marine environments as well. They comprise over 110,000 named [[Species|species]], of which 51,000 are species of spiders. The term is derived from the [[Ancient Greek|Greek]] word (aráchnē, 'spider'), from the myth of the hubristic human weaver Arachne, who was turned into a spider.",
 			},
 		},
 		infobox = {
@@ -2268,14 +2302,14 @@ return {
 		description = "Genus of fish",
 		tags = { "Vertebrates", "Fishes" },
 		aliases = { "Pirarucu", "Paiche" },
-		summary = "The **arapaima**, **pirarucu**, or **paiche** is a large species of bonytongue in the genus **Arapaima** native to the Amazon and Essequibo basins of South America. Arapaima is the type genus of the subfamily Arapaiminae within the family Osteoglossidae. They are among the world's largest freshwater fish, reaching as much as 3 m in length. They are an important food fish. They have declined in the native range due to overfishing and habitat loss. In contrast, arapaima have been introduced to several tropical regions outside the native range (within South America and elsewhere), where they are sometimes considered [[Invasive species|invasive species]]. In Kerala, India, arapaima escaped from aquaculture ponds after floods in 2018.",
+		summary = "The **arapaima**, **pirarucu**, or **paiche** is a large species of bonytongue in the genus **Arapaima** native to the [[Amazon basin|Amazon]] and Essequibo basins of South America. Arapaima is the [[Type genus|type genus]] of the subfamily Arapaiminae within the family Osteoglossidae. They are among the world's largest freshwater fish, reaching as much as 3 m in length. They are an important food fish. They have declined in the native range due to [[Overfishing|overfishing]] and habitat loss. In contrast, arapaima have been [[Introduced species|introduced]] to several tropical regions outside the native range (within South America and elsewhere), where they are sometimes considered [[Invasive species|invasive species]]. In [[Kerala]], India, arapaima escaped from aquaculture ponds after floods in 2018.",
 		sections = {
 			{
 				"Overview",
 				'Its [[Portuguese language|Portuguese]] name, derives from the Tupi language words pira and urucum, meaning "red fish". Arapaima was traditionally regarded as a monotypic genus, but later, several species were distinguished. As a consequence of this [[Taxonomy (biology)|taxonomic]] confusion, most earlier studies were done using the name A. gigas, but this species is only known from old museum specimens and the exact native range is unclear. The regularly seen and studied species is A. arapaima, although a small number of A. leptosoma also have been recorded in the aquarium trade.',
 			},
 		},
-		related = { "Osteichthyes", "Chondrichthyes" },
+		related = { "Osteichthyes", "Coelacanth" },
 		infobox = {
 			{ "Scientific name", "Arapaima" },
 		},
@@ -2292,7 +2326,7 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Archaeopteryx lived in the Late Jurassic around 150 million years ago, in what is now southern Germany, during a time when Europe was an [[Archipelago|archipelago]] of islands in a shallow warm tropical sea, much closer to the [[Equator|equator]] than it is now. Similar in size to a [[Eurasian magpie]], with the largest individuals possibly attaining the size of a raven, the largest species of Archaeopteryx could grow to about 50 cm in length. Despite their small size, broad wings, and inferred ability to fly or glide, Archaeopteryx had more in common with other small [[Mesozoic]] dinosaurs than with modern birds. These features make Archaeopteryx a clear candidate for a transitional fossil between non-avian dinosaurs and avian dinosaurs (birds). Thus, Archaeopteryx plays an important role, not only in the study of the origin of birds, but in the study of dinosaurs.",
+				"Archaeopteryx lived in the [[Late Jurassic]] around 150 million years ago, in what is now southern Germany, during a time when Europe was an [[Archipelago|archipelago]] of islands in a shallow warm tropical sea, much closer to the [[Equator|equator]] than it is now. Similar in size to a [[Eurasian magpie]], with the largest individuals possibly attaining the size of a raven, the largest species of Archaeopteryx could grow to about 50 cm in length. Despite their small size, broad wings, and inferred ability to fly or glide, Archaeopteryx had more in common with other small [[Mesozoic]] dinosaurs than with modern birds. These features make Archaeopteryx a clear candidate for a transitional fossil between non-avian dinosaurs and avian dinosaurs (birds). Thus, Archaeopteryx plays an important role, not only in the study of the origin of birds, but in the study of dinosaurs.",
 			},
 		},
 		related = { "Bird of prey", "Seabird" },
@@ -2316,7 +2350,7 @@ return {
 				"Living armadillos are characterized by a leathery armor shell and long, sharp claws for digging. They have short legs, but can move quite quickly. The average length of an armadillo is about 75 cm, including its tail. The giant armadillo grows up to 150 cm and weighs up to 54 kg, while the pink fairy armadillo has a length of only 13–15 cm. When threatened by a predator, Tolypeutes species frequently roll up into a ball; they are the only species of armadillo capable of this. Armadillos are currently classified into two families, Dasypodidae, with Dasypus as the only living genus, and Chlamyphoridae, which contains all other living armadillos as well as the glyptodonts.",
 			},
 		},
-		related = { "Hyrax", "Sirenia" },
+		related = { "Sirenia", "Hyrax" },
 	},
 	{
 		title = "Arthropod",
@@ -2327,13 +2361,14 @@ return {
 		description = "Phylum of invertebrates with jointed exoskeletons",
 		tags = { "Animals", "Arthropods" },
 		aliases = { "Arthropods", "Arthropoda" },
-		summary = "**Arthropods** are [[Invertebrate|invertebrates]] in the phylum **Arthropoda**. They possess an exoskeleton with a [[Cuticle|cuticle]] made of [[Chitin|chitin]], often mineralised with [[Calcium carbonate|calcium carbonate]], a body with differentiated (metameric) segments, and paired jointed appendages. In order to keep growing, they must go through stages of [[Moulting|moulting]], a process by which they shed their exoskeleton to reveal a new one. They form an extremely diverse group of up to ten million species.",
+		summary = "**Arthropods** are [[Invertebrate|invertebrates]] in the [[Phylum|phylum]] **Arthropoda**. They possess an exoskeleton with a [[Cuticle|cuticle]] made of [[Chitin|chitin]], often mineralised with [[Calcium carbonate|calcium carbonate]], a body with differentiated (metameric) [[Segmentation (biology)|segments]], and paired jointed appendages. In order to keep growing, they must go through stages of [[Moulting|moulting]], a process by which they shed their exoskeleton to reveal a new one. They form an extremely diverse group of up to ten million species.",
 		sections = {
 			{
 				"Overview",
-				"An arthropod has an open circulatory system, with a body cavity called a haemocoel through which haemolymph circulates to the interior organs. Like their exteriors, the internal organs of arthropods are generally built of repeated segments. They have ladder-like nervous systems, with paired ventral nerve cords running through all segments and forming paired ganglia in each segment. Their heads are formed by fusion of varying numbers of segments, and their [[Brain|brains]] are formed by fusion of the ganglia of these segments and encircle the esophagus. The respiratory and excretory systems of arthropods vary, depending as much on their environment as on the subphylum to which they belong. Arthropods use combinations of compound eyes and pigment-pit ocelli for vision.",
+				"An arthropod has an open circulatory system, with a body cavity called a haemocoel through which haemolymph circulates to the interior [[Organ (biology)|organs]]. Like their exteriors, the internal organs of arthropods are generally built of repeated segments. They have ladder-like [[Nervous system|nervous systems]], with paired ventral nerve cords running through all segments and forming paired ganglia in each segment. Their heads are formed by fusion of varying numbers of segments, and their [[Brain|brains]] are formed by fusion of the ganglia of these segments and encircle the esophagus. The respiratory and excretory systems of arthropods vary, depending as much on their environment as on the [[Subphylum|subphylum]] to which they belong. Arthropods use combinations of compound eyes and pigment-pit ocelli for vision.",
 			},
 		},
+		related = { "Chanterelle" },
 		infobox = {
 			{ "Scientific name", "Arthropoda" },
 		},
@@ -2346,11 +2381,11 @@ return {
 		source = "wikipedia",
 		description = "Order of mammals",
 		tags = { "Mammals", "Artiodactyla" },
-		summary = "**Artiodactyla** is an order of placental mammals. Typically, they are ungulates which bear weight equally on two (an even number) of their five toes (the third and fourth, often in the form of a hoof). The other three toes are either present, absent, vestigial, or pointing posteriorly. By contrast, most perissodactyls bear weight on an odd number of the five toes. Another difference between the two orders is that many artiodactyls (except for Suina) digest plant [[Cellulose|cellulose]] in one or more stomach chambers rather than in their intestine (as perissodactyls do).",
+		summary = "**Artiodactyla** is an [[Order (taxonomy)|order]] of placental mammals. Typically, they are [[Ungulate|ungulates]] which bear weight equally on two (an even number) of their five toes (the third and fourth, often in the form of a hoof). The other three toes are either present, absent, vestigial, or pointing posteriorly. By contrast, most perissodactyls bear weight on an odd number of the five toes. Another difference between the two orders is that many artiodactyls (except for Suina) digest plant [[Cellulose|cellulose]] in one or more stomach chambers rather than in their intestine (as perissodactyls do).",
 		sections = {
 			{
 				"Overview",
-				'Molecular biology, along with fossil discoveries, has found that cetaceans ([[Blue whale|whales]], [[Dolphin|dolphins]], and [[Porpoise|porpoises]]) fall within this taxonomic branch, being most closely related to hippopotamuses. Some modern taxonomists thus apply the name **Cetartiodactyla** to this group, while others opt to include cetaceans within the existing name of Artiodactyla. Some researchers use "**even-toed ungulates**" to exclude cetaceans and only include terrestrial artiodactyls, making the term paraphyletic in nature. The roughly 270 land-based even-toed ungulate species include pigs, peccaries, hippopotamuses, [[Antelope|antelopes]], [[Deer|deer]], [[Giraffe|giraffes]], [[Camel|camels]], [[Llama|llamas]], [[Llama|alpacas]], sheep, [[Capra (genus)|goats]] and cattle. Many are herbivores, but suids are omnivorous, and cetaceans are entirely carnivorous.',
+				'Molecular biology, along with fossil discoveries, has found that cetaceans ([[Blue whale|whales]], [[Dolphin|dolphins]], and [[Porpoise|porpoises]]) fall within this taxonomic branch, being most closely related to hippopotamuses. Some modern taxonomists thus apply the name **Cetartiodactyla** to this group, while others opt to include cetaceans within the existing name of Artiodactyla. Some researchers use "**even-toed ungulates**" to exclude cetaceans and only include terrestrial artiodactyls, making the term [[Paraphyly|paraphyletic]] in nature. The roughly 270 land-based even-toed ungulate species include pigs, peccaries, hippopotamuses, [[Antelope|antelopes]], [[Deer|deer]], [[Giraffe|giraffes]], [[Camel|camels]], [[Llama|llamas]], [[Llama|alpacas]], sheep, [[Capra (genus)|goats]] and cattle. Many are herbivores, but suids are omnivorous, and [[Cetacean|cetaceans]] are entirely carnivorous.',
 			},
 		},
 		infobox = {
@@ -2366,14 +2401,14 @@ return {
 		description = "Family of birds",
 		tags = { "Birds", "Charadriiformes" },
 		aliases = { "Auks", "Alcids", "Alcidae" },
-		summary = "**Auks** or **alcids** are [[Bird|birds]] of the family **Alcidae** in the order Charadriiformes. The alcid family includes the murres, guillemots, auklets, puffins, and murrelets. The family contains 25 extant or recently extinct species that are classified into 11 genera. Auks are found throughout the Northern Hemisphere.",
+		summary = "**Auks** or **alcids** are [[Bird|birds]] of the family **Alcidae** in the order Charadriiformes. The alcid family includes the murres, guillemots, auklets, puffins, and murrelets. The family contains 25 extant or recently extinct species that are classified into 11 genera. Auks are found throughout the [[Northern Hemisphere]].",
 		sections = {
 			{
 				"Overview",
 				'Apart from the extinct great auk, all auks can fly, and are excellent swimmers and divers (appearing to "fly" in water), but their walking appears clumsy.',
 			},
 		},
-		related = { "Common nightingale", "New World warbler", "Tit (bird)" },
+		related = { "Honeyguide" },
 		infobox = {
 			{ "Scientific name", "Alcidae" },
 		},
@@ -2381,20 +2416,19 @@ return {
 	{
 		title = "Aurochs",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐄",
 		source = "wikipedia",
 		description = "Extinct species of large cattle",
 		tags = { "Mammals", "Artiodactyla" },
 		aliases = { "Bos primigenius", "Aurochsen", "Ure" },
-		summary = "The **aurochs** (**Bos primigenius**; or; pl.: **aurochs** or **aurochsen**; also **ure** or **urus**) is an extinct species of bovine, considered to be the wild ancestor of modern domestic [[Cattle|cattle]] (Bos taurus). With a shoulder height of up to 1.8 m in bulls and 1.55 m in cows, it was one of the largest [[Herbivore|herbivores]] in the [[Holocene]]; it had massive elongated and broad horns that reached 80 cm in length.",
+		summary = "The **aurochs** (**Bos primigenius**; or; pl.: **aurochs** or **aurochsen**; also **ure** or **urus**) is an [[Extinction|extinct]] species of bovine, considered to be the wild ancestor of modern domestic [[Cattle|cattle]] (Bos taurus). With a shoulder height of up to 1.8 m in bulls and 1.55 m in cows, it was one of the largest [[Herbivore|herbivores]] in the [[Holocene]]; it had massive elongated and broad horns that reached 80 cm in length.",
 		sections = {
 			{
 				"Overview",
-				"The aurochs was part of the Pleistocene megafauna and had an expansive range spanning from western Europe and northern Africa to the Indian subcontinent and East Asia. It probably evolved in Asia and migrated west and north during warm interglacial periods. The oldest-known aurochs [[Fossil|fossils]] date to the Middle Pleistocene. Its distribution progressively contracted during the Holocene due to habitat loss and hunting. The last known remains were found in Bulgaria dating to the late 17th or early 18th century. There is a long history of interaction between aurochs and humans, including archaic hominins like Neanderthals. The aurochs is depicted in [[Paleolithic]] [[Cave painting|cave paintings]], [[Neolithic]] petroglyphs, [[Ancient Egypt|Ancient Egyptian]] reliefs and [[Bronze Age]] figurines. Its horns were used in votive offerings, as trophies and drinking horns.",
+				"The aurochs was part of the [[Pleistocene]] [[Megafauna|megafauna]] and had an expansive range spanning from western Europe and northern Africa to the Indian subcontinent and East Asia. It probably evolved in Asia and migrated west and north during warm interglacial periods. The oldest-known aurochs [[Fossil|fossils]] date to the [[Middle Pleistocene]]. Its distribution progressively contracted during the Holocene due to [[Habitat destruction|habitat loss]] and hunting. The last known remains were found in Bulgaria dating to the late 17th or early 18th century. There is a long history of interaction between aurochs and humans, including archaic hominins like Neanderthals. The aurochs is depicted in [[Paleolithic]] [[Cave painting|cave paintings]], [[Neolithic]] petroglyphs, [[Ancient Egypt|Ancient Egyptian]] [[Relief|reliefs]] and [[Bronze Age]] figurines. Its horns were used in votive offerings, as trophies and drinking horns.",
 			},
 		},
-		related = { "Bactrian camel" },
 		infobox = {
 			{ "Scientific name", "Bos primigenius" },
 			{ "Conservation status", "Extinct" },
@@ -2408,14 +2442,13 @@ return {
 		source = "wikipedia",
 		description = "Genus of hominin ancestral to modern humans",
 		tags = { "Mammals", "Primates" },
-		summary = '**Australopithecus** is an extinct genus of early hominins that existed in Africa during the Pliocene and Early Pleistocene. The genera [[Homo]] (which includes modern [[Human|humans]]), [[Paranthropus]], and Kenyanthropus evolved from some Australopithecus species. Australopithecus is a member of the subtribe Australopithecina, which sometimes also includes Ardipithecus, though the term "australopithecine" is sometimes used to refer only to members of Australopithecus. Species include A. garhi, A. africanus, A. sediba, A. afarensis, A. anamensis, A. bahrelghazali, and A. deyiremeda.',
+		summary = '**Australopithecus** is an extinct [[Genus|genus]] of early [[Hominini|hominins]] that existed in Africa during the [[Pliocene]] and Early Pleistocene. The genera [[Homo]] (which includes modern [[Human|humans]]), [[Paranthropus]], and Kenyanthropus evolved from some Australopithecus species. Australopithecus is a member of the subtribe Australopithecina, which sometimes also includes Ardipithecus, though the term "australopithecine" is sometimes used to refer only to members of Australopithecus. Species include A. garhi, A. africanus, A. sediba, A. afarensis, A. anamensis, A. bahrelghazali, and A. deyiremeda.',
 		sections = {
 			{
 				"Overview",
 				"Debate exists as to whether some Australopithecus species should be reclassified into new genera, or if Paranthropus and Kenyanthropus are synonymous with Australopithecus, in part because of the taxonomic inconsistency. Furthermore, because e.g. A. africanus is more closely related to humans, or their ancestors at the time, than e.g. A. anamensis and many more Australopithecus branches, Australopithecus cannot be consolidated into a coherent grouping without also including the genus Homo and other genera. The earliest known member of the genus, A. anamensis, existed in eastern Africa around 4.2 million years ago.",
 			},
 		},
-		related = { "Rhesus macaque" },
 	},
 	{
 		title = "Baboon",
@@ -2426,14 +2459,13 @@ return {
 		description = "Genus of mammals",
 		tags = { "Mammals", "Primates" },
 		aliases = { "Baboons", "Papio" },
-		summary = "**Baboons** are [[Primate|primates]] comprising the [[Biology|genus]] **Papio**, one of the 23 genera of [[Old World monkey|Old World monkeys]], in the family Cercopithecidae. There are six species of baboon: the hamadryas baboon, the Guinea baboon, the olive baboon, the yellow baboon, the Kinda baboon and the chacma baboon. Each species is native to one of six areas of [[Africa]] and the hamadryas baboon is also native to part of the [[Arabian Peninsula]]. Baboons are among the largest non-hominoid primates and have existed for at least two million years.",
+		summary = "**Baboons** are [[Primate|primates]] comprising the [[Biology|genus]] **Papio**, one of the 23 [[Genus|genera]] of [[Old World monkey|Old World monkeys]], in the family Cercopithecidae. There are six species of baboon: the hamadryas baboon, the Guinea baboon, the olive baboon, the yellow baboon, the Kinda baboon and the chacma baboon. Each species is native to one of six areas of [[Africa]] and the hamadryas baboon is also native to part of the [[Arabian Peninsula]]. Baboons are among the largest non-hominoid primates and have existed for at least two million years.",
 		sections = {
 			{
 				"Overview",
-				"Baboons vary in size and weight depending on the species. The smallest, the Kinda baboon, is 50 cm in length and weighs only 14 kg, while the largest, the chacma baboon, is up to 120 cm in length and weighs 40 kg. All baboons have long, dog-like muzzles, heavy, powerful jaws with sharp canine teeth, close-set eyes, thick fur except on their muzzles, short tails, and nerveless, hairless pads of skin on their protruding buttocks called ischial callosities that provide for sitting comfort. Male hamadryas baboons have large white manes. Baboons are diurnal and terrestrial, but sleep in trees, or on high cliffs or rocks at night, away from predators. They are found in open savannas and woodlands across Africa. They are omnivorous and their diet consists of a variety of plants and animals. Their principal predators are Nile crocodiles, leopards, [[Lion|lions]] and [[Hyena|hyenas]].",
+				"Baboons vary in size and weight depending on the species. The smallest, the Kinda baboon, is 50 cm in length and weighs only 14 kg, while the largest, the chacma baboon, is up to 120 cm in length and weighs 40 kg. All baboons have long, dog-like muzzles, heavy, powerful jaws with sharp canine teeth, close-set eyes, thick fur except on their muzzles, short tails, and nerveless, hairless pads of skin on their protruding buttocks called ischial callosities that provide for sitting comfort. Male hamadryas baboons have large white manes. Baboons are [[Diurnality|diurnal]] and [[Terrestrial animal|terrestrial]], but sleep in trees, or on high cliffs or rocks at night, away from predators. They are found in open savannas and woodlands across Africa. They are [[Omnivore|omnivorous]] and their diet consists of a variety of plants and animals. Their principal predators are Nile crocodiles, leopards, [[Lion|lions]] and [[Hyena|hyenas]].",
 			},
 		},
-		related = { "Capuchin monkey" },
 		infobox = {
 			{ "Scientific name", "Papio" },
 		},
@@ -2451,10 +2483,9 @@ return {
 		sections = {
 			{
 				"Overview",
-				"The domesticated Bactrian camel has served as pack animals in inner Asia since ancient times. With its tolerance for cold, drought, and high altitudes, it enabled the travel of caravans on the [[Silk Road]]. Bactrian camels, whether domesticated or feral, are a separate species from the wild Bactrian camel (Camelus ferus), which is the only truly wild (as opposed to feral) species of camelid in the Old World. Domestic Bactrian camels do not descend from wild Bactrian camels, with the two species having split around 1 million years ago.",
+				"The domesticated Bactrian camel has served as pack animals in [[Inner Asia|inner Asia]] since ancient times. With its tolerance for cold, drought, and high altitudes, it enabled the travel of caravans on the [[Silk Road]]. Bactrian camels, whether domesticated or feral, are a separate species from the wild Bactrian camel (Camelus ferus), which is the only truly [[Wildlife|wild]] (as opposed to feral) species of [[Camelidae|camelid]] in the [[Old World]]. Domestic Bactrian camels do not descend from wild Bactrian camels, with the two species having split around 1 million years ago.",
 			},
 		},
-		related = { "Red deer", "Antelope" },
 		infobox = {
 			{ "Scientific name", "Camelus bactrianus" },
 			{ "Conservation status", "Domesticated" },
@@ -2469,8 +2500,8 @@ return {
 		description = "Genus of fish",
 		tags = { "Fishes", "Acanthomorpha" },
 		aliases = { "Sphyraena", "Sphyraenidae" },
-		summary = "A **barracuda** is a large, predatory, [[Actinopterygii|ray-finned]], saltwater [[Fish|fish]] of the genus **Sphyraena**, the only genus in the family **Sphyraenidae**, which was named by Constantine Samuel Rafinesque in 1815. It is found in tropical and subtropical oceans worldwide ranging from the eastern border of the Atlantic Ocean to the [[Red Sea]], on its western border the [[Caribbean Sea]], and in tropical areas of the Pacific Ocean. Barracudas reside near the top of the water and near coral reefs and sea grasses. Barracudas are often targeted by sport-fishing enthusiasts.",
-		related = { "Cichlid", "Tilapia" },
+		summary = "A **barracuda** is a large, predatory, [[Actinopterygii|ray-finned]], saltwater [[Fish|fish]] of the [[Genus|genus]] **Sphyraena**, the only genus in the family **Sphyraenidae**, which was named by [[Constantine Samuel Rafinesque]] in 1815. It is found in tropical and subtropical oceans worldwide ranging from the eastern border of the Atlantic Ocean to the [[Red Sea]], on its western border the [[Caribbean Sea]], and in tropical areas of the Pacific Ocean. Barracudas reside near the top of the water and near coral reefs and sea grasses. Barracudas are often targeted by [[Recreational fishing|sport-fishing]] enthusiasts.",
+		related = { "Cichlid", "Ocean sunfish" },
 		infobox = {
 			{ "Scientific name", "Sphyraena" },
 		},
@@ -2484,14 +2515,13 @@ return {
 		description = "Order of flying mammals",
 		tags = { "Mammals", "Bats" },
 		aliases = { "Bats", "Chiroptera" },
-		summary = "**Bats** (order **Chiroptera** ) are winged mammals, the only [[Mammal|mammals]] capable of true and sustained flight. Bats are more agile in flight than most [[Bird|birds]], using long, spread-out digits covered with a thin membrane or patagium. The smallest bat, and one of the smallest extant mammals, is Kitti's hog-nosed bat, which is 29–33 mm in length, 150 mm across the forearm and 2 g in mass. The largest bats are the flying foxes, with the giant golden-crowned flying fox (Acerodon jubatus) reaching a weight of 1.5 kg and having a wingspan of 1.6 m.",
+		summary = "**Bats** ([[Order (taxonomy)|order]] **Chiroptera** ) are winged mammals, the only [[Mammal|mammals]] capable of true and sustained flight. Bats are more agile in flight than most [[Bird|birds]], using long, spread-out digits covered with a thin membrane or patagium. The smallest bat, and one of the smallest extant mammals, is Kitti's hog-nosed bat, which is 29–33 mm in length, 150 mm across the forearm and 2 g in mass. The largest bats are the flying foxes, with the giant golden-crowned flying fox (Acerodon jubatus) reaching a weight of 1.5 kg and having a wingspan of 1.6 m.",
 		sections = {
 			{
 				"Overview",
-				"The second-largest order of mammals after [[Rodent|rodents]], bats account for about 20% of all [[Taxonomy (biology)|classified]] mammal [[Species|species]] worldwide, with at least 1,500 known species. These were traditionally divided into two suborders: the largely fruit-eating [[Megabat|megabats]] and the [[Microbat|microbats]]. But more recent evidence has supported dividing the order into Yinpterochiroptera and Yangochiroptera, with megabats as members of the former along with several species of microbats. Many bats are insectivores, and most of the rest are frugivores (fruit-eaters) or nectarivores (nectar-eaters). Most bats are nocturnal, and many roost in caves or other refuges; it is uncertain whether bats have these behaviours to escape predators. Bats are distributed globally in almost all regions. They are important in their [[Ecosystem|ecosystems]] for [[Pollination|pollinating]] flowers and dispersing seeds as well as controlling insect populations.",
+				"The second-largest order of mammals after [[Rodent|rodents]], bats account for about 20% of all [[Taxonomy (biology)|classified]] mammal [[Species|species]] worldwide, with at least 1,500 known species. These were traditionally divided into two suborders: the largely fruit-eating [[Megabat|megabats]] and the [[Microbat|microbats]]. But more recent evidence has supported dividing the order into Yinpterochiroptera and Yangochiroptera, with megabats as members of the former along with several species of microbats. Many bats are [[Insectivore|insectivores]], and most of the rest are frugivores (fruit-eaters) or nectarivores (nectar-eaters). Most bats are [[Nocturnal animal|nocturnal]], and many roost in caves or other refuges; it is uncertain whether bats have these behaviours to escape [[Predation|predators]]. Bats are distributed globally in almost all regions. They are important in their [[Ecosystem|ecosystems]] for [[Pollination|pollinating]] flowers and dispersing seeds as well as controlling insect populations.",
 			},
 		},
-		related = { "Proboscidea" },
 		infobox = {
 			{ "Scientific name", "Chiroptera" },
 		},
@@ -2499,16 +2529,32 @@ return {
 	{
 		title = "Batomorphi",
 		category = "Animal",
-		fame = 3,
+		fame = 2,
 		emoji = "🐟",
 		source = "wikipedia",
 		description = "Division of cartilaginous fishes",
 		tags = { "Fishes", "Batoidea" },
 		aliases = { "Rays", "Batoidea" },
-		summary = "**Batomorphi** is a division of [[Chondrichthyes|cartilaginous fishes]], commonly known as **rays**; this taxon is sometimes considered as the superorder **Batoidea**, but the 5th edition of Fishes of the World classifies it as the division Batomorphi. Batomorphi, along with the [[Shark|shark]] division Selachii, both compose the subclass Elasmobranchii. Rays are the most speciose of cartilaginous fishes groups, with well over 600 species in 26 families. Rays are distinguished by their flattened bodies, enlarged pectoral fins that are fused to the head, and gill slits that are placed on their ventral surfaces.",
-		related = { "Sawfish", "Skate (fish)" },
+		summary = "**Batomorphi** is a division of [[Chondrichthyes|cartilaginous fishes]], commonly known as **rays**; this taxon is sometimes considered as the [[Order (taxonomy)|superorder]] **Batoidea**, but the 5th edition of Fishes of the World classifies it as the division Batomorphi. Batomorphi, along with the [[Shark|shark]] division Selachii, both compose the subclass Elasmobranchii. Rays are the most speciose of cartilaginous fishes groups, with well over 600 species in 26 [[Family (taxonomy)|families]]. Rays are distinguished by their flattened bodies, enlarged pectoral fins that are fused to the head, and gill slits that are placed on their ventral surfaces.",
+		related = { "Koi" },
 		infobox = {
 			{ "Scientific name", "Batomorphi" },
+		},
+	},
+	{
+		title = "Beak",
+		category = "Animal",
+		fame = 1,
+		emoji = "🐦",
+		source = "wikipedia",
+		description = "Facial structure found in birds and various other animal clades",
+		tags = { "More articles" },
+		summary = "The **beak** or **bill** is an external rostrum structure found mostly in [[Bird|birds]]. The terms beak and rostrum are also used to refer to a similar organ in some non-avian [[Theropoda|theropods]], [[Ornithischia|ornithischians]], [[Pterosaur|pterosaurs]], [[Cetacean|cetaceans]], dicynodonts, rhynchosaurs, anuran [[Tadpole|tadpoles]], [[Turtle|turtles]], [[Monotreme|monotremes]] (i.e. [[Echidna|echidnas]] and [[Platypus|platypuses]], which have a bill-like structure), sirens, [[Tetraodontidae|pufferfish]], billfishes, parrotfish and cephalopods.",
+		sections = {
+			{
+				"Overview",
+				"Although beaks vary significantly in size, shape, color and texture, they share a similar underlying structure. Two bony projections–the upper and lower mandibles–are covered with a thin keratinized layer of epidermis known as the rhamphotheca. In most species, two holes called nares lead to the respiratory system.",
+			},
 		},
 	},
 	{
@@ -2520,11 +2566,11 @@ return {
 		description = "Family of carnivoran mammals",
 		tags = { "Mammals", "Carnivora" },
 		aliases = { "Bears", "Ursidae" },
-		summary = "**Bears** are [[Carnivora|carnivoran]] mammals of the family **Ursidae**. They are classified as caniforms within the suborder Caniformia. Although only eight species of bears are extant, they are widespread, appearing in a wide variety of [[Habitat|habitats]] throughout most of the Northern Hemisphere and partially in the Southern Hemisphere. Bears are found on the continents of North America, South America, and Eurasia. Common characteristics of modern bears include large bodies with stocky legs, long snouts, small rounded ears, shaggy hair, plantigrade paws with five nonretractile claws, and short tails.",
+		summary = "**Bears** are [[Carnivora|carnivoran]] mammals of the [[Family (taxonomy)|family]] **Ursidae**. They are classified as caniforms within the suborder Caniformia. Although only eight species of bears are extant, they are widespread, appearing in a wide variety of [[Habitat|habitats]] throughout most of the Northern Hemisphere and partially in the Southern Hemisphere. Bears are found on the continents of North America, South America, and Eurasia. Common characteristics of modern bears include large bodies with stocky legs, long snouts, small rounded ears, shaggy hair, plantigrade paws with five nonretractile claws, and short tails.",
 		sections = {
 			{
 				"Overview",
-				"While the [[Polar bear|polar bear]] is mostly carnivorous, and the [[Giant panda|giant panda]] is mostly herbivorous, the remaining six species are omnivorous with varying diets. With the exception of courting individuals and mothers with their young, bears are typically solitary animals. They may be diurnal or nocturnal, and they have an excellent sense of smell. Despite their heavy build and awkward gait, they are adept runners, climbers, and swimmers. Bears use shelters, such as caves and logs, as their dens; most species occupy their dens during the winter for a long period of [[Hibernation|hibernation]], up to 100 days. Bears have been hunted since prehistoric times for their meat and fur. They have also been used for bear-baiting and other forms of entertainment, such as being made to dance. With their powerful physical presence, they play a prominent role in the arts, mythology, and other cultural aspects of various human societies.",
+				"While the [[Polar bear|polar bear]] is mostly [[Carnivore|carnivorous]], and the [[Giant panda|giant panda]] is mostly [[Herbivore|herbivorous]], the remaining six species are [[Omnivore|omnivorous]] with varying diets. With the exception of courting individuals and mothers with their young, bears are typically solitary animals. They may be [[Diurnality|diurnal]] or [[Nocturnal animal|nocturnal]], and they have an excellent sense of smell. Despite their heavy build and awkward gait, they are adept runners, climbers, and swimmers. Bears use shelters, such as caves and logs, as their dens; most species occupy their dens during the winter for a long period of [[Hibernation|hibernation]], up to 100 days. Bears have been hunted since [[Prehistory|prehistoric]] times for their meat and fur. They have also been used for bear-baiting and other forms of entertainment, such as being made to dance. With their powerful physical presence, they play a prominent role in the arts, mythology, and other cultural aspects of various human societies.",
 			},
 		},
 		infobox = {
@@ -2540,14 +2586,13 @@ return {
 		description = "Semiaquatic rodent",
 		tags = { "Mammals", "Rodents" },
 		aliases = { "Beavers", "Castor" },
-		summary = "**Beavers** (genus **Castor**) are large semiaquatic rodents of the Northern Hemisphere. There are two extant [[Species|species]]: the North American beaver (Castor canadensis) and the Eurasian beaver (C. fiber). Beavers are the second-largest living rodents, after capybaras, weighing up to 50 kg. They have stout bodies with large heads, long chisel-like incisors, brown or gray fur, hand-like front feet, webbed back feet, and tails that are flat and scaly. The two species differ in skull and tail shape and fur color. Beavers can be found in a number of freshwater habitats, such as rivers, streams, lakes and ponds. They are herbivorous, consuming [[Bark (botany)|tree bark]], aquatic plants, grasses and sedges.",
+		summary = "**Beavers** (genus **Castor**) are large [[Semiaquatic|semiaquatic]] rodents of the [[Northern Hemisphere]]. There are two extant [[Species|species]]: the North American beaver (Castor canadensis) and the Eurasian beaver (C. fiber). Beavers are the second-largest living rodents, after capybaras, weighing up to 50 kg. They have stout bodies with large heads, long chisel-like incisors, brown or gray [[Fur|fur]], hand-like front feet, webbed back feet, and tails that are flat and scaly. The two species differ in skull and tail shape and fur color. Beavers can be found in a number of [[Freshwater ecosystem|freshwater habitats]], such as rivers, streams, lakes and ponds. They are [[Herbivore|herbivorous]], consuming [[Bark (botany)|tree bark]], aquatic plants, grasses and sedges.",
 		sections = {
 			{
 				"Overview",
-				"Beavers build dams and lodges using tree branches, vegetation, rocks and mud; they chew down trees for building material. Dams restrict water flow, forming ponds. Lodges, which are usually built in ponds, serve as shelters. Their infrastructure creates [[Wetland|wetlands]] used by many other species, and because of their effect on other organisms in the [[Ecosystem|ecosystem]], beavers are considered a keystone species. Adult males and females live in monogamous pairs with their offspring. After their first year, the young help their parents repair dams and lodges; older siblings may also help raise newly born offspring. Beavers hold territories and mark them using scent mounds made of mud, debris, and castoreum—a liquid substance excreted through the beaver's urethra-based castor sacs. Beavers can also recognize their kin by their anal gland secretions and are more likely to tolerate them as neighbors.",
+				"Beavers build dams and lodges using tree branches, vegetation, rocks and mud; they chew down trees for building material. Dams restrict water flow, forming ponds. Lodges, which are usually built in ponds, serve as shelters. Their infrastructure creates [[Wetland|wetlands]] used by many other species, and because of their effect on other organisms in the [[Ecosystem|ecosystem]], beavers are considered a [[Keystone species|keystone species]]. Adult males and females live in monogamous pairs with their offspring. After their first year, the young help their parents repair dams and lodges; older siblings may also help raise newly born offspring. Beavers hold [[Territory (animal)|territories]] and mark them using scent mounds made of mud, debris, and castoreum—a liquid substance excreted through the beaver's urethra-based castor sacs. Beavers can also recognize their kin by their anal gland secretions and are more likely to tolerate them as neighbors.",
 			},
 		},
-		related = { "Muskrat" },
 		infobox = {
 			{ "Scientific name", "Castor" },
 		},
@@ -2563,10 +2608,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Bed bug bites are caused primarily by two species of insects: Cimex lectularius (the common bed bug) and Cimex hemipterus, found primarily in the tropics. Their size ranges between 1 and 7 mm. They spread by crawling between nearby locations or by being carried within personal items. Infestation is rarely due to a lack of hygiene but is more common in high-density areas. Diagnosis involves both finding the bugs and the occurrence of compatible symptoms. Bed bugs spend much of their time in dark, hidden locations like mattress seams, or cracks in a wall. Treatment is directed towards the symptoms. Eliminating bed bugs from the home is often difficult, partly because bed bugs can survive up to approximately 300 days without feeding. Repeated treatments of a home may be required.",
+				"Bed bug bites are caused primarily by two species of insects: Cimex lectularius (the common bed bug) and Cimex hemipterus, found primarily in the tropics. Their size ranges between 1 and 7 mm. They spread by crawling between nearby locations or by being carried within personal items. Infestation is rarely due to a lack of [[Hygiene|hygiene]] but is more common in high-density areas. Diagnosis involves both finding the bugs and the occurrence of compatible symptoms. Bed bugs spend much of their time in dark, hidden locations like mattress seams, or cracks in a wall. Treatment is directed towards the symptoms. Eliminating bed bugs from the home is often difficult, partly because bed bugs can survive up to approximately 300 days without feeding. Repeated treatments of a home may be required.",
 			},
 		},
-		related = { "Scale insect", "Aphid" },
+		related = { "Mole cricket" },
 		infobox = {
 			{ "Field", "Family medicine, dermatology" },
 			{ "Frequency", "Relatively common" },
@@ -2575,22 +2620,43 @@ return {
 	{
 		title = "Beetle",
 		category = "Animal",
-		fame = 1,
+		fame = 2,
 		emoji = "🪲",
 		source = "wikipedia",
 		description = "Order of insects",
 		tags = { "Insects and other hexapods", "Beetles (Coleoptera)" },
 		aliases = { "Beetles", "Coleoptera" },
-		summary = "**Beetles** are [[Insect|insects]] that form the order **Coleoptera**, in the superorder Holometabola. Their front pair of wings are hardened into wing-cases, elytra, distinguishing them from most other insects. The Coleoptera, with about 400,000 described species, is the largest of all orders, constituting almost 40% of described [[Arthropod|arthropods]] and 25% of all known animal species; new species are discovered frequently, with estimates suggesting that there are between 0.9 and 2.1 million total species.",
+		summary = "**Beetles** are [[Insect|insects]] that form the [[Taxonomic rank|order]] **Coleoptera**, in the superorder Holometabola. Their front pair of wings are hardened into wing-cases, elytra, distinguishing them from most other insects. The Coleoptera, with about 400,000 described species, is the largest of all orders, constituting almost 40% of described [[Arthropod|arthropods]] and 25% of all known animal species; new species are discovered frequently, with estimates suggesting that there are between 0.9 and 2.1 million total species.",
 		sections = {
 			{
 				"Overview",
-				"Found in almost every habitat except the sea and the polar regions, they interact with their [[Ecosystem|ecosystems]] in several ways: beetles often feed on plants and [[Mushroom|fungi]], break down animal and plant debris, and eat other [[Invertebrate|invertebrates]]. Some species are serious agricultural pests, such as the Colorado potato beetle, while others such as [[Coccinellidae]] (ladybirds or ladybugs) eat [[Aphid|aphids]], [[Scale insect|scale insects]], thrips, and other plant-sucking insects that damage crops. Some others also have unusual characteristics, such as fireflies, which use a light-emitting organ for mating and communication purposes. Beetles typically have a particularly hard exoskeleton including the elytra, though some such as the rove beetles have very short elytra while blister beetles have softer elytra.",
+				"Found in almost every habitat except the sea and the [[Polar regions|polar regions]], they interact with their [[Ecosystem|ecosystems]] in several ways: beetles often feed on plants and [[Mushroom|fungi]], break down animal and plant debris, and eat other [[Invertebrate|invertebrates]]. Some species are serious agricultural pests, such as the Colorado potato beetle, while others such as [[Coccinellidae]] (ladybirds or ladybugs) eat [[Aphid|aphids]], [[Scale insect|scale insects]], thrips, and other plant-sucking insects that damage crops. Some others also have unusual characteristics, such as fireflies, which use a light-emitting organ for mating and communication purposes. Beetles typically have a particularly hard [[Exoskeleton|exoskeleton]] including the elytra, though some such as the rove beetles have very short elytra while blister beetles have softer elytra.",
 			},
 		},
 		related = { "Dung beetle", "Firefly", "Weevil" },
 		infobox = {
 			{ "Scientific name", "Coleoptera" },
+		},
+	},
+	{
+		title = "Beluga whale",
+		category = "Animal",
+		fame = 3,
+		emoji = "🐋",
+		source = "wikipedia",
+		description = "Species of whale",
+		tags = { "More articles" },
+		aliases = { "White whale", "Delphinapterus leucas" },
+		summary = "The **beluga whale** or the **white whale** (**Delphinapterus leucas**) is an [[Arctic]] and sub-Arctic [[Cetacean|cetacean]]. It is one of two living members of the family Monodontidae, along with the narwhal, and the only member of the [[Genus|genus]] **Delphinapterus**. It is also known as the **sea canary**, due to its high-pitched calls; and the **melonhead**, though that more commonly refers to the melon-headed whale, which is an oceanic dolphin.",
+		sections = {
+			{
+				"Overview",
+				"The beluga is adapted to life in the Arctic, with anatomical and physiological characteristics that differentiate it from other cetaceans. Amongst these are its all-white colour that gives the whale its name; and the absence of a dorsal fin, which allows it to swim under [[Sea ice|ice]] with ease. It possesses a distinctive protuberance at the front of its head which houses an [[Animal echolocation|echolocation organ]] called the melon, which in this species is large and deformable. The beluga's body size is between that of a [[Dolphin|dolphin]] and a True's beaked whale, with males growing up to 5.5 m long and weighing up to 1600 kg. This whale has a stocky body. Like many cetaceans, a large percentage of its weight is [[Blubber|blubber]] (subcutaneous fat). Its sense of hearing is highly developed and its [[Animal echolocation|echolocation]] allows it to move about and find breathing holes under sheet ice.",
+			},
+		},
+		infobox = {
+			{ "Scientific name", "Delphinapterus leucas" },
+			{ "Conservation status", "Least Concern" },
 		},
 	},
 	{
@@ -2602,14 +2668,14 @@ return {
 		description = "Family of archaic-looking ray-finned fishes",
 		tags = { "Fishes", "Chondrosteans" },
 		aliases = { "Bichirs", "Reedfish", "Polypteridae" },
-		summary = "**Bichirs** and the **reedfish** comprise **Polypteridae**, a family of archaic [[Actinopterygii|ray-finned fishes]] and the only family in the order **Polypteriformes**.",
+		summary = "**Bichirs** and the **reedfish** comprise **Polypteridae**, a [[Family (taxonomy)|family]] of archaic [[Actinopterygii|ray-finned fishes]] and the only family in the [[Order (taxonomy)|order]] **Polypteriformes**.",
 		sections = {
 			{
 				"Overview",
-				"All the [[Species|species]] occur in freshwater [[Habitat|habitats]] in tropical [[Africa]] and the [[Nile]] River system, mainly swampy, shallow [[Floodplain|floodplains]] and [[Estuary|estuaries]]. Cladistia, polypterids and their fossil relatives, are considered the sister group to all other extant ray-finned fishes (Actinopteri). They likely diverged from Actinopteri at least 330 million years ago. A closely related group, the Scanilepiformes, are known from the later [[Permian]] to the [[Triassic]], and are likely ancestral to polypterids. The oldest polypterids are around 100 million years old, from the early Late Cretaceous of South America and Africa.",
+				"All the [[Species|species]] occur in [[Fresh water|freshwater]] [[Habitat|habitats]] in tropical [[Africa]] and the [[Nile]] River system, mainly swampy, shallow [[Floodplain|floodplains]] and [[Estuary|estuaries]]. Cladistia, polypterids and their fossil relatives, are considered the [[Sister group|sister group]] to all other extant ray-finned fishes (Actinopteri). They likely diverged from Actinopteri at least 330 million years ago. A closely related group, the Scanilepiformes, are known from the later [[Permian]] to the [[Triassic]], and are likely ancestral to polypterids. The oldest polypterids are around 100 million years old, from the early [[Late Cretaceous]] of South America and Africa.",
 			},
 		},
-		related = { "Tiger shark", "Salmonidae" },
+		related = { "Salmon", "Salmonidae" },
 		infobox = {
 			{ "Scientific name", "Polypteridae" },
 		},
@@ -2622,15 +2688,92 @@ return {
 		source = "wikipedia",
 		description = "Animals with embryonic bilateral symmetry",
 		tags = { "Organisms", "Animals" },
-		summary = '**Bilateria** is a large clade of [[Animal|animals]] characterised by bilateral symmetry during embryonic development. This means their body plans are laid around a longitudinal axis with a front (or "head") and a rear (or "tail") end, as well as a left–right–symmetrical belly (ventral) and back (dorsal) surface. Nearly all bilaterians maintain a bilaterally symmetrical body as adults; the most notable exception is the [[Echinoderm|echinoderms]], which have pentaradial symmetry as adults, but bilateral symmetry as [[Embryo|embryos]]. With few exceptions, bilaterian embryos are triploblastic, having three germ layers: endoderm, mesoderm and ectoderm, and have complete digestive tracts with a separate mouth and anus.',
+		summary = '**Bilateria** is a large [[Clade|clade]] of [[Animal|animals]] characterised by bilateral symmetry during embryonic development. This means their [[Body plan|body plans]] are laid around a longitudinal axis with a front (or "head") and a rear (or "tail") end, as well as a left–right–symmetrical belly (ventral) and back (dorsal) surface. Nearly all bilaterians maintain a bilaterally symmetrical body as adults; the most notable exception is the [[Echinoderm|echinoderms]], which have pentaradial symmetry as adults, but bilateral symmetry as [[Embryo|embryos]]. With few exceptions, bilaterian embryos are triploblastic, having three germ layers: endoderm, mesoderm and ectoderm, and have complete digestive tracts with a separate mouth and anus.',
 		sections = {
 			{
 				"Overview",
-				"Some bilaterians lack body cavities, while others have a primary body cavity derived from the blastocoel, or a secondary cavity, the coelom. Cephalization is a characteristic feature among most bilaterians, where the [[Sense|sense]] organs and central nerve ganglia become concentrated at the front end of the animal. Bilaterians constitute one of the five main lineages of [[Animal|animals]], the other four being Porifera (sponges), [[Cnidaria]] ([[Jellyfish|jellyfish]], hydrozoans, sea anemones and [[Coral reef|corals]]), Ctenophora (comb jellies) and Placozoa. They rapidly diversified in the late Ediacaran and the [[Cambrian]], and are now by far the most successful animal lineage, with over 98% of known animal species. Bilaterians are traditionally classified as either deuterostomes or protostomes, on the basis of whether the blastopore becomes the anus or mouth.",
+				"Some bilaterians lack body cavities, while others have a primary body cavity derived from the blastocoel, or a secondary cavity, the coelom. Cephalization is a characteristic feature among most bilaterians, where the [[Sense|sense]] organs and [[Central nervous system|central nerve]] ganglia become concentrated at the front end of the animal. Bilaterians constitute one of the five main lineages of [[Animal|animals]], the other four being Porifera (sponges), [[Cnidaria]] ([[Jellyfish|jellyfish]], hydrozoans, sea anemones and [[Coral reef|corals]]), Ctenophora (comb jellies) and Placozoa. They rapidly diversified in the late [[Ediacaran]] and the [[Cambrian]], and are now by far the most successful animal lineage, with over 98% of known animal species. Bilaterians are traditionally classified as either deuterostomes or protostomes, on the basis of whether the blastopore becomes the anus or mouth.",
 			},
 		},
 		infobox = {
 			{ "Scientific name", "Bilateria" },
+		},
+	},
+	{
+		title = "Biodiversity loss",
+		category = "Animal",
+		fame = 1,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Extinction of species or loss of species in a given habitat",
+		tags = { "More articles" },
+		summary = "**Biodiversity loss** happens when [[Species|species]] disappear completely from Earth ([[Extinction|extinction]]) or when there is a decrease or disappearance of species in a specific area. Biodiversity loss means that there is a reduction in [[Biodiversity|biological diversity]] in a given area. The decrease can be temporary or permanent. It is temporary if the damage that led to the loss is reversible in time, for example through ecological restoration.If this is not possible, then the decrease is permanent. The cause of most of the biodiversity loss is, generally speaking, human activities that push the planetary boundaries too far.",
+		sections = {
+			{
+				"Overview",
+				'These activities include [[Habitat destruction|habitat destruction]] (for example [[Deforestation|deforestation]]) and land use intensification (for example monoculture farming). Further problem areas are [[Air pollution|air]] and [[Water pollution|water pollution]] (including nutrient pollution), over-exploitation, invasive species and [[Climate change|climate change]]. Many scientists, along with the Global Assessment Report on Biodiversity and Ecosystem Services, say that the main reason for biodiversity loss is a growing human population because this leads to human overpopulation and excessive consumption. Others disagree, saying that loss of habitat is caused mainly by "the growth of commodities for export" and that population has little to do with overall consumption. More important are wealth disparities between and within countries. In any case, all contemporary biodiversity loss has been attributed to human activities. Climate change is another threat to global biodiversity.',
+			},
+		},
+		related = { "The World Factbook" },
+	},
+	{
+		title = "Biogeography",
+		category = "Animal",
+		fame = 1,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Study of distribution of species",
+		tags = { "More articles" },
+		summary = "**Biogeography** is the study of the [[Species distribution|distribution]] of [[Species|species]] and [[Ecosystem|ecosystems]] in [[Geography|geographic space]] and throughout geological time. Organisms and biological communities often vary in a regular fashion along geographic gradients of [[Latitude|latitude]], [[Elevation|elevation]], isolation and habitat area. Phytogeography is the branch of biogeography that studies the distribution of [[Plant|plants]], Zoogeography is the branch that studies distribution of [[Animal|animals]], while Mycogeography is the branch that studies distribution of [[Mushroom|fungi]], such as [[Mushroom|mushrooms]].",
+		sections = {
+			{
+				"Overview",
+				"Knowledge of spatial variation in the numbers and types of organisms is as vital to us today as it was to our early human ancestors, as we adapt to heterogeneous but geographically predictable [[Natural environment|environments]]. Biogeography is an integrative field of inquiry that unites concepts and information from [[Ecology|ecology]], [[Evolutionary biology|evolutionary biology]], [[Taxonomy (biology)|taxonomy]], [[Geology|geology]], [[Physical geography|physical geography]], palaeontology, and [[Climatology|climatology]]. Modern biogeographic research combines information and ideas from many fields, from the physiological and ecological constraints on organismal dispersal to geological and climatological phenomena operating at global spatial scales and [[Evolution|evolutionary]] time frames. The short-term interactions within a habitat and species of organisms describe the ecological application of biogeography. Historical biogeography describes the long-term, evolutionary periods of time for broader classifications of organisms.",
+			},
+		},
+		related = { "Greenwood Publishing Group" },
+	},
+	{
+		title = "Biomass (ecology)",
+		category = "Animal",
+		fame = 2,
+		emoji = "⚖️",
+		source = "wikipedia",
+		description = "Total mass of living organisms in a given area (all species or selected species)",
+		tags = { "More articles" },
+		aliases = { "Biomass" },
+		summary = "**Biomass** is the total [[Mass|mass]] of living biological [[Organism|organisms]] in a given area or [[Ecosystem|ecosystem]] at a specific time. Biomass may refer to the species biomass, which is the mass of one or more species, or to community biomass, which is the mass of all species in the community. It encompasses microorganisms, plants, and animals, and is typically expressed as total mass or average mass per unit area.",
+		sections = {
+			{
+				"Overview",
+				"The method used to measure biomass depends on the context. In some cases, biomass refers to the wet weight of organisms as they exist in nature. For example, in a [[Salmon|salmon]] [[Fishery|fishery]], the salmon biomass might be regarded as the total wet weight the salmon would have if they were taken out of the water. In other contexts, biomass can be measured in terms of the dried organic mass, so perhaps only 30% of the actual weight might count, the rest being [[Water|water]]. In other contexts, it may refer to dry weight (excluding water content), or to the mass of organic carbon, excluding inorganic components such as bones, shells, or teeth. In 2018, Bar-On et al. estimated Earth's total live biomass at approximately 550 billion tonnes of carbon, the majority of which is found in plants. A 1998 study by Field et al. estimated global annual net [[Primary production|primary production]] at just over 100 billion tonnes of carbon per year.",
+			},
+		},
+	},
+	{
+		title = "Bird egg",
+		category = "Animal",
+		fame = 2,
+		emoji = "🥚",
+		source = "wikipedia",
+		description = "Component of avian reproduction",
+		tags = { "More articles" },
+		summary = "A **bird egg** is the reproductive structure produced by female birds, consisting of a hard, calcareous shell that encloses nutrient-dense yolk, protective albumen, and embryonic membranes, providing a self-contained environment for embryonic development and hatching. Bird eggs range in quantity from one (as in condors) to up to seventeen (the grey partridge). Clutch size may vary latitudinally within a species. Some [[Bird|birds]] lay eggs even when the eggs have not been fertilized; it is not uncommon for pet owners to find their lone bird nesting on a clutch of infertile eggs, which are sometimes called wind-eggs.",
+	},
+	{
+		title = "Bird migration",
+		category = "Animal",
+		fame = 1,
+		emoji = "🐦",
+		source = "wikipedia",
+		description = "Seasonal movement of birds",
+		tags = { "More articles" },
+		summary = "**Bird migration** is a seasonal movement of some [[Bird|birds]] between breeding and wintering grounds that occurs twice a year. It is typically between northern and southern regions. [[Animal migration|Migration]] carries inherent risks, including [[Predation|predation]] and other hazards en route.",
+		sections = {
+			{
+				"Overview",
+				"The Arctic tern holds the long-distance migration record for birds, travelling between [[Arctic]] breeding grounds and the [[Antarctic]] each year. Some species of [[Procellariiformes|tubenoses]], such as [[Albatross|albatrosses]], circle the Earth, flying over the southern oceans, while others such as Manx shearwaters migrate 14,000 km between their northern breeding grounds and the Southern Ocean. Shorter migrations are common, while longer ones are not. The shorter migrations include altitudinal migrations on mountains, including the [[Andes]] and [[Himalayas]]. The timing of migration seems to be controlled primarily by changes in day length. Migrating birds navigate using [[Celestial navigation|celestial cues]] from the Sun and stars, the [[Earth's magnetic field]], and mental maps.",
+			},
 		},
 	},
 	{
@@ -2642,14 +2785,14 @@ return {
 		description = "Paraphyletic group of birds",
 		tags = { "Vertebrates", "Birds" },
 		aliases = { "Birds of prey", "Predatory birds", "Raptors" },
-		summary = "**Birds of prey** or **predatory birds**, also known as **raptors**, are hypercarnivorous species of [[Bird|bird]] that actively [[Predation|hunt and feed]] on other [[Vertebrate|vertebrates]], mainly mammals, [[Reptile|reptiles]], and smaller birds. Although predatory birds primarily hunt live prey, many species—such as fish eagles, vultures, and condors—also scavenge and eat carrion.",
+		summary = "**Birds of prey** or **predatory birds**, also known as **raptors**, are hypercarnivorous species of [[Bird|bird]] that actively [[Predation|hunt and feed]] on other [[Vertebrate|vertebrates]], mainly mammals, [[Reptile|reptiles]], and smaller birds. Although predatory birds primarily hunt live prey, many species—such as fish eagles, vultures, and condors—also scavenge and eat [[Carrion|carrion]].",
 		sections = {
 			{
 				"Overview",
-				'Although the term "bird of prey" could theoretically be taken to include all birds that actively hunt and eat other animals, ornithologists typically use the narrower definition followed in this page, excluding many piscivorous predators such as [[Stork|storks]], [[Crane (bird)|cranes]], [[Heron|herons]], [[Gull|gulls]], skuas, [[Penguin|penguins]], and [[Kingfisher|kingfishers]], as well as many primarily insectivorous birds such as [[Nightjar|nightjars]], frogmouths, and some [[Passerine|passerines]] (e.g. [[Shrike|shrikes]]); omnivorous passerine birds such as crows and ravens; and opportunistic predators from predominantly frugivorous or herbivorous ratites such as cassowaries and rheas. Some extinct predatory telluravian birds had talons similar to those of modern birds of prey, including mousebird relatives (Sandcoleidae), and Messelasturidae indicating possible common descent.',
+				'Although the term "bird of prey" could theoretically be taken to include all birds that actively hunt and eat other animals, ornithologists typically use the narrower definition followed in this page, excluding many piscivorous predators such as [[Stork|storks]], [[Crane (bird)|cranes]], [[Heron|herons]], [[Gull|gulls]], skuas, [[Penguin|penguins]], and [[Kingfisher|kingfishers]], as well as many primarily insectivorous birds such as [[Nightjar|nightjars]], frogmouths, and some [[Passerine|passerines]] (e.g. [[Shrike|shrikes]]); [[Omnivore|omnivorous]] passerine birds such as crows and ravens; and opportunistic predators from predominantly frugivorous or [[Herbivore|herbivorous]] [[Ratite|ratites]] such as cassowaries and rheas. Some extinct predatory telluravian birds had talons similar to those of modern birds of prey, including mousebird relatives (Sandcoleidae), and Messelasturidae indicating possible [[Common descent|common descent]].',
 			},
 		},
-		related = { "Archaeopteryx", "Ploceidae", "Tyrant flycatcher" },
+		related = { "Archaeopteryx" },
 	},
 	{
 		title = "Bird-of-paradise",
@@ -2660,14 +2803,14 @@ return {
 		description = "Family of birds of the order Passeriformes",
 		tags = { "Birds", "Corvoidea" },
 		aliases = { "Birds-of-paradise", "Paradisaeidae" },
-		summary = "The **birds-of-paradise** are members of the family **Paradisaeidae** of the order Passeriformes. They are found mainly in [[New Guinea]], as well as eastern [[Australia]] and the [[Maluku Islands]]. The family has 44 species in 17 genera. The males of these species tend to have very long, elaborate feathers extending from the beak, wings, tail, or head. For the most part, they are confined to dense [[Rainforest|rainforest]] habitats. The diet of all species is dominated by fruit and to a lesser extent arthropods. The birds-of-paradise have a variety of breeding systems, ranging from monogamy to lek-type polygamy.",
+		summary = "The **birds-of-paradise** are members of the [[Family (taxonomy)|family]] **Paradisaeidae** of the order Passeriformes. They are found mainly in [[New Guinea]], as well as eastern [[Australia]] and the [[Maluku Islands]]. The family has 44 species in 17 [[Genus|genera]]. The males of these species tend to have very long, elaborate feathers extending from the beak, wings, tail, or head. For the most part, they are confined to dense [[Rainforest|rainforest]] habitats. The diet of all species is dominated by fruit and to a lesser extent arthropods. The birds-of-paradise have a variety of breeding systems, ranging from monogamy to lek-type polygamy.",
 		sections = {
 			{
 				"Overview",
-				"Notably, the long tail feather of the Greater bird-of-paradise is used as a decorative element in the Shripech, the royal crown of Nepalese monarchs. A number of species are threatened by hunting and habitat loss.",
+				"Notably, the long tail feather of the Greater bird-of-paradise is used as a decorative element in the Shripech, the royal crown of Nepalese monarchs. A number of species are threatened by hunting and [[Habitat destruction|habitat loss]].",
 			},
 		},
-		related = { "Corvus", "Corvidae" },
+		related = { "Corvidae", "Honeyeater" },
 		infobox = {
 			{ "Scientific name", "Paradisaeidae" },
 		},
@@ -2681,13 +2824,14 @@ return {
 		description = "Class of molluscs",
 		tags = { "Animals", "Mollusks" },
 		aliases = { "Bivalves", "Lamellibranchiata", "Pelecypoda" },
-		summary = "**Bivalvia** or **bivalves**, in previous centuries referred to as the **Lamellibranchiata** and **Pelecypoda**, is a class of aquatic molluscs (marine and freshwater) that have laterally compressed soft bodies enclosed by a calcified exoskeleton consisting of a hinged pair of half-shells known as valves. As a group, bivalves have no head and lack some typical molluscan organs such as the radula and the odontophore. Their gills have evolved into ctenidia, specialised organs for feeding and breathing.",
+		summary = "**Bivalvia** or **bivalves**, in previous centuries referred to as the **Lamellibranchiata** and **Pelecypoda**, is a [[Class (taxonomy)|class]] of [[Aquatic animal|aquatic]] [[Mollusca|molluscs]] (marine and freshwater) that have laterally compressed soft bodies enclosed by a calcified [[Exoskeleton|exoskeleton]] consisting of a hinged pair of half-shells known as valves. As a group, bivalves have no head and lack some typical molluscan organs such as the radula and the odontophore. Their [[Gill|gills]] have evolved into ctenidia, specialised organs for feeding and breathing.",
 		sections = {
 			{
 				"Overview",
-				'Common bivalves include clams, [[Oyster|oysters]], cockles, mussels, [[Scallop|scallops]], and numerous other families that live in saltwater, as well as a number of families that live in freshwater. Majority of the class are benthic filter feeders that bury themselves in sediment, where they are relatively safe from [[Predation|predation]]. Others lie on the sea floor or attach themselves to rocks or other hard surfaces. Some bivalves, such as scallops and file shells, can swim. Shipworms bore into wood, clay, or stone and live inside these substances. The shell of a bivalve is composed of [[Calcium carbonate|calcium carbonate]], and consists of two, usually similar, parts called valves. These valves are for feeding and for disposal of waste. These are joined together along one edge (the hinge line) by a flexible ligament that, usually in conjunction with interlocking "teeth" on each of the valves, forms the hinge.',
+				'Common bivalves include clams, [[Oyster|oysters]], cockles, mussels, [[Scallop|scallops]], and numerous other [[Family (taxonomy)|families]] that live in saltwater, as well as a number of families that live in freshwater. Majority of the class are benthic [[Filter feeder|filter feeders]] that bury themselves in sediment, where they are relatively safe from [[Predation|predation]]. Others lie on the sea floor or attach themselves to rocks or other hard surfaces. Some bivalves, such as scallops and file shells, can swim. Shipworms bore into wood, clay, or stone and live inside these substances. The [[Exoskeleton|shell]] of a bivalve is composed of [[Calcium carbonate|calcium carbonate]], and consists of two, usually similar, parts called valves. These valves are for feeding and for disposal of waste. These are joined together along one edge (the hinge line) by a flexible ligament that, usually in conjunction with interlocking "teeth" on each of the valves, forms the hinge.',
 			},
 		},
+		related = { "Chanterelle" },
 		infobox = {
 			{ "Scientific name", "Bivalvia" },
 		},
@@ -2701,22 +2845,32 @@ return {
 		description = "Family of insects",
 		tags = { "Insects and other hexapods", "Flies (Diptera)" },
 		aliases = { "Black flies", "Blackflies", "Buffalo gnats" },
-		summary = "**Black flies** or **blackflies** (sometimes called **buffalo gnats**, **turkey gnats**, or **white socks**) are [[Fly|flies]] in the family **Simuliidae** of the Culicomorpha infraorder. Simuliidae are related to the Ceratopogonidae, Chironomidae, and Thaumaleidae. Over 2,200 species of black flies have been formally named, of which 15 are extinct. They are divided into two subfamilies: Parasimuliinae contains only one genus and four species; Simuliinae contains all the rest. Over 1,800 of the species belong to the genus Simulium.",
+		summary = "**Black flies** or **blackflies** (sometimes called **buffalo gnats**, **turkey gnats**, or **white socks**) are [[Fly|flies]] in the family **Simuliidae** of the Culicomorpha [[Order (taxonomy)|infraorder]]. Simuliidae are related to the Ceratopogonidae, Chironomidae, and Thaumaleidae. Over 2,200 species of black flies have been formally named, of which 15 are extinct. They are divided into two subfamilies: Parasimuliinae contains only one genus and four species; Simuliinae contains all the rest. Over 1,800 of the species belong to the genus Simulium.",
 		sections = {
 			{
 				"Overview",
-				"Black flies are usually small, black or gray, with short legs and antennae. They are a common nuisance for humans, and many U.S. states have programs to suppress the black fly population.",
+				"Black flies are usually small, black or gray, with short legs and [[Antenna (zoology)|antennae]]. They are a common nuisance for humans, and many U.S. states have programs to suppress the black fly population.",
 			},
 		},
-		related = { "Drosophila melanogaster" },
+		related = { "Drosophila melanogaster", "Housefly" },
 		infobox = {
 			{ "Scientific name", "Simuliidae" },
 		},
 	},
 	{
-		title = "Body louse",
+		title = "Blubber",
 		category = "Animal",
 		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Thick layer of animal body fat",
+		tags = { "More articles" },
+		summary = "**Blubber** is a thick layer of vascularized adipose tissue under the skin of all [[Cetacean|cetaceans]], [[Pinniped|pinnipeds]], [[Penguin|penguins]], [[Sirenia|sirenians]], and [[Polar bear|polar bears]]. It was present in many marine reptiles, such as ichthyosaurs and [[Plesiosaur|plesiosaurs]].",
+	},
+	{
+		title = "Body louse",
+		category = "Animal",
+		fame = 3,
 		emoji = "🐞",
 		source = "wikipedia",
 		description = "Subspecies of insect",
@@ -2729,7 +2883,7 @@ return {
 				"Body lice may lay eggs on the host's hairs and clothing, but clothing is where the majority of eggs are usually secured. Since body lice cannot jump or fly, they spread by direct contact with another person or more rarely by contact with clothing or bed sheets that are infested. In developed countries, infestations are only a problem in areas of poverty where there is poor body hygiene, crowded living conditions, and a lack of access to clean clothing. Outbreaks can also occur in situations where large groups of people are forced to live in unsanitary conditions. These types of outbreaks are seen globally in prisons, homeless populations, refugees of war, or when natural disasters occur and proper sanitation is not available.",
 			},
 		},
-		related = { "Cockroach", "Termite" },
+		related = { "Termite", "Cockroach" },
 		infobox = {
 			{ "Scientific name", "Pediculus humanus" },
 		},
@@ -2743,8 +2897,8 @@ return {
 		description = "Family of snakes",
 		tags = { "Vertebrates", "Reptiles" },
 		aliases = { "Boas", "Boids" },
-		summary = "The **Boidae**, commonly known as **boas** or **boids**, are a family of nonvenomous [[Snake|snakes]] primarily found in the Americas, as well as Africa, Europe, Asia, and some Pacific islands. Boas include some of the world's largest snakes, with the green anaconda of South America being the heaviest and second-longest snake known; in general, adults are medium to large in size, with females usually larger than the males. Six subfamilies comprising 14-15 genera and 54-67 [[Species|species]] are currently recognized.",
-		related = { "Lizard", "Caiman" },
+		summary = "The **Boidae**, commonly known as **boas** or **boids**, are a [[Family (taxonomy)|family]] of nonvenomous [[Snake|snakes]] primarily found in the Americas, as well as Africa, Europe, Asia, and some Pacific islands. Boas include some of the world's largest snakes, with the green anaconda of South America being the heaviest and second-longest snake known; in general, adults are medium to large in size, with females usually larger than the males. Six [[Subfamily|subfamilies]] comprising 14-15 [[Genus|genera]] and 54-67 [[Species|species]] are currently recognized.",
+		related = { "Lizard", "Turtle" },
 		infobox = {
 			{ "Scientific name", "Boidae" },
 		},
@@ -2758,14 +2912,14 @@ return {
 		description = "Moth mainly used in the production of silk",
 		tags = { "Insects and other hexapods", "Lepidoptera" },
 		aliases = { "Domestic silk moth" },
-		summary = "**Bombyx mori**, commonly known as the **domestic silk moth**, is a [[Domestication|domesticated]] [[Moth|moth]] species belonging to the family Bombycidae. It is the closest relative of Bombyx mandarina, the wild silk moth. **Silkworms** are the [[Larva|larvae]] of silk moths. The silkworm is of particular economic value, being a primary producer of [[Silk|silk]]. The silkworm's preferred food are the leaves of white mulberry, though they may eat other species of mulberry, and even leaves of other plants. Domestic silk moths are entirely dependent on humans for reproduction, as a result of millennia of selective breeding. Wild silk moths, which are other species of Bombyx, are not as commercially viable in the production of silk.",
+		summary = "**Bombyx mori**, commonly known as the **domestic silk moth**, is a [[Domestication|domesticated]] [[Moth|moth]] species belonging to the [[Family (taxonomy)|family]] Bombycidae. It is the closest relative of Bombyx mandarina, the wild silk moth. **Silkworms** are the [[Larva|larvae]] of silk moths. The silkworm is of particular economic value, being a primary producer of [[Silk|silk]]. The silkworm's preferred food are the [[Leaf|leaves]] of white mulberry, though they may eat other species of mulberry, and even leaves of other plants. Domestic silk moths are entirely dependent on humans for reproduction, as a result of millennia of selective breeding. Wild silk moths, which are other species of Bombyx, are not as commercially viable in the production of silk.",
 		sections = {
 			{
 				"Overview",
-				"Sericulture, the practice of breeding silk moths for the production of raw silk, has existed for at least 5,000 years in China, whence it spread to India, Korea, Nepal, Japan, and then the West. The domestic silk moth was domesticated from the wild silk moth Bombyx mandarina, which has a range from northern India to northern China, Korea, Japan, and the far eastern regions of Russia. The domestic silk moth derives from Chinese rather than Japanese or Korean stock. Silk moths were unlikely to have been domestically bred before the [[Neolithic]] period. Before then, the tools to manufacture quantities of silk thread had not been developed. The domesticated Bombyx mori and the wild Bombyx mandarina can still breed and sometimes produce hybrids. It is unknown if B. mori can hybridize with other Bombyx species.",
+				"Sericulture, the practice of breeding silk moths for the production of raw silk, has existed for at least 5,000 years in China, whence it spread to India, Korea, Nepal, Japan, and then the West. The domestic silk moth was domesticated from the wild silk moth Bombyx mandarina, which has a range from northern India to northern China, Korea, Japan, and the [[Russian Far East|far eastern regions of Russia]]. The domestic silk moth derives from Chinese rather than Japanese or Korean stock. Silk moths were unlikely to have been domestically bred before the [[Neolithic]] period. Before then, the tools to manufacture quantities of silk thread had not been developed. The domesticated Bombyx mori and the wild Bombyx mandarina can still breed and sometimes produce hybrids. It is unknown if B. mori can hybridize with other Bombyx species.",
 			},
 		},
-		related = { "Cricket (insect)", "Geometer moth", "Pieris brassicae" },
+		related = { "Geometer moth", "Pieris brassicae", "Swallowtail butterfly" },
 		infobox = {
 			{ "Scientific name", "Bombyx mori" },
 			{ "Conservation status", "Domesticated" },
@@ -2774,17 +2928,17 @@ return {
 	{
 		title = "Bonobo",
 		category = "Animal",
-		fame = 3,
+		fame = 2,
 		emoji = "🦍",
 		source = "wikipedia",
 		description = "Species of great ape",
 		tags = { "Mammals", "Primates" },
 		aliases = { "Pygmy chimpanzee", "Dwarf chimpanzee", "Gracile chimpanzee" },
-		summary = "The **bonobo**, also historically called the **pygmy chimpanzee** (less often the **dwarf chimpanzee** or **gracile chimpanzee**), is the smallest [[Species|species]] of great ape and one of the two making up the genus Pan (the other being the common chimpanzee, Pan troglodytes). While bonobos are today recognized as a distinct species, they were initially thought to be a subspecies of Pan troglodytes, because of the physical similarities between the two species. Taxonomically, members of the chimpanzee/bonobo subtribe Panina—composed entirely by the genus Pan—are collectively termed panins.",
+		summary = "The **bonobo**, also historically called the **pygmy chimpanzee** (less often the **dwarf chimpanzee** or **gracile chimpanzee**), is the smallest [[Species|species]] of great ape and one of the two making up the [[Genus|genus]] [[Pan (genus)|Pan]] (the other being the common chimpanzee, Pan troglodytes). While bonobos are today recognized as a distinct species, they were initially thought to be a subspecies of Pan troglodytes, because of the physical similarities between the two species. Taxonomically, members of the chimpanzee/bonobo subtribe Panina—composed entirely by the genus [[Pan (genus)|Pan]]—are collectively termed panins.",
 		sections = {
 			{
 				"Overview",
-				"Bonobos are distinguished from common chimpanzees by relatively long limbs, pinker lips, a darker face, a tail-tuft through adulthood, and longer, parted hair on their heads. Some individuals have sparser, thin hair over parts of their bodies. Bonobos typically live 40 years in captivity; their lifespan in the wild is unknown, but it is almost certainly much shorter. The bonobo is found in a 500000 km² area within the Congo Basin of the [[Democratic Republic of the Congo]] (DRC), Central Africa. It is predominantly frugivorous, compared to the often highly omnivorous diets and hunting of small monkeys, duiker and other antelope exhibited by common chimpanzees. Bonobos inhabit primary and secondary forest, including seasonally inundated swamp forest.",
+				"Bonobos are distinguished from common chimpanzees by relatively long limbs, pinker lips, a darker face, a tail-tuft through adulthood, and longer, parted hair on their heads. Some individuals have sparser, thin hair over parts of their bodies. Bonobos typically live 40 years in captivity; their lifespan in the wild is unknown, but it is almost certainly much shorter. The bonobo is found in a 500000 km² area within the [[Congo Basin]] of the [[Democratic Republic of the Congo]] (DRC), Central Africa. It is predominantly frugivorous, compared to the often highly [[Omnivore|omnivorous]] diets and hunting of small monkeys, duiker and other antelope exhibited by common chimpanzees. Bonobos inhabit primary and secondary forest, including seasonally inundated swamp forest.",
 			},
 		},
 		infobox = {
@@ -2800,14 +2954,13 @@ return {
 		source = "wikipedia",
 		description = "Family of mammals belonging to even-toed ungulates",
 		tags = { "Mammals", "Artiodactyla" },
-		summary = "**Bovidae** is the biological family of cloven-hoofed, [[Ruminant|ruminant]] mammals that includes cattle, bison, buffalo, [[Antelope|antelopes]], and goat-antelopes such as sheep and [[Capra (genus)|goats]]. There are 143 extant species and 300 known extinct species of **bovids**, which are divided into either 11 major subfamilies, or two subfamilies with 13 tribes. The earliest known bovid had evolved by 20 million years ago, in the early Miocene.",
+		summary = "**Bovidae** is the [[Family (taxonomy)|biological family]] of cloven-hoofed, [[Ruminant|ruminant]] mammals that includes cattle, bison, buffalo, [[Antelope|antelopes]], and goat-antelopes such as sheep and [[Capra (genus)|goats]]. There are 143 [[Neontology|extant species]] and 300 known extinct species of **bovids**, which are divided into either 11 major subfamilies, or two subfamilies with 13 [[Tribe (taxonomy)|tribes]]. The earliest known bovid had evolved by 20 million years ago, in the early [[Miocene]].",
 		sections = {
 			{
 				"Overview",
-				"The bovids show great variation in size and [[Animal coloration|colouration]] of their fur. With exceptions in some domesticated forms, all male bovids have two or more horns, and in many species, females possess horns too. The size and shape of the horns vary greatly, but the basic structure is always one or more pairs of simple, unbranched, bony protrusions of the skull covered in a permanent sheath of keratin, and often with a spiral, twisted, or fluted shape, Most bovids bear 30 to 32 teeth. Most bovids are diurnal: social activity and feeding usually peak during dawn and dusk. Bovids typically rest before dawn, during midday, and after dark. They have various methods of social organisation and social behaviour, which are classified into solitary and gregarious behaviour. Bovids use different forms of vocal, olfactory, and tangible communication. Most species alternately feed and ruminate throughout the day.",
+				"The bovids show great variation in size and [[Animal coloration|colouration]] of their fur. With exceptions in some domesticated forms, all male bovids have two or more horns, and in many species, females possess horns too. The size and shape of the horns vary greatly, but the basic structure is always one or more pairs of simple, unbranched, bony protrusions of the skull covered in a permanent sheath of keratin, and often with a spiral, twisted, or fluted shape, Most bovids bear 30 to 32 teeth. Most bovids are [[Diurnality|diurnal]]: social activity and feeding usually peak during dawn and dusk. Bovids typically rest before dawn, during midday, and after dark. They have various methods of social organisation and social behaviour, which are classified into solitary and gregarious behaviour. Bovids use different forms of vocal, olfactory, and tangible [[Animal communication|communication]]. Most species alternately feed and ruminate throughout the day.",
 			},
 		},
-		related = { "African buffalo" },
 		infobox = {
 			{ "Scientific name", "Bovidae" },
 		},
@@ -2820,11 +2973,11 @@ return {
 		source = "wikipedia",
 		description = "Common name for several species of land turtle",
 		tags = { "Vertebrates", "Reptiles" },
-		summary = "**Box turtle** is the common name for several [[Species|species]] of land turtle. It may refer to those of the genus Cuora or Pyxidea, which are the Asian box turtles, or more commonly to species of the genus Terrapene, the North American box turtles. They are largely characterized by having a shell shaped like a [[Dome|dome]], which is hinged at the bottom, allowing the animal to close its shell tightly to escape [[Predation|predators]]. Furthermore, the two genera are very different in [[Habitat|habitat]], behavior and appearance, and are not even classified in the same family.",
+		summary = "**Box turtle** is the common name for several [[Species|species]] of land turtle. It may refer to those of the [[Genus|genus]] Cuora or Pyxidea, which are the Asian box turtles, or more commonly to species of the genus Terrapene, the North American box turtles. They are largely characterized by having a shell shaped like a [[Dome|dome]], which is hinged at the bottom, allowing the animal to close its shell tightly to escape [[Predation|predators]]. Furthermore, the two genera are very different in [[Habitat|habitat]], behavior and appearance, and are not even classified in the same [[Family (taxonomy)|family]].",
 		sections = {
 			{
 				"Overview",
-				"Even though box turtles became very popular pets, their needs in captivity are complex and the capture of turtles can have serious detrimental effects on the wild population. The box turtle commonly lives over twenty years, with verified cases of lifespans exceeding 40 to 50 years. There have been unverified cases of box turtles living for a hundred years and more.",
+				"Even though box turtles became very popular pets, their needs in captivity are complex and the capture of turtles can have serious detrimental effects on the wild population. The box turtle commonly lives over twenty years, with verified cases of [[Life expectancy|lifespans]] exceeding 40 to 50 years. There have been unverified cases of box turtles living for a hundred years and more.",
 			},
 		},
 		related = { "Lizard", "Turtle" },
@@ -2838,15 +2991,37 @@ return {
 		description = "Infraorder of crustaceans",
 		tags = { "Arthropods", "Crustaceans" },
 		aliases = { "True crabs" },
-		summary = "**Brachyura** is an infraorder of [[Decapod|decapod]] [[Crustacean|crustaceans]] comprising the **true crabs**. They typically have a very short projecting tail-like abdomen, usually hidden entirely under the thorax. Their exoskeleton is often thickened and hard. They generally have five pairs of legs, and the frontmost pair end in chelae, which function as pincers. They are present in all the world's oceans, in freshwater, and on land, often hiding themselves in small crevices or burrowing into [[Sediment|sediment]]. True crabs are omnivores, feeding on a variety of food, including a significant proportion of algae, as well as detritus and other [[Invertebrate|invertebrates]].",
+		summary = "**Brachyura** is an [[Order (taxonomy)|infraorder]] of [[Decapod|decapod]] [[Crustacean|crustaceans]] comprising the **true crabs**. They typically have a very short projecting [[Tail|tail]]-like abdomen, usually hidden entirely under the thorax. Their [[Exoskeleton|exoskeleton]] is often thickened and hard. They generally have five pairs of legs, and the frontmost pair end in chelae, which function as pincers. They are present in all the world's oceans, in freshwater, and on land, often hiding themselves in small crevices or burrowing into [[Sediment|sediment]]. True crabs are [[Omnivore|omnivores]], feeding on a variety of food, including a significant proportion of algae, as well as [[Detritivore|detritus]] and other [[Invertebrate|invertebrates]].",
 		sections = {
 			{
 				"Overview",
-				"True crabs are widely consumed by humans as [[Food|food]], with over 1.5 million tonnes caught annually. True crabs first appeared in the fossil record during the [[Jurassic]] period, around 200 million years ago, achieving great diversity by the [[Cretaceous]] period; around 7,000 extant species in 96 families are known. The true crabs are the largest of the crab decapod groups with carcinised body forms. Smaller groups include the porcelain crabs, king crabs, and hairy stone crabs which have independently evolved similar forms and lifestyles.",
+				"True crabs are widely consumed by humans as [[Food|food]], with over 1.5 million tonnes caught annually. True crabs first appeared in the [[Fossil|fossil record]] during the [[Jurassic]] period, around 200 million years ago, achieving great diversity by the [[Cretaceous]] period; around 7,000 extant species in 96 families are known. The true crabs are the largest of the [[Crab|crab]] decapod groups with carcinised body forms. Smaller groups include the porcelain crabs, king crabs, and hairy stone crabs which have [[Convergent evolution|independently evolved similar forms]] and lifestyles.",
+			},
+		},
+		related = { "Ostracod" },
+		infobox = {
+			{ "Scientific name", "Brachyura" },
+		},
+	},
+	{
+		title = "Brassica oleracea",
+		category = "Animal",
+		fame = 2,
+		emoji = "🌱",
+		source = "wikipedia",
+		description = "Species of plant",
+		tags = { "More articles" },
+		aliases = { "Wild cabbage" },
+		summary = "**Brassica oleracea**, also known as **wild cabbage** in its uncultivated form, is a plant of the family [[Brassicaceae]].",
+		sections = {
+			{
+				"Overview",
+				"The species originated from feral populations of related plants in the [[Eastern Mediterranean]], where it was most likely first cultivated. It has many common [[Cultivar|cultivars]] that are used as culinary vegetables, including [[Cabbage|cabbage]], [[Broccoli|broccoli]], [[Cauliflower|cauliflower]], romanesco, [[Kale|kale]], Brussels sprout, [[Collard (plant)|collard]], Savoy cabbage, [[Kohlrabi|kohlrabi]], and gai lan.",
 			},
 		},
 		infobox = {
-			{ "Scientific name", "Brachyura" },
+			{ "Scientific name", "Brassica oleracea" },
+			{ "Conservation status", "Data Deficient" },
 		},
 	},
 	{
@@ -2857,13 +3032,14 @@ return {
 		source = "wikipedia",
 		tags = { "Mammals", "Carnivora" },
 		aliases = { "Ursus arctos" },
-		summary = "The **brown bear** (**Ursus arctos**) is a large [[Bear|bear]] native to [[Eurasia]] and [[North America]]. Of the land [[Carnivora|carnivorans]], it is rivaled in size only by its closest relative, the [[Polar bear|polar bear]], which is much less variable in size and slightly bigger on average. The fur ranges in color from cream to reddish to dark brown. It has evolved large hump muscles, unique among bears, and paws up to 21 cm wide and 36 cm long, to effectively dig through dirt. Its teeth are similar to those of other bears and reflect its dietary plasticity.",
+		summary = "The **brown bear** (**Ursus arctos**) is a large [[Bear|bear]] native to [[Eurasia]] and [[North America]]. Of the land [[Carnivora|carnivorans]], it is rivaled in size only by its closest relative, the [[Polar bear|polar bear]], which is much less variable in size and slightly bigger on average. The [[Fur|fur]] ranges in color from cream to reddish to dark brown. It has evolved large hump muscles, unique among bears, and paws up to 21 cm wide and 36 cm long, to effectively dig through dirt. Its teeth are similar to those of other bears and reflect its dietary plasticity.",
 		sections = {
 			{
 				"Overview",
-				"Throughout the brown bear's range, it inhabits mainly [[Forest|forested habitats]] in elevations of up to 5000 m. It is omnivorous, and consumes a variety of plant and animal species. Contrary to popular belief, the brown bear derives 90% of its diet from plants. When hunting, it will target animals as small as [[Insect|insects]] and rodents to those as large as [[Moose|moose]] or muskoxen. In parts of coastal Alaska, brown bears predominantly feed on spawning [[Salmon|salmon]] that come near shore to lay their eggs. For most of the year, it is a usually solitary animal that associates only when mating or raising cubs. Females give birth to an average of one to three cubs that remain with their mother for 1.5 to 4.5 years. It is a long-lived animal, with an average lifespan of 25 years in the wild.",
+				"Throughout the brown bear's range, it inhabits mainly [[Forest|forested habitats]] in elevations of up to 5000 m. It is [[Omnivore|omnivorous]], and consumes a variety of plant and animal species. Contrary to popular belief, the brown bear derives 90% of its diet from plants. When hunting, it will target animals as small as [[Insect|insects]] and rodents to those as large as [[Moose|moose]] or muskoxen. In parts of coastal [[Alaska]], brown bears predominantly feed on spawning [[Salmon|salmon]] that come near shore to lay their eggs. For most of the year, it is a usually [[Sociality|solitary animal]] that associates only when [[Mating|mating]] or raising cubs. Females give birth to an average of one to three cubs that remain with their mother for 1.5 to 4.5 years. It is a long-lived animal, with an average lifespan of 25 years in the wild.",
 			},
 		},
+		related = { "Lynx" },
 		infobox = {
 			{ "Scientific name", "Ursus arctos" },
 			{ "Conservation status", "Least Concern" },
@@ -2872,7 +3048,7 @@ return {
 	{
 		title = "Brown rat",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐀",
 		source = "wikipedia",
 		description = "Species of common rat",
@@ -2885,7 +3061,6 @@ return {
 				"Selective breeding of the brown rat has produced the fancy rat (rats kept as pets), as well as the laboratory rat (rats used as model organisms in biological research). Both fancy rats and laboratory rats are of the [[Domestication|domesticated]] subspecies Rattus norvegicus domestica. Studies of wild rats in New York City have shown that populations living in different neighborhoods can evolve distinct genomic profiles over time, by slowly accruing different traits.",
 			},
 		},
-		related = { "Muskrat" },
 		infobox = {
 			{ "Scientific name", "Rattus norvegicus" },
 			{ "Conservation status", "Least Concern" },
@@ -2900,11 +3075,11 @@ return {
 		description = "Phylum of colonial aquatic invertebrates called moss animals",
 		tags = { "Invertebrates, others", "Lophotrochozoa" },
 		aliases = { "Polyzoa", "Ectoprocta", "Moss animals" },
-		summary = 'The **Bryozoa** (also known as the **Polyzoa**, **Ectoprocta** or commonly as **moss animals**) are a phylum of simple, aquatic [[Invertebrate|invertebrate]] animals, nearly all living in sedentary colonies. Typically about 0.5 mm long, they have a special feeding structure called a lophophore, a "crown" of tentacles used for filter feeding. The bryozoa are classified as the marine bryozoa (Stenolaemata), freshwater bryozoa (Phylactolaemata), and mostly-marine bryozoa (Gymnolaemata), a few members of which prefer brackish water. Most marine bryozoans live in tropical waters, but a few are found in [[Oceanic trench|oceanic trenches]] and polar waters. 5,869living species of bryozoa are known.',
+		summary = 'The **Bryozoa** (also known as the **Polyzoa**, **Ectoprocta** or commonly as **moss animals**) are a [[Phylum|phylum]] of simple, [[Aquatic animal|aquatic]] [[Invertebrate|invertebrate]] animals, nearly all living in sedentary [[Colony (biology)|colonies]]. Typically about 0.5 mm long, they have a special feeding structure called a lophophore, a "crown" of tentacles used for [[Filter feeder|filter feeding]]. The bryozoa are classified as the marine bryozoa (Stenolaemata), freshwater bryozoa (Phylactolaemata), and mostly-marine bryozoa (Gymnolaemata), a few members of which prefer [[Brackish water|brackish water]]. Most marine bryozoans live in tropical waters, but a few are found in [[Oceanic trench|oceanic trenches]] and polar waters. 5,869living species of bryozoa are known.',
 		sections = {
 			{
 				"Overview",
-				'Originally all of the crown group Bryozoa were colonial, but as an adaptation to a mesopsammal (interstitial spaces in marine sand) life or to deep-sea habitats, secondarily solitary forms have since evolved. Five genera are solitary: Aethozooides, Aethozoon, Franzenella, Solella, which together make up the family Aethozoidae, and Monobryozoon, which has a statocyst-like organ with a supposed excretory function. The terms Polyzoa and Bryozoa were introduced in 1830 and 1831, respectively. Soon after it was named, another group of animals was discovered whose filtering mechanism looked similar, so it was included in Bryozoa until 1869, when the two groups were noted to be very different internally. The new group was given the name "Entoprocta", while the original Bryozoa were called "Ectoprocta".',
+				'Originally all of the crown group Bryozoa were colonial, but as an adaptation to a mesopsammal (interstitial spaces in marine sand) life or to deep-sea habitats, secondarily solitary forms have since evolved. Five [[Genus|genera]] are solitary: Aethozooides, Aethozoon, Franzenella, Solella, which together make up the family Aethozoidae, and Monobryozoon, which has a statocyst-like organ with a supposed excretory function. The terms Polyzoa and Bryozoa were introduced in 1830 and 1831, respectively. Soon after it was named, another group of animals was discovered whose filtering mechanism looked similar, so it was included in Bryozoa until 1869, when the two groups were noted to be very different internally. The new group was given the name "Entoprocta", while the original Bryozoa were called "Ectoprocta".',
 			},
 		},
 		related = { "Earthworm", "Annelid" },
@@ -2921,14 +3096,14 @@ return {
 		description = "Small, long-tailed, seed-eating parakeet",
 		tags = { "Birds", "Psittaciformes" },
 		aliases = { "Common parakeet", "Shell parakeet", "Budgie" },
-		summary = "The **budgerigar**, also known as the **common parakeet**, **shell parakeet** or **budgie**, is a small, long-tailed, seed-eating [[Parrot|parrot]] native to [[Australia]]. Naturally, the species is green and yellow with black, scalloped markings on the nape, back, and wings. Budgies are bred in captivity with colouring of blues, whites, yellows, greys, and even with small crests. Juveniles and chicks are monomorphic (the sexes are visually indistinguishable), while adults are told apart by their cere colouring and their behaviour.",
+		summary = "The **budgerigar**, also known as the **common parakeet**, **shell parakeet** or **budgie**, is a small, long-tailed, seed-eating [[Parrot|parrot]] native to [[Australia]]. Naturally, the species is green and yellow with black, scalloped markings on the nape, back, and wings. Budgies are bred in captivity with colouring of blues, whites, yellows, greys, and even with small crests. Juveniles and chicks are monomorphic (the sexes are visually indistinguishable), while adults are told apart by their [[Beak|cere]] colouring and their behaviour.",
 		sections = {
 			{
 				"Overview",
-				"The species is monotypic, meaning it is the only member of the genus **Melopsittacus**, which is the only genus in the tribe **Melopsittacini**. The budgerigar is closely related to lories and the fig parrots. The origin of the budgerigar's name is unclear. First recorded in 1805, budgerigars are popular pets around the world due to their small size, low cost, and ability to mimic human speech. They are the third most popular pet in the world, after the domesticated [[Dog|dog]] and [[Cat|cat]]. Budgies are nomadic flock parakeets that have been bred in captivity since the 19th century. In both the wild and in captivity, budgerigars breed opportunistically and in pairs. They are found wild throughout the drier parts of [[Australia]], where they have survived harsh inland conditions for over five million years. Their success can be attributed to a nomadic lifestyle and their ability to breed while on the move.",
+				"The species is [[Monotypic taxon|monotypic]], meaning it is the only member of the genus **Melopsittacus**, which is the only genus in the tribe **Melopsittacini**. The budgerigar is closely related to lories and the fig parrots. The origin of the budgerigar's name is unclear. First recorded in 1805, budgerigars are popular pets around the world due to their small size, low cost, and ability to mimic human speech. They are the third most popular pet in the world, after the domesticated [[Dog|dog]] and [[Cat|cat]]. Budgies are nomadic flock parakeets that have been bred in captivity since the 19th century. In both the wild and in captivity, budgerigars breed opportunistically and in pairs. They are found wild throughout the drier parts of [[Australia]], where they have survived harsh inland conditions for over five million years. Their success can be attributed to a nomadic lifestyle and their ability to breed while on the move.",
 			},
 		},
-		related = { "Bird of prey", "Galliformes" },
+		related = { "Galliformes", "Bird of prey" },
 		infobox = {
 			{ "Scientific name", "Melopsittacus undulatus" },
 			{ "Conservation status", "Least Concern" },
@@ -2943,8 +3118,8 @@ return {
 		description = "Family of birds",
 		tags = { "Birds", "Passerida" },
 		aliases = { "Bulbuls", "Pycnonotidae" },
-		summary = "The **bulbuls** are members of a family, **Pycnonotidae**, of medium-sized passerine [[Songbird|songbirds]], which also includes greenbuls, brownbuls, leafloves, and bristlebills. The family is distributed across most of Africa and into the Middle East, tropical Asia to Indonesia, and north as far as Japan. A few insular species occur on the tropical islands of the Indian Ocean. There are 161 species in 28 genera. While different species are found in a wide range of habitats, the African species are predominantly found in [[Rainforest|rainforest]], whereas Asian bulbuls are predominantly found in more open areas.",
-		related = { "Bird of prey", "Galliformes" },
+		summary = "The **bulbuls** are members of a [[Family (taxonomy)|family]], **Pycnonotidae**, of medium-sized passerine [[Songbird|songbirds]], which also includes greenbuls, brownbuls, leafloves, and bristlebills. The family is distributed across most of Africa and into the Middle East, tropical Asia to Indonesia, and north as far as Japan. A few insular species occur on the tropical islands of the Indian Ocean. There are 161 species in 28 [[Genus|genera]]. While different species are found in a wide range of habitats, the African species are predominantly found in [[Rainforest|rainforest]], whereas Asian bulbuls are predominantly found in more open areas.",
+		related = { "Sunbird", "Finch" },
 		infobox = {
 			{ "Scientific name", "Pycnonotidae" },
 		},
@@ -2952,20 +3127,20 @@ return {
 	{
 		title = "Bumblebee",
 		category = "Animal",
-		fame = 3,
+		fame = 2,
 		emoji = "🐞",
 		source = "wikipedia",
 		description = "Genus of insect",
 		tags = { "Insects and other hexapods", "Hymenoptera" },
 		aliases = { "Bombus" },
-		summary = "A **bumblebee** (or bumble bee, bumble-bee, or humble-bee) is any of over 250 species in the genus **Bombus**, part of Apidae, one of the [[Bee|bee]] families. This genus is the only extant group in the tribe Bombini, though a few extinct related genera (e.g., Calyptapis) are known from [[Fossil|fossils]]. They are found primarily in the Northern Hemisphere, although they are also found in South America, where a few lowland tropical species have been identified. European bumblebees have also been introduced to New Zealand and [[Tasmania]]. Female bumblebees can sting repeatedly, but generally ignore humans and other animals.",
+		summary = "A **bumblebee** (or bumble bee, bumble-bee, or humble-bee) is any of over 250 species in the [[Genus|genus]] **Bombus**, part of Apidae, one of the [[Bee|bee]] families. This genus is the only [[Neontology|extant]] group in the tribe Bombini, though a few extinct related genera (e.g., Calyptapis) are known from [[Fossil|fossils]]. They are found primarily in the [[Northern Hemisphere]], although they are also found in South America, where a few lowland tropical species have been identified. European bumblebees have also been introduced to New Zealand and [[Tasmania]]. Female bumblebees can sting repeatedly, but generally ignore humans and other animals.",
 		sections = {
 			{
 				"Overview",
-				"Most bumblebees are eusocial insects that form colonies with a single queen. The colonies are smaller than those of [[Bee|honey bees]], growing to as few as 50 individuals in a nest. Cuckoo bumblebees were previously classified as a separate genus, but are now usually treated as members of Bombus. Bumblebees have round bodies covered in soft hair (long branched setae) called 'pile', making them appear and feel fuzzy. They have aposematic (warning) coloration, often consisting of contrasting bands of colour, and different species of bumblebee in a region often resemble each other in mutually protective Müllerian mimicry. Harmless insects such as hoverflies often derive protection from resembling bumblebees, in Batesian mimicry, and may be confused with them. Nest-making bumblebees can be distinguished from similarly large, fuzzy cuckoo bumblebees by the form of the female hind leg.",
+				"Most bumblebees are [[Eusociality|eusocial]] insects that form [[Colony (biology)|colonies]] with a single queen. The colonies are smaller than those of [[Bee|honey bees]], growing to as few as 50 individuals in a nest. Cuckoo bumblebees were previously classified as a separate genus, but are now usually treated as members of Bombus. Bumblebees have round bodies covered in soft hair (long branched setae) called 'pile', making them appear and feel fuzzy. They have [[Aposematism|aposematic (warning) coloration]], often consisting of contrasting bands of colour, and different species of bumblebee in a region often resemble each other in mutually protective Müllerian mimicry. Harmless insects such as hoverflies often derive protection from resembling bumblebees, in Batesian mimicry, and may be confused with them. Nest-making bumblebees can be distinguished from similarly large, fuzzy cuckoo bumblebees by the form of the female hind leg.",
 			},
 		},
-		related = { "Carpenter ant", "Odonata" },
+		related = { "Africanized bee", "Fire ant" },
 		infobox = {
 			{ "Scientific name", "Bombus" },
 		},
@@ -2979,17 +3154,35 @@ return {
 		description = "Family of birds",
 		tags = { "Birds", "Gruiformes" },
 		aliases = { "Bustards", "Floricans", "Korhaans" },
-		summary = "**Bustards**, including **floricans** and **korhaans**, are large, terrestrial [[Bird|birds]] living mainly in dry grassland areas and in [[Steppe|steppe]] regions. They range in length from 40 to 150 cm. They make up the family **Otididae**.",
+		summary = "**Bustards**, including **floricans** and **korhaans**, are large, [[Terrestrial animal|terrestrial]] [[Bird|birds]] living mainly in dry grassland areas and in [[Steppe|steppe]] regions. They range in length from 40 to 150 cm. They make up the [[Family (taxonomy)|family]] **Otididae**.",
 		sections = {
 			{
 				"Overview",
-				"Bustards are omnivorous and opportunistic, eating leaves, buds, seeds, fruit, small [[Vertebrate|vertebrates]], and [[Invertebrate|invertebrates]]. There are 26 species currently recognised.",
+				"Bustards are [[Omnivore|omnivorous]] and opportunistic, eating leaves, buds, seeds, fruit, small [[Vertebrate|vertebrates]], and [[Invertebrate|invertebrates]]. There are 26 species currently recognised.",
 			},
 		},
-		related = { "Hornbill", "Rail (bird)" },
+		related = { "Rail (bird)" },
 		infobox = {
 			{ "Scientific name", "Otididae" },
 		},
+	},
+	{
+		title = "Bycatch",
+		category = "Animal",
+		fame = 3,
+		emoji = "🐟",
+		source = "wikipedia",
+		description = "Fish or other marine species caught unintentionally",
+		tags = { "More articles" },
+		aliases = { "By-catch" },
+		summary = '**Bycatch** (or **by-catch**), in the [[Fishing industry|fishing industry]], is a [[Fish|fish]] or other marine species that is caught unintentionally while fishing for specific species or sizes of wildlife. The term "bycatch" is also sometimes used for untargeted catch in other forms of animal harvesting or collecting. Non-[[Marine life|marine]] species ([[Freshwater fish|freshwater fish]] not saltwater fish) that are caught (either intentionally or unintentionally) but regarded as generally "undesirable" are referred to as rough fish (mainly US) or coarse fish (mainly UK).',
+		sections = {
+			{
+				"Overview",
+				'In 1997, the [[OECD|Organisation for Economic Co-operation and Development]] (OECD) defined bycatch as "total fishing mortality, excluding that accounted directly by the retained catch of target species". Bycatch contributes to fishery decline and is a mechanism of [[Overfishing|overfishing]] for unintentional catch. The average annual bycatch rate of [[Pinniped|pinnipeds]] and [[Cetacean|cetaceans]] in the US from 1990 to 1999 was estimated at 6215 animals with a [[Standard error|standard error]] of 448. Bycatch issues originated with the "mortality of dolphins in tuna nets in the 1960s".',
+			},
+		},
+		related = { "Terrestrial animal", "Filter feeder" },
 	},
 	{
 		title = "Caecilian",
@@ -3004,10 +3197,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"The skin is slimy, with ringlike markings or grooves, and in some species hides scales underneath. Modern caecilians are a clade, the order **Gymnophiona** (or **Apoda**), one of the three living amphibian groups alongside Anura ([[Frog|frogs]] and toads) and Urodela ([[Salamander|salamanders]]). Gymnophiona is a crown group, encompassing all modern caecilians and all descendants of their last common ancestor. There are more than 220 living [[Species|species]] of caecilian classified in 10 families. **Gymnophionomorpha** is a recently coined name for the corresponding total group which includes Gymnophiona as well as a few extinct stem-group caecilians (extinct amphibians whose closest living relatives are caecilians but are not descended from any caecilian). Some palaeontologists have used the name Gymnophiona for the total group and the old name Apoda for the crown group.",
+				"The skin is slimy, with ringlike markings or grooves, and in some species hides scales underneath. Modern caecilians are a [[Clade|clade]], the [[Order (taxonomy)|order]] **Gymnophiona** (or **Apoda**), one of the three living amphibian groups alongside Anura ([[Frog|frogs]] and toads) and Urodela ([[Salamander|salamanders]]). Gymnophiona is a [[Crown group|crown group]], encompassing all modern caecilians and all descendants of their last common ancestor. There are more than 220 living [[Species|species]] of caecilian classified in 10 [[Family (taxonomy)|families]]. **Gymnophionomorpha** is a recently coined name for the corresponding total group which includes Gymnophiona as well as a few extinct stem-group caecilians (extinct amphibians whose closest living relatives are caecilians but are not descended from any caecilian). Some palaeontologists have used the name Gymnophiona for the total group and the old name Apoda for the crown group.",
 			},
 		},
-		related = { "American bullfrog", "Leptodactylidae", "Ranidae" },
+		related = { "Leptodactylidae", "True toad" },
 		infobox = {
 			{ "Scientific name", "Gymnophiona" },
 		},
@@ -3020,11 +3213,11 @@ return {
 		source = "wikipedia",
 		description = "Free-living species of nematode",
 		tags = { "Invertebrates, others", "Ecdysozoa" },
-		summary = "**Caenorhabditis elegans** is a free-living transparent [[Nematode|nematode]] about 1 mm in length that lives in temperate soil environments. It is the type species of its genus. The name is a blend of the Greek caeno- 'recent', rhabditis 'rod-like', and Latin elegans 'elegant'. In 1900, Maupas initially named it Rhabditis elegans. Osche placed it in the subgenus Caenorhabditis in 1952, and in 1955, Dougherty raised Caenorhabditis to the status of genus.",
+		summary = "**Caenorhabditis elegans** is a free-living transparent [[Nematode|nematode]] about 1 mm in length that lives in temperate soil environments. It is the [[Type species|type species]] of its genus. The name is a blend of the Greek caeno- 'recent', rhabditis 'rod-like', and Latin elegans 'elegant'. In 1900, Maupas initially named it Rhabditis elegans. Osche placed it in the subgenus Caenorhabditis in 1952, and in 1955, Dougherty raised Caenorhabditis to the status of [[Genus|genus]].",
 		sections = {
 			{
 				"Overview",
-				'C. elegans is an unsegmented pseudocoelomate and lacks respiratory or circulatory systems. Most of these nematodes are hermaphrodites and a few are males. Males have specialised tails for mating that include spicules. In 1963, Sydney Brenner proposed research into C. elegans, primarily in the area of neuronal development. In 1974, he began research into the [[Molecular biology|molecular]] and [[Developmental biology|developmental biology]] of C. elegans, which has since been extensively used as a model organism. It was the first multicellular organism to have its whole genome sequenced, and in 2019 it was the first organism to have its connectome (neuronal "wiring diagram") completed. As of 2024 four Nobel prizes have been won for work done on C. elegans.',
+				'C. elegans is an unsegmented pseudocoelomate and lacks respiratory or circulatory systems. Most of these nematodes are hermaphrodites and a few are males. Males have specialised tails for mating that include spicules. In 1963, Sydney Brenner proposed research into C. elegans, primarily in the area of neuronal development. In 1974, he began research into the [[Molecular biology|molecular]] and [[Developmental biology|developmental biology]] of C. elegans, which has since been extensively used as a model organism. It was the first [[Multicellular organism|multicellular organism]] to have its whole genome sequenced, and in 2019 it was the first organism to have its connectome (neuronal "wiring diagram") completed. As of 2024 four Nobel prizes have been won for work done on C. elegans.',
 			},
 		},
 		infobox = {
@@ -3034,20 +3227,20 @@ return {
 	{
 		title = "Caiman",
 		category = "Animal",
-		fame = 1,
+		fame = 3,
 		emoji = "🦎",
 		source = "wikipedia",
 		description = "Subfamily of reptiles",
 		tags = { "Vertebrates", "Reptiles" },
 		aliases = { "Cayman", "Caimaninae" },
-		summary = "A **caiman**, also spelled **cayman** (from Taíno kaiman), is an alligatorid belonging to the subfamily **Caimaninae**, one of two primary lineages within the Alligatoridae family, the other being [[Crocodile|alligators]]. Caimans are native to [[Central America|Central]] and [[South America]] and inhabit [[Marsh|marshes]], [[Swamp|swamps]], [[Lake|lakes]], and [[Mangrove|mangrove]] rivers. They have scaly skin and live a fairly nocturnal existence. They are relatively small-sized crocodilians with an average maximum weight of 6 to 40 kg depending on species, with the exception of the black caiman (Melanosuchus niger), which can grow more than 4 m long and weigh more than 450 kg.",
+		summary = "A **caiman**, also spelled **cayman** (from Taíno kaiman), is an alligatorid belonging to the [[Subfamily|subfamily]] **Caimaninae**, one of two primary lineages within the Alligatoridae [[Family (taxonomy)|family]], the other being [[Crocodile|alligators]]. Caimans are native to [[Central America|Central]] and [[South America]] and inhabit [[Marsh|marshes]], [[Swamp|swamps]], [[Lake|lakes]], and [[Mangrove|mangrove]] rivers. They have scaly skin and live a fairly nocturnal existence. They are relatively small-sized crocodilians with an average maximum weight of 6 to 40 kg depending on species, with the exception of the black caiman (Melanosuchus niger), which can grow more than 4 m long and weigh more than 450 kg.",
 		sections = {
 			{
 				"Overview",
 				"The black caiman is the largest caiman species in the world and is found in the slow-moving rivers and lakes that surround the Amazon basin. The smallest species is the Cuvier's dwarf caiman (Paleosuchus palpebrosus), which grows to 1.2 to 1.5 m long. There are six different species of caiman found throughout the watery jungle habitats of Central and Southern America. The average length for most of the other caiman species is about 2 to 2.5 m long. Caimans are distinguished from alligators, their closest relatives, by a few defining features: a lack of a bony septum between the nostrils, ventral armor composed of overlapping bony scutes formed from two parts united by a suture, and longer and sharper teeth than alligators. Caimans also tend to be more agile and crocodile-like in their movements. The calcium rivets on caiman scales make their hides stiffer than those of alligators.",
 			},
 		},
-		related = { "Adder", "Common snapping turtle", "Garter snake", "Mamba", "Rattlesnake" },
+		related = { "Boidae", "Crocodylia", "Horned lizard", "Rattlesnake" },
 		infobox = {
 			{ "Scientific name", "Caimaninae" },
 		},
@@ -3061,10 +3254,24 @@ return {
 		description = "Family of flies",
 		tags = { "Insects and other hexapods", "Flies (Diptera)" },
 		aliases = { "Blowflies", "Blow flies", "Carrion flies" },
-		summary = "The **Calliphoridae** (commonly known as **blowflies**, **blow flies**, **blow-flies**, **carrion flies**, **bluebottles**, or **greenbottles**) are a family of insects in the order Diptera, with almost 1,900 known species. The maggot larvae, often used as fishing bait, are known as **gentles**. The family is known to be polyphyletic, but much remains disputed regarding proper treatment of the constituent taxa, some of which are occasionally accorded family status (e.g., Bengaliidae and Helicoboscidae).",
-		related = { "Drosophila melanogaster", "Fly" },
+		summary = "The **Calliphoridae** (commonly known as **blowflies**, **blow flies**, **blow-flies**, **carrion flies**, **bluebottles**, or **greenbottles**) are a [[Family (taxonomy)|family]] of insects in the order Diptera, with almost 1,900 known species. The maggot larvae, often used as fishing bait, are known as **gentles**. The family is known to be polyphyletic, but much remains disputed regarding proper treatment of the constituent taxa, some of which are occasionally accorded family status (e.g., Bengaliidae and Helicoboscidae).",
+		related = { "Crane fly", "Tsetse fly" },
 		infobox = {
 			{ "Scientific name", "Calliphoridae" },
+		},
+	},
+	{
+		title = "Camelidae",
+		category = "Animal",
+		fame = 2,
+		emoji = "👪",
+		source = "wikipedia",
+		description = "Family of mammals",
+		tags = { "More articles" },
+		aliases = { "Camelid" },
+		summary = "**Camelidae** is a [[Family (taxonomy)|family]] of mammals belonging to the [[Ungulate|ungulate]] order Artiodactyla (even-toed ungulates) and the only living family in the suborder Tylopoda. The seven [[Neontology|extant]] species of **camelid** are divided into two [[Tribe (taxonomy)|tribes]], Camelini, including [[Dromedary|dromedary camels]], [[Bactrian camel|Bactrian camels]] and wild Bactrian camels, and Lamini, including [[Llama|llamas]], [[Llama|alpacas]], [[Vicuña|vicuñas]], and [[Guanaco|guanacos]].",
+		infobox = {
+			{ "Scientific name", "Camelidae" },
 		},
 	},
 	{
@@ -3075,14 +3282,13 @@ return {
 		source = "wikipedia",
 		description = "Family of mammals",
 		tags = { "Mammals", "Carnivora" },
-		summary = "**Canidae** is a biological family of caniform carnivorans, constituting a clade. A member of this family is a **canid**, colloquially referred to as **dogs**. The family includes three subfamilies: the Caninae, and the extinct Borophaginae and Hesperocyoninae. The Caninae are the canines, and include [[Dog|domestic dogs]], [[Wolf|wolves]], [[Coyote|coyotes]], raccoon dogs, [[Fox|foxes]], [[Jackal|jackals]], and other species.",
+		summary = "**Canidae** is a [[Family (taxonomy)|biological family]] of caniform carnivorans, constituting a [[Clade|clade]]. A member of this family is a **canid**, colloquially referred to as **dogs**. The family includes three [[Subfamily|subfamilies]]: the Caninae, and the extinct Borophaginae and Hesperocyoninae. The Caninae are the canines, and include [[Dog|domestic dogs]], [[Wolf|wolves]], [[Coyote|coyotes]], raccoon dogs, [[Fox|foxes]], [[Jackal|jackals]], and other species.",
 		sections = {
 			{
 				"Overview",
 				"Canids are found on all continents except [[Antarctica]], having arrived independently or accompanied by [[Human|human beings]] over extended periods of time. Canids vary in size from the 2 m gray wolf to the 24 cm fennec fox. The body forms of canids are similar, typically having long muzzles, upright ears, teeth adapted for cracking bones and slicing flesh, long legs, and bushy tails. They are mostly social animals, living together in family units or small groups and behaving co-operatively. Typically, only the breeding pair in a group breeds and a litter of young are reared annually in an underground den. Canids communicate by scent signals and vocalizations. One canid, the domestic dog, originated from a symbiotic relationship with [[Upper Paleolithic]] humans and is one of the most widely kept domestic animals.",
 			},
 		},
-		related = { "Lynx" },
 		infobox = {
 			{ "Scientific name", "Canidae" },
 		},
@@ -3096,13 +3302,14 @@ return {
 		description = "Genus of mammals, the goats",
 		tags = { "Mammals", "Artiodactyla" },
 		aliases = { "Capra", "Goats" },
-		summary = "**Capra** is a genus of [[Mammal|mammals]], the **goats**, comprising ten [[Species|species]], including the markhor and several species known as ibexes. The [[Goat|domestic goat]] (Capra hircus) is a domesticated [[Species|species]] derived from the bezoar ibex (Capra aegagrus aegagrus), a subspecies of the wild goat. It is one of the oldest domesticated species of animal—according to archaeological evidence its earliest domestication occurred in Iran at 10,000 calibrated calendar years ago.",
+		summary = "**Capra** is a [[Genus|genus]] of [[Mammal|mammals]], the **goats**, comprising ten [[Species|species]], including the markhor and several species known as ibexes. The [[Goat|domestic goat]] (Capra hircus) is a [[Domestication|domesticated]] [[Species|species]] derived from the bezoar ibex (Capra aegagrus aegagrus), a subspecies of the wild goat. It is one of the oldest domesticated species of animal—according to archaeological evidence its earliest domestication occurred in Iran at 10,000 calibrated calendar years ago.",
 		sections = {
 			{
 				"Overview",
 				"Wild goats are animals of [[Mountain|mountain]] habitats. They are very agile and hardy, able to climb on bare rock and survive on sparse vegetation. They can be distinguished from the genus Ovis, which includes sheep, by the presence of scent glands close to the feet, in the groin, and in front of the eyes, and the absence of other facial glands, and by the presence of a beard in some specimens, and of hairless calluses on the knees of the forelegs.",
 			},
 		},
+		related = { "Muskox" },
 		infobox = {
 			{ "Scientific name", "Capra" },
 		},
@@ -3116,14 +3323,14 @@ return {
 		description = "Subfamily of New World monkeys",
 		tags = { "Mammals", "Primates" },
 		aliases = { "Capuchin monkeys", "Cebinae" },
-		summary = 'The **capuchin monkeys** are [[New World monkey|New World monkeys]] of the subfamily **Cebinae**. They are famous for their complex foraging skills, such as tool use to crack open nuts. As neotropical primates, their distribution includes tropical forests in [[Central America]] and [[South America]] as far south as northern [[Argentina]]. In Central America, they are called white-faced monkeys ("carablanca") in [[Spanish language|Spanish]], where they usually occupy the wet lowland forests on the Caribbean coast of Costa Rica and Panama and deciduous dry forest on the Pacific coast. Capuchins have the largest brain-to-body ratio of any nonhuman primate, as well as complex brain wiring.',
+		summary = 'The **capuchin monkeys** are [[New World monkey|New World monkeys]] of the subfamily **Cebinae**. They are famous for their complex foraging skills, such as tool use to crack open nuts. As [[Neotropical realm|neotropical]] primates, their distribution includes tropical forests in [[Central America]] and [[South America]] as far south as northern [[Argentina]]. In Central America, they are called white-faced monkeys ("carablanca") in [[Spanish language|Spanish]], where they usually occupy the wet lowland forests on the Caribbean coast of Costa Rica and Panama and deciduous dry forest on the Pacific coast. Capuchins have the largest brain-to-body ratio of any nonhuman primate, as well as complex brain wiring.',
 		sections = {
 			{
 				"Overview",
 				"Their neural complexity is likely related to their sociality and advanced foraging skills. Capuchins have evolved skills to access food that other monkeys cannot — and to mentally map food sources in their territories.",
 			},
 		},
-		related = { "Primate", "Human evolution" },
+		related = { "Homo", "Ape" },
 		infobox = {
 			{ "Scientific name", "Cebinae" },
 		},
@@ -3137,7 +3344,7 @@ return {
 		description = "Largest species of rodents",
 		tags = { "Mammals", "Rodents" },
 		aliases = { "Greater capybara", "Hydrochoerus hydrochaeris" },
-		summary = "The **capybara** or **greater capybara** (**Hydrochoerus hydrochaeris**) is the largest living [[Rodent|rodent]], native to all countries in [[South America]] except [[Chile]]. It is a semiaquatic [[Herbivore|herbivore]] that inhabits savannas and dense forests, living near and in bodies of freshwater and feeding mainly on grasses and aquatic plants.",
+		summary = "The **capybara** or **greater capybara** (**Hydrochoerus hydrochaeris**) is the largest living [[Rodent|rodent]], native to all countries in [[South America]] except [[Chile]]. It is a [[Semiaquatic|semiaquatic]] [[Herbivore|herbivore]] that inhabits savannas and dense forests, living near and in bodies of freshwater and feeding mainly on [[Grass|grasses]] and [[Aquatic plant|aquatic plants]].",
 		sections = {
 			{
 				"Overview",
@@ -3158,14 +3365,14 @@ return {
 		description = "Bird family",
 		tags = { "Birds", "Passerida" },
 		aliases = { "Cardinal-grosbeaks", "Cardinals" },
-		summary = '**Cardinalidae** (sometimes referred to as "**cardinal-grosbeaks**" or simply "**cardinals**") is a family of New World-endemic [[Passerine|passerine]] [[Bird|birds]] that consists of cardinals, grosbeaks, and buntings. It also includes several other genera such as the tanager-like Piranga and the warbler-like Granatellus. Membership of this family is not easily defined by a single or even a set of physical characteristics, but instead by molecular work. Among songbirds, they range from average-sized to relatively large and have stout features. Some species have large, heavy bills.',
+		summary = '**Cardinalidae** (sometimes referred to as "**cardinal-grosbeaks**" or simply "**cardinals**") is a family of [[New World]]-[[Endemism|endemic]] [[Passerine|passerine]] [[Bird|birds]] that consists of cardinals, grosbeaks, and buntings. It also includes several other genera such as the tanager-like Piranga and the warbler-like Granatellus. Membership of this family is not easily defined by a single or even a set of physical characteristics, but instead by molecular work. Among songbirds, they range from average-sized to relatively large and have stout features. Some species have large, heavy bills.',
 		sections = {
 			{
 				"Overview",
-				"Members of this group are beloved for their brilliant red, yellow, or blue plumages seen in many of the breeding males in this family. Most species are monogamous breeders that nest in open-cup nests, with parents taking turns incubating the eggs and taking care of their young. Most are arboreal species, although the dickcissel (Spiza americana) is a ground-dwelling [[Prairie|prairie]] bird. In terms of conservation, most members of this family are considered least concern by the IUCN Red List. However, a few birds, such as the Carrizal seedeater (Amaurospiza carrizalensis), are considered endangered.",
+				"Members of this group are beloved for their brilliant red, yellow, or blue plumages seen in many of the breeding males in this family. Most species are monogamous breeders that nest in open-cup nests, with parents taking turns incubating the eggs and taking care of their young. Most are [[Arboreal locomotion|arboreal]] species, although the dickcissel (Spiza americana) is a ground-dwelling [[Prairie|prairie]] bird. In terms of conservation, most members of this family are considered [[Least-concern species|least concern]] by the [[IUCN Red List]]. However, a few birds, such as the Carrizal seedeater (Amaurospiza carrizalensis), are considered [[Endangered species|endangered]].",
 			},
 		},
-		related = { "Bird of prey", "Galliformes" },
+		related = { "Sunbird", "Finch" },
 		infobox = {
 			{ "Scientific name", "Cardinalidae" },
 		},
@@ -3173,17 +3380,17 @@ return {
 	{
 		title = "Carnivora",
 		category = "Animal",
-		fame = 1,
+		fame = 2,
 		emoji = "🐾",
 		source = "wikipedia",
 		description = "Order of mammals",
 		tags = { "Mammals", "Carnivora" },
 		aliases = { "Carnivorans" },
-		summary = "**Carnivora** is an order of placental mammals specialised primarily in eating flesh, whose members are formally referred to as **carnivorans**. The order Carnivora is the sixth largest order of mammals, comprising at least 293 [[Species|species]]. Carnivorans are found on every major landmass and in a variety of habitats, ranging from the cold polar regions of Earth to the hyper-arid region of the [[Sahara|Sahara Desert]] and the open seas. Carnivorans exhibit a wide array of body plans, varying greatly in size and shape.",
+		summary = "**Carnivora** is an [[Order (taxonomy)|order]] of placental mammals specialised primarily in eating flesh, whose members are formally referred to as **carnivorans**. The order Carnivora is the sixth largest order of mammals, comprising at least 293 [[Species|species]]. Carnivorans are found on every major landmass and in a variety of habitats, ranging from the cold [[Polar regions|polar regions of Earth]] to the hyper-arid region of the [[Sahara|Sahara Desert]] and the open seas. Carnivorans exhibit a wide array of body plans, varying greatly in size and shape.",
 		sections = {
 			{
 				"Overview",
-				'Carnivora are divided into two suborders, the Feliformia, containing the true felids and several "[[Cat|cat]]-like" animals; and the Caniformia, containing the true canids and many "[[Dog|dog]]-like" animals. The feliforms include the [[Felidae]], Viverridae, [[Hyena|hyena]], and [[Mongoose|mongoose]] families, the majority of which live only in the Old World; cats are the only exception, occurring in the Old World and the New World, entering the Americas via the Bering land bridge. The caniforms include the Caninae, [[Procyonidae]], [[Bear|bears]], mustelids, [[Skunk|skunks]], and [[Pinniped|pinnipeds]] that occur worldwide with immense diversity in their morphology, diet, and behaviour.',
+				'Carnivora are divided into two [[Order (taxonomy)|suborders]], the Feliformia, containing the true felids and several "[[Cat|cat]]-like" animals; and the Caniformia, containing the true canids and many "[[Dog|dog]]-like" animals. The feliforms include the [[Felidae]], Viverridae, [[Hyena|hyena]], and [[Mongoose|mongoose]] families, the majority of which live only in the Old World; cats are the only exception, occurring in the Old World and the New World, entering the Americas via the Bering land bridge. The caniforms include the Caninae, [[Procyonidae]], [[Bear|bears]], mustelids, [[Skunk|skunks]], and [[Pinniped|pinnipeds]] that occur worldwide with immense diversity in their morphology, diet, and behaviour.',
 			},
 		},
 		related = { "European badger" },
@@ -3207,10 +3414,27 @@ return {
 				"True carpenter ants build nests inside wood, consisting of galleries chewed out with their mandibles or jaws, preferably in dead, damp wood. However, unlike [[Termite|termites]], they do not consume wood, but instead discard a material that resembles sawdust outside their nest. Sometimes, carpenter ants hollow out sections of trees. They also commonly infest wooden buildings and structures, causing a widespread problem: they are a major cause of structural damage. Nevertheless, their ability to excavate wood helps in [[Decomposition|forest decomposition]]. The genus includes over 1,000 species. They also farm [[Aphid|aphids]]. In their farming, the ants protect the aphids from predators (usually other insects) while they excrete a sugary fluid called honeydew, which the ants get by stroking the aphids with their antennae.",
 			},
 		},
-		related = { "Wasp", "Hymenoptera" },
+		related = { "Wasp", "Bumblebee" },
 		infobox = {
 			{ "Scientific name", "Camponotus" },
 		},
+	},
+	{
+		title = "Carrion",
+		category = "Animal",
+		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Dead and decaying flesh of an animal",
+		tags = { "More articles" },
+		summary = "Carrion is an important food source for large [[Carnivore|carnivores]] and [[Omnivore|omnivores]] in most ecosystems. Examples of carrion-eating animals include vultures, [[Eagle|eagles]], [[Hyena|hyenas]], Virginia opossum, [[Tasmanian devil|Tasmanian devils]], and [[Coyote|coyotes]]. Many invertebrates, for example carrion beetles, burying beetles, [[Calliphoridae|blow-fly]] maggots, and flesh-fly maggots, also eat carrion. All of these animals, together with [[Microorganism|microbial]] decomposers, help to recycle nitrogen and carbon in animal remains.",
+		sections = {
+			{
+				"Overview",
+				"The act of eating carrion is termed necrophagy or necrophagia, and animals that do this are described as necrophages or carrion feeders. The term [[Scavenger|scavenger]] is widely used to describe carrion-eating animals too, but this term is broader in scope, encompassing also the consumption of [[Scavenger|refuse]] and dead plant material. Carrion begins to decay at the moment of the animal's death, and it will increasingly attract insects and breed [[Bacteria|bacteria]]. Not long after the animal has died, its body will begin to exude a foul odor caused by the presence of bacteria and the emission of cadaverine and putrescine.",
+			},
+		},
+		related = { "Ball-and-stick model" },
 	},
 	{
 		title = "Cassowary",
@@ -3221,14 +3445,14 @@ return {
 		description = "Genus of flightless birds",
 		tags = { "Birds", "Ratites" },
 		aliases = { "Cassowaries", "Casuarius" },
-		summary = "**Cassowaries** are flightless birds of the genus **Casuarius**, in the order Casuariiformes. They are classified as ratites, flightless birds without a keel on their sternum bones. Cassowaries are native to the tropical forests of [[New Guinea]] ([[Western New Guinea]] and [[Papua New Guinea]]), the Moluccas (Seram and Aru Islands), and northeastern [[Australia]].",
+		summary = "**Cassowaries** are flightless birds of the genus **Casuarius**, in the order Casuariiformes. They are classified as ratites, flightless birds without a keel on their sternum bones. Cassowaries are native to the [[Tropical forest|tropical forests]] of [[New Guinea]] ([[Western New Guinea]] and [[Papua New Guinea]]), the Moluccas (Seram and Aru Islands), and northeastern [[Australia]].",
 		sections = {
 			{
 				"Overview",
-				"Three cassowary species are extant. The most common, the southern cassowary, is the fourth-tallest and third-heaviest living bird, smaller only than the two species of ostrich and the [[Emu|emu]]. The other two species of cassowary are the northern cassowary and the dwarf cassowary; the northern cassowary is the most recently discovered and the most threatened. A fourth, extinct, species is the pygmy cassowary. They are known to attack both dogs and humans.",
+				"Three cassowary species are [[Neontology|extant]]. The most common, the southern cassowary, is the fourth-tallest and third-heaviest living bird, smaller only than the two species of ostrich and the [[Emu|emu]]. The other two species of cassowary are the northern cassowary and the dwarf cassowary; the northern cassowary is the most recently discovered and the most threatened. A fourth, extinct, species is the pygmy cassowary. They are known to attack both dogs and humans.",
 			},
 		},
-		related = { "European robin", "Old World sparrow", "Woodpecker" },
+		related = { "Tyto" },
 		infobox = {
 			{ "Scientific name", "Casuarius" },
 		},
@@ -3242,14 +3466,14 @@ return {
 		description = "Order of fish",
 		tags = { "Fishes", "Siluriformes" },
 		aliases = { "Siluriformes", "Nematognathi" },
-		summary = "**Catfish** are a diverse group of ray-finned fish of the order **Siluriformes** (historically **Nematognathi**). Catfish are named for their prominent barbels, which resemble a [[Cat|cat]]'s whiskers, though not all catfish have prominent barbels. All Siluriformes lack scales, instead possessing either smooth skin or armour-plated bodies. This order of fish are defined by features of the skull (such as maxillae modified into the barbels' bases) and swimbladder.",
+		summary = "**Catfish** are a diverse group of [[Actinopterygii|ray-finned fish]] of the [[Order (taxonomy)|order]] **Siluriformes** (historically **Nematognathi**). Catfish are [[Common name|named]] for their prominent barbels, which resemble a [[Cat|cat]]'s whiskers, though not all catfish have prominent barbels. All Siluriformes lack scales, instead possessing either smooth skin or armour-plated bodies. This order of fish are defined by features of the skull (such as maxillae modified into the barbels' bases) and swimbladder.",
 		sections = {
 			{
 				"Overview",
 				'Catfish range in size and behavior from the three largest species alive, the Mekong giant catfish from [[Southeast Asia]], the wels catfish of [[Eurasia]], and the piraíba of [[South America]], to detritivorous and scavenging bottom feeders, down to the tiny ectoparasitic species known as the candiru. In the [[Southern United States]], catfish may be known by a variety of [[Slang|slang]] names, such as "mud cat", "polliwogs", or "chuckleheads". Such names are regional and unstandardized. For instance, "chucklehead" in one region may refer to a bullhead catfish but indicate blue catfish elsewhere. Catfish as a group are of considerable commercial importance; many of the larger species are farmed or [[Fishing|fished]] for food, such as the Pangasius (a shark catfish) and Clarias (like the walking catfish). Many of the smaller species, such as members of the genus Corydoras, are important in the aquarium hobby.',
 			},
 		},
-		related = { "Galaxiidae", "Ilish", "Sardine" },
+		related = { "Galaxiidae", "Tiger shark" },
 		infobox = {
 			{ "Scientific name", "Siluriformes" },
 		},
@@ -3267,7 +3491,7 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Taurine cattle are widely distributed across Europe and temperate areas of Asia, the Americas, and Australia. Zebus are found mainly in India and tropical areas of Asia, America, and Australia. Sanga cattle are found primarily in [[Sub-Saharan Africa|sub-Saharan Africa]]. These types, sometimes classified as separate species or subspecies, are further divided into over 1,000 recognized breeds. Cattle are commonly raised for meat, for dairy products, and for [[Leather|leather]]. As draft animals, they pull [[Cart|carts]] and farm implements. Small breeds such as the miniature Zebu are kept as [[Pet|pets]]. About 10,500 years ago, taurine cattle were domesticated from wild [[Aurochs|aurochs]] progenitors in central Anatolia, the [[Levant]] and Western Iran. A separate domestication event occurred in the Indian subcontinent, which gave rise to zebu. There were over 940 million cattle in the world by 2022.",
+				"Taurine cattle are widely distributed across Europe and temperate areas of Asia, the Americas, and Australia. Zebus are found mainly in India and tropical areas of Asia, America, and Australia. Sanga cattle are found primarily in [[Sub-Saharan Africa|sub-Saharan Africa]]. These types, sometimes classified as separate species or subspecies, are further divided into over 1,000 recognized breeds. Cattle are commonly raised for meat, for dairy products, and for [[Leather|leather]]. As draft animals, they pull [[Cart|carts]] and farm implements. Small breeds such as the miniature Zebu are kept as [[Pet|pets]]. About 10,500 years ago, taurine cattle were domesticated from wild [[Aurochs|aurochs]] progenitors in central Anatolia, the [[Levant]] and Western Iran. A separate domestication event occurred in the [[Indian subcontinent]], which gave rise to zebu. There were over 940 million cattle in the world by 2022.",
 			},
 		},
 		infobox = {
@@ -3278,17 +3502,17 @@ return {
 	{
 		title = "Centipede",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐾",
 		source = "wikipedia",
 		description = "Many-legged arthropods with elongated bodies",
 		tags = { "Arthropoda, others", "Myriapoda" },
 		aliases = { "Centipedes", "Chilopoda" },
-		summary = '**Centipedes** are predatory [[Arthropod|arthropods]] belonging to the class **Chilopoda** of the subphylum [[Myriapoda]], an arthropod group which includes [[Millipede|millipedes]] and other multi-legged animals. Centipedes are elongated segmented (metameric) animals with one pair of legs per body segment. Despite the name, no species of centipede has exactly 100 legs; the number of pairs of legs is an odd number that ranges from 15 pairs to 191 pairs. Less common names include "forty-legs" and "hundred-legs".',
+		summary = '**Centipedes** are [[Predation|predatory]] [[Arthropod|arthropods]] belonging to the class **Chilopoda** of the subphylum [[Myriapoda]], an arthropod group which includes [[Millipede|millipedes]] and other multi-legged animals. Centipedes are elongated segmented (metameric) animals with one pair of legs per body segment. Despite the name, no species of centipede has exactly 100 legs; the number of pairs of legs is an odd number that ranges from 15 pairs to 191 pairs. Less common names include "forty-legs" and "hundred-legs".',
 		sections = {
 			{
 				"Overview",
-				"Centipedes are predominantly generalist [[Carnivore|carnivores]], hunting for a variety of prey items that can be overpowered. They have a wide geographical range, which can be found in terrestrial habitats from [[Tropical rainforest|tropical rainforests]] to [[Desert|deserts]]. Within these habitats, centipedes require a moist microhabitat because they lack the waxy cuticle of [[Insect|insects]] and [[Arachnid|arachnids]], causing them to rapidly lose water. Accordingly, they avoid direct sunlight by staying under cover or by being active at night.",
+				"Centipedes are predominantly generalist [[Carnivore|carnivores]], hunting for a variety of prey items that can be overpowered. They have a wide geographical range, which can be found in terrestrial habitats from [[Tropical rainforest|tropical rainforests]] to [[Desert|deserts]]. Within these habitats, centipedes require a moist microhabitat because they lack the waxy cuticle of [[Insect|insects]] and [[Arachnid|arachnids]], causing them to rapidly lose water. Accordingly, they avoid direct sunlight by staying under cover or by being [[Nocturnal animal|active at night]].",
 			},
 		},
 		infobox = {
@@ -3298,20 +3522,19 @@ return {
 	{
 		title = "Cetacean",
 		category = "Animal",
-		fame = 2,
+		fame = 1,
 		emoji = "🐾",
 		source = "wikipedia",
 		description = "Infraorder of marine mammals",
 		tags = { "Mammals", "Cetaceans" },
 		aliases = { "Cetaceans", "Cetacea" },
-		summary = "**Cetaceans** are marine mammals belonging to the infraorder **Cetacea**, a secondarily aquatic clade under the order [[Artiodactyla]] that include [[Blue whale|whales]], [[Dolphin|dolphins]], porpoises and extinct groups such as Basilosaurus. Most cetaceans live in marine environments, particularly the pelagic zone, but some reside solely in brackish or fresh water. Having a cosmopolitan distribution, they can be found in some rivers and all of Earth's oceans. Many species [[Animal migration|migrate]] seasonally over vast ranges for food advantages.",
+		summary = "**Cetaceans** are [[Marine mammal|marine mammals]] belonging to the [[Order (taxonomy)|infraorder]] **Cetacea**, a secondarily aquatic clade under the order [[Artiodactyla]] that include [[Blue whale|whales]], [[Dolphin|dolphins]], porpoises and extinct groups such as Basilosaurus. Most cetaceans live in marine environments, particularly the [[Pelagic zone|pelagic zone]], but some reside solely in [[Brackish water|brackish]] or [[Fresh water|fresh water]]. Having a [[Cosmopolitan distribution|cosmopolitan distribution]], they can be found in some rivers and all of Earth's oceans. Many species [[Animal migration|migrate]] seasonally over vast ranges for food advantages.",
 		sections = {
 			{
 				"Overview",
-				"Key characteristics of cetaceans are their fully aquatic life cycle, streamlined, fish-like body shape, the need to periodically surface and breathe air, and exclusively carnivorous diet. Some cetaceans - the toothed whales - are capable of echolocation. As nektonic animals, cetaceans propel themselves through the water with powerful up-and-down movements of their tails, which have evolved into in a horizontal paddle-like fluke. Their hindlimbs have disappeared with only some vestigial skeleton of the pelvis and femurs, and their forelimbs have evolved into flippers which they use to paddle and steer. Some fast-swimming groups, most notably the smaller dolphins and porpoises, have a dorsal fin to facilitate directional stability. Cetaceans also have large brains and have high intelligence, complex social behaviour, and song-like communication.",
+				"Key characteristics of cetaceans are their fully aquatic [[Biological life cycle|life cycle]], streamlined, fish-like body shape, the need to periodically surface and breathe air, and exclusively [[Carnivore|carnivorous]] diet. Some cetaceans - the toothed whales - are capable of [[Animal echolocation|echolocation]]. As nektonic animals, cetaceans propel themselves through the water with powerful up-and-down movements of their tails, which have evolved into in a horizontal paddle-like fluke. Their hindlimbs have disappeared with only some vestigial skeleton of the pelvis and femurs, and their forelimbs have evolved into flippers which they use to paddle and steer. Some fast-swimming groups, most notably the smaller dolphins and porpoises, have a dorsal fin to facilitate directional stability. Cetaceans also have large brains and have high intelligence, complex social behaviour, and song-like communication.",
 			},
 		},
-		related = { "Humpback whale" },
 		infobox = {
 			{ "Scientific name", "Cetacea" },
 		},
@@ -3325,14 +3548,14 @@ return {
 		description = "Family of reptiles",
 		tags = { "Vertebrates", "Reptiles" },
 		aliases = { "Chameleons", "Chamaeleonidae" },
-		summary = "**Chameleons** (family **Chamaeleonidae**) are a distinctive and highly specialized clade of Old World [[Lizard|lizards]] with 200 species described as of June 2015. The members of this family are best known for their distinct range of colours, being capable of colour-shifting [[Camouflage|camouflage]]. The large number of [[Species|species]] in the family exhibit considerable variability in their capacity to change colour. For some, it is more of a shift of brightness (shades of brown); for others, a plethora of colour-combinations (reds, yellows, greens, blues) can be seen.",
+		summary = "**Chameleons** ([[Family (taxonomy)|family]] **Chamaeleonidae**) are a distinctive and highly specialized [[Clade|clade]] of Old World [[Lizard|lizards]] with 200 species described as of June 2015. The members of this family are best known for their distinct range of colours, being capable of colour-shifting [[Camouflage|camouflage]]. The large number of [[Species|species]] in the family exhibit considerable variability in their capacity to change colour. For some, it is more of a shift of brightness (shades of brown); for others, a plethora of colour-combinations (reds, yellows, greens, blues) can be seen.",
 		sections = {
 			{
 				"Overview",
-				"Chameleons are also distinguished by their zygodactylous feet, their prehensile tail, their laterally compressed bodies, their head casques, their projectile tongues used for catching prey, their swaying gait, and in some species crests or horns on their brow and snout. Chameleons' eyes are independently mobile, and because of this the chameleon's brain is constantly analyzing two separate, individual images of its environment. When hunting prey, the eyes focus forward in coordination, affording stereoscopic vision. Chameleons are diurnal and adapted for visual hunting of invertebrates, mostly insects, although the large species also can catch small vertebrates. Chameleons typically are arboreal, but there are also many species that live on the ground.",
+				"Chameleons are also distinguished by their zygodactylous feet, their prehensile tail, their laterally compressed bodies, their head casques, their projectile tongues used for catching prey, their swaying gait, and in some species crests or horns on their brow and snout. Chameleons' eyes are independently mobile, and because of this the chameleon's brain is constantly analyzing two separate, individual images of its environment. When hunting prey, the eyes focus forward in coordination, affording stereoscopic vision. Chameleons are [[Diurnality|diurnal]] and adapted for visual hunting of invertebrates, mostly insects, although the large species also can catch small vertebrates. Chameleons typically are [[Arboreal locomotion|arboreal]], but there are also many species that live on the ground.",
 			},
 		},
-		related = { "Alligator snapping turtle", "Coral snake", "Gecko", "Naja", "Sea snake" },
+		related = { "Agkistrodon piscivorus", "Box turtle", "Garter snake", "Naja", "Skink" },
 		infobox = {
 			{ "Scientific name", "Chamaeleonidae" },
 		},
@@ -3345,19 +3568,19 @@ return {
 		source = "wikipedia",
 		description = "Order of fishes",
 		tags = { "Fishes", "Characiformes" },
-		summary = "**Characiformes** is an order of [[Actinopterygii|ray-finned fish]], comprising the characins and their allies. Grouped in 18 recognized families, more than 2000 different species are described, including the well-known [[Piranha|piranha]] and tetras. Characins are most diverse in the Neotropics, where they are found in lakes and rivers throughout most of [[South America|South]] and [[Central America]]. At least 209 species of characins are found in Africa, including the distichodontids, citharinids, alestids, and hepsetids. The rest of the characins originate in the [[Americas]].",
+		summary = "**Characiformes** is an order of [[Actinopterygii|ray-finned fish]], comprising the characins and their allies. Grouped in 18 recognized [[Family (taxonomy)|families]], more than 2000 different species are described, including the well-known [[Piranha|piranha]] and tetras. Characins are most diverse in the Neotropics, where they are found in lakes and rivers throughout most of [[South America|South]] and [[Central America]]. At least 209 species of characins are found in Africa, including the distichodontids, citharinids, alestids, and hepsetids. The rest of the characins originate in the [[Americas]].",
 		sections = {
 			{
 				"Overview",
-				"A few characins become quite large, and are important as [[Fish as food|food]] or game. Most, however, are small shoaling fish (or forage fish). Many species commonly called tetras are popular in aquaria because of their bright colors, general hardiness, and tolerance towards other fish in community tanks.",
+				"A few characins become quite large, and are important as [[Fish as food|food]] or [[Game fish|game]]. Most, however, are small [[Shoaling and schooling|shoaling]] fish (or [[Forage fish|forage fish]]). Many species [[Common name|commonly called]] tetras are popular in aquaria because of their bright colors, general hardiness, and tolerance towards other fish in community tanks.",
 			},
 		},
-		related = { "Tiger shark", "Salmon" },
+		related = { "Salmon", "Salmonidae" },
 	},
 	{
 		title = "Chelicerata",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐾",
 		source = "wikipedia",
 		description = "Subphylum of arthropods",
@@ -3366,7 +3589,7 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Chelicerata split from Mandibulata by the mid-[[Cambrian]], as evidenced by stem-group chelicerates like Habeliida, Mollisonia and Megachelicerax present by this time. The surviving marine species include the four species of [[Xiphosura|xiphosurans]] (horseshoe crabs), and possibly the 1,300 species of pycnogonids (sea spiders), if the latter are indeed chelicerates. On the other hand, there are over 77,000 well-identified species of air-breathing chelicerates, and there may be about 500,000 unidentified species. Like all [[Arthropod|arthropods]], chelicerates have segmented bodies with jointed limbs, all covered in a [[Cuticle|cuticle]] made of [[Chitin|chitin]] and [[Protein|proteins]]. The chelicerate body plan consists of two tagmata, the prosoma and the opisthosoma – excepting the mites, which have lost any visible division between these sections. The chelicerae, which give the group its name, are the only appendages that appear before the mouth.",
+				"Chelicerata split from Mandibulata by the mid-[[Cambrian]], as evidenced by stem-group chelicerates like Habeliida, Mollisonia and Megachelicerax present by this time. The surviving marine species include the four species of [[Xiphosura|xiphosurans]] (horseshoe crabs), and possibly the 1,300 species of pycnogonids (sea spiders), if the latter are indeed chelicerates. On the other hand, there are over 77,000 well-identified species of air-breathing chelicerates, and there may be about 500,000 unidentified species. Like all [[Arthropod|arthropods]], chelicerates have [[Segmentation (biology)|segmented]] bodies with jointed limbs, all covered in a [[Cuticle|cuticle]] made of [[Chitin|chitin]] and [[Protein|proteins]]. The chelicerate [[Body plan|body plan]] consists of two tagmata, the prosoma and the opisthosoma – excepting the mites, which have lost any visible division between these sections. The chelicerae, which give the group its name, are the only appendages that appear before the mouth.",
 			},
 		},
 		infobox = {
@@ -3382,14 +3605,14 @@ return {
 		description = "Cartilaginous fish in the order Chimaeriformes",
 		tags = { "Vertebrates", "Fishes" },
 		aliases = { "Chimaeras", "Chimaeriformes", "Ghost sharks" },
-		summary = "**Chimaeras** are [[Chondrichthyes|cartilaginous fish]] in the order **Chimaeriformes**, known informally as **ghost sharks**, **rat fish** (not to be confused with rattails), **spookfish**, or **rabbit fish**; the last two names are also applied, respectively, to the [[Actinopterygii|ray-finned fish]] groups of Opisthoproctidae and Siganidae.",
+		summary = "**Chimaeras** are [[Chondrichthyes|cartilaginous fish]] in the [[Order (taxonomy)|order]] **Chimaeriformes**, known informally as **ghost sharks**, **rat fish** (not to be confused with rattails), **spookfish**, or **rabbit fish**; the last two names are also applied, respectively, to the [[Actinopterygii|ray-finned fish]] groups of Opisthoproctidae and Siganidae.",
 		sections = {
 			{
 				"Overview",
-				'At one time a "diverse and abundant" group (based on the fossil record), their closest living relatives are [[Shark|sharks]] and rays, though their last common ancestor with them lived nearly 400 million years ago. Living species (aside from plough-nose chimaeras) are largely confined to deep water.',
+				'At one time a "diverse and abundant" group (based on the [[Fossil|fossil record]]), their closest living relatives are [[Shark|sharks]] and rays, though their last common ancestor with them lived nearly 400 million years ago. Living species (aside from plough-nose chimaeras) are largely confined to deep water.',
 			},
 		},
-		related = { "Arapaima", "Milkfish", "Stickleback" },
+		related = { "Coral reef fish" },
 		infobox = {
 			{ "Scientific name", "Chimaeriformes" },
 		},
@@ -3403,14 +3626,13 @@ return {
 		description = "Species of great ape",
 		tags = { "Mammals", "Primates" },
 		aliases = { "Chimp" },
-		summary = "The **chimpanzee**, commonly abbreviated to **chimp**, is a medium-sized great ape species found in the forests and savannas of equatorial Africa. It has four confirmed subspecies and a fifth proposed one. The chimpanzee shares the genus Pan with the [[Bonobo|bonobo]]. Evidence from fossils and DNA sequencing shows that the two species are [[Human|humans]]' closest living relatives. The chimpanzee is bigger and more robust than the bonobo. It is covered in coarse black hair but has a bare face, fingers, toes, palms of the hands, and soles of the feet.",
+		summary = "The **chimpanzee**, commonly abbreviated to **chimp**, is a medium-sized [[Hominidae|great ape]] species found in the forests and savannas of equatorial Africa. It has four confirmed subspecies and a fifth proposed one. The chimpanzee shares the genus [[Pan (genus)|Pan]] with the [[Bonobo|bonobo]]. Evidence from fossils and [[DNA sequencing]] shows that the two species are [[Human|humans]]' closest living relatives. The chimpanzee is bigger and more robust than the bonobo. It is covered in coarse black hair but has a bare face, fingers, toes, palms of the hands, and soles of the feet.",
 		sections = {
 			{
 				"Overview",
-				"The species lives in groups with up to 200 members, although individuals travel and forage in much smaller groups during the day. Nearly all chimpanzee populations have been recorded using tools, modifying sticks, rocks, grass and leaves and using them for [[Hunting|hunting]] and acquiring [[Honey|honey]], [[Termite|termites]], [[Ant|ants]], nuts and water. The species has also been found creating sharpened sticks to spear small mammals. Its gestation period is eight months. The infant is weaned at about three years old but usually maintains a close relationship with its mother for several years more. The chimpanzee is listed on the IUCN Red List as an [[Endangered species|endangered species]]. Between 170,000 and 300,000 individuals are estimated across its range. Chimpanzees appear in Western popular culture as comical-figures and have featured in entertainments such as chimpanzees' tea parties, circus acts and stage shows.",
+				"The species lives in groups with up to 200 members, although individuals travel and forage in much smaller groups during the day. Nearly all chimpanzee populations have been recorded using tools, modifying sticks, rocks, grass and leaves and using them for [[Hunting|hunting]] and acquiring [[Honey|honey]], [[Termite|termites]], [[Ant|ants]], nuts and water. The species has also been found creating sharpened sticks to spear small mammals. Its gestation period is eight months. The infant is weaned at about three years old but usually maintains a close relationship with its mother for several years more. The chimpanzee is listed on the [[IUCN Red List]] as an [[Endangered species|endangered species]]. Between 170,000 and 300,000 individuals are estimated across its range. Chimpanzees appear in Western popular culture as comical-figures and have featured in entertainments such as chimpanzees' tea parties, circus acts and stage shows.",
 			},
 		},
-		related = { "Tarsier" },
 		infobox = {
 			{ "Scientific name", "Pan troglodytes" },
 			{ "Conservation status", "Endangered" },
@@ -3419,20 +3641,20 @@ return {
 	{
 		title = "Chondrichthyes",
 		category = "Animal",
-		fame = 1,
+		fame = 2,
 		emoji = "🐟",
 		source = "wikipedia",
 		description = "Class of jawed cartilaginous fish",
 		tags = { "Vertebrates", "Fishes" },
 		aliases = { "Cartilaginous fish", "Chondrichthyans" },
-		summary = "**Chondrichthyes** is a class of jawed fish that contains the **cartilaginous fish** or **chondrichthyans**, which all have skeletons primarily composed of cartilage. They can be contrasted with the [[Osteichthyes]] or bony fish, which have skeletons primarily composed of bone tissue. Chondrichthyes are aquatic [[Vertebrate|vertebrates]] with paired fins, paired nares, placoid scales, and conus arteriosus in the [[Heart|heart]]. Within the infraphylum [[Gnathostomata]], cartilaginous fishes are distinct from all other jawed vertebrates.",
+		summary = "**Chondrichthyes** is a [[Class (taxonomy)|class]] of jawed fish that contains the **cartilaginous fish** or **chondrichthyans**, which all have [[Skeleton|skeletons]] primarily composed of cartilage. They can be contrasted with the [[Osteichthyes]] or bony fish, which have skeletons primarily composed of bone tissue. Chondrichthyes are [[Aquatic animal|aquatic]] [[Vertebrate|vertebrates]] with paired fins, paired nares, placoid scales, and conus arteriosus in the [[Heart|heart]]. Within the infraphylum [[Gnathostomata]], cartilaginous fishes are distinct from all other jawed vertebrates.",
 		sections = {
 			{
 				"Overview",
-				"The class is divided into two subclasses: Elasmobranchii ([[Shark|sharks]], rays, [[Skate (fish)|skates]] and [[Sawfish|sawfish]]) which lack opercula, and Holocephali ([[Chimaera|chimaeras]], sometimes called ghost sharks, which are sometimes separated into their own class). Extant chondrichthyans range in size from the 10 cm finless sleeper ray to the over 10 m [[Whale shark|whale shark]].",
+				"The class is divided into two subclasses: Elasmobranchii ([[Shark|sharks]], [[Batomorphi|rays]], [[Skate (fish)|skates]] and [[Sawfish|sawfish]]) which lack opercula, and Holocephali ([[Chimaera|chimaeras]], sometimes called ghost sharks, which are sometimes separated into their own class). Extant chondrichthyans range in size from the 10 cm finless sleeper ray to the over 10 m [[Whale shark|whale shark]].",
 			},
 		},
-		related = { "Acanthodii", "Deep-sea fish", "Ophidiiformes" },
+		related = { "Flying fish" },
 		infobox = {
 			{ "Scientific name", "Chondrichthyes" },
 		},
@@ -3446,11 +3668,11 @@ return {
 		description = "Phylum of animals having a dorsal nerve cord",
 		tags = { "Organisms", "Animals" },
 		aliases = { "Chordata" },
-		summary = "A **chordate** is a [[Bilateria|bilaterian]] [[Animal|animal]] belonging to the phylum **Chordata**. All chordates possess, at some point during their larval or adult stages, five distinctive physical characteristics (synapomorphies) that distinguish them from other taxa: a notochord, a hollow dorsal nerve cord, an endostyle or thyroid, pharyngeal slits, and a post-anal tail.",
+		summary = "A **chordate** is a [[Bilateria|bilaterian]] [[Animal|animal]] belonging to the [[Phylum|phylum]] **Chordata**. All chordates possess, at some point during their larval or adult stages, five distinctive physical characteristics (synapomorphies) that distinguish them from other [[Taxon|taxa]]: a notochord, a hollow dorsal nerve cord, an endostyle or thyroid, pharyngeal slits, and a post-anal [[Tail|tail]].",
 		sections = {
 			{
 				"Overview",
-				"In addition to the morphological characteristics used to define chordates, analysis of genome sequences has identified two conserved signature indels (CSIs) in their proteins: cyclophilin-like protein and inner mitochondrial membrane protease ATP23, which are exclusively shared by all [[Vertebrate|vertebrates]], tunicates and cephalochordates. These CSIs provide molecular means to reliably distinguish chordates from all other [[Animal|animals]]. Chordates are divided into three subphyla: Vertebrata ([[Fish|fish]], [[Amphibian|amphibians]], [[Reptile|reptiles]], [[Bird|birds]] and [[Mammal|mammals]]), which possess a skull and whose notochords are replaced by a cartilaginous/bony axial endoskeleton (spine); Tunicata or Urochordata (sea squirts, salps, and larvaceans), which only retain the synapomorphies during their [[Larva|larval]] stage; and Cephalochordata (lancelets), which resemble jawless fish but have no gills or a distinct head.",
+				"In addition to the morphological characteristics used to define chordates, analysis of genome sequences has identified two conserved signature indels (CSIs) in their proteins: cyclophilin-like protein and inner mitochondrial membrane protease ATP23, which are exclusively shared by all [[Vertebrate|vertebrates]], tunicates and cephalochordates. These CSIs provide molecular means to reliably distinguish chordates from all other [[Animal|animals]]. Chordates are divided into three [[Phylum|subphyla]]: Vertebrata ([[Fish|fish]], [[Amphibian|amphibians]], [[Reptile|reptiles]], [[Bird|birds]] and [[Mammal|mammals]]), which possess a skull and whose notochords are replaced by a cartilaginous/[[Bone|bony]] axial [[Endoskeleton|endoskeleton]] (spine); Tunicata or Urochordata (sea squirts, salps, and larvaceans), which only retain the synapomorphies during their [[Larva|larval]] stage; and Cephalochordata (lancelets), which resemble jawless fish but have no [[Gill|gills]] or a distinct head.",
 			},
 		},
 		infobox = {
@@ -3470,10 +3692,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Cicadas have prominent eyes set wide apart, short antennae, and membranous front wings. They have an exceptionally loud song, produced in most species by the rapid buckling and unbuckling of drum-like tymbals. The earliest known fossil Cicadomorpha appeared in the Upper Permian period; extant species occur all around the world in temperate to tropical climates. They typically live in trees, feeding on watery sap from xylem tissue, and laying their eggs in a slit in the bark. Most cicadas are cryptic. The vast majority of species are active during the day as adults, with some calling at dawn or dusk. Only a rare few species are known to be nocturnal. One exclusively North American genus, Magicicada (the periodical cicadas), which spend most of their lives as underground nymphs, emerge in predictable intervals of 13 or 17 years, depending on the species and the location.",
+				"Cicadas have prominent eyes set wide apart, short antennae, and membranous front wings. They have an exceptionally loud song, produced in most species by the rapid buckling and unbuckling of drum-like tymbals. The earliest known fossil Cicadomorpha appeared in the Upper Permian period; extant species occur all around the world in temperate to tropical climates. They typically live in trees, feeding on watery sap from [[Xylem|xylem]] tissue, and laying their eggs in a slit in the bark. Most cicadas are cryptic. The vast majority of species are active during the day as adults, with some calling at dawn or dusk. Only a rare few species are known to be nocturnal. One exclusively North American genus, Magicicada (the periodical cicadas), which spend most of their lives as underground nymphs, emerge in predictable intervals of 13 or 17 years, depending on the species and the location.",
 			},
 		},
-		related = { "Dragonfly", "Mole cricket" },
+		related = { "Grasshopper" },
 		infobox = {
 			{ "Scientific name", "Cicadoidea" },
 		},
@@ -3487,46 +3709,50 @@ return {
 		description = "Family of fishes",
 		tags = { "Fishes", "Acanthomorpha" },
 		aliases = { "Cichlids", "Cichlidae" },
-		summary = "**Cichlids** are a large, diverse, and widespread family of percomorph [[Fish|fish]] in the family **Cichlidae,** order Cichliformes. At least 1,760 [[Species|species]] have been [[Binomial nomenclature|scientifically described]], making it one of the largest [[Vertebrate|vertebrate]] families, with only the Cyprinidae being more speciose. New species are discovered annually, and many species remain undescribed. The actual number of species is therefore unknown, with estimates varying between 2,000 and 3,000. They are native to the Neotropics, Africa (including [[Madagascar]]), the Middle East, and the Indian subcontinent, although some species have been introduced worldwide.",
+		summary = "**Cichlids** are a large, diverse, and widespread family of percomorph [[Fish|fish]] in the [[Family (taxonomy)|family]] **Cichlidae,** order Cichliformes. At least 1,760 [[Species|species]] have been [[Binomial nomenclature|scientifically described]], making it one of the largest [[Vertebrate|vertebrate]] families, with only the Cyprinidae being more speciose. New species are discovered annually, and many species remain undescribed. The actual number of species is therefore unknown, with estimates varying between 2,000 and 3,000. They are native to the Neotropics, Africa (including [[Madagascar]]), the Middle East, and the [[Indian subcontinent]], although some species have been introduced worldwide.",
 		sections = {
 			{
 				"Overview",
-				"Many cichlids, particularly [[Tilapia|tilapia]], are important food fishes, while others, such as the Cichla species, are valued game fish. The family also includes many popular freshwater aquarium fish kept by hobbyists, including the angelfish, oscars, and discus. Cichlids have the largest number of [[Endangered species|endangered species]] among [[Vertebrate|vertebrate]] families, most in the haplochromine group. Cichlids are well known for their rapid evolution into morphologically diverse species flocks within the African Great Lakes. Some of these key morphological differences include jaw and teeth structure, fin, head, and body shape, and most importantly, their coloration. Their diversity in the African Great Lakes is important for the study of speciation in evolution. Many cichlids introduced into waters outside of their natural range have become nuisances.",
+				"Many cichlids, particularly [[Tilapia|tilapia]], are important food fishes, while others, such as the Cichla species, are valued game fish. The family also includes many popular freshwater aquarium fish kept by hobbyists, including the angelfish, oscars, and discus. Cichlids have the largest number of [[Endangered species|endangered species]] among [[Vertebrate|vertebrate]] families, most in the haplochromine group. Cichlids are well known for their rapid evolution into morphologically diverse species flocks within the African Great Lakes. Some of these key morphological differences include jaw and teeth structure, fin, head, and body shape, and most importantly, their coloration. Their diversity in the African Great Lakes is important for the study of [[Speciation|speciation]] in evolution. Many cichlids [[Introduced species|introduced]] into waters outside of their natural range have become nuisances.",
 			},
 		},
-		related = {
-			"Alaska pollock",
-			"Cod",
-			"European seabass",
-			"Gobioidei",
-			"Guppy",
-			"Mackerel",
-			"Marlin",
-			"Perch",
-			"Plaice",
-			"Seahorse",
-			"Siamese fighting fish",
-			"Turbot",
-		},
+		related = { "Guppy", "Perciformes" },
 		infobox = {
 			{ "Scientific name", "Cichlidae" },
 		},
 	},
 	{
-		title = "Cnidaria",
+		title = "Claw",
 		category = "Animal",
 		fame = 2,
 		emoji = "🐾",
 		source = "wikipedia",
-		description = "Aquatic animal phylum having cnidocytes",
-		tags = { "Animals", "Cnidarians" },
-		summary = "Their distinguishing features are an decentralized nerve net distributed throughout a gelatinous body, and the presence of cnidocytes or cnidoblasts, specialized cells with ejectable organelles used mainly for envenomation and capturing prey. Their bodies consist of mesoglea, a non-living, jelly-like substance, sandwiched between two layers of epithelium that are mostly one [[Cell (biology)|cell]] thick.",
+		description = "Curved, pointed appendage at the end of a digit of a mammal, bird, or reptile",
+		tags = { "More articles" },
+		summary = "A **claw** is a curved, pointed appendage found at the end of a toe or finger in most [[Amniote|amniotes]] ([[Mammal|mammals]], [[Reptile|reptiles]], [[Bird|birds]]). Some [[Invertebrate|invertebrates]] such as beetles, [[Spider|spiders]], and velvet worms have somewhat similar fine, hooked structures at the end of the leg or tarsus for gripping a surface as they walk. The pincers of crabs, lobsters, [[Crayfish|crayfish]], shrimps, prawns and scorpions, more formally known as their chelae, are sometimes called claws.",
 		sections = {
 			{
 				"Overview",
-				"Cnidarians mostly have two basic body forms: swimming medusae and sessile polyps, both of which are radially symmetrical with mouths surrounded by tentacles that bear cnidocytes, which are specialized stinging cells used to capture prey. Both forms have a single orifice and body cavity that are used for [[Digestion|digestion]] and [[Respiration (physiology)|respiration]]. Many cnidarian species produce colonies that are single organisms composed of medusa-like or polyp-like zooids, or both (hence they are trimorphic). Cnidarians' activities are coordinated by a decentralized nerve net and simple receptors. Cnidarians also have rhopalia, which are involved in gravity sensing and sometimes chemoreception. Several free-swimming species of Cubozoa and Scyphozoa possess balance-sensing statocysts, and some have simple eyes.",
+				"A true claw is made of a hard [[Protein|protein]] called keratin. Claws are used to catch and hold prey in [[Carnivore|carnivorous]] [[Mammal|mammals]] such as [[Cat|cats]] and [[Dog|dogs]], but may also be used for such purposes as digging, climbing trees, self-defense and grooming, in those and other species. Similar appendages that are flat and do not come to a sharp point are called nails instead. Claw-like projections that do not form at the end of digits but spring from other parts of the foot are properly named spurs.",
 			},
 		},
+	},
+	{
+		title = "Cnidaria",
+		category = "Animal",
+		fame = 3,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Aquatic animal phylum having cnidocytes",
+		tags = { "Animals", "Cnidarians" },
+		summary = "Their distinguishing features are an decentralized nerve net distributed throughout a gelatinous body, and the presence of cnidocytes or cnidoblasts, specialized cells with ejectable organelles used mainly for envenomation and capturing [[Predation|prey]]. Their bodies consist of mesoglea, a non-living, jelly-like substance, sandwiched between two layers of epithelium that are mostly one [[Cell (biology)|cell]] thick.",
+		sections = {
+			{
+				"Overview",
+				"Cnidarians mostly have two basic body forms: swimming medusae and sessile polyps, both of which are radially symmetrical with mouths surrounded by tentacles that bear cnidocytes, which are specialized stinging cells used to capture prey. Both forms have a single orifice and body cavity that are used for [[Digestion|digestion]] and [[Respiration (physiology)|respiration]]. Many cnidarian species produce [[Colony (biology)|colonies]] that are single organisms composed of medusa-like or polyp-like zooids, or both (hence they are trimorphic). Cnidarians' activities are coordinated by a decentralized nerve net and simple receptors. Cnidarians also have rhopalia, which are involved in gravity sensing and sometimes chemoreception. Several free-swimming species of Cubozoa and Scyphozoa possess balance-sensing statocysts, and some have simple eyes.",
+			},
+		},
+		related = { "Shiitake" },
 		infobox = {
 			{ "Scientific name", "Cnidaria" },
 		},
@@ -3539,14 +3765,14 @@ return {
 		source = "wikipedia",
 		description = "Family of beetles",
 		tags = { "Insects and other hexapods", "Beetles (Coleoptera)" },
-		summary = '**Coccinellidae** is a widespread family of small [[Beetle|beetles]]. They are commonly known as **ladybugs** in North America and **ladybirds** in the United Kingdom, Australia, New Zealand, Ireland, and other English speaking territories; "lady" refers to Mary, the mother of Jesus. Entomologists use the names **ladybird beetles** or **lady beetles** to avoid confusion with true bugs. The more than 6,000 described species have a global distribution and are found in a variety of habitats. They are oval beetles with a domed back and flat underside. Many of the species have conspicuous aposematic (warning) colours and patterns, such as red with black spots, that warn potential predators that they taste bad.',
+		summary = '**Coccinellidae** is a widespread [[Family (taxonomy)|family]] of small [[Beetle|beetles]]. They are commonly known as **ladybugs** in North America and **ladybirds** in the United Kingdom, Australia, New Zealand, Ireland, and other English speaking territories; "lady" refers to Mary, the mother of Jesus. Entomologists use the names **ladybird beetles** or **lady beetles** to avoid confusion with true bugs. The more than 6,000 described species have a global distribution and are found in a variety of habitats. They are oval beetles with a domed back and flat underside. Many of the species have conspicuous aposematic (warning) colours and patterns, such as red with black spots, that warn potential [[Predation|predators]] that they taste bad.',
 		sections = {
 			{
 				"Overview",
-				"Most coccinellid species are carnivorous predators, preying on insects such as [[Aphid|aphids]] and [[Scale insect|scale insects]]. Other species are known to consume non-animal matter, including plants and fungi. They are promiscuous breeders, reproducing in spring and summer in temperate regions and during the [[Wet season|wet season]] in tropical regions. Many predatory species lay their eggs near colonies of prey, providing their larvae with a food source. Like most insects, they develop from [[Larva|larva]] to [[Pupa|pupa]] to adult. Temperate species hibernate and diapause during the winter; tropical species are dormant during the [[Dry season|dry season]]. Coccinellids migrate between dormancy and breeding sites. Species that prey on agricultural pests are considered beneficial insects. Several species have been introduced outside their range as biological control agents, with varying degrees of success.",
+				"Most coccinellid species are [[Carnivore|carnivorous]] predators, preying on insects such as [[Aphid|aphids]] and [[Scale insect|scale insects]]. Other species are known to consume non-animal matter, including plants and fungi. They are promiscuous breeders, reproducing in spring and summer in temperate regions and during the [[Wet season|wet season]] in tropical regions. Many predatory species lay their eggs near colonies of prey, providing their larvae with a food source. Like most insects, they develop from [[Larva|larva]] to [[Pupa|pupa]] to adult. Temperate species hibernate and diapause during the winter; tropical species are dormant during the [[Dry season|dry season]]. Coccinellids migrate between dormancy and breeding sites. Species that prey on agricultural pests are considered beneficial insects. Several species have been introduced outside their range as [[Biological pest control|biological control]] agents, with varying degrees of success.",
 			},
 		},
-		related = { "Damselfly", "Dung beetle", "Firefly", "Weevil" },
+		related = { "Dung beetle", "Firefly", "Weevil" },
 		infobox = {
 			{ "Scientific name", "Coccinellidae" },
 		},
@@ -3560,14 +3786,14 @@ return {
 		description = "Any bird in the family Cacatuidae",
 		tags = { "Birds", "Psittaciformes" },
 		aliases = { "Cacatuidae", "Cacatuoidea" },
-		summary = "A **cockatoo** is any of the 22 [[Species|species]] of [[Parrot|parrots]] belonging to the family **Cacatuidae**, the only family in the superfamily **Cacatuoidea**, native to Australasia. Along with the Psittacoidea (true parrots), they make up the order Psittaciformes. The family has a mainly Australasian distribution, ranging from the [[Philippines]] and the eastern [[Indonesia|Indonesian]] islands of Wallacea to [[New Guinea]], the [[Solomon Islands]] and [[Australia]].",
+		summary = "A **cockatoo** is any of the 22 [[Species|species]] of [[Parrot|parrots]] belonging to the [[Family (taxonomy)|family]] **Cacatuidae**, the only family in the superfamily **Cacatuoidea**, native to [[Australasia]]. Along with the Psittacoidea (true parrots), they make up the [[Order (taxonomy)|order]] Psittaciformes. The family has a mainly [[Australasia|Australasian]] distribution, ranging from the [[Philippines]] and the eastern [[Indonesia|Indonesian]] islands of Wallacea to [[New Guinea]], the [[Solomon Islands]] and [[Australia]].",
 		sections = {
 			{
 				"Overview",
-				"Cockatoos are recognisable by their prominent crests and curved bills. Their plumage is generally less [[Color|colourful]] than that of other parrots, being mainly white, grey, or black and often with coloured features in the crest, cheeks, or tail. On average, they are larger than other parrots; however, the cockatiel, the smallest cockatoo species, is medium-sized. The phylogenetic position of the cockatiel remains unresolved, except that it is one of the earliest offshoots of the cockatoo lineage. The remaining species are in two main clades. The five large black-coloured cockatoos of the genus Calyptorhynchus form one branch. The second and larger branch is formed by the genus Cacatua, comprising 12 species of white-plumaged cockatoos and three monotypic genera that branched off earlier, namely the pink and grey galah, the mainly grey gang-gang cockatoo and the large black-plumaged palm cockatoo.",
+				"Cockatoos are recognisable by their prominent crests and curved [[Beak|bills]]. Their [[Plumage|plumage]] is generally less [[Color|colourful]] than that of other parrots, being mainly white, grey, or black and often with coloured features in the crest, cheeks, or tail. On average, they are larger than other parrots; however, the cockatiel, the smallest cockatoo species, is medium-sized. The phylogenetic position of the cockatiel remains unresolved, except that it is one of the earliest offshoots of the cockatoo lineage. The remaining species are in two main clades. The five large black-coloured cockatoos of the genus Calyptorhynchus form one branch. The second and larger branch is formed by the genus Cacatua, comprising 12 species of white-plumaged cockatoos and three monotypic genera that branched off earlier, namely the pink and grey galah, the mainly grey gang-gang cockatoo and the large black-plumaged palm cockatoo.",
 			},
 		},
-		related = { "Bird of prey", "Galliformes" },
+		related = { "Galliformes", "Bird of prey" },
 		infobox = {
 			{ "Scientific name", "Cacatuidae" },
 		},
@@ -3581,14 +3807,14 @@ return {
 		description = "Insects of the order Blattodea",
 		tags = { "Arthropods", "Insects and other hexapods" },
 		aliases = { "Cockroaches", "Roaches" },
-		summary = "**Cockroaches** (or **roaches**) are insects belonging to the order Blattodea (Blattaria). About 30 cockroach [[Species|species]] out of 4,600 are associated with human habitats. Some species are well-known pests.",
+		summary = "**Cockroaches** (or **roaches**) are insects belonging to the [[Order (taxonomy)|order]] Blattodea (Blattaria). About 30 cockroach [[Species|species]] out of 4,600 are associated with human habitats. Some species are well-known [[Pest (organism)|pests]].",
 		sections = {
 			{
 				"Overview",
-				'Modern cockroaches are an ancient group that first appeared during the Late Jurassic. Their ancestors, known as "roachoids", likely originated during the Carboniferous period around 320 million years ago. Those early ancestors, however, lacked the internal ovipositors of modern roaches. Cockroaches are somewhat generalized insects lacking special adaptations (such as the sucking mouthparts of [[Aphid|aphids]] and other [[Hemiptera|true bugs]]); they have chewing mouthparts and are probably among the most primitive of living Neopteran insects. They are common and hardy insects capable of tolerating a wide range of [[Köppen climate classification|climates]], from [[Arctic]] cold to [[Tropics|tropical]] heat. Tropical cockroaches are often much larger than temperate species.',
+				'Modern cockroaches are an ancient group that first appeared during the [[Late Jurassic]]. Their ancestors, known as "roachoids", likely originated during the [[Carboniferous]] period around 320 million years ago. Those early ancestors, however, lacked the internal ovipositors of modern roaches. Cockroaches are somewhat generalized insects lacking special adaptations (such as the sucking mouthparts of [[Aphid|aphids]] and other [[Hemiptera|true bugs]]); they have chewing mouthparts and are probably among the most primitive of living Neopteran insects. They are common and hardy insects capable of tolerating a wide range of [[Köppen climate classification|climates]], from [[Arctic]] cold to [[Tropics|tropical]] heat. Tropical cockroaches are often much larger than temperate species.',
 			},
 		},
-		related = { "Body louse", "Phasmatodea" },
+		related = { "Body louse", "Mantis" },
 		infobox = {
 			{ "Scientific name", "Blattodea" },
 		},
@@ -3596,7 +3822,7 @@ return {
 	{
 		title = "Cod",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐟",
 		source = "wikipedia",
 		description = "Common name for several fish, but mainly the demersal genus Gadus",
@@ -3605,28 +3831,28 @@ return {
 		sections = {
 			{
 				"Overview",
-				"The two most common species of cod are the Atlantic cod (Gadus morhua), which lives in the colder waters and deeper sea regions throughout the North Atlantic, and the Pacific cod (Gadus macrocephalus), which is found in both eastern and western regions of the northern [[Pacific Ocean|Pacific]]. Gadus morhua was named by [[Carl Linnaeus|Linnaeus]] in 1758. (However, G. morhua callarias, a low-salinity, nonmigratory race restricted to parts of the Baltic, was originally described as Gadus callarias by Linnaeus.) Cod as food is popular in several parts of the world. It has a mild flavour and a dense, flaky, white flesh. Cod livers are processed to make cod liver oil, a common source of vitamin A, vitamin D, vitamin E, and omega-3 fatty acids (EPA and DHA). Scrod is young Atlantic cod or [[Haddock|haddock]]. In the United Kingdom, Atlantic cod is one of the most common ingredients in fish and chips, along with [[Haddock|haddock]] and [[Plaice|plaice]].",
+				"The two most common species of cod are the Atlantic cod (Gadus morhua), which lives in the colder waters and deeper sea regions throughout the North Atlantic, and the Pacific cod (Gadus macrocephalus), which is found in both eastern and western regions of the northern [[Pacific Ocean|Pacific]]. Gadus morhua was named by [[Carl Linnaeus|Linnaeus]] in [[10th edition of Systema Naturae|1758]]. (However, G. morhua callarias, a low-salinity, nonmigratory [[Subspecies|race]] restricted to parts of the Baltic, was originally described as Gadus callarias by Linnaeus.) Cod as food is popular in several parts of the world. It has a mild flavour and a dense, flaky, white flesh. Cod livers are processed to make cod liver oil, a common source of vitamin A, vitamin D, vitamin E, and omega-3 fatty acids (EPA and DHA). Scrod is young Atlantic cod or [[Haddock|haddock]]. In the United Kingdom, Atlantic cod is one of the most common ingredients in fish and chips, along with [[Haddock|haddock]] and [[Plaice|plaice]].",
 			},
 		},
-		related = { "Cichlid", "Tilapia" },
+		related = { "Gobioidei", "Perch" },
 	},
 	{
 		title = "Coelacanth",
 		category = "Animal",
-		fame = 3,
+		fame = 2,
 		emoji = "🐟",
 		source = "wikipedia",
 		description = "Class of lobe-finned fishes",
 		tags = { "Vertebrates", "Fishes" },
 		aliases = { "Coelacanths", "Actinistia" },
-		summary = "**Coelacanths** are an ancient group of [[Sarcopterygii|lobe-finned fish]] (Sarcopterygii) in the class **Actinistia**. As sarcopterygians, they are more closely related to [[Lungfish|lungfish]] and [[Tetrapod|tetrapods]] (the terrestrial vertebrates including living [[Amphibian|amphibians]], [[Reptile|reptiles]], [[Bird|birds]] and [[Mammal|mammals]]) than to [[Actinopterygii|ray-finned fish]]. There is only a single living genus, Latimeria, with two described species.",
+		summary = "**Coelacanths** are an ancient group of [[Sarcopterygii|lobe-finned fish]] (Sarcopterygii) in the [[Class (taxonomy)|class]] **Actinistia**. As sarcopterygians, they are more closely related to [[Lungfish|lungfish]] and [[Tetrapod|tetrapods]] (the terrestrial vertebrates including living [[Amphibian|amphibians]], [[Reptile|reptiles]], [[Bird|birds]] and [[Mammal|mammals]]) than to [[Actinopterygii|ray-finned fish]]. There is only a single living genus, Latimeria, with two described species.",
 		sections = {
 			{
 				"Overview",
-				"The name **coelacanth** originates from the [[Permian]] genus Coelacanthus, which was the first scientifically named genus of coelacanths (in 1839), becoming the type genus of **Coelacanthiformes** as other species were discovered and named. Well-represented in freshwater and marine deposits from as early as the Devonian period (more than 410million years ago), they were thought to have become extinct in the Late Cretaceous, around [[Cretaceous–Paleogene extinction event|66million years ago]]. The first living species, Latimeria chalumnae, the West [[Indian Ocean]] coelacanth, was described from specimens [[Fishing|fished]] off the coast of [[South Africa]] from 1938 onward; they are now also known to inhabit the seas around the Comoro Islands off the [[East Africa|east coast of Africa]]. The second species, Latimeria menadoensis, the Indonesian coelacanth, was discovered in the late 1990s, which inhabits the seas of Eastern Indonesia, from Manado to [[Western New Guinea|Papua]].",
+				"The name **coelacanth** originates from the [[Permian]] genus Coelacanthus, which was the first scientifically named genus of coelacanths (in 1839), becoming the [[Type genus|type genus]] of **Coelacanthiformes** as other species were discovered and named. Well-represented in freshwater and marine deposits from as early as the [[Devonian]] period (more than 410[[Million years ago|million years ago]]), they were thought to have become extinct in the [[Late Cretaceous]], around [[Cretaceous–Paleogene extinction event|66million years ago]]. The first living species, Latimeria chalumnae, the West [[Indian Ocean]] coelacanth, was described from specimens [[Fishing|fished]] off the coast of [[South Africa]] from 1938 onward; they are now also known to inhabit the seas around the Comoro Islands off the [[East Africa|east coast of Africa]]. The second species, Latimeria menadoensis, the Indonesian coelacanth, was discovered in the late 1990s, which inhabits the seas of Eastern Indonesia, from Manado to [[Western New Guinea|Papua]].",
 			},
 		},
-		related = { "Osteichthyes", "Chondrichthyes" },
+		related = { "Milkfish" },
 		infobox = {
 			{ "Scientific name", "Actinistia" },
 		},
@@ -3634,23 +3860,40 @@ return {
 	{
 		title = "Columbidae",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "👪",
 		source = "wikipedia",
 		description = "Family of birds",
 		tags = { "Birds", "Columbiformes" },
 		aliases = { "Doves", "Pigeons" },
-		summary = "**Columbidae** is a bird family consisting of **doves** and **pigeons**. It is the only family in the order **Columbiformes**. These are stout-bodied birds with small heads, relatively short necks and slender bills that in some species feature fleshy ceres. They [[Herbivore|feed largely on plant matter]], feeding on seeds (granivory), fruit (frugivory), and foliage (folivory).",
+		summary = "**Columbidae** is a bird [[Family (taxonomy)|family]] consisting of **doves** and **pigeons**. It is the only family in the [[Order (taxonomy)|order]] **Columbiformes**. These are stout-bodied birds with small heads, relatively short necks and slender bills that in some species feature fleshy ceres. They [[Herbivore|feed largely on plant matter]], feeding on seeds (granivory), fruit (frugivory), and foliage (folivory).",
 		sections = {
 			{
 				"Overview",
-				'In colloquial English, the smaller species tend to be called "doves", and the larger ones "pigeons", although the distinction is not consistent, and there is no scientific separation between them. Historically, the common names for these birds involve a great deal of variation. The bird most commonly referred to as "pigeon" is the domestic pigeon, descendant of the wild [[Rock dove|rock dove]], which is a common inhabitant of cities as the feral pigeon. Columbidae contains 52 genera divided into 353 [[Species|species]]. The family occurs worldwide, often in close proximity to humans, but the greatest diversity is in the Indomalayan and Australasian realms. 118 species (34%) are at risk, and 13 are [[Extinction|extinct]], with the most famous examples being the [[Dodo|dodo]], a large, flightless, island bird, and the [[Passenger pigeon|passenger pigeon]], that once flocked in the billions.',
+				'In colloquial English, the smaller species tend to be called "doves", and the larger ones "pigeons", although the distinction is not consistent, and there is no scientific separation between them. Historically, the common names for these birds involve a great deal of variation. The bird most commonly referred to as "pigeon" is the domestic pigeon, descendant of the wild [[Rock dove|rock dove]], which is a common inhabitant of cities as the feral pigeon. Columbidae contains 52 [[Genus|genera]] divided into 353 [[Species|species]]. The family occurs worldwide, often in close proximity to humans, but the greatest diversity is in the Indomalayan and Australasian realms. 118 species (34%) are at risk, and 13 are [[Extinction|extinct]], with the most famous examples being the [[Dodo|dodo]], a large, [[Flightless bird|flightless]], island bird, and the [[Passenger pigeon|passenger pigeon]], that once flocked in the billions.',
 			},
 		},
-		related = { "Honeyguide", "Red-winged blackbird" },
+		related = { "Toucan" },
 		infobox = {
 			{ "Scientific name", "Columbidae" },
 		},
+	},
+	{
+		title = "Commensalism",
+		category = "Animal",
+		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Beneficial symbiosis between species",
+		tags = { "More articles" },
+		summary = "**Commensalism** is a long-term biological interaction ([[Symbiosis|symbiosis]]) in which members of one [[Species|species]] gain benefits while those of the other species neither benefit nor are harmed.",
+		sections = {
+			{
+				"Overview",
+				"The commensal (the species that benefits from the association) may obtain nutrients, shelter, support, or locomotion from the host species, which is substantially unaffected. The commensal relation is often between a larger host and a smaller commensal; the [[Host (biology)|host]] organism is unmodified, whereas the commensal species may show great structural adaptation consistent with its habits, as in the [[Remora|remoras]] that ride attached to sharks and other fishes. Remoras feed on their hosts' fecal matter, while pilot fish feed on the leftovers of their hosts' meals. Numerous birds perch on bodies of large mammal [[Herbivore|herbivores]] or feed on the insects turned up by grazing mammals.",
+			},
+		},
+		related = { "Satyameva Jayate" },
 	},
 	{
 		title = "Common myna",
@@ -3661,14 +3904,14 @@ return {
 		description = "Bird of the family Sturnidae",
 		tags = { "Birds", "Passerida" },
 		aliases = { "Indian myna", "Acridotheres tristis", "Mynah" },
-		summary = "The **common myna** or **Indian myna** (**Acridotheres tristis**), sometimes spelled **mynah**, is a [[Bird|bird]] in the family Sturnidae, native to [[Asia]]. An omnivorous open woodland bird with a strong territorial instinct, the common myna has adapted extremely well to [[Urban area|urban]] environments.",
+		summary = "The **common myna** or **Indian myna** (**Acridotheres tristis**), sometimes spelled **mynah**, is a [[Bird|bird]] in the [[Family (taxonomy)|family]] Sturnidae, native to [[Asia]]. An omnivorous open woodland bird with a strong territorial instinct, the common myna has adapted extremely well to [[Urban area|urban]] environments.",
 		sections = {
 			{
 				"Overview",
 				'The range of the common myna is increasing at such a rapid rate that in 2000 the IUCN Species Survival Commission declared it one of the world\'s most [[Invasive species|invasive species]] and one of only three birds listed among "100 of the World\'s Worst Invasive Species" that pose a threat to biodiversity, agriculture and human interests. In particular, the species poses a serious threat to the [[Ecosystem|ecosystems]] of [[Australia]], where it was named "The Most Important Pest/Problem" in 2008.',
 			},
 		},
-		related = { "Galliformes", "Bird of prey" },
+		related = { "Sunbird", "Finch" },
 		infobox = {
 			{ "Scientific name", "Acridotheres tristis" },
 			{ "Conservation status", "Least Concern" },
@@ -3684,7 +3927,7 @@ return {
 		tags = { "Birds", "Passerida" },
 		aliases = { "Rufous nightingale", "Nightingale", "Luscinia megarhynchos" },
 		summary = "The **common nightingale**, **rufous nightingale** or simply **nightingale** (**Luscinia megarhynchos**), is a small [[Passerine|passerine]] [[Bird|bird]] which is known for its powerful and beautiful song, often described as one of the most beautiful sounds in nature. An [[Old World flycatcher]], it belongs to a group of more terrestrial species, often called chats. Its range partly overlaps with that of the more northerly thrush nightingale (Luscinia luscinia), a closely related species with which hybrids have occurred.",
-		related = { "Galliformes", "Bird of prey" },
+		related = { "Sunbird", "Finch" },
 		infobox = {
 			{ "Scientific name", "Luscinia megarhynchos" },
 			{ "Conservation status", "Least Concern" },
@@ -3699,14 +3942,14 @@ return {
 		description = "Species of flightless bird",
 		tags = { "Birds", "Ratites" },
 		aliases = { "Struthio camelus", "Ostrich" },
-		summary = "The **common ostrich** (**Struthio camelus**), or simply **ostrich**, is a [[Species|species]] of flightless bird native to certain areas of Africa (and historically, Arabia) and is the largest living species of bird. The common ostrich is one of two extant species of ostriches, the only living members of the genus Struthio in the ratite group of birds. The other is the Somali ostrich (Struthio molybdophanes), which has been recognised as a distinct species by BirdLife International since 2014, having been previously considered a distinctive subspecies of ostrich.",
+		summary = "The **common ostrich** (**Struthio camelus**), or simply **ostrich**, is a [[Species|species]] of [[Flightless bird|flightless bird]] native to certain areas of Africa (and historically, Arabia) and is the largest living species of bird. The common ostrich is one of two extant species of ostriches, the only living members of the [[Genus|genus]] Struthio in the [[Ratite|ratite]] group of birds. The other is the Somali ostrich (Struthio molybdophanes), which has been recognised as a distinct species by BirdLife International since 2014, having been previously considered a distinctive subspecies of ostrich.",
 		sections = {
 			{
 				"Overview",
-				"The common ostrich belongs to the order Struthioniformes. Struthioniformes previously contained all the ratites, such as the [[Kiwi (bird)|kiwis]], [[Emu|emus]], [[Rhea (bird)|rheas]], and [[Cassowary|cassowaries]]. However, a recent genetic analysis has found that the group is not monophyletic, as it is paraphyletic with respect to the [[Tinamou|tinamous]], so the ostriches are now classified as the only members of the order. Phylogenetic studies have shown that it is the sister group to all other members of [[Palaeognathae]], and that the flighted tinamous are the sister group to the extinct [[Moa|moa]]. It is distinctive in its appearance, with a long neck and legs, and can run for a long time at a speed of 55 km/h with short bursts up to about 70 km/h, the fastest land speed of any bipedal animal.",
+				"The common ostrich belongs to the [[Order (taxonomy)|order]] Struthioniformes. Struthioniformes previously contained all the ratites, such as the [[Kiwi (bird)|kiwis]], [[Emu|emus]], [[Rhea (bird)|rheas]], and [[Cassowary|cassowaries]]. However, a recent genetic analysis has found that the group is not monophyletic, as it is paraphyletic with respect to the [[Tinamou|tinamous]], so the ostriches are now classified as the only members of the order. [[Phylogenetics|Phylogenetic]] studies have shown that it is the sister group to all other members of [[Palaeognathae]], and that the flighted tinamous are the sister group to the extinct [[Moa|moa]]. It is distinctive in its appearance, with a long neck and legs, and can run for a long time at a speed of 55 km/h with short bursts up to about 70 km/h, the fastest land speed of any bipedal animal.",
 			},
 		},
-		related = { "Ara (bird)", "Hummingbird", "Sunbird" },
+		related = { "Resplendent quetzal" },
 		infobox = {
 			{ "Scientific name", "Struthio camelus" },
 			{ "Conservation status", "Least Concern" },
@@ -3721,11 +3964,11 @@ return {
 		description = "Species of bird",
 		tags = { "Birds", "Galliformes" },
 		aliases = { "Phasianus colchicus", "Ring-necked pheasant", "Blue-headed pheasant" },
-		summary = "The **common pheasant** (**Phasianus colchicus**), **ring-necked pheasant**, or **blue-headed pheasant**, is a bird in the pheasant family (Phasianidae). The genus name comes from [[Latin]] phasianus 'pheasant'. The species name colchicus is [[Latin]] for 'of Colchis' (modern day [[Georgia (country)|Georgia]]), a country on the [[Black Sea]] where pheasants became known to Europeans. Although Phasianus was previously thought to be closely related to the genus Gallus, the genus of junglefowl and domesticated [[Chicken|chickens]], recent studies show that they are in different subfamilies, having diverged over 20 million years ago.",
+		summary = "The **common pheasant** (**Phasianus colchicus**), **ring-necked pheasant**, or **blue-headed pheasant**, is a bird in the pheasant [[Family (taxonomy)|family]] (Phasianidae). The genus name comes from [[Latin]] phasianus 'pheasant'. The species name colchicus is [[Latin]] for 'of Colchis' (modern day [[Georgia (country)|Georgia]]), a country on the [[Black Sea]] where pheasants became known to Europeans. Although Phasianus was previously thought to be closely related to the genus Gallus, the genus of junglefowl and domesticated [[Chicken|chickens]], recent studies show that they are in different subfamilies, having diverged over 20 million years ago.",
 		sections = {
 			{
 				"Overview",
-				"It is native to Asia, where it is widespread, and also to the extreme southeast of Europe in the northern foothills of the Caucasus Mountains. It has been widely introduced elsewhere as a game bird. In parts of its range, mainly in places where none of its relatives occurs such as in Europe, where it is naturalised, it is simply known as the **pheasant**. **Ring-necked pheasant** is both the collective name for a number of subspecies and their intergrades that have white neck rings and the name used for the species as a whole in North America. It is a well-known gamebird, among those of more than regional importance perhaps the most widespread and ancient one in the whole world. The common pheasant is one of the world's most hunted birds; it has been introduced for that purpose to many regions and is also common on game farms, where it is commercially bred.",
+				"It is native to Asia, where it is widespread, and also to the extreme southeast of Europe in the northern foothills of the Caucasus Mountains. It has been widely introduced elsewhere as a game bird. In parts of its range, mainly in places where none of its relatives occurs such as in Europe, where it is naturalised, it is simply known as the **pheasant**. **Ring-necked pheasant** is both the collective name for a number of [[Subspecies|subspecies]] and their intergrades that have white neck rings and the name used for the species as a whole in North America. It is a well-known gamebird, among those of more than regional importance perhaps the most widespread and ancient one in the whole world. The common pheasant is one of the world's most hunted birds; it has been introduced for that purpose to many regions and is also common on game farms, where it is commercially bred.",
 			},
 		},
 		related = { "Galliformes", "Grouse" },
@@ -3765,14 +4008,14 @@ return {
 		description = "Large, black species of passerine bird",
 		tags = { "Birds", "Corvoidea" },
 		aliases = { "Northern raven", "Corvus corax" },
-		summary = "The **common raven** or **northern raven** (**Corvus corax**) is a large all-black [[Passerine|passerine]] bird. It is the most widely distributed of all corvids, found across the Northern Hemisphere. It is one of the two largest corvids, alongside the thick-billed raven, and is the heaviest passerine bird; at maturity, the common raven averages 63 cm in length and 1.47 kg in weight, up to 2 kg in the heaviest individuals. Although their typical lifespan is considerably shorter, common ravens can live more than 23 years in the wild. Young birds may travel in flocks but later mate for life, with each mated pair defending a territory.",
+		summary = "The **common raven** or **northern raven** (**Corvus corax**) is a large all-black [[Passerine|passerine]] bird. It is the most widely distributed of all corvids, found across the [[Northern Hemisphere]]. It is one of the two largest corvids, alongside the thick-billed raven, and is the heaviest passerine bird; at maturity, the common raven averages 63 cm in length and 1.47 kg in weight, up to 2 kg in the heaviest individuals. Although their typical lifespan is considerably shorter, common ravens can live more than 23 years in the wild. Young birds may travel in flocks but later mate for life, with each mated pair defending a [[Territory (animal)|territory]].",
 		sections = {
 			{
 				"Overview",
-				"Common ravens have coexisted with humans for thousands of years and in some areas have been so numerous that people have regarded them as pests. Part of their success as a species is due to their omnivorous diet; they are extremely versatile and opportunistic in finding sources of nutrition, feeding on carrion, insects, cereal grains, berries, fruit, small animals, nesting birds, and food waste. Some notable feats of problem-solving provide evidence that the common raven is unusually intelligent. Over the centuries, the raven has been the subject of mythology, folklore, art, and literature. In many cultures, including the indigenous cultures of [[Norse mythology|Scandinavia]], ancient Ireland and Wales, [[Bhutan]], the northwest coast of North America, and Siberia and northeast Asia, the common raven has been revered as a spiritual figure or godlike creature.",
+				"Common ravens have coexisted with humans for thousands of years and in some areas have been so numerous that people have regarded them as [[Pest (organism)|pests]]. Part of their success as a species is due to their [[Omnivore|omnivorous diet]]; they are extremely versatile and opportunistic in finding sources of nutrition, feeding on [[Carrion|carrion]], insects, cereal grains, berries, fruit, small animals, nesting birds, and food waste. Some notable feats of problem-solving provide evidence that the common raven is unusually intelligent. Over the centuries, the raven has been the subject of mythology, folklore, art, and literature. In many cultures, including the indigenous cultures of [[Norse mythology|Scandinavia]], ancient Ireland and Wales, [[Bhutan]], the northwest coast of North America, and Siberia and northeast Asia, the common raven has been revered as a spiritual figure or godlike creature.",
 			},
 		},
-		related = { "Eurasian magpie", "Lyrebird" },
+		related = { "Eurasian magpie" },
 		infobox = {
 			{ "Scientific name", "Corvus corax" },
 			{ "Conservation status", "Least Concern" },
@@ -3781,20 +4024,20 @@ return {
 	{
 		title = "Common snapping turtle",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐢",
 		source = "wikipedia",
 		description = "Species of turtles",
 		tags = { "Vertebrates", "Reptiles" },
 		aliases = { "Chelydra serpentina" },
-		summary = "The **common snapping turtle** (**Chelydra serpentina**) is a [[Species|species]] of large, freshwater [[Turtle|turtles]] in the family Chelydridae. Its natural range extends from southeastern [[Canada]], southwest to the edge of the [[Rocky Mountains]], as far east as Nova Scotia, and [[Florida]]. The present-day C. serpentina population in the Middle [[Rio Grande]] suggests that the common snapping turtle has been present in this drainage since at least the 17th century and is likely native. The three species of Chelydra and the larger [[Alligator snapping turtle|alligator snapping turtles]] (genus Macrochelys) are the only extant chelydrids, a family now restricted to the Americas.",
+		summary = "The **common snapping turtle** (**Chelydra serpentina**) is a [[Species|species]] of large, freshwater [[Turtle|turtles]] in the [[Family (taxonomy)|family]] Chelydridae. Its natural range extends from southeastern [[Canada]], southwest to the edge of the [[Rocky Mountains]], as far east as [[Nova Scotia]], and [[Florida]]. The present-day C. serpentina population in the Middle [[Rio Grande]] suggests that the common snapping turtle has been present in this drainage since at least the 17th century and is likely native. The three species of Chelydra and the larger [[Alligator snapping turtle|alligator snapping turtles]] (genus Macrochelys) are the only extant chelydrids, a family now restricted to the Americas.",
 		sections = {
 			{
 				"Overview",
 				'The common snapping turtle, as its name implies, is the most widespread. The common snapping turtle is noted for its combative disposition when out of the water, with its powerful, beak-like jaws, and highly mobile head and neck (hence the specific epithet serpentina, meaning "[[Snake|snake]]-like"). In water, it is likely to flee and hide underwater in sediment. Females, and presumably also males, in more northern populations mature later (at 15–20 years) and at a larger size than in more southern populations (about 12 years). Lifespan in the wild is poorly known, but long-term mark-recapture data from Algonquin Park in Ontario, Canada, suggest a maximum age over 100 years.',
 			},
 		},
-		related = { "Lizard", "Caiman" },
+		related = { "Lizard" },
 		infobox = {
 			{ "Scientific name", "Chelydra serpentina" },
 			{ "Conservation status", "Least Concern" },
@@ -3803,20 +4046,20 @@ return {
 	{
 		title = "Common starling",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐦",
 		source = "wikipedia",
 		description = "Species of passerine birds",
 		tags = { "Birds", "Passerida" },
 		aliases = { "Sturnus vulgaris", "European starling" },
-		summary = "The **common starling** (**Sturnus vulgaris**), also known simply as the **starling** in Great Britain and Ireland, and as the **European starling** in North America, is a medium-sized [[Passerine|passerine]] [[Bird|bird]] in the starling family, Sturnidae. It is about 20 cm long and has glossy black plumage with a metallic sheen, which is speckled with white at some times of the year. The legs are pink and the bill is black in winter and yellow in summer; young birds have browner plumage than the adults. Its gift for mimicry has been noted in literature including the Mabinogion and the works of [[Pliny the Elder]] and [[William Shakespeare]].",
+		summary = "The **common starling** (**Sturnus vulgaris**), also known simply as the **starling** in Great Britain and Ireland, and as the **European starling** in North America, is a medium-sized [[Passerine|passerine]] [[Bird|bird]] in the starling family, Sturnidae. It is about 20 cm long and has glossy black [[Plumage|plumage]] with a metallic sheen, which is speckled with white at some times of the year. The legs are pink and the bill is black in winter and yellow in summer; young birds have browner plumage than the adults. Its gift for [[Mimicry|mimicry]] has been noted in literature including the Mabinogion and the works of [[Pliny the Elder]] and [[William Shakespeare]].",
 		sections = {
 			{
 				"Overview",
-				"The common starling has about 12 subspecies breeding in open [[Habitat|habitats]] across its native range in temperate Europe and across the Palearctic to western Mongolia, and it has been introduced as an invasive species to Australia, New Zealand, Canada, the United States, [[Mexico]], [[Argentina]], [[South Africa]] and [[Fiji]]. This bird is resident in western and southern Europe and southwestern Asia, while northeastern populations migrate south and west in the winter within the breeding range and also further south to [[Iberian Peninsula|Iberia]] and North Africa. The common starling builds an untidy nest in a natural or artificial cavity in which four or five glossy, pale blue eggs are laid. These take two weeks to hatch and the young remain in the nest for another three weeks. There are normally one or two breeding attempts each year.",
+				"The common starling has about 12 [[Subspecies|subspecies]] breeding in open [[Habitat|habitats]] across its native range in temperate Europe and across the Palearctic to western Mongolia, and it has been introduced as an invasive species to Australia, New Zealand, Canada, the United States, [[Mexico]], [[Argentina]], [[South Africa]] and [[Fiji]]. This bird is resident in western and southern Europe and southwestern Asia, while northeastern populations [[Bird migration|migrate]] south and west in the winter within the breeding range and also further south to [[Iberian Peninsula|Iberia]] and North Africa. The common starling builds an untidy nest in a natural or artificial cavity in which four or five glossy, pale blue eggs are laid. These take two weeks to hatch and the young remain in the nest for another three weeks. There are normally one or two breeding attempts each year.",
 			},
 		},
-		related = { "Galliformes", "Bird of prey" },
+		related = { "Sunbird", "Finch" },
 		infobox = {
 			{ "Scientific name", "Sturnus vulgaris" },
 			{ "Conservation status", "Least Concern" },
@@ -3834,10 +4077,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Coral reefs occupy less than 1% of the surface area of the world oceans, but provide a home for 25% of all marine fish species. Reef habitats are a sharp contrast to the open water habitats that make up the other 99% of the world oceans. However, loss and degradation of coral reef habitat, increasing pollution, and overfishing including the use of destructive fishing practices, are threatening the survival of the coral reefs and the associated reef fish.",
+				"Coral reefs occupy less than 1% of the surface area of the world oceans, but provide a home for 25% of all marine fish species. Reef habitats are a sharp contrast to the open water habitats that make up the other 99% of the world oceans. However, loss and degradation of coral reef habitat, increasing [[Marine pollution|pollution]], and [[Overfishing|overfishing]] including the use of destructive fishing practices, are threatening the survival of the coral reefs and the associated reef fish.",
 			},
 		},
-		related = { "Osteichthyes", "Chondrichthyes" },
+		related = { "Osteichthyes", "Coelacanth" },
 	},
 	{
 		title = "Coral snake",
@@ -3848,26 +4091,26 @@ return {
 		description = "Large group of elapid snakes",
 		tags = { "Vertebrates", "Reptiles" },
 		aliases = { "Coral snakes" },
-		summary = "**Coral snakes** are a large group of elapid [[Snake|snakes]] that can be divided into two distinct groups, the Old World coral snakes and New World coral snakes. There are 27 [[Species|species]] of Old World coral snakes, in three genera (Calliophis, Hemibungarus, and Sinomicrurus), and 83 recognized species of New World coral snakes, in two genera (Micruroides and Micrurus). Phylogenetic studies suggest that the group originated in the Old World. Meanwhile, snakes of the genus Micruroides have never caused a medically significant bite.",
-		related = { "Lizard", "Caiman" },
+		summary = "**Coral snakes** are a large group of elapid [[Snake|snakes]] that can be divided into two distinct groups, the [[Old World]] coral snakes and [[New World]] coral snakes. There are 27 [[Species|species]] of Old World coral snakes, in three [[Genus|genera]] (Calliophis, Hemibungarus, and Sinomicrurus), and 83 recognized species of New World coral snakes, in two genera (Micruroides and Micrurus). Phylogenetic studies suggest that the group originated in the Old World. Meanwhile, snakes of the genus Micruroides have never caused a medically significant bite.",
+		related = { "Lizard", "Turtle" },
 	},
 	{
 		title = "Cormorant",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "👪",
 		source = "wikipedia",
 		description = "Family of aquatic birds",
 		tags = { "Birds", "Pelecanimorphae" },
 		aliases = { "Phalacrocoracidae", "Cormorants", "Shags" },
-		summary = "**Phalacrocoracidae** is a family of approximately 40 [[Species|species]] of aquatic birds found worldwide and commonly known as **cormorants** and **shags**. Several different classifications of the family have been proposed, but in 2021 the International Ornithologists' Union (IOU) adopted a consensus taxonomy of seven genera.",
+		summary = "**Phalacrocoracidae** is a [[Family (taxonomy)|family]] of approximately 40 [[Species|species]] of aquatic birds found worldwide and commonly known as **cormorants** and **shags**. Several different classifications of the family have been proposed, but in 2021 the International Ornithologists' Union (IOU) adopted a consensus taxonomy of seven [[Genus|genera]].",
 		sections = {
 			{
 				"Overview",
 				'The great cormorant (Phalacrocorax carbo) and the common shag (Gulosus aristotelis) are the only two species of the family commonly encountered in Britain and Ireland. The common names "cormorant" and "shag" have been assigned to different species in the family somewhat haphazardly. Cormorants and shags are medium-to-large birds, with body weight in the range of 0.35–5 kg and wing span of 60–100 cm. The majority of species have dark feathers. The bill is long, thin and hooked. Their feet have webbing between all four toes. All species are fish-eaters, catching the prey by diving from the surface. They are excellent divers, and under water they propel themselves with their feet with help from their wings; some cormorant species have been found to dive as deep as 45 m.',
 			},
 		},
-		related = { "Stork", "Heron" },
+		related = { "Darter", "Pelican", "Sulidae" },
 		infobox = {
 			{ "Scientific name", "Phalacrocoracidae" },
 		},
@@ -3880,14 +4123,14 @@ return {
 		source = "wikipedia",
 		description = "Family of perching birds",
 		tags = { "Birds", "Corvoidea" },
-		summary = "**Corvidae** is a cosmopolitan family of [[Songbird|oscine]] [[Passerine|passerine]] [[Bird|birds]] that contains the crows, ravens, rooks, magpies, jackdaws, jays, treepies, choughs, and nutcrackers. In colloquial terms, the **crow family** is made up of **corvids**; currently 135 species are included. The genus [[Corvus]] containing 47 species makes up over a third of the entire family. The raven is the largest passerine bird.",
+		summary = "**Corvidae** is a [[Cosmopolitan distribution|cosmopolitan]] [[Family (taxonomy)|family]] of [[Songbird|oscine]] [[Passerine|passerine]] [[Bird|birds]] that contains the crows, ravens, rooks, magpies, jackdaws, jays, treepies, choughs, and nutcrackers. In [[Colloquialism|colloquial]] terms, the **crow family** is made up of **corvids**; currently 135 species are included. The genus [[Corvus]] containing 47 species makes up over a third of the entire family. The raven is the largest passerine bird.",
 		sections = {
 			{
 				"Overview",
-				"Corvids display remarkable intelligence for animals of their size, and are among the most intelligent birds thus far studied. Their total brain-to-body mass ratio is equal to that of non-human great apes and cetaceans, and only slightly lower than that of humans. They are medium to large in size, with strong feet and bills, rictal bristles, and a single [[Moulting|moult]] each year. Corvids are found worldwide, except for the southern tip of [[South America]] and the polar ice caps. The majority of the species are found in tropical South and [[Central America]] and in southern Asia, with fewer than ten species each in Africa and Australasia. The genus [[Corvus]] has re-entered Australia in relatively recent geological prehistory, with five species and one subspecies there.",
+				"Corvids display remarkable [[Animal cognition|intelligence]] for animals of their size, and are among the most intelligent birds thus far studied. Their total brain-to-body mass ratio is equal to that of non-human [[Hominidae|great apes]] and [[Cetacean|cetaceans]], and only slightly lower than that of humans. They are medium to large in size, with strong feet and bills, [[Beak|rictal bristles]], and a single [[Moulting|moult]] each year. Corvids are found worldwide, except for the southern tip of [[South America]] and the polar [[Ice cap|ice caps]]. The majority of the species are found in tropical South and [[Central America]] and in southern Asia, with fewer than ten species each in Africa and [[Australasia]]. The genus [[Corvus]] has re-entered Australia in relatively recent geological prehistory, with five species and one subspecies there.",
 			},
 		},
-		related = { "Eurasian magpie", "Honeyeater", "Wren" },
+		related = { "Bird-of-paradise" },
 		infobox = {
 			{ "Scientific name", "Corvidae" },
 		},
@@ -3895,19 +4138,19 @@ return {
 	{
 		title = "Corvus",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐦",
 		source = "wikipedia",
 		description = "Genus of birds including crows, ravens and rooks",
 		tags = { "Birds", "Corvoidea" },
-		summary = '**Corvus** is a widely distributed genus of [[Passerine|passerine]] birds ranging from medium-sized to large-sized in the family [[Corvidae]]. It includes species commonly known as crows, ravens, and rooks. The species commonly encountered in Europe are the carrion crow, hooded crow, [[Common raven|common raven]], and rook; those discovered later were named "crow" or "raven" chiefly on the basis of their size, crows generally being smaller. The genus name is [[Latin]] for "raven".',
+		summary = '**Corvus** is a widely distributed [[Genus|genus]] of [[Passerine|passerine]] birds ranging from medium-sized to large-sized in the family [[Corvidae]]. It includes species commonly known as crows, ravens, and rooks. The species commonly encountered in Europe are the carrion crow, hooded crow, [[Common raven|common raven]], and rook; those discovered later were named "crow" or "raven" chiefly on the basis of their size, crows generally being smaller. The genus name is [[Latin]] for "raven".',
 		sections = {
 			{
 				"Overview",
-				"The 46 or so members of this genus occur on all continents except [[South America]], [[Antarctica]] and several islands. The genus Corvus makes up a third of the species in the family Corvidae. The members appear to have evolved in Asia from the corvid stock, which had evolved in [[Australia]]. In 2002, research found that some crow species are capable of not only tool use, but also tool construction. Crows are now considered to be among the world's most intelligent animals with an encephalization quotient equal to that of many non-human primates.",
+				"The 46 or so members of this genus occur on all continents except [[South America]], [[Antarctica]] and several islands. The genus Corvus makes up a third of the species in the family Corvidae. The members appear to have evolved in Asia from the corvid stock, which had evolved in [[Australia]]. In 2002, research found that some crow species are capable of not only tool use, but also tool construction. Crows are now considered to be among the world's most [[Animal cognition|intelligent]] animals with an encephalization quotient equal to that of many non-human primates.",
 			},
 		},
-		related = { "Bird-of-paradise", "Honeyeater", "Tyto" },
+		related = { "Eurasian magpie" },
 		infobox = {
 			{ "Scientific name", "Corvus" },
 		},
@@ -3915,20 +4158,19 @@ return {
 	{
 		title = "Cougar",
 		category = "Animal",
-		fame = 3,
+		fame = 2,
 		emoji = "🐈",
 		source = "wikipedia",
 		description = "Wild cat species native to the Americas",
 		tags = { "Mammals", "Carnivora" },
 		aliases = { "Puma", "Mountain lion", "Catamount" },
-		summary = "The **cougar**, also called **puma**, **mountain lion**, **catamount**, and **panther**, is a large feline native to the Americas. It inhabits [[North America|North]], [[Central America|Central]] and [[South America]], making it the most widely distributed wild, terrestrial [[Mammal|mammal]] in the Western Hemisphere, and one of the most widespread in the world. Its range spans Yukon, British Columbia and Alberta in Canada, the [[Rocky Mountains]] and areas in the western United States. Further south, its range extends through Mexico to the [[Amazon rainforest]] and the southern [[Andes|Andes Mountains]] in [[Patagonia]]. It is an adaptable generalist species, occurring in most American [[Habitat|habitat]] types.",
+		summary = "The **cougar**, also called **puma**, **mountain lion**, **catamount**, and **panther**, is a large feline native to the Americas. It inhabits [[North America|North]], [[Central America|Central]] and [[South America]], making it the most widely distributed wild, terrestrial [[Mammal|mammal]] in the [[Western Hemisphere]], and one of the most widespread in the world. Its range spans [[Yukon]], [[British Columbia]] and [[Alberta]] in Canada, the [[Rocky Mountains]] and areas in the western United States. Further south, its range extends through Mexico to the [[Amazon rainforest]] and the southern [[Andes|Andes Mountains]] in [[Patagonia]]. It is an adaptable generalist species, occurring in most American [[Habitat|habitat]] types.",
 		sections = {
 			{
 				"Overview",
-				"It prefers habitats with dense underbrush and rocky areas for stalking but also lives in open areas. The cougar is largely solitary. Its activity pattern varies from diurnality and cathemerality to crepuscularity and nocturnality between protected and non-protected areas, and is apparently correlated with the presence of other predators, prey species, livestock and humans. It is an ambush predator that pursues a wide variety of prey. Ungulates, particularly [[Deer|deer]], are its primary prey, but it also hunts [[Rodent|rodents]]. It is territorial and lives at low population densities. Individual home ranges depend on terrain, vegetation and abundance of prey. While large, it is not always the dominant apex predator in its range, yielding prey to other predators. It is reclusive and mostly avoids people. The cougar is listed as Least Concern on the IUCN Red List.",
+				"It prefers habitats with dense underbrush and rocky areas for stalking but also lives in open areas. The cougar is largely solitary. Its activity pattern varies from [[Diurnality|diurnality]] and cathemerality to [[Crepuscular animal|crepuscularity]] and [[Nocturnal animal|nocturnality]] between protected and non-protected areas, and is apparently correlated with the presence of other predators, prey species, livestock and humans. It is an ambush predator that pursues a wide variety of prey. [[Ungulate|Ungulates]], particularly [[Deer|deer]], are its primary prey, but it also hunts [[Rodent|rodents]]. It is [[Territory (animal)|territorial]] and lives at low population densities. Individual home ranges depend on terrain, vegetation and abundance of prey. While large, it is not always the dominant [[Apex predator|apex predator]] in its range, yielding prey to other predators. It is reclusive and mostly avoids people. The cougar is listed as [[Least-concern species|Least Concern]] on the [[IUCN Red List]].",
 			},
 		},
-		related = { "Weasel", "Carnivora" },
 		infobox = {
 			{ "Scientific name", "Puma concolor" },
 			{ "Conservation status", "Least Concern" },
@@ -3947,7 +4189,7 @@ return {
 		sections = {
 			{
 				"Overview",
-				"The coyote is listed as least concern by the International Union for Conservation of Nature, due to its wide distribution and abundance throughout North America. The species is versatile, able to adapt to and expand into environments modified by humans; urban coyotes are common in many cities. The coyote was sighted in eastern [[Panama]] (across the [[Panama Canal]] from their home range) for the first time in 2013. The coyote has 19 recognized subspecies. The average male weighs 8 to 20 kg and the average female 7 to 18 kg. Their fur color is predominantly light gray and red or fulvous interspersed with black and white, though it varies somewhat with geography. It is highly flexible in social organization, living either in a family unit or in loosely knit packs of unrelated individuals.",
+				"The coyote is listed as [[Least-concern species|least concern]] by the [[International Union for Conservation of Nature]], due to its wide distribution and abundance throughout North America. The species is versatile, able to adapt to and expand into environments modified by humans; urban coyotes are common in many cities. The coyote was sighted in eastern [[Panama]] (across the [[Panama Canal]] from their home range) for the first time in 2013. The coyote has 19 recognized [[Subspecies|subspecies]]. The average male weighs 8 to 20 kg and the average female 7 to 18 kg. Their fur color is predominantly light gray and red or fulvous interspersed with black and white, though it varies somewhat with geography. It is highly flexible in social organization, living either in a family unit or in loosely knit packs of unrelated individuals.",
 			},
 		},
 		infobox = {
@@ -3964,14 +4206,14 @@ return {
 		description = "Family of large, long-legged birds",
 		tags = { "Birds", "Gruiformes" },
 		aliases = { "Cranes", "Gruidae" },
-		summary = '**Cranes** are a type of large [[Bird|bird]] with long legs and necks in the biological family **Gruidae** of the order [[Gruiformes]]. The family has 15 species placed in four genera which are Antigone, Balearica, Leucogeranus, and Grus. They are large birds with long necks and legs, a tapering form, and long secondary feathers on the wing that project over the tail. Most species have muted gray or white plumages, marked with black, and red bare patches on the face, but the crowned cranes of the genus Balearica have vibrantly-coloured wings and golden "crowns" of feathers. Cranes fly with their necks extended outwards instead of bent into an S-shape and their long legs outstretched.',
+		summary = '**Cranes** are a type of large [[Bird|bird]] with long legs and necks in the [[Family (taxonomy)|biological family]] **Gruidae** of the [[Order (taxonomy)|order]] [[Gruiformes]]. The family has 15 species placed in four genera which are Antigone, Balearica, Leucogeranus, and Grus. They are large birds with long necks and legs, a tapering form, and long secondary feathers on the wing that project over the tail. Most species have muted gray or white plumages, marked with black, and red bare patches on the face, but the crowned cranes of the genus Balearica have vibrantly-coloured wings and golden "crowns" of feathers. Cranes fly with their necks extended outwards instead of bent into an S-shape and their long legs outstretched.',
 		sections = {
 			{
 				"Overview",
-				"Cranes live on most continents, with the exception of [[Antarctica]] and [[South America]]. Some species and populations of cranes migrate over long distances; others do not migrate at all. Cranes are solitary during the breeding season, occurring in pairs, but during the non-breeding season, most species are gregarious, forming large flocks where their numbers are sufficient. They are opportunistic feeders that change their diets according to the season and their own nutrient requirements. They eat a range of items from small [[Rodent|rodents]], eggs of birds, [[Fish|fish]], [[Amphibian|amphibians]], and [[Insect|insects]] to [[Cereal|grain]] and berries. Cranes construct platform nests in shallow water, and typically lay a clutch of two eggs at a time. Both parents help to rear the young, which remain with them until the next breeding season.",
+				"Cranes live on most continents, with the exception of [[Antarctica]] and [[South America]]. Some species and populations of cranes [[Bird migration|migrate]] over long distances; others do not migrate at all. Cranes are solitary during the breeding season, occurring in pairs, but during the non-breeding season, most species are gregarious, forming large flocks where their numbers are sufficient. They are opportunistic feeders that change their diets according to the season and their own nutrient requirements. They eat a range of items from small [[Rodent|rodents]], eggs of birds, [[Fish|fish]], [[Amphibian|amphibians]], and [[Insect|insects]] to [[Cereal|grain]] and berries. Cranes construct platform nests in shallow water, and typically lay a clutch of two eggs at a time. Both parents help to rear the young, which remain with them until the next breeding season.",
 			},
 		},
-		related = { "Flamingo", "Rail (bird)" },
+		related = { "Eurasian eagle-owl" },
 		infobox = {
 			{ "Scientific name", "Gruidae" },
 		},
@@ -3992,7 +4234,7 @@ return {
 				'The classification of crane flies has been varied in the past, with some or all of these families treated as subfamilies, but the following classification is currently accepted. Species counts are approximate, and vary over time. Superfamily Tipuloidea (typical crane flies) Family Cylindrotomidae (Cylindrotomid or long-bodied crane flies, 67 species) Family Limoniidae (Limoniid crane flies, 10,786 species, possibly paraphyletic) Family Pediciidae (Hairy-eyed crane flies, 498 species) Family Tipulidae (Large crane flies, 4,351 species) In colloquial speech, crane flies are known as **mosquito hawks** or "**skeeter-eaters**", though they do not actually prey on adult mosquitos or other insects. They are also sometimes called "daddy longlegs", a name which is also used for arachnids of the family Pholcidae and the order Opiliones. The [[Larva|larvae]] of crane flies are known commonly as leatherjackets.',
 			},
 		},
-		related = { "Drosophila melanogaster", "Fly" },
+		related = { "Drosophila melanogaster", "Housefly" },
 		infobox = {
 			{ "Scientific name", "Tipuloidea" },
 		},
@@ -4006,14 +4248,30 @@ return {
 		description = "Freshwater crustaceans",
 		tags = { "Arthropods", "Crustaceans" },
 		aliases = { "Crawfish", "Crawdads" },
-		summary = "**Crayfish**, **crawfish**, or **crawdads** are freshwater [[Crustacean|crustaceans]] belonging to the infraorder Astacidea, which also contains [[Lobster|lobsters]]. Taxonomically, they are members of the superfamilies Astacoidea and Parastacoidea. They breathe through feather-like gills. Some species are found in brooks and streams, where fresh water is running, while others thrive in [[Swamp|swamps]], ditches, and paddy fields. Most crayfish cannot tolerate polluted water, although some species, such as Procambarus clarkii, are hardier. Crayfish feed on animals and plants, either living or decomposing, and detritus.",
+		summary = "**Crayfish**, **crawfish**, or **crawdads** are freshwater [[Crustacean|crustaceans]] belonging to the infraorder Astacidea, which also contains [[Lobster|lobsters]]. Taxonomically, they are members of the superfamilies Astacoidea and Parastacoidea. They breathe through feather-like [[Gill|gills]]. Some species are found in brooks and streams, where [[Fresh water|fresh water]] is running, while others thrive in [[Swamp|swamps]], ditches, and paddy fields. Most crayfish cannot tolerate [[Water pollution|polluted water]], although some species, such as Procambarus clarkii, are hardier. Crayfish feed on animals and plants, either living or decomposing, and [[Detritus|detritus]].",
 		sections = { { "Overview", 'The term "crayfish" is applied to saltwater species in some countries.' } },
-		related = { "Brachyura" },
+	},
+	{
+		title = "Crepuscular animal",
+		category = "Animal",
+		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Animal behavior primarily characterized by activity during the twilight",
+		tags = { "More articles" },
+		aliases = { "Crepuscular" },
+		summary = "In [[Zoology|zoology]], a **crepuscular animal** is one that is active primarily during the twilight period: being matutinal (active around dawn), vespertine/vespertinal (active around dusk), or both. This is distinguished from [[Diurnality|diurnal]] and [[Nocturnal animal|nocturnal]] behavior, where an animal is active during the hours of [[Daytime|daytime]] and of [[Night|night]], respectively. Some crepuscular animals may also be active by moonlight or during an overcast day, under lower-light conditions.",
+		sections = {
+			{
+				"Overview",
+				"A number of factors affect the time of day an animal is active. The temperature may be too high at midday or too low at night. Some creatures may adjust their activities depending on local competition.",
+			},
+		},
 	},
 	{
 		title = "Cricket (insect)",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐞",
 		source = "wikipedia",
 		description = "Small insects of the family Gryllidae",
@@ -4023,10 +4281,10 @@ return {
 		sections = {
 			{
 				"Overview",
-				"Crickets have mainly cylindrically shaped bodies, round heads, and long antennae. Behind the head is a smooth, robust pronotum. The abdomen ends in a pair of long cerci; females have a long, cylindrical ovipositor. Diagnostic features include legs with 3-segmented tarsi; as with many Orthoptera, the hind legs have enlarged femora, providing power for jumping. The front wings are adapted as tough, leathery elytra, and some crickets chirp by rubbing parts of these together. The hind wings are membranous and folded when not in use for flight; many species, however, are flightless. The largest members of the family are the bull crickets, Brachytrupes, which are up to 5 cm long. Crickets are distributed all around the world except at latitudes 55° or higher, with the greatest diversity being in the [[Tropics|tropics]].",
+				"Crickets have mainly cylindrically shaped bodies, round heads, and long [[Antenna (zoology)|antennae]]. Behind the head is a smooth, robust pronotum. The abdomen ends in a pair of long cerci; females have a long, cylindrical ovipositor. Diagnostic features include legs with 3-segmented tarsi; as with many Orthoptera, the hind legs have enlarged femora, providing power for jumping. The front wings are adapted as tough, leathery elytra, and some crickets chirp by rubbing parts of these together. The hind wings are membranous and folded when not in use for flight; many species, however, are flightless. The largest members of the family are the bull crickets, Brachytrupes, which are up to 5 cm long. Crickets are distributed all around the world except at latitudes 55° or higher, with the greatest diversity being in the [[Tropics|tropics]].",
 			},
 		},
-		related = { "Drosophila melanogaster", "Scale insect" },
+		related = { "Moth", "Scale insect" },
 	},
 	{
 		title = "Cro-Magnon",
@@ -4037,7 +4295,7 @@ return {
 		description = "Earliest anatomically modern humans in Europe and West Asia",
 		tags = { "Mammals", "Primates" },
 		aliases = { "Cro-Magnons", "European early modern humans", "EEMH" },
-		summary = "**Cro-Magnons** or **European early modern humans** (**EEMH**) were the first surviving expansion of early modern humans (Homo sapiens) found in [[Europe]] and [[Siberia]], continuously occupying the continent possibly from as early as 56,800 years ago. They interacted and interbred with the indigenous [[Neanderthal|Neanderthals]] (H. neanderthalensis) of Europe and Western Asia, who went extinct 35,000 to 40,000 years ago. At the time of this admixture, those Neanderthals already possessed about 6% Homo sapiens ancestry, from admixture with an earlier, extinct sapiens population in Eurasia earlier than 240kya.",
+		summary = "**Cro-Magnons** or **European early modern humans** (**EEMH**) were the first surviving expansion of [[Early modern human|early modern humans]] (Homo sapiens) found in [[Europe]] and [[Siberia]], continuously occupying the continent possibly from as early as 56,800 years ago. They interacted and interbred with the indigenous [[Neanderthal|Neanderthals]] (H. neanderthalensis) of Europe and Western Asia, who went extinct 35,000 to 40,000 years ago. At the time of this admixture, those Neanderthals already possessed about 6% Homo sapiens ancestry, from admixture with an earlier, extinct sapiens population in Eurasia earlier than 240kya.",
 		sections = {
 			{
 				"Overview",
@@ -4054,16 +4312,49 @@ return {
 		description = "Order of reptiles",
 		tags = { "Vertebrates", "Reptiles" },
 		aliases = { "Crocodilia", "Crocodilians" },
-		summary = "**Crocodylia** or **Crocodilia** is an order of semiaquatic, predatory [[Reptile|reptiles]] that are known as **crocodilians**. They appeared 83.5 million years ago in the Late [[Cretaceous]] period (Campanian stage) and are the closest living relatives of [[Bird|birds]], as the two groups are the only known survivors of the Archosauria. Members of the crocodilian total group, the clade Pseudosuchia, appeared about 250 million years ago in the Early Triassic period, and diversified during the [[Mesozoic]] era. The order includes the [[Crocodile|true crocodiles]] (family Crocodylidae), the [[Crocodile|alligators]] and [[Caiman|caimans]] (family Alligatoridae), and the gharial and false gharial (family Gavialidae).",
+		summary = "**Crocodylia** or **Crocodilia** is an [[Order (taxonomy)|order]] of [[Semiaquatic|semiaquatic]], predatory [[Reptile|reptiles]] that are known as **crocodilians**. They appeared 83.5 million years ago in the Late [[Cretaceous]] period (Campanian stage) and are the closest living relatives of [[Bird|birds]], as the two groups are the only known survivors of the [[Archosaur|Archosauria]]. Members of the crocodilian [[Crown group|total group]], the [[Clade|clade]] Pseudosuchia, appeared about 250 million years ago in the Early Triassic period, and diversified during the [[Mesozoic]] era. The order includes the [[Crocodile|true crocodiles]] ([[Family (taxonomy)|family]] Crocodylidae), the [[Crocodile|alligators]] and [[Caiman|caimans]] (family Alligatoridae), and the gharial and false gharial (family Gavialidae).",
 		sections = {
 			{
 				"Overview",
-				'Although the term "crocodiles" is sometimes used to refer to all of these families, the term "crocodilians" is less ambiguous. Extant crocodilians have flat heads with long snouts and tails that are compressed on the sides, with their eyes, ears, and nostrils at the top of the head. Alligators and caimans tend to have broader U-shaped jaws that, when closed, show only the upper teeth, whereas crocodiles usually have narrower V-shaped jaws with both rows of teeth visible when closed. Gharials have extremely slender, elongated jaws. The teeth are conical and peg-like, and the bite is powerful. All crocodilians are good swimmers and can move on land in a "high walk" position, traveling with their legs erect rather than sprawling. Crocodilians have thick skin covered in non-overlapping scales and, like birds, have a four-chambered [[Heart|heart]] and lungs with unidirectional airflow.',
+				'Although the term "crocodiles" is sometimes used to refer to all of these families, the term "crocodilians" is less ambiguous. Extant crocodilians have flat heads with long snouts and tails that are compressed on the sides, with their eyes, ears, and nostrils at the top of the head. Alligators and caimans tend to have broader U-shaped jaws that, when closed, show only the upper teeth, whereas crocodiles usually have narrower V-shaped jaws with both rows of teeth visible when closed. Gharials have extremely slender, elongated jaws. The teeth are conical and peg-like, and the bite is powerful. All crocodilians are good swimmers and can move on land in a "high walk" position, traveling with their legs erect rather than sprawling. Crocodilians have thick skin covered in non-overlapping scales and, like birds, have a four-chambered [[Heart|heart]] and [[Lung|lungs]] with unidirectional airflow.',
 			},
 		},
-		related = { "Lizard" },
+		related = { "Lizard", "Turtle" },
 		infobox = {
 			{ "Scientific name", "Crocodilia" },
+		},
+	},
+	{
+		title = "Crossbreed",
+		category = "Animal",
+		fame = 2,
+		emoji = "🐾",
+		source = "wikipedia",
+		description = "Animal with parents of differing breeds",
+		tags = { "More articles" },
+		summary = 'A **crossbreed** is an organism with purebred parents of two different breeds, varieties, or populations. A domestic animal of unknown ancestry, where the breed status of only one parent or grandparent is known, may also be called a crossbreed though the term "mixed breed" is technically more accurate. Outcrossing is a type of crossbreeding used within a purebred breed to increase the genetic diversity within the breed, particularly when there is a need to avoid inbreeding.',
+		sections = {
+			{
+				"Overview",
+				"In animal breeding, crossbreeds are crosses within a single species, while [[Hybrid (biology)|hybrids]] are crosses between different species. In plant breeding terminology, the term crossbreed is uncommon, and no universal term is used to distinguish hybridization or crossing within a population from those between populations, or even those between species. Crossbreeding is the process of breeding such an organism. It can be beneficially used to maintain health and viability of organisms. However, irresponsible crossbreeding can also produce organisms of inferior quality or dilute a purebred gene pool to the point of [[Extinction|extinction]] of a given [[Breed|breed]] of organism.",
+			},
+		},
+	},
+	{
+		title = "Crown group",
+		category = "Animal",
+		fame = 2,
+		emoji = "👑",
+		source = "wikipedia",
+		description = "Monophyletic closure of a set of living species",
+		tags = { "More articles" },
+		aliases = { "Crown clade", "Crown assemblage" },
+		summary = "In [[Phylogenetics|phylogenetics]], the **crown group**, **crown clade**, or **crown assemblage** is a collection of [[Species|species]] composed of the living representatives of the collection, the most recent common ancestor of the collection, and all descendants of the most recent common ancestor. It is thus a way of defining a [[Clade|clade]], a group consisting of a species and all its [[Neontology|extant]] or [[Extinction|extinct]] descendants. For example, Aves (birds) can be defined as a crown group, which includes the most recent common ancestor of all modern birds, and all of its extant or extinct descendants.",
+		sections = {
+			{
+				"Overview",
+				'The concept was developed by Willi Hennig, the formulator of [[Cladistics|phylogenetic systematics]], as a way of classifying living organisms relative to their extinct relatives in his "Die Stammesgeschichte der Insekten", and the "crown" and "stem" group terminology was coined by R. P. S. Jefferies in 1979. Though formulated in the 1970s, the term was not commonly used until its reintroduction in 2000 by Graham Budd and Sören Jensen.',
+			},
 		},
 	},
 	{
@@ -4075,14 +4366,13 @@ return {
 		description = "Subphylum of arthropods",
 		tags = { "Arthropods", "Crustaceans" },
 		aliases = { "Crustaceans", "Crustacea" },
-		summary = "**Crustaceans** are mandibulate [[Arthropod|arthropods]] that are traditionally a part of the paraphyletic subphylum **Crustacea**. Crustaceans are mainly aquatic, including [[Decapod|decapods]] ([[Shrimp|shrimps]], prawns, crabs, [[Lobster|lobsters]], and [[Crayfish|crayfish]]), seed shrimps, branchiopods, fish lice, [[Krill|krill]], remipedes, isopods, barnacles, copepods, opossum shrimps, amphipods and mantis shrimp. It is now well accepted that [[Hexapoda|hexapods]] ([[Insect|insects]] and entognathans) are cladistically crustaceans, with the two groups now combined in the monophyletic clade Pancrustacea. The three classes Cephalocarida, Branchiopoda, and Remipedia are more closely related to the [[Hexapoda|hexapods]] than they are to any other crustaceans (oligostracans and multicrustaceans).",
+		summary = "**Crustaceans** are mandibulate [[Arthropod|arthropods]] that are traditionally a part of the [[Paraphyly|paraphyletic]] [[Subphylum|subphylum]] **Crustacea**. Crustaceans are mainly [[Aquatic animal|aquatic]], including [[Decapod|decapods]] ([[Shrimp|shrimps]], prawns, [[Crab|crabs]], [[Lobster|lobsters]], and [[Crayfish|crayfish]]), seed shrimps, branchiopods, fish lice, [[Krill|krill]], remipedes, isopods, barnacles, copepods, opossum shrimps, amphipods and mantis shrimp. It is now well accepted that [[Hexapoda|hexapods]] ([[Insect|insects]] and entognathans) are cladistically crustaceans, with the two groups now combined in the [[Monophyly|monophyletic]] clade Pancrustacea. The three classes Cephalocarida, Branchiopoda, and Remipedia are more closely related to the [[Hexapoda|hexapods]] than they are to any other crustaceans (oligostracans and multicrustaceans).",
 		sections = {
 			{
 				"Overview",
-				"The 67,000 described species range in size from Stygotantulus stocki at 0.1 mm, to the Japanese spider crab with a leg span of up to 3.8 m and a mass of 20 kg. Like other [[Arthropod|arthropods]], crustaceans have an exoskeleton, which they moult to grow. They are distinguished from other groups of [[Arthropod|arthropods]], such as [[Insect|insects]], [[Myriapoda|myriapods]] and [[Chelicerata|chelicerates]], by the possession of biramous (two-parted) limbs, and by their larval forms, such as the nauplius stage of branchiopods and copepods. The group has an extensive fossil record, reaching back to the [[Cambrian]]. More than 7.9 million tons of crustaceans per year are harvested by fishery or farming for [[Human|human]] consumption, consisting mostly of shrimp and prawns. [[Krill]] and copepods are not as widely fished, but may be the animals with the greatest biomass on the planet, and form a vital part of the food chain.",
+				"The 67,000 described species range in size from Stygotantulus stocki at 0.1 mm, to the Japanese spider crab with a leg span of up to 3.8 m and a mass of 20 kg. Like other [[Arthropod|arthropods]], crustaceans have an [[Exoskeleton|exoskeleton]], which they moult to grow. They are distinguished from other groups of [[Arthropod|arthropods]], such as [[Insect|insects]], [[Myriapoda|myriapods]] and [[Chelicerata|chelicerates]], by the possession of biramous (two-parted) limbs, and by their larval forms, such as the nauplius stage of branchiopods and copepods. The group has an extensive [[Fossil|fossil record]], reaching back to the [[Cambrian]]. More than 7.9 million tons of crustaceans per year are harvested by fishery or farming for [[Human|human]] consumption, consisting mostly of shrimp and prawns. [[Krill]] and copepods are not as widely fished, but may be the animals with the greatest [[Biomass (ecology)|biomass]] on the planet, and form a vital part of the food chain.",
 			},
 		},
-		related = { "Trilobite" },
 	},
 	{
 		title = "Cuckoo",
@@ -4093,14 +4383,14 @@ return {
 		description = "Family of birds",
 		tags = { "Birds", "Cuculiformes" },
 		aliases = { "Cuckoos", "Roadrunners", "Cuculidae" },
-		summary = "**Cuckoos** and **Roadrunners** are [[Bird|birds]] in the family **Cuculidae**, the sole taxon in the order **Cuculiformes**. The cuckoo family includes the common cuckoo, roadrunners, koels, malkohas, couas, coucals, and anis. The coucals and anis are sometimes separated as distinct families, the Centropodidae and Crotophagidae, respectively. The cuckoo order Cuculiformes is one of three that make up the Otidimorphae, the other two being the [[Turaco|turacos]] and the [[Bustard|bustards]]. The family Cuculidae contains 150 species, which are divided into 33 genera.",
+		summary = "**Cuckoos** and **Roadrunners** are [[Bird|birds]] in the family **Cuculidae**, the sole [[Taxon|taxon]] in the order **Cuculiformes**. The cuckoo family includes the common cuckoo, roadrunners, koels, malkohas, couas, coucals, and anis. The coucals and anis are sometimes separated as distinct families, the Centropodidae and Crotophagidae, respectively. The cuckoo order Cuculiformes is one of three that make up the Otidimorphae, the other two being the [[Turaco|turacos]] and the [[Bustard|bustards]]. The family Cuculidae contains 150 species, which are divided into 33 genera.",
 		sections = {
 			{
 				"Overview",
-				"The cuckoos are generally medium-sized, slender birds. Most species live in trees, though a sizeable minority are ground-dwelling. The family has a cosmopolitan distribution; the majority of species are tropical. Some species are migratory, including all those breeding in cooler temperate climates. The cuckoos feed on insects, insect larvae, and a variety of other animals, as well as fruit. However, most species raise their own young. Cuckoos have played a role in human culture for thousands of years, appearing in [[Greek mythology]] as sacred to the goddess [[Hera]]. In Europe, the cuckoo is associated with spring, and with cuckoldry, for example in [[William Shakespeare|Shakespeare]]'s Love's Labour's Lost. In India, cuckoos are sacred to Kamadeva, the god of desire and longing, whereas in Japan, the cuckoo symbolises unrequited love.",
+				"The cuckoos are generally medium-sized, slender birds. Most species live in trees, though a sizeable minority are ground-dwelling. The family has a [[Cosmopolitan distribution|cosmopolitan distribution]]; the majority of species are tropical. Some species are [[Bird migration|migratory]], including all those breeding in cooler temperate climates. The cuckoos feed on insects, insect larvae, and a variety of other animals, as well as fruit. However, most species raise their own young. Cuckoos have played a role in human culture for thousands of years, appearing in [[Greek mythology]] as sacred to the goddess [[Hera]]. In Europe, the cuckoo is associated with spring, and with cuckoldry, for example in [[William Shakespeare|Shakespeare]]'s Love's Labour's Lost. In India, cuckoos are sacred to Kamadeva, the god of desire and longing, whereas in Japan, the cuckoo symbolises unrequited love.",
 			},
 		},
-		related = { "Albatross", "House sparrow", "Starling" },
+		related = { "Eurasian eagle-owl" },
 		infobox = {
 			{ "Scientific name", "Cuculidae" },
 		},
@@ -4108,20 +4398,20 @@ return {
 	{
 		title = "Cypriniformes",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐟",
 		source = "wikipedia",
 		description = "Order of fishes",
 		tags = { "Fishes", "Cypriniformes" },
 		aliases = { "Cypriniform" },
-		summary = '**Cypriniformes** is an order of [[Actinopterygii|ray-finned fish]] which contains many sister families and genera of **cypriniform** fish split into several suborders, including the barbs, loaches, botias, carps, danionins, and minnows, amongst others. Cypriniformes is an "order-within-an-order", placed under the superorder Ostariophysi—which is also made up of cyprinid, **ostariophysin** fishes. The order contains 11–12 families (with some authorities having listed as many as 23), over 400 genera, and more than 4,250 named [[Species|species]]; new species are regularly described, and new genera are recognized frequently.',
+		summary = '**Cypriniformes** is an [[Order (taxonomy)|order]] of [[Actinopterygii|ray-finned fish]] which contains many [[Sister group|sister]] [[Family (taxonomy)|families]] and [[Genus|genera]] of **cypriniform** fish split into several [[Order (taxonomy)|suborders]], including the barbs, loaches, botias, carps, danionins, and minnows, amongst others. Cypriniformes is an "order-within-an-order", placed under the superorder Ostariophysi—which is also made up of cyprinid, **ostariophysin** fishes. The order contains 11–12 families (with some authorities having listed as many as 23), over 400 genera, and more than 4,250 named [[Species|species]]; new species are regularly described, and new genera are recognized frequently.',
 		sections = {
 			{
 				"Overview",
 				"Cyprinids are most diverse in [[South Asia|South]] and [[Southeast Asia]] and are entirely absent from [[Australia]] and [[South America]]. At 112 years old, the longest-lived cypriniform fish documented is the bigmouth buffalo. Their closest living relatives are the [[Characiformes]] (characins, tetras and their kin), the Gymnotiformes ([[Electric eel|electric eel]] and American knifefishes), and the [[Catfish|Siluriformes]] ([[Catfish|catfishes]]).",
 			},
 		},
-		related = { "Tiger shark", "Salmon" },
+		related = { "Salmon", "Salmonidae" },
 		infobox = {
 			{ "Scientific name", "Cypriniformes" },
 		},
@@ -4134,14 +4424,14 @@ return {
 		source = "wikipedia",
 		description = "Order of fishes",
 		tags = { "Fishes", "Acanthomorpha" },
-		summary = "**Cyprinodontiformes** is an order of [[Actinopterygii|ray-finned fish]], comprising mostly small, freshwater fish. Many popular aquarium fish, such as killifish and live-bearers, are included. They are closely related to the Atheriniformes and are occasionally included with them. A colloquial term for the order as a whole is **toothcarps**, though they are not actually close relatives of the true carps – the latter belong to the superorder Ostariophysi, while the toothcarps are Acanthopterygii.",
+		summary = "**Cyprinodontiformes** is an [[Order (taxonomy)|order]] of [[Actinopterygii|ray-finned fish]], comprising mostly small, freshwater fish. Many popular aquarium fish, such as killifish and live-bearers, are included. They are closely related to the Atheriniformes and are occasionally included with them. A colloquial term for the order as a whole is **toothcarps**, though they are not actually close relatives of the true carps – the latter belong to the superorder Ostariophysi, while the toothcarps are Acanthopterygii.",
 		sections = {
 			{
 				"Overview",
-				"The families of Cyprinodontiformes can be informally divided into three groups based on reproductive strategy: viviparous and ovoviviparous (all species give live birth), and oviparous (all species are egg-laying). The live-bearing groups differ in whether the young are carried to term within (ovoviviparous) or without (viviparous) an enclosing eggshell. Phylogenetically however, one of the two suborders – the Aplocheiloidei – contains oviparous species exclusively, as do two of the four superfamilies of the other suborder (the Cyprinodontoidea and Valencioidea of the Cyprinodontoidei). Vivipary and ovovivipary have [[Evolution|evolved]] independently from oviparous ancestors, the latter possibly twice. The oldest fossil record of the group is the extinct?Cyprinodon primulus, a nomen vanum known from isolated fossil scales from the Late Paleocene of Argentina.",
+				"The families of Cyprinodontiformes can be informally divided into three groups based on reproductive strategy: viviparous and ovoviviparous (all species give live birth), and oviparous (all species are egg-laying). The live-bearing groups differ in whether the young are carried to term within (ovoviviparous) or without (viviparous) an enclosing eggshell. [[Phylogenetic tree|Phylogenetically]] however, one of the two suborders – the Aplocheiloidei – contains oviparous species exclusively, as do two of the four superfamilies of the other suborder (the Cyprinodontoidea and Valencioidea of the Cyprinodontoidei). Vivipary and ovovivipary have [[Evolution|evolved]] independently from oviparous ancestors, the latter possibly twice. The oldest fossil record of the group is the extinct?Cyprinodon primulus, a nomen vanum known from isolated fossil scales from the Late Paleocene of Argentina.",
 			},
 		},
-		related = { "Cichlid", "Tilapia" },
+		related = { "Cichlid", "Ocean sunfish" },
 		infobox = {
 			{ "Scientific name", "Cyprinodontiformes" },
 		},
@@ -4155,14 +4445,14 @@ return {
 		description = "Suborder of insects",
 		tags = { "Insects and other hexapods", "Odonata" },
 		aliases = { "Damselflies", "Zygoptera" },
-		summary = "**Damselflies** are flying insects of the suborder **Zygoptera** in the order [[Odonata]]. They are similar to dragonflies (which constitute the other odonatan suborder, Epiprocta) but are usually smaller and have slimmer bodies. Most species fold the wings along the body when at rest, unlike dragonflies which hold the wings flat and away from the body. Damselflies have existed since the Late Jurassic, and are found on every continent except [[Antarctica]].",
+		summary = "**Damselflies** are flying insects of the suborder **Zygoptera** in the order [[Odonata]]. They are similar to dragonflies (which constitute the other odonatan suborder, Epiprocta) but are usually smaller and have slimmer bodies. Most species fold the wings along the body when at rest, unlike dragonflies which hold the wings flat and away from the body. Damselflies have existed since the [[Late Jurassic]], and are found on every continent except [[Antarctica]].",
 		sections = {
 			{
 				"Overview",
-				"All damselflies are predatory insects: both [[Nymph (biology)|nymphs]] and adults actively hunt and eat other insects. The nymphs are aquatic, with different species living in a variety of freshwater habitats including acidic [[Bog|bogs]], [[Pond|ponds]], [[Lake|lakes]] and [[River|rivers]]. The nymphs moult repeatedly, at the last moult climbing out of the water to undergo [[Metamorphosis|metamorphosis]]. The skin splits down the back, they emerge and inflate their wings and abdomen to gain their adult form. Their presence on a body of water indicates that it is relatively unpolluted, but their dependence on freshwater makes them vulnerable to damage to their [[Wetland|wetland]] habitats. Some species of damselfly have elaborate courtship behaviours. Like dragonflies, they reproduce using indirect insemination and delayed fertilisation.",
+				"All damselflies are predatory insects: both [[Nymph (biology)|nymphs]] and adults actively hunt and eat other insects. The nymphs are aquatic, with different species living in a variety of [[Freshwater ecosystem|freshwater habitats]] including acidic [[Bog|bogs]], [[Pond|ponds]], [[Lake|lakes]] and [[River|rivers]]. The nymphs moult repeatedly, at the last moult climbing out of the water to undergo [[Metamorphosis|metamorphosis]]. The skin splits down the back, they emerge and inflate their wings and abdomen to gain their adult form. Their presence on a body of water indicates that it is relatively unpolluted, but their dependence on freshwater makes them vulnerable to damage to their [[Wetland|wetland]] habitats. Some species of damselfly have elaborate [[Mating|courtship]] behaviours. Like dragonflies, they reproduce using indirect insemination and delayed [[Fertilisation|fertilisation]].",
 			},
 		},
-		related = { "Drosophila melanogaster", "Scale insect" },
+		related = { "Dragonfly" },
 		infobox = {
 			{ "Scientific name", "Zygoptera" },
 		},
@@ -4170,17 +4460,17 @@ return {
 	{
 		title = "Darter",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "👪",
 		source = "wikipedia",
 		description = "Family of birds",
 		tags = { "Birds", "Pelecanimorphae" },
 		aliases = { "Darters", "Anhingas", "Snakebirds" },
-		summary = 'The **darters**, **anhingas**, or **snakebirds** are mainly tropical waterbirds in the family **Anhingidae**, which contains a single genus, **Anhinga**. There are four living [[Species|species]] found in the Americas, Africa, Asia and Australasia. The term snakebird is usually used without any additions to signify whichever of the completely allopatric species occurs in any one region. It refers to their long thin neck, which has a snake-like appearance when they swim with their bodies submerged, or when mated pairs twist it during their bonding displays. "Darter" is used with a geographical term when referring to particular species.',
+		summary = 'The **darters**, **anhingas**, or **snakebirds** are mainly [[Tropics|tropical]] waterbirds in the [[Family (taxonomy)|family]] **Anhingidae**, which contains a single genus, **Anhinga**. There are four living [[Species|species]] found in the Americas, Africa, Asia and Australasia. The term snakebird is usually used without any additions to signify whichever of the completely allopatric species occurs in any one region. It refers to their long thin neck, which has a snake-like appearance when they swim with their bodies submerged, or when mated pairs twist it during their bonding displays. "Darter" is used with a geographical term when referring to particular species.',
 		sections = {
 			{
 				"Overview",
-				"It alludes to their manner of procuring food, as they impale [[Fish|fishes]] with their thin, pointed beak. The American darter (A. anhinga) is more commonly known as the anhinga. It is sometimes called water turkey in the Southern United States; though the anhinga is quite unrelated to the wild turkey, they are both large, blackish birds with long, fanlike, pale-tipped dark tails.",
+				"It alludes to their manner of procuring food, as they impale [[Fish|fishes]] with their thin, pointed [[Beak|beak]]. The American darter (A. anhinga) is more commonly known as the anhinga. It is sometimes called water turkey in the Southern United States; though the anhinga is quite unrelated to the wild turkey, they are both large, blackish birds with long, fanlike, pale-tipped dark tails.",
 			},
 		},
 		related = { "Stork", "Heron" },
@@ -4196,7 +4486,7 @@ return {
 		source = "wikipedia",
 		description = "Taxon of carnivorous marsupials",
 		tags = { "Mammals", "Marsupials" },
-		summary = "**Dasyuromorphia** is an order comprising most of the Australian carnivorous [[Marsupial|marsupials]]. The order contains four families: Myrmecobiidae, with just a single living species, the numbat (Myrmecobius fasciatus); Thylacinidae, with one recently extinct species, the thylacine (Thylacinus cynocephalus) and several fossil species; Dasyuridae, with 73 extant species, including quolls, dunnarts, and the [[Tasmanian devil]]; and the extinct fossil family Malleodectidae with one genus.",
+		summary = "**Dasyuromorphia** is an [[Order (taxonomy)|order]] comprising most of the Australian [[Carnivore|carnivorous]] [[Marsupial|marsupials]]. The order contains four families: Myrmecobiidae, with just a single living species, the numbat (Myrmecobius fasciatus); Thylacinidae, with one recently extinct species, the thylacine (Thylacinus cynocephalus) and several fossil species; Dasyuridae, with 73 extant species, including quolls, dunnarts, and the [[Tasmanian devil]]; and the extinct fossil family Malleodectidae with one genus.",
 		related = { "Opossum" },
 		infobox = {
 			{ "Scientific name", "Dasyuromorphia" },
@@ -4211,8 +4501,8 @@ return {
 		description = "Order of crustaceans",
 		tags = { "Arthropods", "Crustaceans" },
 		aliases = { "Decapoda" },
-		summary = "A **decapod** is a [[Crustacean|crustacean]] in the large order of **Decapoda** within the class [[Malacostraca]], including crabs, [[Lobster|lobsters]], [[Crayfish|crayfish]], shrimp, and prawns. Most decapods are [[Scavenger|scavengers]]. The order is estimated to contain nearly 15,000 extant species in around 2,700 genera, with around 3,300 fossil species. Nearly half of these species are crabs, with the shrimp (about 3,000 species) and Anomura including hermit crabs, king crabs, porcelain crabs, squat lobsters (about 2500 species) making up the bulk of the remainder. The earliest fossils of the group date to the Devonian.",
-		related = { "Brachyura" },
+		summary = "A **decapod** is a [[Crustacean|crustacean]] in the large [[Order (taxonomy)|order]] of **Decapoda** within the class [[Malacostraca]], including [[Crab|crabs]], [[Lobster|lobsters]], [[Crayfish|crayfish]], shrimp, and prawns. Most decapods are [[Scavenger|scavengers]]. The order is estimated to contain nearly 15,000 extant species in around 2,700 genera, with around 3,300 fossil species. Nearly half of these species are crabs, with the shrimp (about 3,000 species) and Anomura including hermit crabs, king crabs, porcelain crabs, squat lobsters (about 2500 species) making up the bulk of the remainder. The earliest fossils of the group date to the [[Devonian]].",
+		related = { "Trilobite" },
 		infobox = {
 			{ "Scientific name", "Decapoda" },
 		},
@@ -4220,19 +4510,19 @@ return {
 	{
 		title = "Deep-sea fish",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🐟",
 		source = "wikipedia",
 		description = "Fauna found in deep-sea areas",
 		tags = { "Vertebrates", "Fishes" },
-		summary = "**Deep-sea fish** are fish that live in the darkness below the sunlit surface waters, that is below the epipelagic or photic zone of the [[Ocean|sea]]. The lanternfish is, by far, the most common deep-sea fish. Other deep-sea fishes include the flashlight fish, cookiecutter shark, bristlemouths, [[Anglerfish|anglerfish]], viperfish, and some species of eelpout.",
+		summary = "**Deep-sea fish** are fish that live in the darkness below the sunlit surface waters, that is below the epipelagic or photic zone of the [[Ocean|sea]]. The lanternfish is, by far, the most common deep-sea fish. Other [[Deep sea|deep-sea]] fishes include the flashlight fish, cookiecutter shark, bristlemouths, [[Anglerfish|anglerfish]], viperfish, and some species of eelpout.",
 		sections = {
 			{
 				"Overview",
-				"Only about 2% of known marine species inhabit the pelagic environment. This means that they live in the water column as opposed to the benthic organisms that live in or on the sea floor. Deep-sea organisms generally inhabit bathypelagic (1–4 km deep) and abyssopelagic (4–6 km deep) zones. However, characteristics of deep-sea organisms, such as bioluminescence can be seen in the mesopelagic (200–1,000 m deep) zone as well. The mesopelagic zone is the disphotic zone, meaning light there is minimal but still measurable. The oxygen minimum layer exists somewhere between a depth of 700 and 1,000 m depending on the place in the ocean. This area is also where nutrients are most abundant. The bathypelagic and abyssopelagic zones are aphotic, meaning that no light penetrates this area of the ocean. These zones make up about 75% of the inhabitable ocean space.",
+				"Only about 2% of known marine species inhabit the [[Pelagic zone|pelagic]] environment. This means that they live in the water column as opposed to the benthic organisms that live in or on the sea floor. Deep-sea organisms generally inhabit bathypelagic (1–4 km deep) and abyssopelagic (4–6 km deep) zones. However, characteristics of deep-sea organisms, such as bioluminescence can be seen in the mesopelagic (200–1,000 m deep) zone as well. The mesopelagic zone is the disphotic zone, meaning light there is minimal but still measurable. The oxygen minimum layer exists somewhere between a depth of 700 and 1,000 m depending on the place in the ocean. This area is also where nutrients are most abundant. The bathypelagic and abyssopelagic zones are aphotic, meaning that no light penetrates this area of the ocean. These zones make up about 75% of the inhabitable ocean space.",
 			},
 		},
-		related = { "Osteichthyes", "Chondrichthyes" },
+		related = { "Arapaima", "Stickleback" },
 	},
 	{
 		title = "Deer",
@@ -4249,6 +4539,7 @@ return {
 				"The musk deer (Moschidae) of Asia and chevrotains (Tragulidae) of tropical African and Asian forests are separate families that are also in the ruminant clade Ruminantia; they are not especially closely related to Cervidae. Deer appear in art from [[Paleolithic]] cave paintings onwards, and they have played a role in mythology, religion, and literature throughout history, as well as in [[Heraldry|heraldry]], such as red deer that appear in the coat of arms of Åland. Their economic importance includes the use of their meat as venison, their skins as soft, strong buckskin, and their antlers as handles for knives. Deer hunting has been a popular activity since the Middle Ages and remains a resource for many families today.",
 			},
 		},
+		related = { "Muskox" },
 		infobox = {
 			{ "Scientific name", "Cervidae" },
 		},
@@ -4256,13 +4547,13 @@ return {
 	{
 		title = "Denisovan",
 		category = "Animal",
-		fame = 2,
+		fame = 3,
 		emoji = "🧍",
 		source = "wikipedia",
 		description = "Archaic human species from Asia",
 		tags = { "Mammals", "Primates" },
 		aliases = { "Denisovans", "Denisova hominins" },
-		summary = "The **Denisovans** or **Denisova hominins** are an extinct [[Species|species]] or subspecies of archaic human that ranged across Asia during the Middle to Late Pleistocene, approximately 200,000–32,000 years ago. Most of what is known about Denisovans comes from [[DNA]] evidence. While many recent fossils have been found and tentatively identified as Denisovan, the first Denisovans discovered were known from few physical remains. Consequently, no formal species name has been established. However, an analysis of the mitochondrial DNA and endogenous proteins from the Harbin cranium, which had been given the name **Homo longi**, showed that this skull represents a Denisovan.",
+		summary = "The **Denisovans** or **Denisova hominins** are an [[Extinction|extinct]] [[Species|species]] or [[Subspecies|subspecies]] of archaic human that ranged across Asia during the [[Middle Pleistocene|Middle]] to [[Late Pleistocene]], approximately 200,000–32,000 years ago. Most of what is known about Denisovans comes from [[DNA]] evidence. While many recent fossils have been found and tentatively identified as Denisovan, the first Denisovans discovered were known from few physical remains. Consequently, no formal species name has been established. However, an analysis of the [[Mitochondrial DNA|mitochondrial DNA]] and endogenous proteins from the Harbin cranium, which had been given the name **Homo longi**, showed that this skull represents a Denisovan.",
 		sections = {
 			{
 				"Overview",
@@ -4274,495 +4565,18 @@ return {
 		},
 	},
 	{
-		title = "Dimetrodon",
-		category = "Animal",
-		fame = 3,
-		emoji = "🐾",
-		source = "wikipedia",
-		description = "Genus of carnivorous synapsids from the Permian",
-		tags = { "Reptiles", "Dinosaurs and prehistoric reptiles" },
-		summary = "**Dimetrodon** is an extinct genus of sphenacodontid synapsid that lived during the Cisuralian to early Guadalupian epoch of the [[Permian]] period, around 294.1–271 million years ago. With most species measuring 1.7–4.6 m long and weighing 28–250 kg, the most prominent feature of Dimetrodon is the large neural spine sail on its back formed by elongated spines extending from the vertebrae. It was an obligate quadruped (it could walk only on four legs) and had a tall, curved skull with large teeth of different sizes set along the jaws. Most fossils have been found in the Southwestern United States, the majority of these coming from a geological deposit called the Red Beds of Texas and Oklahoma.",
-		sections = {
-			{
-				"Overview",
-				"More recently, its fossils have also been found in [[Germany]] and over a dozen species have been named since the genus was first erected in 1878. Dimetrodon is often mistaken for a [[Dinosaur|dinosaur]] or portrayed as a contemporary of dinosaurs in [[Popular culture|popular culture]], but it became extinct by the middle [[Permian]], some 40 million years before the appearance of dinosaurs. Although [[Reptile|reptile]]-like in appearance and physiology, Dimetrodon is much more closely related to [[Mammal|mammals]], as it belongs to the closest sister family to therapsids, the latter of which contains the direct ancestor of mammals.",
-			},
-		},
-		related = { "Theropoda", "Sauropoda" },
-		infobox = {
-			{ "Scientific name", "Dimetrodon" },
-		},
-	},
-	{
-		title = "Dingo",
-		category = "Animal",
-		fame = 3,
-		emoji = "🐾",
-		source = "wikipedia",
-		description = "Canid species native to Australia",
-		tags = { "Mammals", "Carnivora" },
-		summary = "The **dingo** is a lineage of [[Dog|dog]] found in [[Australia]]. It is a medium-sized canine that possesses a lean, hardy body adapted for speed, agility, and stamina. Its three main coat colourations are light ginger or tan, black and tan, or creamy white. The skull is wedge-shaped and appears large in proportion to the body.",
-		sections = {
-			{
-				"Overview",
-				"Its taxonomic classification is debated: it is variously considered a form of [[Dog|domestic dog]] (Canis familiaris or Canis lupus familiaris) not warranting recognition as a subspecies, or a subspecies of dog (**Canis familiaris dingo**) or [[Wolf|wolf]] (**Canis lupus dingo**), or a full species in its own right (**Canis dingo**). The dingo is closely related to the New Guinea singing dog: their lineage split early from the lineage that led to today's domestic dogs, and can be traced back through Maritime Southeast Asia to Asia. The oldest remains of dingoes discovered in Australia are around 3,500 years old. A dingo pack usually consists of a mated pair, their offspring from the current year, and sometimes offspring from the previous year.",
-			},
-		},
-		infobox = {
-			{ "Scientific name", "Canis familiaris" },
-		},
-	},
-	{
-		title = "Diplodocus",
-		category = "Animal",
-		fame = 2,
-		emoji = "🦕",
-		source = "wikipedia",
-		description = "Genus of diplodocid sauropod dinosaurs (fossil)",
-		tags = { "Reptiles", "Dinosaurs and prehistoric reptiles" },
-		summary = '**Diplodocus** is an [[Extinction|extinct]] genus of diplodocid sauropod [[Dinosaur|dinosaurs]] known from the Late Jurassic of North America and possibly Europe. The first [[Fossil|fossils]] of Diplodocus were discovered in 1877 by S. W. Williston. The generic name, coined by Othniel Charles Marsh in 1878, is a Neo-Latin term derived from [[Ancient Greek|Greek]] (diplos) "double" and (dokos) "beam", in reference to the double-beamed chevron bones located in the underside of the tail, which were then considered unique.',
-		sections = {
-			{
-				"Overview",
-				"The genus lived in what is now mid-western North America, at the end of the [[Jurassic]] period. It is one of the more common dinosaur fossils found in the middle to upper Morrison Formation, with most specimens being found in rocks dated between about 151.88 and 149.1 million years ago, during the latest Kimmeridgian Age, although it may have made it into the Tithonian, with at least one specimen (AMNH FR 223) being potentially from among the youngest deposits of the formation. The Morrison Formation records an environment and time dominated by gigantic sauropod dinosaurs, such as Apatosaurus, Barosaurus, Brachiosaurus, Brontosaurus, and Camarasaurus. Its great size may have been a deterrent to the predators [[Allosaurus]] and Ceratosaurus: their remains have been found in the same strata, which suggests that they coexisted with Diplodocus.",
-			},
-		},
-		related = { "Iguanodon", "Plesiosaur", "Stegosaurus", "Triceratops" },
-		infobox = {
-			{ "Scientific name", "Diplodocus" },
-		},
-	},
-	{
-		title = "Diprotodontia",
-		category = "Animal",
-		fame = 3,
-		emoji = "🐾",
-		source = "wikipedia",
-		description = "Order of marsupial mammals",
-		tags = { "Mammals", "Marsupials" },
-		summary = '**Diprotodontia** is the largest extant order of marsupials, with about 155 species, including the [[Kangaroo|kangaroos]], wallabies, possums, [[Koala|koala]], wombats, and many others. Extinct diprotodonts include the [[Hippopotamus|hippopotamus]]-sized Diprotodon, and Thylacoleo, the so-called "marsupial lion".',
-		related = { "Marsupial", "Opossum" },
-		infobox = {
-			{ "Scientific name", "Diprotodontia" },
-		},
-	},
-	{
-		title = "Dodo",
-		category = "Animal",
-		fame = 3,
-		emoji = "🐦",
-		source = "wikipedia",
-		description = "Extinct species of bird",
-		tags = { "Birds", "Columbiformes" },
-		aliases = { "Raphus cucullatus" },
-		summary = "The **dodo** (**Raphus cucullatus**) is an [[Extinction|extinct]] flightless bird that was endemic to [[Mauritius]], an island east of [[Madagascar]] in the [[Indian Ocean]]. The dodo's closest relative was the also-extinct and flightless Rodrigues solitaire. The two formed the subtribe Raphina, a clade of extinct flightless birds that are a part of the group that includes [[Columbidae|pigeons and doves]] (the family Columbidae). The closest living relative of the dodo is the Nicobar pigeon. A white dodo was once thought to have existed on the nearby island of [[Réunion]], but it is now believed that this assumption was merely confusion based on the also-extinct Réunion ibis and paintings of white dodos.",
-		sections = {
-			{
-				"Overview",
-				"Subfossil remains show the dodo measured about 62.6–75 cm in height and may have weighed 10.6–17.5 kg in the wild. The dodo's appearance in life is evidenced only by drawings, paintings, and written accounts from the 17th century. Since these portraits vary considerably, and since only some of the illustrations are known to have been drawn from live specimens, the dodos' exact appearance in life remains unresolved, and little is known about its behaviour. It used gizzard stones to help [[Digestion|digest]] its food, which is thought to have included fruits, and its main [[Habitat|habitat]] is believed to have been the woods in the drier coastal areas of Mauritius. One account states its clutch consisted of a single egg. It is presumed that the dodo became flightless because of the ready availability of abundant food sources and a relative absence of predators on Mauritius.",
-			},
-		},
-		related = { "Antbird", "Icterid", "Swallow" },
-		infobox = {
-			{ "Scientific name", "Raphus cucullatus" },
-			{ "Conservation status", "Extinct" },
-		},
-	},
-	{
-		title = "Domestic turkey",
-		category = "Animal",
-		fame = 3,
-		emoji = "🦃",
-		source = "wikipedia",
-		description = "Species of bird",
-		tags = { "Birds", "Galliformes" },
-		aliases = { "Meleagris gallopavo domesticus" },
-		summary = "The **domestic turkey** (**Meleagris gallopavo domesticus**) is a large fowl, one of the two [[Species|species]] in the genus Meleagris and the same species as the wild turkey. Turkey domestication was thought to have occurred in central Mesoamerica at least 2,000 years ago,. The main domestic turkey varieties today descend from the turkey raised in central Mexico that was subsequently imported into Europe by the Spanish in the 16th century.",
-		sections = {
-			{
-				"Overview",
-				'The domestic turkey is a popular form of [[Poultry|poultry]]. It is raised throughout temperate parts of the world, partially because industrialized farming has made it very cheap for the amount of meat it produces. Female domestic turkeys are called hens, and the chicks are poults or turkeylings. In Canada and the United States, male turkeys are called toms. In the United Kingdom and Ireland, they are stags. The fleshy protuberance atop the beak is the snood and the one attached to the underside of the beak is known as a wattle. The English-language name for this species results likely from an early misidentification of the bird with an unrelated species, guineafowl, which was imported to England through [[Turkey|the country of Turkey]]. The Latin species name gallopāvō means "chicken peacock".',
-			},
-		},
-		related = { "Bulbul", "Common quail", "Peafowl" },
-		infobox = {
-			{ "Scientific name", "Meleagris gallopavo" },
-			{ "Conservation status", "Domesticated" },
-		},
-	},
-	{
-		title = "Donkey",
-		category = "Animal",
-		fame = 2,
-		emoji = "🐴",
-		source = "wikipedia",
-		description = "Domesticated animal primarily used for transportation",
-		tags = { "Mammals", "Perissodactyla" },
-		aliases = { "Ass" },
-		summary = "The **donkey** or **ass** is a domesticated equine. It derives from the African wild ass, Equus africanus, and may be classified either as a subspecies thereof, **Equus africanus asinus**, or as a separate [[Species|species]], **Equus asinus**. It was domesticated in Africa some 5,000 years ago, and has been used mainly as a working animal since that time.",
-		sections = {
-			{
-				"Overview",
-				"There are more than 40 million donkeys in the world, mostly in underdeveloped countries, where they are used principally as draught or pack animals. While working donkeys are often associated with those living at or below subsistence, small numbers of donkeys or asses are kept for breeding, as pets, and for livestock protection in developed countries. Jacks are often mated with female [[Horse|horses]] (mares) to produce mules; the less common hybrid of a male horse (stallion) and jenny is a hinny.",
-			},
-		},
-		related = { "Equidae", "Perissodactyla", "Tapir", "Zebra" },
-		infobox = {
-			{ "Scientific name", "Equus africanus" },
-			{ "Conservation status", "Domesticated" },
-		},
-	},
-	{
-		title = "Dormouse",
-		category = "Animal",
-		fame = 3,
-		emoji = "👪",
-		source = "wikipedia",
-		description = "Family of rodents",
-		tags = { "Mammals", "Rodents" },
-		aliases = { "Gliridae", "Myoxidae", "Muscardinidae" },
-		summary = "A **dormouse** is a [[Rodent|rodent]] of the family **Gliridae** (this family is also variously called **Myoxidae** or **Muscardinidae** by different taxonomists). Dormice are nocturnal animals found in Africa, Asia, and Europe. They are named for their long dormant [[Hibernation|hibernation]] period of six months or longer. There are nine genera and 28 living species of dormice, with half of living species belonging to the African genus Graphiurus.",
-		infobox = {
-			{ "Scientific name", "Gliridae" },
-		},
-	},
-	{
-		title = "Dragonfly",
-		category = "Animal",
-		fame = 2,
-		emoji = "🐞",
-		source = "wikipedia",
-		description = "Raptorial winged insects",
-		tags = { "Insects and other hexapods", "Odonata" },
-		aliases = { "Anisoptera" },
-		summary = "A **dragonfly** is a flying insect belonging to the infraorder **Anisoptera** below the order [[Odonata]]. About 3,000 extant species of dragonflies are known. Most are [[Tropics|tropical]], with fewer species in temperate regions. Loss of [[Wetland|wetland]] habitat threatens dragonfly populations around the world. Adult dragonflies are characterised by a pair of large, multifaceted, compound eyes, two pairs of strong, transparent wings, sometimes with coloured patches, and an elongated body. Many dragonflies have brilliant iridescent or metallic colours produced by structural coloration, making them conspicuous in flight. An adult dragonfly's compound eyes have nearly 24,000 ommatidia each.",
-		sections = {
-			{
-				"Overview",
-				'Dragonflies can be mistaken for the closely related damselflies, which make up the other odonatan infraorder (Zygoptera) and are similar in body plan, though usually lighter in build; however, the wings of most dragonflies are held flat and away from the body, while damselflies hold their wings folded at rest, along or above the abdomen. Dragonflies are agile fliers, while damselflies have a weaker, fluttery flight. Dragonflies make use of motion camouflage when attacking prey or rivals. Dragonflies are predatory insects, both in their aquatic [[Nymph (biology)|nymphal]] stage (also known as "naiads") and as adults. In some species, the nymphal stage lasts up to five years, and the adult stage may be as long as 10 weeks, but most species have an adult lifespan in the order of five weeks or less, and some survive for only a few days.',
-			},
-		},
-		related = { "Drosophila melanogaster", "Scale insect" },
-		infobox = {
-			{ "Scientific name", "Anisoptera" },
-		},
-	},
-	{
-		title = "Dromedary",
-		category = "Animal",
-		fame = 3,
-		emoji = "🐫",
-		source = "wikipedia",
-		description = "One-humped camel",
-		tags = { "Mammals", "Artiodactyla" },
-		aliases = { "Camelus dromedarius", "Dromedary camel", "Arabian camel" },
-		summary = "The **dromedary** (**Camelus dromedarius**), also known as the **dromedary camel**, **Arabian camel** and **one-humped camel**, is a large [[Camel|camel]] of the genus Camelus with one hump on its back. It is the tallest of the three camel species; adult males stand 1.8–2.4 m at the shoulder, while females are 1.7–1.9 m tall. Males typically weigh between 400 and 690 kg, and females weigh between 300 and 540 kg. The dromedary's distinctive features include its long, curved neck, narrow chest, a single hump, and long hairs on the throat, shoulders, and hump. The coat is generally a shade of brown. The hump is 20 cm tall or more, and is made of fat bound together by fibrous tissue.",
-		sections = {
-			{
-				"Overview",
-				"The dromedary feeds on foliage and desert vegetation; several adaptations, such as the ability to tolerate losing more than 30% of its total water content, allow it to thrive in its desert habitat. Mating occurs annually and peaks in the rainy season; females bear a single calf after a gestation of 15 months. It is mainly active during daylight hours and forms herds of about 20 individuals, which are led by a dominant male. The dromedary has not occurred naturally in the wild for nearly 2,000 years. It was probably first domesticated in the [[Arabian Peninsula]] about 4,000 years ago. In the wild, the dromedary inhabited arid regions, including the [[Sahara]]. The domesticated dromedary is kept in the semiarid to arid regions of the Old World, mainly in Africa, the Arabian Peninsula and the Thar desert in Pakistan and India. A feral population occurs in Australia.",
-			},
-		},
-		related = { "African buffalo" },
-		infobox = {
-			{ "Scientific name", "Camelus dromedarius" },
-			{ "Conservation status", "Domesticated" },
-		},
-	},
-	{
-		title = "Drosophila melanogaster",
-		category = "Animal",
-		fame = 1,
-		emoji = "🍎",
-		source = "wikipedia",
-		description = "Species of fruit fly",
-		tags = { "Insects and other hexapods", "Flies (Diptera)" },
-		summary = '**Drosophila melanogaster** is a species of [[Fly|fly]] (an [[Insect|insect]] of the order Diptera) in the family Drosophilidae. The species is often referred to as the **fruit fly** or **lesser fruit fly**, or less commonly the "[[Vinegar|vinegar]] fly", "pomace fly", or "[[Banana|banana]] fly". D. melanogaster is attracted to rotting fruit and fermenting beverages and is often found in orchards, kitchens, and pubs.',
-		sections = {
-			{
-				"Overview",
-				"Starting with Charles W. Woodworth's 1901 proposal of the use of this species as a model organism, D. melanogaster continues to be widely used for biological research in [[Genetics|genetics]], [[Physiology|physiology]], microbial pathogenesis, and life history evolution. In 1946 D. melanogaster was the first animal to be launched into space. As of 2017, six [[Nobel Prize|Nobel Prizes]] have been awarded to drosophilists for their work using the insect. Drosophila melanogaster is typically used in research owing to its rapid life cycle, relatively simple genetics with only four pairs of [[Chromosome|chromosomes]], and large number of offspring per generation. It was originally an African species, with all non-African lineages having a common origin. Its geographic range includes all continents, including islands. D. melanogaster is a common pest in homes, restaurants, and other places where food is served.",
-			},
-		},
-		related = { "Black fly", "Calliphoridae", "Crane fly", "Housefly", "Tabanidae", "Tsetse fly" },
-		infobox = {
-			{ "Scientific name", "Drosophila melanogaster" },
-		},
-	},
-	{
-		title = "Duck",
-		category = "Animal",
-		fame = 2,
-		emoji = "🦆",
-		source = "wikipedia",
-		description = "Common name for many species of bird",
-		tags = { "Birds", "Anseriformes" },
-		summary = "**Duck** is the common name for numerous species of waterfowl in the family Anatidae. Ducks are generally smaller and shorter-necked than [[Swan|swans]] and [[Goose|geese]], which are members of the same family. Divided among several subfamilies, they are a form taxon; they do not represent a monophyletic group (the group of all descendants of a single common ancestral species), since swans and geese are not considered ducks. Ducks are mostly aquatic birds, and may be found in both fresh water and sea water.",
-		sections = {
-			{
-				"Overview",
-				"Ducks are sometimes confused with several types of unrelated water birds with similar forms, such as [[Loon|loons]] or divers, grebes, gallinules and coots.",
-			},
-		},
-		related = { "American robin", "Lark", "Starling" },
-	},
-	{
-		title = "Dung beetle",
-		category = "Animal",
-		fame = 3,
-		emoji = "🪲",
-		source = "wikipedia",
-		description = "Informal group of insects",
-		tags = { "Insects and other hexapods", "Beetles (Coleoptera)" },
-		summary = "All [[Species|species]] of dung beetle belong to the superfamily Scarabaeoidea, most of them to the subfamilies Scarabaeinae and Aphodiinae of the family Scarabaeidae (scarab beetles). There are dung-feeding beetles which belong to other families, such as the Geotrupidae (the earth-boring dung beetle). The Scarabaeinae alone comprises more than 5,000 species.",
-		sections = {
-			{
-				"Overview",
-				"As they do not belong to a single group sharing a common ancestor, there is a diversity in the behavior of dung beetles, including the iconic dung-rolling behavior revered by Ancient Egyptians as the god Khepri rolling the [[Sun|sun]] across the sky.",
-			},
-		},
-		related = { "Beetle", "Coccinellidae" },
-	},
-	{
-		title = "Eared seal",
-		category = "Animal",
-		fame = 2,
-		emoji = "🦭",
-		source = "wikipedia",
-		description = "Family of marine mammals",
-		tags = { "Mammals", "Pinnipeds" },
-		aliases = { "Otariid", "Otary", "Otariidae" },
-		summary = "An **eared seal**, **otariid**, or **otary**, is any member of the marine mammal family **Otariidae**, one of three groupings of pinnipeds. They comprise 15 extant [[Species|species]] in seven genera (another species became extinct in the 1950s) and are commonly known either as sea lions or fur seals, distinct from true seals (phocids) and the [[Walrus|walrus]] (odobenids). Otariids are adapted to a semiaquatic lifestyle, feeding and migrating in the water, but breeding and resting on land or ice. They reside in subpolar, temperate, and equatorial waters throughout the [[Pacific Ocean|Pacific]] and Southern Oceans, the southern [[Indian Ocean|Indian]], and Atlantic Oceans. They are conspicuously absent in the north Atlantic.",
-		sections = {
-			{
-				"Overview",
-				'The words "otariid" and "otary" come from the [[Ancient Greek]] ὠ (ōtárion), meaning "little ear", referring to the small but visible external ear flaps (pinnae), which distinguishes them from the [[Earless seal|phocids]].',
-			},
-		},
-		related = { "Pinniped" },
-		infobox = {
-			{ "Scientific name", "Otariidae" },
-		},
-	},
-	{
-		title = "Earless seal",
-		category = "Animal",
-		fame = 2,
-		emoji = "🦭",
-		source = "wikipedia",
-		description = "Family of mammals",
-		tags = { "Mammals", "Pinnipeds" },
-		aliases = { "Earless seals", "Phocids", "True seals" },
-		summary = "The **earless seals**, also known as **phocids** or **true seals**, are one of the three main groups of [[Mammal|mammals]] within the seal lineage, [[Pinniped|Pinnipedia]]. All true seals are members of the family **Phocidae**. They are sometimes called **crawling seals** to distinguish them from the fur seals and sea lions of the family [[Eared seal|Otariidae]]. Seals live in the [[Ocean|oceans]] of both hemispheres and, with the exception of the more tropical monk seals, are mostly confined to polar, subpolar, and temperate climates. The Baikal seal is the only species of exclusively freshwater seal.",
-		related = { "Walrus" },
-		infobox = {
-			{ "Scientific name", "Phocidae" },
-		},
-	},
-	{
-		title = "Earthworm",
+		title = "Detritivore",
 		category = "Animal",
 		fame = 2,
 		emoji = "🐾",
 		source = "wikipedia",
-		description = "Terrestrial invertebrate, order Opisthopora",
-		tags = { "Invertebrates, others", "Lophotrochozoa" },
-		summary = 'An **earthworm** is a [[Soil|soil]]-dwelling terrestrial [[Invertebrate|invertebrate]] that belongs to the phylum Annelida. The term is the common name for the largest members of the class (or subclass, depending on the author) Oligochaeta. In classical systems, they were in the order of Opisthopora since the male pores opened posterior to the female pores, although the internal male segments are anterior to the female. Theoretical cladistic studies have placed them in the suborder Lumbricina of the order Haplotaxida, but this may change. Other [[Slang|slang]] names for earthworms include "dew-worm", "rainworm", "nightcrawler", and "angleworm" (from its use as [[Angling|angling]] hookbait).',
+		tags = { "More articles" },
+		summary = "There are many kinds of [[Invertebrate|invertebrates]], [[Vertebrate|vertebrates]], and [[Plant|plants]] that eat detritus or carry out coprophagy. By doing so, all these detritivores contribute to [[Decomposition|decomposition]] and the nutrient cycles. Detritivores should be distinguished from other [[Decomposer|decomposers]], such as many species of [[Bacteria|bacteria]], [[Mushroom|fungi]] and [[Protist|protists]], which are unable to ingest discrete lumps of matter. Instead, these other decomposers live by absorbing and metabolizing on a molecular scale (saprotrophic nutrition). The terms detritivore and decomposer are often used interchangeably, but they describe different organisms. Detritivores are usually [[Arthropod|arthropods]] and help in the process of remineralization.",
 		sections = {
 			{
 				"Overview",
-				'Larger terrestrial earthworms are also called megadriles (which translates to "big worms") as opposed to the microdriles ("small worms") in the families Tubificidae (semiaquatic), Lumbricidae and Enchytraeidae (terrestrial). The megadriles are characterized by a distinct clitellum (more extensive than that of microdriles) and a vascular system with true capillaries. Earthworms are commonly found in moist, compost-rich soil, eating a wide variety of organic matters, which include detritus, living [[Protozoa|protozoa]], nematodes, [[Bacteria|bacteria]], [[Mushroom|fungi]] and [[Algae|algae]] (including [[Diatom|diatoms]] and [[Cyanobacteria|cyanobacteria]]). An earthworm\'s digestive system runs the length of its body. They are one of nature\'s most important detritivores and coprophages, and also serve directly as [[Food|food]] for many low-level consumers ([[Predation|predation]]) within the [[Ecosystem|ecosystems]] (e.g. [[Wild boar|wild boars]], [[Mole (animal)|moles]], blackbirds, [[Centipede|centipedes]]), ground beetles, [[Flatworm|flatworms]].',
+				"Detritivores perform the first stage of remineralization, by fragmenting the dead plant matter, allowing decomposers to perform the second stage of remineralization. Plant tissues are made up of resilient molecules (e.g. [[Cellulose|cellulose]], lignin, xylan) that decay at a much lower rate than other organic molecules. The activity of detritivores is the reason why there is not an accumulation of plant litter in nature. Detritivores are an important aspect of many [[Ecosystem|ecosystems]]. They can live on any type of soil with an organic component, including marine ecosystems, where they are termed interchangeably with bottom feeders. Typical detritivorous animals include millipedes, springtails, woodlice, dung flies, slugs, many terrestrial worms, sea stars, sea cucumbers, fiddler crabs, and some sedentary marine [[Polychaete|Polychaetes]] such as worms of the family Terebellidae.",
 			},
-		},
-		related = { "Bryozoa" },
-		infobox = {
-			{ "Scientific name", "Lumbricina" },
-		},
-	},
-	{
-		title = "Earwig",
-		category = "Animal",
-		fame = 3,
-		emoji = "🐞",
-		source = "wikipedia",
-		description = "Order of insects",
-		tags = { "Arthropods", "Insects and other hexapods" },
-		aliases = { "Earwigs", "Dermaptera" },
-		summary = '**Earwigs** make up the [[Insect|insect]] order **Dermaptera**. With about 2,000 [[Species|species]] in 12 families, they are one of the smaller insect orders. Earwigs have characteristic cerci, a pair of forceps-like pincers on their abdomen, and membranous wings folded underneath short, rarely used forewings, hence the scientific order name, "skin wings". Earwigs are found on all continents except [[Antarctica]].',
-		sections = {
-			{
-				"Overview",
-				"Earwigs are mostly nocturnal and often hide in small, moist crevices during the day, and are active at night, feeding on a wide variety of insects and plants. Damage to foliage, flowers, and various crops is commonly blamed on earwigs, especially the common earwig Forficula auricularia. Earwigs have five molts in the year before they become adults. Many earwig species display maternal care, which is uncommon among insects. Female earwigs may care for their eggs; the ones that do will continue to watch over [[Nymph (biology)|nymphs]] until their second molt. Extant Dermaptera belong to the suborder Neodermaptera, which first appeared during the [[Cretaceous]]. Some earwig specimen fossils are placed with extinct suborders Archidermaptera or Eodermaptera, the former dating to the Late Triassic and the latter to the Middle Jurassic.",
-			},
-		},
-		related = { "Louse" },
-		infobox = {
-			{ "Scientific name", "Dermaptera" },
-		},
-	},
-	{
-		title = "Eastern copperhead",
-		category = "Animal",
-		fame = 3,
-		emoji = "🦎",
-		source = "wikipedia",
-		description = "Species of reptile",
-		tags = { "Vertebrates", "Reptiles" },
-		summary = "The eastern copperhead has distinctive, dark brown, hourglass-shaped markings, overlaid on a light reddish brown or brown/gray background. The body type is heavy, rather than slender. Neonates are born with green or yellow tail tips, which progress to a darker brown or black within one year. Adults grow to a typical length (including tail) of 50–95 cm.",
-		sections = {
-			{
-				"Overview",
-				'In most of the United States of America, the eastern copperhead favors deciduous forest and mixed woodlands. It may occupy rock outcroppings and ledges, but is also found in low-lying, swampy regions. During the winter, it hibernates in dens or limestone crevices, often together with timber rattlesnakes and black rat snakes. The eastern copperhead is known to feed on a wide variety of prey, including invertebrates (primarily [[Arthropod|arthropods]]) and [[Vertebrate|vertebrates]]. Like most pit vipers, the eastern copperhead is generally an ambush predator; it takes up a promising position and waits for suitable prey to arrive. As a common species within its range, it may be encountered by humans. Unlike other viperids, it often "freezes" instead of slithering away and fleeing, due to its habit of relying on excellent camouflage. Bites occur due to people unknowingly stepping on or near them.',
-			},
-		},
-		related = { "Lizard", "Turtle" },
-		infobox = {
-			{ "Scientific name", "Agkistrodon contortrix" },
-			{ "Conservation status", "Least Concern" },
-		},
-	},
-	{
-		title = "Echidna",
-		category = "Animal",
-		fame = 2,
-		emoji = "👪",
-		source = "wikipedia",
-		description = "Family of mammals",
-		tags = { "Mammals", "Monotremes" },
-		aliases = { "Echidnas", "Spiny anteaters", "Tachyglossidae" },
-		summary = "**Echidnas**, sometimes known as **spiny anteaters**, are quill-covered [[Monotreme|monotremes]] (egg-laying [[Mammal|mammals]]) belonging to the family **Tachyglossidae**, living in [[Australia]] and [[New Guinea]]. The four extant species of echidnas and the [[Platypus|platypus]] are the only living mammals that lay eggs and the only surviving members of the order Monotremata. The diet of some species consists of ants and termites, but they are not closely related to the American [[Anteater|true anteaters]] or to [[Hedgehog|hedgehogs]]. Their young are called puggles.",
-		sections = {
-			{
-				"Overview",
-				"Echidnas evolved between 20 and 50 million years ago and descend from an amphibious, [[Platypus|platypus]]-like monotreme.",
-			},
-		},
-		infobox = {
-			{ "Scientific name", "Tachyglossidae" },
-		},
-	},
-	{
-		title = "Echinoderm",
-		category = "Animal",
-		fame = 1,
-		emoji = "🐾",
-		source = "wikipedia",
-		description = "Marine phylum of animals often with radial symmetries",
-		tags = { "Animals", "Echinoderms" },
-		aliases = { "Echinodermata" },
-		summary = 'An **echinoderm** is any [[Animal|animal]] of the phylum **Echinodermata**, which includes [[Starfish|starfish]], brittle stars, [[Sea urchin|sea urchins]], sand dollars and [[Sea cucumber|sea cucumbers]], as well as the sessile sea lilies or "stone lilies". While bilaterally symmetrical as [[Larva|larvae]], as adults echinoderms are recognisable by their usually five-pointed radial symmetry (pentamerous symmetry), and are found on the sea bed at every ocean depth from the intertidal zone to the abyssal zone. The phylum contains about 7,600 living [[Species|species]], making it the second-largest group of deuterostomes after the [[Chordate|chordates]], as well as the largest marine-only phylum. The first definitive echinoderms appeared near the start of the [[Cambrian]].',
-		sections = {
-			{
-				"Overview",
-				"Echinoderms are important both ecologically and geologically. Ecologically, there are few other groupings so abundant in the deep sea, as well as [[Continental shelf|shallower oceans]]. Most echinoderms are able to reproduce asexually and regenerate tissue, organs and limbs; in some cases, they can undergo complete regeneration from a single limb. Geologically, the value of echinoderms is in their ossified dermal endoskeletons, which are major contributors to many [[Limestone|limestone]] formations and can provide valuable clues as to the geological environment. They were the most used species in regenerative research in the 19th and 20th centuries. Further, some scientists hold that the radiation of echinoderms was responsible for the Mesozoic Marine Revolution.",
-			},
-		},
-		infobox = {
-			{ "Scientific name", "Echinodermata" },
-		},
-	},
-	{
-		title = "Eel",
-		category = "Animal",
-		fame = 3,
-		emoji = "🐟",
-		source = "wikipedia",
-		description = "Order of fishes",
-		tags = { "Vertebrates", "Fishes" },
-		aliases = { "Eels", "Anguilliformes" },
-		summary = "**Eels** are ray-finned fish belonging to the order **Anguilliformes**, which consists of eight suborders, 20 families, 164 genera, and about 1000 [[Species|species]]. Eels undergo considerable development from the early larval stage to the eventual adult stage and are usually predators.",
-		sections = {
-			{
-				"Overview",
-				'The term "eel" is also used for some other eel-shaped fish, such as [[Electric eel|electric eels]] (genus Electrophorus), swamp eels (order Synbranchiformes), slime eels (class Myxini), and deep-sea spiny eels (family Notacanthidae). However, these other clades, with the exception of deep-sea spiny eels, whose order Notacanthiformes is the sister clade to true eels, evolved their eel-like shapes independently from the true eels. As a general rule, most eels are marine. Exceptions are the catadromous genus Anguilla and the freshwater moray, which spend most of their life in freshwater, the anadromous rice-paddy eel, which spawns in freshwater, and the freshwater snake eel Stictorhinus.',
-			},
-		},
-		related = { "Coelacanth", "Mullet (fish)" },
-		infobox = {
-			{ "Scientific name", "Anguilliformes" },
-		},
-	},
-	{
-		title = "Electric eel",
-		category = "Animal",
-		fame = 3,
-		emoji = "🐟",
-		source = "wikipedia",
-		description = "Genus of fishes in South America",
-		tags = { "Vertebrates", "Fishes" },
-		aliases = { "Electric eels", "Electrophorus", "Electrophorinae" },
-		summary = "The **electric eels** are a genus, **Electrophorus**, of neotropical freshwater fish from South America in the family Gymnotidae, of which they are the only members of the subfamily **Electrophorinae**. They are known for their ability to stun their prey by generating electricity, delivering shocks at up to 860 [[Volt|volts]]. Their electrical capabilities were first studied in 1775, contributing to the invention of the [[Electric battery|electric battery]] in 1800.",
-		sections = {
-			{
-				"Overview",
-				"Despite their name, electric eels are not closely related to the true eels (Anguilliformes) but are members of the electroreceptive knifefish order Gymnotiformes. In 2019, electric eels were split into three species: for more than two centuries before that, the genus was believed to be monotypic, containing only Electrophorus electricus. They are nocturnal, obligate air-breathing animals, with poor vision complemented by electrolocation; they mainly eat fish. Electric eels grow for as long as they live, adding more vertebrae to their spinal column. Males are larger than females. Some captive specimens have lived for over 20 years.",
-			},
-		},
-		related = { "Coelacanth", "Mullet (fish)" },
-		infobox = {
-			{ "Scientific name", "Electrophorus" },
-		},
-	},
-	{
-		title = "Electric ray",
-		category = "Animal",
-		fame = 3,
-		emoji = "🐟",
-		source = "wikipedia",
-		description = "Order of cartilaginous fishes",
-		tags = { "Fishes", "Batoidea" },
-		aliases = { "Electric rays", "Torpediniformes" },
-		summary = "The **electric rays** are a group of rays, flattened cartilaginous fish with enlarged pectoral fins, composing the order **Torpediniformes**. They are known for being capable of producing an electric discharge, ranging from 8 to 220 [[Volt|volts]], depending on species, used to stun prey and for defense. There are 69 species in four families.",
-		sections = {
-			{
-				"Overview",
-				"Perhaps the best known members are those of the genus Torpedo. The name comes from the [[Latin]], 'to be stiffened or paralyzed', from the effect on someone who touches the fish.",
-			},
-		},
-		related = { "Sawfish", "Skate (fish)" },
-		infobox = {
-			{ "Scientific name", "Torpediniformes" },
-		},
-	},
-	{
-		title = "Elk",
-		category = "Animal",
-		fame = 3,
-		emoji = "🦌",
-		source = "wikipedia",
-		description = "Species of deer",
-		tags = { "Mammals", "Artiodactyla" },
-		summary = 'The word "elk" originally referred to the European variety of the [[Moose|moose]], Alces alces, but was transferred to Cervus canadensis by North American colonists.',
-		sections = {
-			{
-				"Overview",
-				'The name "wapiti" is derived from a Shawnee and Cree word meaning "white rump", after the distinctive light fur around the tail region which the animals may fluff-up or raise to signal their agitation or distress to one another, when fleeing perceived threats, or among males courting females and sparring for dominance. A similar trait is seen in other artiodactyl species, like the bighorn sheep, [[Pronghorn|pronghorn]] and the white-tailed deer, to varying degrees. Elk dwell in open forest and forest-edge habitats, grazing on grasses and sedges and browsing higher-growing plants, leaves, twigs and bark. Males also engage in ritualized mating behaviors during the mating season, including posturing to attract females, antler-wrestling (sparring), and bugling, a loud series of throaty whistles, bellows, screams, and other vocalizations that establish dominance over other males and aim to attract females.',
-			},
-		},
-		infobox = {
-			{ "Scientific name", "Cervus canadensis" },
-			{ "Conservation status", "Least Concern" },
-		},
-	},
-	{
-		title = "Emu",
-		category = "Animal",
-		fame = 2,
-		emoji = "🐦",
-		source = "wikipedia",
-		description = "Large flightless bird endemic to Australia",
-		tags = { "Birds", "Ratites" },
-		summary = "The **emu** is a [[Species|species]] of flightless bird endemic to [[Australia]], where it is the tallest native bird. It is the only extant member of the genus Dromaius and the third-tallest living bird after its African ratite relatives, the [[Common ostrich|common ostrich]] and Somali ostrich. The emu's native ranges cover most of the Australian mainland. The Tasmanian, Kangaroo Island and King Island subspecies became extinct after the European settlement of Australia in 1788.",
-		sections = {
-			{
-				"Overview",
-				"The emu has soft, brown feathers, a long neck, and long legs. It can grow up to 1.9 m in height. It is a robust [[Bipedalism|bipedal]] runner that can travel great distances, and when necessary can sprint at 48 km/h. It is omnivorous and forages on a variety of plants and insects, and can go for weeks without eating. It drinks infrequently, but takes in copious amounts of fresh water when the opportunity arises. Breeding takes place in May and June, and fighting among females for a mate is common. Females can mate several times and lay several clutches of eggs in one season. The male incubates the eggs; during this process he hardly eats or drinks and loses a significant amount of weight. The eggs hatch after around eight weeks, and the young are nurtured by their fathers. They reach full size after around six months, but can remain as a family unit until the next breeding season.",
-			},
-		},
-		related = { "Common starling", "Old World sparrow", "Trogon" },
-		infobox = {
-			{ "Scientific name", "Dromaius novaehollandiae" },
-			{ "Conservation status", "Least Concern" },
 		},
 	},
 }

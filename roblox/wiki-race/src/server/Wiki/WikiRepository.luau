@@ -193,6 +193,18 @@ local function firstSentence(text: string, maxLength: number): string
 	return sentence
 end
 
+-- The first `count` words of a page — the race hint for the target.
+local function firstWords(text: string, count: number): string
+	local words = {}
+	for word in string.gmatch(text, "%S+") do
+		table.insert(words, word)
+		if #words >= count then
+			return table.concat(words, " ") .. "…"
+		end
+	end
+	return table.concat(words, " ")
+end
+
 local function countWords(runs, total)
 	for _, run in runs do
 		for _ in string.gmatch(run.t, "%S+") do
@@ -225,6 +237,7 @@ function WikiRepository:preview(id: string)
 		photo = self:photo(node),
 		funny = node.funny,
 		blurb = firstSentence(plainText(node.summary), 180),
+		hint = firstWords(plainText(node.summary), 25),
 	}
 end
 

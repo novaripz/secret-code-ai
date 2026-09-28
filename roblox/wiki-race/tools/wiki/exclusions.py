@@ -33,7 +33,7 @@ Edward Teller|J. Robert Oppenheimer
 Lilith|Devil|Zombie|Cain and Abel
 Body modification|Body piercing|Circumcision|Tattoo|Taboo|Forensic science|Playboy|Photojournalism
 Lust|Hatred|Revenge|Eunuch|Criminology|Deviance (sociology)|Explosive|Dynamite|Machete|Propaganda
-Ghetto|Slavery|Human trafficking|Prostitution|Pornography
+-logy|Antisemitism|Depression (mood)|Military|Central Intelligence Agency|United States Air Force|United States Navy|Vladimir Lenin|Deng Xiaoping|Metabolic waste|Commander-in-chief|Puppet state|Ghetto|Slavery|Human trafficking|Prostitution|Pornography
 """.replace("\n", "|").split("|")) - {""}
 
 
