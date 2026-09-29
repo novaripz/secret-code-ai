@@ -8,7 +8,7 @@ local Signal = require(game:GetService("ReplicatedStorage"):WaitForChild("WikiRa
 
 local Theme = {}
 Theme.current = Themes.classic
-Theme.id = "classic"
+Theme.id = "dark"
 Theme.changed = Signal.new()
 
 local bindings = setmetatable({}, { __mode = "k" }) -- instance → { [property] = token | fn }

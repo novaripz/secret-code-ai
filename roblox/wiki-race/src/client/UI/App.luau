@@ -517,6 +517,130 @@ end
 -- Loading ------------------------------------------------------------------------------------
 
 -- Returns hide(). opts: { retry = fn, cancel = fn, subtle = bool }
+-- Full-screen animated splash for the first boot: dark gradient, bouncing logo,
+-- sliding progress shimmer and rotating tips.
+local TIPS = {
+	"💡 Burning means the target is linked on this very page!",
+	"🧊 Freezing = 5+ clicks away. Start hunting for big hub pages.",
+	"🗺️ Countries and cities link to almost everything.",
+	"🤪 Tap the 🤪 button on a picture to see its meme card.",
+	"🎯 Tap the target card to read its 25-word hint.",
+	"🚽 Yes, Skibidi Toilet has a wiki page. So does Tung Tung Tung Sahur.",
+}
+function App.splash(text: string)
+	local root = Kit.make("Frame", {
+		Name = "Splash",
+		Active = true,
+		Size = UDim2.fromScale(1, 1),
+		BackgroundColor3 = Color3.fromRGB(12, 14, 24),
+		ZIndex = 95,
+		Parent = App.overlay,
+	})
+	local gradient = Instance.new("UIGradient")
+	gradient.Color = ColorSequence.new(Color3.fromRGB(30, 27, 75), Color3.fromRGB(8, 47, 73))
+	gradient.Rotation = 35
+	gradient.Parent = root
+	local logo = Kit.make("TextLabel", {
+		BackgroundTransparency = 1,
+		Text = "🌐",
+		TextScaled = true,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.34),
+		Size = UDim2.fromOffset(110, 110),
+		ZIndex = 96,
+		Parent = root,
+	})
+	local title = Kit.make("TextLabel", {
+		BackgroundTransparency = 1,
+		Text = "WIKI RACE",
+		Font = Enum.Font.LuckiestGuy,
+		TextScaled = true,
+		TextColor3 = Color3.new(1, 1, 1),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.49),
+		Size = UDim2.new(0.8, 0, 0, 64),
+		ZIndex = 96,
+		Parent = root,
+	})
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 3
+	stroke.Color = Color3.fromRGB(99, 102, 241)
+	stroke.Parent = title
+	local status = Kit.make("TextLabel", {
+		BackgroundTransparency = 1,
+		Text = text,
+		Font = Enum.Font.GothamMedium,
+		TextSize = 18,
+		TextColor3 = Color3.fromRGB(203, 213, 225),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.58),
+		Size = UDim2.new(0.9, 0, 0, 24),
+		ZIndex = 96,
+		Parent = root,
+	})
+	local track = Kit.make("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.64),
+		Size = UDim2.fromOffset(280, 8),
+		BackgroundColor3 = Color3.fromRGB(51, 65, 85),
+		ClipsDescendants = true,
+		ZIndex = 96,
+		Parent = root,
+	}, { Kit.corner(4) })
+	local bar = Kit.make("Frame", {
+		Size = UDim2.fromScale(0.35, 1),
+		Position = UDim2.fromScale(-0.35, 0),
+		BackgroundColor3 = Color3.fromRGB(129, 140, 248),
+		ZIndex = 97,
+		Parent = track,
+	}, { Kit.corner(4) })
+	local tip = Kit.make("TextLabel", {
+		BackgroundTransparency = 1,
+		Text = TIPS[math.random(#TIPS)],
+		Font = Enum.Font.Gotham,
+		TextSize = 15,
+		TextWrapped = true,
+		TextColor3 = Color3.fromRGB(148, 163, 184),
+		AnchorPoint = Vector2.new(0.5, 1),
+		Position = UDim2.new(0.5, 0, 1, -40),
+		Size = UDim2.new(0.8, 0, 0, 40),
+		ZIndex = 96,
+		Parent = root,
+	})
+	local alive = true
+	task.spawn(function()
+		local start, t = os.clock(), 0
+		while alive do
+			task.wait(1 / 30)
+			t = os.clock() - start
+			logo.Rotation = math.sin(t * 2) * 8
+			logo.Position = UDim2.fromScale(0.5, 0.34 + math.sin(t * 3) * 0.012)
+			bar.Position = UDim2.fromScale(((t * 0.6) % 1.35) - 0.35, 0)
+			if math.floor(t) % 4 == 0 and math.floor(t) ~= math.floor(t - 1 / 30) then
+				tip.Text = TIPS[math.random(#TIPS)]
+			end
+		end
+	end)
+	local function hide()
+		if not alive then
+			return
+		end
+		alive = false
+		Anim.tween(root, 0.35, { BackgroundTransparency = 1 })
+		for _, child in root:GetDescendants() do
+			if child:IsA("TextLabel") then
+				Anim.tween(child, 0.3, { TextTransparency = 1 })
+			elseif child:IsA("Frame") then
+				Anim.tween(child, 0.3, { BackgroundTransparency = 1 })
+			end
+		end
+		task.delay(0.4, function()
+			root:Destroy()
+		end)
+	end
+	return hide, status
+end
+
 function App.loading(text: string, opts)
 	opts = opts or {}
 	local shade = Kit.make("Frame", {
@@ -666,7 +790,7 @@ local currentCursor = nil
 function App.applyProfile(profile)
 	local equipped = profile.equipped or Catalog.defaults()
 	local themeItem = Catalog.ById[equipped.theme]
-	Theme.set(themeItem and themeItem.theme or "classic")
+	Theme.set(themeItem and themeItem.theme or "dark")
 	Sound.setPack(equipped.sound)
 	Sound.setVolume(profile.settings and profile.settings.sfx or 0.8)
 	Anim.reduced = profile.settings and profile.settings.reducedMotion == true

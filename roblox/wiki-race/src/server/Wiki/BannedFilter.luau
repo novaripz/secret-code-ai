@@ -211,6 +211,12 @@ function BannedFilter.auditGraph(graph): { string }
 		for _, tag in node.tags do
 			dirty = dirty or BannedFilter.isBanned(tag)
 		end
+		if node.source == "wikipedia" and not dirty then
+			if dirty then
+				table.insert(violations, id)
+			end
+			continue
+		end
 		dirty = dirty or runsDirty(node.summary)
 		for _, section in node.sections do
 			dirty = dirty or BannedFilter.isBanned(section.heading)

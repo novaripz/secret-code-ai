@@ -7,7 +7,7 @@ local Catalog = {}
 Catalog.ShopCategories = { "UI", "Profile", "Victory", "Lobby", "Effects", "Sounds", "Badges", "Titles" }
 
 Catalog.Slots = {
-	theme = { name = "UI Theme", category = "UI", default = "theme_classic" },
+	theme = { name = "UI Theme", category = "UI", default = "theme_dark" },
 	frame = { name = "Profile Frame", category = "Profile", default = "frame_none" },
 	victory = { name = "Victory Effect", category = "Victory", default = "victory_confetti" },
 	podium = { name = "Podium Effect", category = "Victory", default = "podium_spotlight" },
