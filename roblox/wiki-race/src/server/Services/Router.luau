@@ -20,7 +20,8 @@ local function dispatch(player: Player, action: any, payload: any)
 	end
 	local entry = handlers[action]
 	if not entry then
-		return { ok = false, error = "Unknown request" }
+		-- Handlers register after the wiki loads; tell early clients to wait.
+		return { ok = false, error = "Server is still starting", code = "Starting" }
 	end
 	if payload ~= nil and type(payload) ~= "table" then
 		return { ok = false, error = "Bad request" }

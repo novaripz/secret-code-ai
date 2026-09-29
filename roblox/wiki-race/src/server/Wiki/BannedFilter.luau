@@ -124,7 +124,10 @@ function BannedFilter.cleanPages(rawPages)
 	end
 
 	local cleaned = {}
-	for _, page in keptRaw do
+	for index, page in keptRaw do
+		if index % 300 == 0 and task and coroutine.isyieldable() then
+			task.wait()
+		end
 		local copy = table.clone(page)
 
 		copy.aliases = {}

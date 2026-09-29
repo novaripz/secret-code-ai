@@ -10,6 +10,13 @@ local Shared = game:GetService("ReplicatedStorage"):WaitForChild("WikiRaceShared
 local Categories = require(Shared.Categories)
 
 local WikiGraph = {}
+
+-- Lets other scripts run during the long build (avoids "Script timeout" in Studio).
+local function breathe(i: number)
+	if i % 300 == 0 and task and coroutine.isyieldable() then
+		task.wait()
+	end
+end
 WikiGraph.__index = WikiGraph
 
 local DISTANCE_CACHE_SIZE = 256
@@ -77,7 +84,8 @@ function WikiGraph.build(pages, options)
 	table.sort(self.ids)
 
 	-- Pass 2: parse markup into runs and collect edges.
-	for _, id in self.ids do
+	for index, id in self.ids do
+		breathe(index)
 		local node = self.nodes[id]
 		local raw = node._raw
 		local function addEdge(targetId)

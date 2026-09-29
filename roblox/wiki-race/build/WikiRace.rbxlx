@@ -13634,7 +13634,8 @@ local function dispatch(player: Player, action: any, payload: any)
 	end
 	local entry = handlers[action]
 	if not entry then
-		return { ok = false, error = "Unknown request" }
+		-- Handlers register after the wiki loads; tell early clients to wait.
+		return { ok = false, error = "Server is still starting", code = "Starting" }
 	end
 	if payload ~= nil and type(payload) ~= "table" then
 		return { ok = false, error = "Bad request" }
@@ -13950,7 +13951,10 @@ function BannedFilter.cleanPages(rawPages)
 	end
 
 	local cleaned = {}
-	for _, page in keptRaw do
+	for index, page in keptRaw do
+		if index % 300 == 0 and task and coroutine.isyieldable() then
+			task.wait()
+		end
 		local copy = table.clone(page)
 
 		copy.aliases = {}
@@ -14631,6 +14635,13 @@ local Shared = game:GetService("ReplicatedStorage"):WaitForChild("WikiRaceShared
 local Categories = require(Shared.Categories)
 
 local WikiGraph = {}
+
+-- Lets other scripts run during the long build (avoids "Script timeout" in Studio).
+local function breathe(i: number)
+	if i % 300 == 0 and task and coroutine.isyieldable() then
+		task.wait()
+	end
+end
 WikiGraph.__index = WikiGraph
 
 local DISTANCE_CACHE_SIZE = 256
@@ -14698,7 +14709,8 @@ function WikiGraph.build(pages, options)
 	table.sort(self.ids)
 
 	-- Pass 2: parse markup into runs and collect edges.
-	for _, id in self.ids do
+	for index, id in self.ids do
+		breathe(index)
 		local node = self.nodes[id]
 		local raw = node._raw
 		local function addEdge(targetId)
@@ -15093,6 +15105,9 @@ function WikiRepository.collectPages(folder: Instance)
 	end)
 	local pages = {}
 	for _, module in modules do
+		if task and coroutine.isyieldable() then
+			task.wait()
+		end
 		local ok, result = pcall(require, module)
 		if ok and type(result) == "table" then
 			for _, page in result do
@@ -90759,7 +90774,10 @@ return {
 		aliases = { "NIST" },
 		summary = "The **National Institute of Standards and Technology** (**NIST**) is an agency of the United States Department of Commerce whose mission is to promote American innovation and industrial competitiveness. NIST's activities are organized into physical science laboratory programs that include [[Nanotechnology|nanoscale science and technology]], [[Engineering|engineering]], [[Information technology|information technology]], [[Neutron|neutron]] research, material measurement, and physical measurement. From 1901 to 1988, the agency was named the **National Bureau of Standards**.",
 		sections = {
-			{ "Overview", "The NIST Historic District was listed on the National Register of Historic Places in 2021." },
+			{
+				"Overview",
+				"The NIST Historic District was listed on the National Register of Historic Places in 2021.",
+			},
 		},
 		infobox = {
 			{ "Headquarters", "100 Bureau Drive Gaithersburg, Maryland, U.S." },
@@ -101187,7 +101205,10 @@ return {
 		tags = { "More articles" },
 		summary = "The **solar mass** is a frequently used [[Mass|unit of mass]] in [[Astronomy|astronomy]], equal to approximately 2×10^30 kg. It is approximately equal to the mass of the [[Sun]]. It is often used to indicate the masses of other [[Star|stars]], as well as [[Star cluster|stellar clusters]], [[Nebula|nebulae]], [[Galaxy|galaxies]] and [[Black hole|black holes]]. More precisely, the mass of the Sun is as follows:",
 		sections = {
-			{ "Overview", "The solar mass is about 333000 times the mass of Earth, or 1047 times the mass of Jupiter." },
+			{
+				"Overview",
+				"The solar mass is about 333000 times the mass of Earth, or 1047 times the mass of Jupiter.",
+			},
 		},
 	},
 	{
@@ -181854,7 +181875,10 @@ return {
 		aliases = { "Louis Henry Sullivan" },
 		summary = '**Louis Henry Sullivan** (September 3, 1856 – April 14, 1924) was an American architect, and has been called a "father of skyscrapers" and "father of modernism". He was an influential architect of the Chicago School, a mentor to [[Frank Lloyd Wright]], and an inspiration to the Chicago group of architects who have come to be known as the Prairie School. Along with Wright and Henry Hobson Richardson, Sullivan is one of "the recognized trinity of American architecture." The phrase "form follows function" is attributed to him; it encapsulated earlier theories of architecture and he applied them to the modern age of the [[Skyscraper|skyscraper]].',
 		sections = {
-			{ "Overview", "In 1944, Sullivan was the second architect to posthumously receive the [[AIA Gold Medal]]." },
+			{
+				"Overview",
+				"In 1944, Sullivan was the second architect to posthumously receive the [[AIA Gold Medal]].",
+			},
 		},
 		related = { "Alvar Aalto", "Eadweard Muybridge", "Ludwig Mies van der Rohe" },
 		infobox = {
@@ -228625,8 +228649,16 @@ end)
 -- Boot ------------------------------------------------------------------------------------
 
 local function boot()
-	local hide = App.loading("Opening the encyclopedia…")
+	local hide = App.loading("Opening the encyclopedia… (loading 11,000 pages)")
 	local ok, data = Net.request(Net.Actions.Bootstrap, {})
+	-- The server needs a few seconds to load the wiki: keep waiting quietly.
+	for _ = 1, 60 do
+		if ok or tostring(data):find("starting", 1, true) == nil then
+			break
+		end
+		task.wait(1)
+		ok, data = Net.request(Net.Actions.Bootstrap, {})
+	end
 	hide()
 	if not ok then
 		App.loading("Couldn't reach the server: " .. tostring(data), { retry = boot })

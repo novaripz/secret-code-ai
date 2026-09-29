@@ -5024,7 +5024,10 @@ return {
 		aliases = { "Louis Henry Sullivan" },
 		summary = '**Louis Henry Sullivan** (September 3, 1856 – April 14, 1924) was an American architect, and has been called a "father of skyscrapers" and "father of modernism". He was an influential architect of the Chicago School, a mentor to [[Frank Lloyd Wright]], and an inspiration to the Chicago group of architects who have come to be known as the Prairie School. Along with Wright and Henry Hobson Richardson, Sullivan is one of "the recognized trinity of American architecture." The phrase "form follows function" is attributed to him; it encapsulated earlier theories of architecture and he applied them to the modern age of the [[Skyscraper|skyscraper]].',
 		sections = {
-			{ "Overview", "In 1944, Sullivan was the second architect to posthumously receive the [[AIA Gold Medal]]." },
+			{
+				"Overview",
+				"In 1944, Sullivan was the second architect to posthumously receive the [[AIA Gold Medal]].",
+			},
 		},
 		related = { "Alvar Aalto", "Eadweard Muybridge", "Ludwig Mies van der Rohe" },
 		infobox = {

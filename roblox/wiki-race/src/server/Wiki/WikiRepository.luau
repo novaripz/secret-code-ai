@@ -51,6 +51,9 @@ function WikiRepository.collectPages(folder: Instance)
 	end)
 	local pages = {}
 	for _, module in modules do
+		if task and coroutine.isyieldable() then
+			task.wait()
+		end
 		local ok, result = pcall(require, module)
 		if ok and type(result) == "table" then
 			for _, page in result do

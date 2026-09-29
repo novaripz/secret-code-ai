@@ -3604,7 +3604,10 @@ return {
 		tags = { "More articles" },
 		summary = "The **solar mass** is a frequently used [[Mass|unit of mass]] in [[Astronomy|astronomy]], equal to approximately 2×10^30 kg. It is approximately equal to the mass of the [[Sun]]. It is often used to indicate the masses of other [[Star|stars]], as well as [[Star cluster|stellar clusters]], [[Nebula|nebulae]], [[Galaxy|galaxies]] and [[Black hole|black holes]]. More precisely, the mass of the Sun is as follows:",
 		sections = {
-			{ "Overview", "The solar mass is about 333000 times the mass of Earth, or 1047 times the mass of Jupiter." },
+			{
+				"Overview",
+				"The solar mass is about 333000 times the mass of Earth, or 1047 times the mass of Jupiter.",
+			},
 		},
 	},
 	{

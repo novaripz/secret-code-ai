@@ -785,7 +785,10 @@ return {
 		aliases = { "NIST" },
 		summary = "The **National Institute of Standards and Technology** (**NIST**) is an agency of the United States Department of Commerce whose mission is to promote American innovation and industrial competitiveness. NIST's activities are organized into physical science laboratory programs that include [[Nanotechnology|nanoscale science and technology]], [[Engineering|engineering]], [[Information technology|information technology]], [[Neutron|neutron]] research, material measurement, and physical measurement. From 1901 to 1988, the agency was named the **National Bureau of Standards**.",
 		sections = {
-			{ "Overview", "The NIST Historic District was listed on the National Register of Historic Places in 2021." },
+			{
+				"Overview",
+				"The NIST Historic District was listed on the National Register of Historic Places in 2021.",
+			},
 		},
 		infobox = {
 			{ "Headquarters", "100 Bureau Drive Gaithersburg, Maryland, U.S." },

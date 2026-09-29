@@ -39,7 +39,7 @@ local me = Fake.addPlayer(501, "Tester")
 Fake.localPlayer = me
 rawget(H.services.Players, "__props").LocalPlayer = me
 local friend = Fake.addPlayer(502, "Friend")
-advance(1)
+advance(60) -- the wiki loads in yielding chunks
 log("server booted, two players joined")
 
 local remote = H.services.ReplicatedStorage:FindFirstChild("WikiRaceNet").Request
@@ -51,7 +51,7 @@ end
 -- Client ----------------------------------------------------------------------------------
 local client = H.node("src/client", "WikiRaceClient")
 H.runScript(client.Main)
-advance(2)
+advance(10)
 local App = H.require(client.UI.App)
 local Store = H.require(client.Core.Store)
 local Theme = H.require(client.UI.Theme)

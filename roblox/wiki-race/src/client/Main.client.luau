@@ -171,8 +171,16 @@ end)
 -- Boot ------------------------------------------------------------------------------------
 
 local function boot()
-	local hide = App.loading("Opening the encyclopedia…")
+	local hide = App.loading("Opening the encyclopedia… (loading 11,000 pages)")
 	local ok, data = Net.request(Net.Actions.Bootstrap, {})
+	-- The server needs a few seconds to load the wiki: keep waiting quietly.
+	for _ = 1, 60 do
+		if ok or tostring(data):find("starting", 1, true) == nil then
+			break
+		end
+		task.wait(1)
+		ok, data = Net.request(Net.Actions.Bootstrap, {})
+	end
 	hide()
 	if not ok then
 		App.loading("Couldn't reach the server: " .. tostring(data), { retry = boot })
