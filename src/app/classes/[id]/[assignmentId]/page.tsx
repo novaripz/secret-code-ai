@@ -84,7 +84,10 @@ function loadChat(assignmentId: string): Msg[] {
 
 function saveChat(assignmentId: string, messages: Msg[]) {
   try {
-    const kept = messages.filter((m) => !m.streaming && (m.content || m.error)).slice(-KEEP_MESSAGES);
+    // A reply that failed before saying anything is not kept: it was about
+    // that moment's connection, and greeting the student with it next time
+    // would only say something is broken that may long since be fixed.
+    const kept = messages.filter((m) => !m.streaming && m.content).slice(-KEEP_MESSAGES);
     if (kept.length === 0) window.localStorage.removeItem(chatKey(assignmentId));
     else window.localStorage.setItem(chatKey(assignmentId), JSON.stringify(kept));
   } catch {

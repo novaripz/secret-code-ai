@@ -175,6 +175,7 @@ export const en = {
   "classes.emptySchool": "Your teacher hasn't set anything in this class yet. You can add your own reminders here too.",
   "classes.emptyOwn": "Add homework, projects and tests here and they show up in your plan.",
   "classes.editAssignment": "Edit assignment",
+  "classes.editAssignmentNamed": "Edit {title}",
   "classes.timeOptional": "Time (optional)",
   "classes.stepsCount": "{done}/{total} steps",
   "classes.stepsTitle": "Your steps",

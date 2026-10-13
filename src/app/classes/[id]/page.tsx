@@ -60,7 +60,7 @@ function DoneToggle({ a }: { a: Assignment }) {
   );
 }
 
-function Row({ a, steps, onDelete }: { a: Assignment; steps?: { done: boolean }[]; onDelete?: () => void }) {
+function Row({ a, steps, onDelete, onEdit }: { a: Assignment; steps?: { done: boolean }[]; onDelete?: () => void; onEdit?: () => void }) {
   const { t } = useI18n();
   const done = a.status === "done";
   const stepsDone = steps?.filter((s) => s.done).length ?? 0;
@@ -98,6 +98,16 @@ function Row({ a, steps, onDelete }: { a: Assignment; steps?: { done: boolean }[
           )}
         </div>
       </div>
+      {onEdit && (
+        <IconButton
+          label={t("classes.editAssignmentNamed", { title: a.title })}
+          size="sm"
+          onClick={onEdit}
+          className="tap-pad text-ink-faint md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+        >
+          <PencilIcon aria-hidden />
+        </IconButton>
+      )}
       {onDelete && (
         <IconButton
           label={t("classes.deleteAssignment", { title: a.title })}
@@ -125,6 +135,7 @@ export default function ClassPage({ params }: { params: Promise<{ id: string }> 
   const allSteps = useSchoolStore((s) => s.steps);
   const { removeClass, removeAssignment, restoreAssignment, updateClass } = useSchoolStore.getState();
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<string | null>(null);
   const [showDone, setShowDone] = useState(false);
   const [removed, setRemoved] = useState<AssignmentSnapshot | null>(null);
 
@@ -266,6 +277,14 @@ export default function ClassPage({ params }: { params: Promise<{ id: string }> 
         </div>
       )}
 
+      {/* Keyed by the assignment, so switching from one edit to another
+          starts from the right row rather than the last draft. */}
+      {editing && (
+        <div className="mt-6">
+          <AssignmentForm key={editing} classId={cls.id} existingId={editing} onDone={() => setEditing(null)} />
+        </div>
+      )}
+
       {removed && (
         <p role="status" className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-ui border border-line bg-surface-1 px-4 py-2.5 text-sm text-ink-dim">
           {t("classes.deleted", { title: removed.assignment.title })}
@@ -313,7 +332,13 @@ export default function ClassPage({ params }: { params: Promise<{ id: string }> 
         ) : (
           <ul className="card divide-y divide-line overflow-hidden">
             {open.map((a) => (
-              <Row key={a.id} a={a} steps={allSteps[a.id]} onDelete={a.origin !== "school" ? () => void deleteAssignment(a) : undefined} />
+              <Row
+                key={a.id}
+                a={a}
+                steps={allSteps[a.id]}
+                onDelete={a.origin !== "school" ? () => void deleteAssignment(a) : undefined}
+                onEdit={a.origin !== "school" ? () => setEditing(a.id) : undefined}
+              />
             ))}
           </ul>
         )}
