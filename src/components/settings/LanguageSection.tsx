@@ -1,9 +1,11 @@
 "use client";
 
+import { useId } from "react";
 import { useProfileStore } from "@/store/useProfileStore";
 import { useI18n } from "@/lib/i18n";
 import { LOCALES, findLocale } from "@/lib/i18n/locales";
 import { LanguagePicker } from "@/components/onboarding/LanguagePicker";
+import { Card } from "./parts";
 
 // Two separate settings, because they are genuinely different questions.
 //
@@ -16,54 +18,43 @@ export function LanguageSection() {
   const languages = useProfileStore((s) => s.languages);
   const setLanguages = useProfileStore((s) => s.setLanguages);
   const { t } = useI18n();
+  const replyId = useId();
+  const ui = findLocale(languages.interface);
 
   return (
-    <div className="space-y-8">
-      <div>
-        <p className="mb-1 cursor-default select-none text-sm font-medium text-[var(--text)]">{t("settings.interfaceLanguage")}</p>
-        <p className="mb-3 cursor-default select-none text-sm text-[var(--text-faint)]">{t("settings.interfaceLanguageHint")}</p>
+    <div className="space-y-5">
+      <Card title={t("settings.interfaceLanguage")} description={t("settings.interfaceLanguageHint")}>
         <LanguagePicker
           selected={languages.interface}
+          label={t("settings.interfaceLanguage")}
           onSelect={(code) => setLanguages({ interface: code })}
         />
-      </div>
+      </Card>
 
-      <div>
-        <p className="mb-1 cursor-default select-none text-sm font-medium text-[var(--text)]">{t("settings.replyLanguage")}</p>
-        <p className="mb-3 cursor-default select-none text-sm text-[var(--text-faint)]">{t("settings.replyLanguageHint")}</p>
-
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setLanguages({ reply: "auto" })}
-            aria-pressed={languages.reply === "auto"}
-            className={`tap inline-flex items-center rounded-xl border px-3.5 py-2 text-sm transition-colors ${
-              languages.reply === "auto"
-                ? "border-[var(--text)] bg-[var(--surface-2)] font-medium text-[var(--text)]"
-                : "border-[var(--line)] text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
-            }`}
-          >
+      <Card title={t("settings.replyLanguage")} description={t("settings.replyLanguageHint")}>
+        {/* Every language Panda speaks, not the first six. The list used to be
+            cut short, so a student who reads Korean could have the buttons in
+            Korean and no way at all to ask for answers in it. */}
+        <label htmlFor={replyId} className="sr-only">
+          {t("settings.replyLanguage")}
+        </label>
+        <select
+          id={replyId}
+          value={languages.reply}
+          onChange={(e) => setLanguages({ reply: e.target.value })}
+          className="input select max-w-sm"
+        >
+          <option value="auto">
             {t("settings.sameAsInterface")}
-            <span className="ml-1.5 text-xs text-[var(--text-faint)]">
-              ({findLocale(languages.interface)?.nativeName})
-            </span>
-          </button>
-
-          {LOCALES.slice(0, 6).map((l) => (
-            <button
-              key={l.code}
-              onClick={() => setLanguages({ reply: l.code })}
-              aria-pressed={languages.reply === l.code}
-              className={`tap inline-flex items-center rounded-xl border px-3.5 py-2 text-sm transition-colors ${
-                languages.reply === l.code
-                  ? "border-[var(--text)] bg-[var(--surface-2)] font-medium text-[var(--text)]"
-                  : "border-[var(--line)] text-[var(--text-dim)] hover:bg-[var(--surface-2)]"
-              }`}
-            >
-              {l.nativeName}
-            </button>
+            {ui ? ` (${ui.nativeName})` : ""}
+          </option>
+          {LOCALES.map((l) => (
+            <option key={l.code} value={l.code}>
+              {l.nativeName === l.englishName ? l.nativeName : `${l.nativeName} — ${l.englishName}`}
+            </option>
           ))}
-        </div>
-      </div>
+        </select>
+      </Card>
     </div>
   );
 }

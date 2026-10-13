@@ -63,7 +63,7 @@ export function TeacherCodeSection() {
     // Already redeemed. A code box here would be a question with no answer, so
     // the space goes to the thing they actually came for.
     return (
-      <div className="rounded-2xl border border-[var(--line)] p-4">
+      <div className="card p-5">
         <p className="cursor-default select-none font-medium text-[var(--text)]">
           {t("teacherCode.alreadyTitle")}
         </p>
@@ -72,7 +72,7 @@ export function TeacherCodeSection() {
         </p>
         <Link
           href="/teacher"
-          className="tap items-center mt-3 inline-flex rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:border-[var(--focus)] hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)]"
+          className="btn btn-outline mt-3"
         >
           {t("teacherCode.openDashboard")}
         </Link>
@@ -81,7 +81,7 @@ export function TeacherCodeSection() {
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--line)] p-4">
+    <div className="card p-5">
       <p className="cursor-default select-none font-medium text-[var(--text)]">
         {t("teacherCode.title")}
       </p>
@@ -95,12 +95,7 @@ export function TeacherCodeSection() {
         // replacing this with a spinner would read as the success being undone.
         <p
           role="status"
-          className="mt-4 rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed"
-          style={{
-            borderColor: "var(--success)",
-            background: "var(--success-soft)",
-            color: "var(--success)",
-          }}
+          className="mt-4 rounded-[var(--radius)] border border-[color-mix(in_srgb,var(--success)_30%,transparent)] bg-[var(--success-soft)] px-3.5 py-2.5 text-sm leading-relaxed text-[var(--success)]"
         >
           <span className="font-medium">{t("teacherCode.successTitle")}</span>{" "}
           {t("teacherCode.successBody")}
@@ -109,7 +104,7 @@ export function TeacherCodeSection() {
         <form onSubmit={submit} className="mt-4 flex flex-col gap-2">
           <label
             htmlFor="settings-teacher-code"
-            className="cursor-default select-none text-sm font-medium text-[var(--text)]"
+            className="field-label cursor-default select-none"
           >
             {t("teacherCode.label")}
           </label>
@@ -129,14 +124,14 @@ export function TeacherCodeSection() {
             aria-describedby={error ? "settings-teacher-code-error" : undefined}
             aria-invalid={error !== null}
             disabled={busy}
-            className="w-full rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3.5 py-2.5 font-mono text-sm tracking-wide text-[var(--text)] outline-none transition-colors placeholder:text-[var(--text-faint)] focus:border-[var(--focus)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-60"
+            className="input max-w-sm font-mono tracking-wide disabled:opacity-60"
           />
 
           <div>
             <button
               type="submit"
               disabled={busy || code.trim().length === 0}
-              className="tap inline-flex items-center rounded-xl bg-[var(--accent)] px-3.5 py-2 text-sm font-medium text-[var(--accent-contrast)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-50"
+              className="btn btn-primary"
             >
               {busy ? t("teacherCode.checking") : t("teacherCode.submit")}
             </button>
@@ -149,12 +144,7 @@ export function TeacherCodeSection() {
             <p
               id="settings-teacher-code-error"
               role="alert"
-              className="rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed"
-              style={{
-                borderColor: "var(--danger)",
-                background: "var(--danger-soft)",
-                color: "var(--danger)",
-              }}
+              className="rounded-[var(--radius)] border border-[color-mix(in_srgb,var(--danger)_30%,transparent)] bg-[var(--danger-soft)] px-3.5 py-2.5 text-sm leading-relaxed text-[var(--danger)]"
             >
               {error}
             </p>
@@ -162,10 +152,7 @@ export function TeacherCodeSection() {
         </form>
       )}
 
-      <div
-        className="mt-4 rounded-xl border border-[var(--line)] p-3.5 text-sm leading-relaxed text-[var(--text-faint)]"
-        style={{ background: "var(--surface-1)" }}
-      >
+      <div className="mt-4 rounded-[var(--radius)] bg-[var(--surface-2)] p-3.5 text-sm leading-relaxed text-[var(--text-faint)]">
         <p className="cursor-default select-none font-medium text-[var(--text)]">
           {t("teacherCode.whereTitle")}
         </p>

@@ -74,7 +74,7 @@ export function DeactivateTeacherSection() {
 
   if (done) {
     return (
-      <div className="rounded-2xl border border-[var(--line)] p-4">
+      <div className="card p-5">
         <p role="status" className="cursor-default select-none font-medium text-[var(--text)]">
           {t("teacherOff.doneTitle")}
         </p>
@@ -111,7 +111,7 @@ export function DeactivateTeacherSection() {
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--line)] p-4">
+    <div className="card p-5">
       <p className="cursor-default select-none font-medium text-[var(--text)]">
         {t("teacherOff.title")}
       </p>
@@ -123,8 +123,7 @@ export function DeactivateTeacherSection() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="tap inline-flex items-center mt-3 rounded-xl border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)]"
-          style={{ borderColor: "var(--danger)", color: "var(--danger)" }}
+          className="btn btn-danger mt-3"
         >
           {t("teacherOff.start")}
         </button>
@@ -137,13 +136,11 @@ export function DeactivateTeacherSection() {
           role="alertdialog"
           aria-labelledby="teacher-off-heading"
           aria-describedby="teacher-off-detail"
-          className="mt-4 rounded-xl border p-3.5"
-          style={{ borderColor: "var(--danger)", background: "var(--danger-soft)" }}
+          className="mt-4 rounded-[var(--radius)] border border-[color-mix(in_srgb,var(--danger)_35%,transparent)] bg-[var(--danger-soft)] p-4"
         >
           <p
             id="teacher-off-heading"
-            className="cursor-default select-none text-sm font-medium"
-            style={{ color: "var(--danger)" }}
+            className="cursor-default select-none text-sm font-medium text-[var(--danger)]"
           >
             {t("teacherOff.confirmTitle")}
           </p>
@@ -189,7 +186,7 @@ export function DeactivateTeacherSection() {
             placeholder={CONFIRM_PHRASE}
             aria-describedby={error ? "teacher-off-error" : undefined}
             disabled={busy}
-            className="mt-1.5 w-full rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3.5 py-2.5 font-mono text-sm text-[var(--text)] outline-none transition-colors placeholder:text-[var(--text-faint)] focus:border-[var(--focus)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-60"
+            className="input mt-1.5 max-w-sm font-mono disabled:opacity-60"
           />
 
           <div className="mt-3 flex flex-wrap gap-2">
@@ -199,8 +196,7 @@ export function DeactivateTeacherSection() {
               // last check, not the only one: the function refuses anything but
               // a demotion whatever this form sends.
               disabled={busy || phrase !== CONFIRM_PHRASE}
-              className="tap inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-medium text-[var(--accent-contrast)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-50"
-              style={{ background: "var(--danger)" }}
+              className="btn border-transparent bg-[var(--danger)] text-white hover:opacity-90"
             >
               {busy ? t("teacherOff.working") : t("teacherOff.submit")}
             </button>
@@ -212,7 +208,7 @@ export function DeactivateTeacherSection() {
                 setError(null);
               }}
               disabled={busy}
-              className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:border-[var(--focus)] hover:text-[var(--text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] disabled:opacity-50"
+              className="btn btn-outline"
             >
               {t("teacherOff.cancel")}
             </button>
@@ -222,12 +218,7 @@ export function DeactivateTeacherSection() {
             <p
               id="teacher-off-error"
               role="alert"
-              className="mt-3 rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed"
-              style={{
-                borderColor: "var(--danger)",
-                background: "var(--surface-1)",
-                color: "var(--danger)",
-              }}
+              className="mt-3 rounded-[var(--radius)] border border-[var(--danger)] bg-[var(--surface-1)] px-3.5 py-2.5 text-sm leading-relaxed text-[var(--danger)]"
             >
               {error}
             </p>
