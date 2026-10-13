@@ -378,6 +378,8 @@ function Trouble({
     quota: t("watch.troubleQuota"),
     "wrong-key": t("watch.troubleWrongKey"),
     failed: t("watch.troubleFailed"),
+    busy: t("watch.troubleBusy"),
+    auth: t("watch.troubleAuth"),
   };
 
   const fallback: Record<WatchProblem, string> = {
@@ -385,6 +387,8 @@ function Trouble({
     quota: t("watch.troubleQuotaHint"),
     "wrong-key": t("watch.troubleWrongKeyHint"),
     failed: t("watch.troubleFailedHint"),
+    busy: t("watch.troubleBusyHint"),
+    auth: t("watch.troubleAuthHint"),
   };
 
   // Quota and a dropped connection both come back on their own; a missing or
