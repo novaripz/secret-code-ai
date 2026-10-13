@@ -12,7 +12,7 @@
 // teacher who does not know that will over-read them.
 
 import Link from "next/link";
-import { useClassAnalytics, useTeacherStore } from "./store";
+import { NO_STUDENTS, useClassAnalytics, useTeacherStore } from "./store";
 import { LoadNote, SectionHeading, Stat, cardClass } from "./primitives";
 import { SignalCard } from "./SignalCard";
 import { PrivacyNote } from "./PrivacyNote";
@@ -24,7 +24,7 @@ export function AnalyticsView({ classId }: { classId: string }) {
   // opposite facts about this room. LoadNote says which one happened, and the
   // rest of the screen only draws once there is something real behind it.
   const { data: analytics, state } = useClassAnalytics(classId);
-  const roster = useTeacherStore((s) => s.roster[classId] ?? []);
+  const roster = useTeacherStore((s) => s.roster[classId] ?? NO_STUDENTS);
 
   if (!analytics) return <LoadNote state={state} what="this class's learning signals" />;
 
@@ -58,7 +58,7 @@ export function AnalyticsView({ classId }: { classId: string }) {
       </div>
 
       {quiet && (
-        <p className="mt-6 rounded-2xl border border-dashed border-[var(--line-strong)] px-4 py-10 text-center text-sm leading-relaxed text-[var(--text-faint)]">
+        <p className="mt-6 rounded-ui-lg border border-dashed border-line-strong px-4 py-8 text-center text-sm leading-relaxed text-ink-faint">
           No struggle signals from this class in the last {analytics.windowDays} days. That is a
           real answer, not a missing one — it means nobody pressed for help often enough on one
           topic for it to be worth a line here. Students working offline or signed out are counted
@@ -99,10 +99,10 @@ export function AnalyticsView({ classId }: { classId: string }) {
               <Link
                 key={s.id}
                 href={`/teacher/classes/${classId}/students/${s.id}`}
-                className={`tap ${cardClass} flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm transition-colors hover:bg-[var(--surface-1)]`}
+                className={`tap ${cardClass} card-interactive flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm`}
               >
-                <span className="min-w-0 truncate font-medium text-[var(--text)]">{s.displayName}</span>
-                <span className="shrink-0 text-xs text-[var(--text-faint)]">
+                <span className="min-w-0 truncate font-[var(--weight-ui)] text-ink">{s.displayName}</span>
+                <span className={`shrink-0 text-xs ${s.overdue > 0 ? "text-danger" : "text-ink-faint"}`}>
                   {s.overdue > 0 ? `${s.overdue} overdue` : "On track"}
                 </span>
               </Link>

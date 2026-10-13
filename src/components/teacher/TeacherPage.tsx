@@ -37,6 +37,8 @@ import { useTeacherStore } from "./store";
 import { RedeemCodePanel } from "./RedeemCodePanel";
 import { TeacherSignIn } from "./TeacherSignIn";
 import { cardClass, quietButtonClass } from "./primitives";
+import { PAGE_WIDTH } from "@/components/home/SchoolKit";
+import { Skeleton } from "@/components/ui/primitives";
 
 export function TeacherPage({ children }: { children: React.ReactNode }) {
   const role = useTeacherStore((s) => s.role);
@@ -64,17 +66,21 @@ export function TeacherPage({ children }: { children: React.ReactNode }) {
   return (
     <AppShell>
       <div className="h-full overflow-y-auto">
-        <div className="mx-auto w-full max-w-5xl px-4 py-7 sm:px-6">
+        <div className={PAGE_WIDTH}>
           {checking ? (
             // Neutral on purpose. A teacher must never see the student wall
             // flash past on the way to their own classes.
-            <p className="text-sm text-[var(--text-faint)]">Checking your account…</p>
+            <div aria-busy="true" aria-label="Checking your account">
+              <Skeleton className="h-11 w-11 rounded-ui" />
+              <Skeleton className="mt-4 h-8 w-64" />
+              <Skeleton className="mt-6 h-32 w-full rounded-ui-lg" />
+            </div>
           ) : !account ? (
             // Signed out — including a guest who walked in from the student
             // side. Offer the door rather than an explanation of the lock; the
             // store's own error for this case says "sign in" and nothing more
             // actionable than what this screen already is.
-            <TeacherSignIn onSignedIn={() => void loadRole()} />
+            <TeacherSignIn onSignedIn={() => void loadRole({ force: true })} />
           ) : state.error ? (
             // Not signed in, or no database configured, or the read failed.
             // All three are stated rather than collapsed into "no access":
@@ -84,7 +90,7 @@ export function TeacherPage({ children }: { children: React.ReactNode }) {
             // Signed in, but an ordinary account. The redeem box re-reads the
             // role from the database on success; it does not flip anything
             // locally, because local state is exactly what a student can edit.
-            <RedeemCodePanel onRedeemed={() => void loadRole()} />
+            <RedeemCodePanel onRedeemed={() => void loadRole({ force: true })} />
           ) : (
             children
           )}
