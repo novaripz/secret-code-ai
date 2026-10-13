@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useAuthStore } from "@/store/useAuthStore";
 import { GoogleSignIn } from "./GoogleSignIn";
+import { GlobeIcon, InfoIcon } from "@/components/icons";
 
 // The sign-in form.
 //
@@ -17,8 +18,12 @@ type Setup = "loading" | "supabase" | "google-only" | "none";
 
 export function SignInPanel({ onDone }: { onDone?: () => void }) {
   const { t } = useI18n();
-  const { signInWithPassword, signUpWithPassword, signInWithGoogle, busy, error, clearError } =
-    useAuthStore();
+  const signInWithPassword = useAuthStore((s) => s.signInWithPassword);
+  const signUpWithPassword = useAuthStore((s) => s.signUpWithPassword);
+  const signInWithGoogle = useAuthStore((s) => s.signInWithGoogle);
+  const busy = useAuthStore((s) => s.busy);
+  const error = useAuthStore((s) => s.error);
+  const clearError = useAuthStore((s) => s.clearError);
 
   const [setup, setSetup] = useState<Setup>("loading");
   const [creating, setCreating] = useState(false);
@@ -26,6 +31,7 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [note, setNote] = useState<string | null>(null);
+  const ids = { name: useId(), email: useId(), password: useId() };
 
   useEffect(() => {
     let cancelled = false;
@@ -58,16 +64,38 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
   }
 
   if (setup === "loading") {
-    return <div className="h-40 animate-pulse rounded-2xl bg-[var(--surface-2)]" />;
+    return (
+      <div className="flex flex-col gap-3" aria-busy="true">
+        <div className="skeleton h-10" />
+        <div className="skeleton h-10" />
+        <div className="skeleton h-10" />
+      </div>
+    );
   }
 
   if (setup === "none") {
+    // Said to the student in their language, without the setup jargon; the
+    // variable names are for whoever runs this copy, one click further in.
     return (
-      <p className="text-sm leading-relaxed text-[var(--text-faint)]">
-        Sign-in isn&apos;t set up yet. Create a project at supabase.com and set{" "}
-        <code className="rounded bg-[var(--surface-2)] px-1 py-0.5 font-mono text-xs">SUPABASE_URL</code> and{" "}
-        <code className="rounded bg-[var(--surface-2)] px-1 py-0.5 font-mono text-xs">SUPABASE_ANON_KEY</code>.
-      </p>
+      <div className="text-start">
+        <div className="flex items-start gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--info-soft)] text-[var(--info)]">
+            <InfoIcon className="h-[18px] w-[18px]" />
+          </span>
+          <div>
+            <p className="font-medium text-[var(--text)]">{t("auth.notSetUpTitle")}</p>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--text-dim)]">{t("auth.notSetUpBody")}</p>
+          </div>
+        </div>
+        <details className="mt-4 text-[13px] leading-relaxed text-[var(--text-faint)]">
+          <summary className="cursor-pointer select-none font-medium text-[var(--text-dim)]">{t("auth.forAdmins")}</summary>
+          <p className="mt-2">
+            Create a project at supabase.com and set{" "}
+            <code className="rounded bg-[var(--surface-2)] px-1 py-0.5 font-mono text-xs">SUPABASE_URL</code> and{" "}
+            <code className="rounded bg-[var(--surface-2)] px-1 py-0.5 font-mono text-xs">SUPABASE_ANON_KEY</code>.
+          </p>
+        </details>
+      </div>
     );
   }
 
@@ -75,85 +103,91 @@ export function SignInPanel({ onDone }: { onDone?: () => void }) {
     return <GoogleSignIn onDone={onDone} />;
   }
 
-  const field =
-    "w-full rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text)] outline-none transition-colors focus:border-[var(--focus)]";
-
   return (
-    <div className="flex w-full flex-col gap-3">
-      <form onSubmit={submit} className="flex flex-col gap-2.5 text-left">
+    <div className="flex w-full flex-col gap-4 text-start">
+      <form onSubmit={submit} className="flex flex-col gap-3">
         {creating && (
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={t("settings.namePlaceholder")}
-            aria-label={t("settings.namePlaceholder")}
-            autoComplete="name"
-            className={field}
-          />
+          <div>
+            <label htmlFor={ids.name} className="field-label mb-1.5">
+              {t("settings.name")}
+            </label>
+            <input
+              id={ids.name}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t("settings.namePlaceholder")}
+              autoComplete="name"
+              className="input"
+            />
+          </div>
         )}
 
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder={t("auth.email")}
-          aria-label={t("auth.email")}
-          autoComplete="email"
-          className={field}
-        />
+        <div>
+          <label htmlFor={ids.email} className="field-label mb-1.5">
+            {t("auth.email")}
+          </label>
+          <input
+            id={ids.email}
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            className="input"
+          />
+        </div>
 
-        <input
-          type="password"
-          required
-          minLength={6}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder={t("auth.password")}
-          aria-label={t("auth.password")}
-          autoComplete={creating ? "new-password" : "current-password"}
-          className={field}
-        />
+        <div>
+          <label htmlFor={ids.password} className="field-label mb-1.5">
+            {t("auth.password")}
+          </label>
+          <input
+            id={ids.password}
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete={creating ? "new-password" : "current-password"}
+            className="input"
+          />
+        </div>
 
-        <button
-          type="submit"
-          disabled={busy || !email.trim() || password.length < 6}
-          className="tap inline-flex items-center rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity disabled:opacity-40"
-        >
+        <button type="submit" disabled={busy || !email.trim() || password.length < 6} className="btn btn-primary mt-1 w-full">
           {busy ? t("auth.oneMoment") : t(creating ? "auth.createAccount" : "auth.signIn")}
         </button>
       </form>
 
+      {note && (
+        <p role="status" className="rounded-[var(--radius)] bg-[var(--success-soft)] px-3.5 py-2.5 text-sm text-[var(--success)]">
+          {note}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="rounded-[var(--radius)] bg-[var(--danger-soft)] px-3.5 py-2.5 text-sm text-[var(--danger)]">
+          {error}
+        </p>
+      )}
+
       <button
+        type="button"
         onClick={() => {
           setCreating((v) => !v);
           setNote(null);
           clearError();
         }}
-        className="text-sm text-[var(--text-faint)] underline-offset-4 hover:text-[var(--text-dim)] hover:underline"
+        className="btn btn-ghost btn-sm self-center"
       >
         {t(creating ? "auth.haveAccount" : "auth.makeAccount")}
       </button>
 
-      <div className="flex items-center gap-3 py-1">
-        <span className="h-px flex-1 bg-[var(--line)]" />
-        <span className="text-xs uppercase tracking-wide text-[var(--text-faint)]">{t("auth.or")}</span>
-        <span className="h-px flex-1 bg-[var(--line)]" />
+      <div className="border-t border-[var(--line)] pt-4">
+        <button type="button" onClick={signInWithGoogle} disabled={busy} className="btn btn-secondary w-full">
+          <GlobeIcon />
+          {t("auth.continueWithGoogle")}
+        </button>
+        <p className="mt-2 text-xs leading-relaxed text-[var(--text-faint)]">{t("auth.googleNote")}</p>
       </div>
-
-      <button
-        onClick={signInWithGoogle}
-        disabled={busy}
-        className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-4 py-2.5 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-40"
-      >
-        {t("auth.continueWithGoogle")}
-      </button>
-      <p className="text-xs leading-relaxed text-[var(--text-faint)]">
-        {t("auth.googleNote")}
-      </p>
-
-      {note && <p className="text-sm text-[var(--success)]">{note}</p>}
-      {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
     </div>
   );
 }

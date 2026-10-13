@@ -20,7 +20,13 @@ export function Wordmark({
   return (
     <span className={`flex items-center gap-2.5 ${className}`}>
       {mark && (
-        <span className={`flex ${box} shrink-0 items-center justify-center rounded-xl bg-[var(--surface-2)]`}>
+        // The mark sits on the brand gradient — the one place the logo
+        // carries the brand colour — so the panda's black and white read as a
+        // badge rather than a doodle on grey.
+        <span
+          className={`flex ${box} shrink-0 items-center justify-center rounded-[var(--radius)] shadow-ui-1`}
+          style={{ background: "var(--brand-gradient)" }}
+        >
           <PandaMark className={glyph} />
         </span>
       )}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Wordmark } from "@/components/Wordmark";
 import { COMPANY_NAME, LEGAL_LAST_UPDATED, lastUpdatedLabel } from "../contact-details";
 
 // The furniture every legal page shares.
@@ -53,11 +54,10 @@ export function LegalShell({
 
       <header className="border-b border-[var(--line)]">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-4 sm:px-6">
-          <Link
-            href="/"
-            className="rounded font-[family-name:var(--font-wordmark)] text-lg font-bold tracking-tight text-[var(--text)]"
-          >
-            Panda
+          {/* The same mark as inside the app, so a parent arriving from an
+              email link sees the thing their child uses. */}
+          <Link href="/" aria-label="Panda" className="rounded-[var(--radius-sm)]">
+            <Wordmark />
           </Link>
           <span className="text-sm text-[var(--text-faint)]">by {COMPANY_NAME}</span>
           <nav aria-label="Legal documents" className="ms-auto flex flex-wrap gap-1">

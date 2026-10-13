@@ -5,6 +5,7 @@ import localforage from "localforage";
 import { nanoid } from "nanoid";
 import { accountScope } from "./useAuthStore";
 import type { Attachment } from "@/lib/attachments";
+import type { Phase, Source } from "@/components/chat/frames";
 
 // The main chat: threads that live outside any single project, so the
 // conversation (and everything the AI remembers from it) follows the user
@@ -27,9 +28,50 @@ export interface AssistantMessage {
   createdAt: number;
   /** True while text is still arriving, so the UI knows to animate new pieces. */
   streaming?: boolean;
-  /** Trimmed copy of what the user attached, for re-rendering the thread. */
-  attachments?: { id: string; kind: Attachment["kind"]; name: string; dataUrl?: string }[];
+  /**
+   * Trimmed copy of what the user attached, for re-rendering the thread — and
+   * for sending it again when the student edits the message or asks for a new
+   * answer. `text` is the content of a text file, capped; an image needs
+   * nothing more than its data URL.
+   */
+  attachments?: StoredAttachment[];
   error?: string;
+}
+
+export interface StoredAttachment {
+  id: string;
+  kind: Attachment["kind"];
+  name: string;
+  dataUrl?: string;
+  text?: string;
+}
+
+/** A text file's content is kept for resending, up to this many characters. */
+const STORED_TEXT_CHARS = 40_000;
+
+/**
+ * Turns a stored attachment back into one that can be sent.
+ *
+ * Images come back whole from their data URL. A text file comes back with
+ * whatever was kept of it; one stored before text was kept comes back as its
+ * name only, which is the honest most that can be resent.
+ */
+export function restoreAttachment(a: StoredAttachment): Attachment {
+  if (a.kind === "image" && a.dataUrl) {
+    const comma = a.dataUrl.indexOf(",");
+    const mimeType = a.dataUrl.slice(5, a.dataUrl.indexOf(";")) || "image/png";
+    const base64 = comma === -1 ? "" : a.dataUrl.slice(comma + 1);
+    return { id: a.id, kind: "image", name: a.name, size: Math.round((base64.length * 3) / 4), dataUrl: a.dataUrl, base64, mimeType };
+  }
+  return { id: a.id, kind: "text", name: a.name, size: a.text?.length ?? 0, text: a.text ?? "" };
+}
+
+/** What Panda is doing in a thread right now. Mirrors the server's progress frames. */
+export interface ActivityState {
+  phase: Phase;
+  query?: string;
+  count?: number;
+  reason?: string;
 }
 
 /**
@@ -113,37 +155,67 @@ export interface Thread {
   createdAt: number;
   updatedAt: number;
   messages: AssistantMessage[];
+  /** Kept at the top of the sidebar, whatever its age. */
+  pinned?: boolean;
 }
 
 export interface ThreadSummary {
   id: string;
   title: string;
   updatedAt: number;
+  pinned?: boolean;
 }
 
 interface AssistantState {
   threads: ThreadSummary[];
   activeThread: Thread | null;
-  loading: boolean;
   hydrated: boolean;
+  /**
+   * Threads with a request in flight, from the moment a message is sent until
+   * its stream has closed. This is the one "busy" signal: the old screen read a
+   * global `loading` that went false as soon as the stream OPENED, so pressing
+   * Enter mid-reply started a second request on top of the first.
+   */
+  pending: Record<string, true>;
+  /** What Panda is doing in each thread, while it is doing it. */
+  activity: Record<string, ActivityState>;
+  /**
+   * Citations, by the message they belong to. In memory only: the stored
+   * message shape stays what it was, and the cost is that sources are lost on
+   * reload — the same trade the screen made when they lived in component state.
+   */
+  sources: Record<string, Source[]>;
 
   hydrate: () => Promise<void>;
   newThread: () => void;
-  openThread: (id: string) => Promise<void>;
+  /** Resolves false when there is no such thread on this device. */
+  openThread: (id: string) => Promise<boolean>;
   deleteThread: (id: string) => Promise<void>;
   renameThread: (id: string, title: string) => Promise<void>;
+  pinThread: (id: string, pinned: boolean) => Promise<void>;
 
   addUserMessage: (content: string, attachments?: Attachment[]) => void;
   addAssistantMessage: (content: string) => void;
-  addErrorMessage: (error: string) => void;
-  setLoading: (loading: boolean) => void;
+  /** Records a turn that failed before saying anything, in the thread that asked. */
+  addErrorMessage: (error: string, threadId?: string) => void;
+  /** Drops a message and everything after it from the open thread (edit, regenerate). */
+  truncateFrom: (messageId: string) => void;
 
   /** Opens an empty assistant message to stream into. Returns its id. */
-  startAssistantMessage: () => string;
-  /** Appends newly arrived text to a streaming message. */
+  startAssistantMessage: (threadId?: string) => string;
+  /** Appends newly arrived text to a streaming message, wherever its thread now is. */
   appendToAssistantMessage: (id: string, chunk: string) => void;
   /** Marks the stream done and writes the finished thread to storage. */
   finishAssistantMessage: (id: string, error?: string) => void;
+
+  /** Marks a thread busy and hands back the controller that can stop it. */
+  beginRequest: (threadId: string) => AbortController;
+  /** Clears the busy mark — only if `controller` is still the thread's current one. */
+  endRequest: (threadId: string, controller: AbortController) => void;
+  /** Stops whatever the thread is waiting on. The partial reply stays. */
+  stopRequest: (threadId: string) => void;
+  setActivity: (threadId: string, activity: ActivityState | null) => void;
+  setSources: (messageId: string, items: Source[]) => void;
 }
 
 function titleFrom(text: string) {
@@ -155,6 +227,10 @@ function titleFrom(text: string) {
 function emptyThread(): Thread {
   const now = Date.now();
   return { id: nanoid(10), title: "New chat", createdAt: now, updatedAt: now, messages: [] };
+}
+
+function summaryOf(thread: Thread): ThreadSummary {
+  return { id: thread.id, title: thread.title, updatedAt: thread.updatedAt, pinned: thread.pinned || undefined };
 }
 
 async function persistThread(thread: Thread) {
@@ -169,32 +245,98 @@ async function writeIndex(index: ThreadSummary[]) {
   await threadStore.setItem(INDEX_KEY, index);
 }
 
+// ---------------------------------------------------------------------------
+// Replies that outlive the screen they started on
+// ---------------------------------------------------------------------------
+//
+// Every write used to go to whichever thread was OPEN, so switching chats
+// mid-reply poured the rest of the answer into the chat the student had just
+// opened, and renaming one mid-reply swapped the live thread for a stale copy
+// off disk. Now a streaming message remembers the thread it belongs to, and a
+// thread that is still being written to is parked here when the student opens
+// another one. The reply finishes where it started, is saved there, and is
+// waiting — complete — when they come back.
+//
+// Module state rather than store state on purpose: nothing renders from these,
+// and putting a Map in zustand would re-render the sidebar on every chunk.
+
+/** Streaming message id → the thread it belongs to. */
+const streamOwner = new Map<string, string>();
+/** Threads with a live request that are not the one on screen. */
+const background = new Map<string, Thread>();
+/** The way to stop each thread's request, by thread id. */
+const controllers = new Map<string, AbortController>();
+/**
+ * Bumped by every open, so a slow read that loses the race to a later click
+ * does not land on screen after it. Clicking chat B then chat C quickly used
+ * to be able to finish on B.
+ */
+let openSeq = 0;
+
 export const useAssistantStore = create<AssistantState>((set, get) => {
-  /** Writes the active thread to disk and keeps the sidebar index in sync. */
+  /** Writes a thread to disk and keeps the sidebar index in sync. */
   async function save(thread: Thread) {
     await persistThread(thread);
     const index = await readIndex();
-    const summary: ThreadSummary = { id: thread.id, title: thread.title, updatedAt: thread.updatedAt };
-    const next = [summary, ...index.filter((t) => t.id !== thread.id)]
+    const next = [summaryOf(thread), ...index.filter((t) => t.id !== thread.id)]
       .sort((a, b) => b.updatedAt - a.updatedAt)
       .slice(0, MAX_THREADS);
     await writeIndex(next);
     set({ threads: next });
   }
 
+  /** Whether a thread still has something arriving, so leaving it must not drop it. */
+  function isLive(thread: Thread) {
+    return !!get().pending[thread.id] || thread.messages.some((m) => m.streaming);
+  }
+
+  /** Called before the open thread is replaced, so a live reply keeps going. */
+  function parkActive() {
+    const current = get().activeThread;
+    if (current && isLive(current)) background.set(current.id, current);
+  }
+
   /**
-   * Appends to the active thread, creating one on the fly if needed.
+   * Applies `fn` to a thread wherever it currently lives — on screen or parked.
+   * Returns the updated thread, or null when it is gone (deleted mid-reply).
+   */
+  function updateThread(threadId: string, fn: (thread: Thread) => Thread): Thread | null {
+    const active = get().activeThread;
+    if (active?.id === threadId) {
+      const next = fn(active);
+      set({ activeThread: next });
+      return next;
+    }
+    const parked = background.get(threadId);
+    if (parked) {
+      const next = fn(parked);
+      background.set(threadId, next);
+      return next;
+    }
+    return null;
+  }
+
+  /**
+   * Appends to a thread, creating the open one on the fly if needed.
    *
    * `persist: false` keeps the message in memory only. That exists for the
    * empty streaming placeholder, which is worth nothing on disk and actively
    * harmful there if the tab closes before the stream ends.
    */
-  function append(message: AssistantMessage, persist = true) {
+  function append(message: AssistantMessage, persist = true, threadId?: string) {
+    if (threadId && threadId !== get().activeThread?.id) {
+      const next = updateThread(threadId, (t) => ({ ...t, updatedAt: Date.now(), messages: [...t.messages, message] }));
+      if (next && persist) void save(next);
+      return;
+    }
     const current = get().activeThread ?? emptyThread();
-    const isFirstUserTurn = message.role === "user" && current.messages.length === 0;
+    // Titled from the first thing the student says — but only a chat that
+    // still has the placeholder name. Editing or retrying the first message
+    // empties the thread for a moment, and that must not undo a rename.
+    const isFirstUserTurn = message.role === "user" && current.messages.length === 0 && current.title === "New chat";
     const thread: Thread = {
       ...current,
-      title: isFirstUserTurn ? titleFrom(message.content) : current.title,
+      title: isFirstUserTurn ? titleFrom(message.content || message.attachments?.[0]?.name || "") : current.title,
       updatedAt: Date.now(),
       messages: [...current.messages, message],
     };
@@ -202,11 +344,29 @@ export const useAssistantStore = create<AssistantState>((set, get) => {
     if (persist) void save(thread);
   }
 
+  /** Changes a stored thread's metadata wherever it lives, then the index. */
+  async function patchMeta(id: string, patch: Partial<Pick<Thread, "title" | "pinned">>) {
+    // The live copy wins over the disk copy. Reading from disk here is what
+    // used to swap a streaming thread for the version saved before the reply.
+    const live = updateThread(id, (t) => ({ ...t, ...patch }));
+    const stored = live ?? (await threadStore.getItem<Thread>(`thread:${id}`));
+    if (!stored) return;
+    const updated = live ?? { ...stored, ...patch };
+    // A thread with no messages has never been saved and should not start
+    // now just because it was renamed; the first message will save it.
+    if (updated.messages.length > 0) await persistThread(updated);
+    const index = (await readIndex()).map((t) => (t.id === id ? { ...t, ...patch, pinned: updated.pinned || undefined } : t));
+    await writeIndex(index);
+    set({ threads: index });
+  }
+
   return {
     threads: [],
     activeThread: null,
-    loading: false,
     hydrated: false,
+    pending: {},
+    activity: {},
+    sources: {},
 
     hydrate: async () => {
       const index = await readIndex();
@@ -214,18 +374,39 @@ export const useAssistantStore = create<AssistantState>((set, get) => {
       if (!get().activeThread) set({ activeThread: emptyThread() });
     },
 
-    newThread: () => set({ activeThread: emptyThread() }),
+    newThread: () => {
+      openSeq++;
+      parkActive();
+      set({ activeThread: emptyThread() });
+    },
 
     openThread: async (id) => {
+      const seq = ++openSeq;
+      if (get().activeThread?.id === id) return true;
+      const parked = background.get(id);
+      if (parked) {
+        parkActive();
+        background.delete(id);
+        set({ activeThread: parked });
+        return true;
+      }
       const thread = await threadStore.getItem<Thread>(`thread:${id}`);
+      if (seq !== openSeq) return true;
+      if (!thread) return false;
+      parkActive();
       // Threads stored before the placeholder stopped being persisted can
       // still hold an empty `streaming: true` bubble from a tab that was
       // closed mid-answer. It is dropped on the way in, so the student never
       // sees a panda animating over nothing.
-      if (thread) set({ activeThread: { ...thread, messages: pruneAbandonedStreams(thread.messages) } });
+      set({ activeThread: { ...thread, messages: pruneAbandonedStreams(thread.messages) } });
+      return true;
     },
 
     deleteThread: async (id) => {
+      // A reply still being written into a deleted chat has nowhere to go;
+      // stopping it saves the tokens and stops `finish` resurrecting the file.
+      get().stopRequest(id);
+      background.delete(id);
       await threadStore.removeItem(`thread:${id}`);
       const index = (await readIndex()).filter((t) => t.id !== id);
       await writeIndex(index);
@@ -238,13 +419,11 @@ export const useAssistantStore = create<AssistantState>((set, get) => {
     renameThread: async (id, title) => {
       const clean = title.trim();
       if (!clean) return;
-      const thread = await threadStore.getItem<Thread>(`thread:${id}`);
-      if (!thread) return;
-      const updated = { ...thread, title: clean };
-      await persistThread(updated);
-      const index = (await readIndex()).map((t) => (t.id === id ? { ...t, title: clean } : t));
-      await writeIndex(index);
-      set((s) => ({ threads: index, activeThread: s.activeThread?.id === id ? updated : s.activeThread }));
+      await patchMeta(id, { title: clean });
+    },
+
+    pinThread: async (id, pinned) => {
+      await patchMeta(id, { pinned: pinned || undefined });
     },
 
     addUserMessage: (content, attachments) =>
@@ -253,55 +432,108 @@ export const useAssistantStore = create<AssistantState>((set, get) => {
         role: "user",
         content,
         createdAt: Date.now(),
-        attachments: attachments?.map((a) => ({ id: a.id, kind: a.kind, name: a.name, dataUrl: a.dataUrl })),
+        attachments: attachments?.map((a) => ({
+          id: a.id,
+          kind: a.kind,
+          name: a.name,
+          dataUrl: a.dataUrl,
+          text: a.kind === "text" && a.text ? a.text.slice(0, STORED_TEXT_CHARS) : undefined,
+        })),
       }),
 
     addAssistantMessage: (content) =>
       append({ id: nanoid(10), role: "assistant", content, createdAt: Date.now() }),
 
-    addErrorMessage: (error) =>
-      append({ id: nanoid(10), role: "assistant", content: "", createdAt: Date.now(), error }),
+    addErrorMessage: (error, threadId) =>
+      append({ id: nanoid(10), role: "assistant", content: "", createdAt: Date.now(), error }, true, threadId),
 
-    startAssistantMessage: () => {
+    truncateFrom: (messageId) => {
+      const current = get().activeThread;
+      if (!current) return;
+      const at = current.messages.findIndex((m) => m.id === messageId);
+      if (at === -1) return;
+      const thread: Thread = { ...current, updatedAt: Date.now(), messages: current.messages.slice(0, at) };
+      set({ activeThread: thread });
+      if (thread.messages.length > 0) void save(thread);
+    },
+
+    startAssistantMessage: (threadId) => {
       const id = nanoid(10);
+      const owner = threadId ?? get().activeThread?.id;
       // Deliberately NOT persisted: an empty placeholder is worth nothing on
       // disk, and if the tab closes mid-stream it is all that would be left —
       // stored forever as an empty message that still claims to be streaming.
       // The real text is written by `finishAssistantMessage`, which is the
       // first moment there is anything worth keeping.
-      append({ id, role: "assistant", content: "", createdAt: Date.now(), streaming: true }, false);
+      append({ id, role: "assistant", content: "", createdAt: Date.now(), streaming: true }, false, owner);
+      const resolved = owner ?? get().activeThread?.id;
+      if (resolved) streamOwner.set(id, resolved);
       return id;
     },
 
     // Chunks land many times a second, so this only touches in-memory state.
     // Persistence waits for finishAssistantMessage.
     appendToAssistantMessage: (id, chunk) => {
-      const thread = get().activeThread;
-      if (!thread) return;
-      set({
-        activeThread: {
-          ...thread,
-          messages: thread.messages.map((m) =>
-            m.id === id ? { ...m, content: m.content + chunk } : m,
-          ),
-        },
-      });
+      const owner = streamOwner.get(id) ?? get().activeThread?.id;
+      if (!owner) return;
+      updateThread(owner, (thread) => ({
+        ...thread,
+        messages: thread.messages.map((m) => (m.id === id ? { ...m, content: m.content + chunk } : m)),
+      }));
     },
 
     finishAssistantMessage: (id, error) => {
-      const current = get().activeThread;
-      if (!current) return;
-      const thread: Thread = {
+      const owner = streamOwner.get(id) ?? get().activeThread?.id;
+      streamOwner.delete(id);
+      if (!owner) return;
+      const thread = updateThread(owner, (current) => ({
         ...current,
         updatedAt: Date.now(),
         messages: current.messages.map((m) =>
           m.id === id ? { ...m, streaming: false, error: error ?? m.error } : m,
         ),
-      };
-      set({ activeThread: thread });
-      void save(thread);
+      }));
+      // Null means the thread was deleted while the reply was arriving, and
+      // saving it now would bring it back from the dead.
+      if (thread) void save(thread);
     },
 
-    setLoading: (loading) => set({ loading }),
+    beginRequest: (threadId) => {
+      controllers.get(threadId)?.abort();
+      const controller = new AbortController();
+      controllers.set(threadId, controller);
+      set((s) => ({ pending: { ...s.pending, [threadId]: true } }));
+      return controller;
+    },
+
+    endRequest: (threadId, controller) => {
+      if (controllers.get(threadId) !== controller) return;
+      controllers.delete(threadId);
+      set((s) => {
+        const pending = { ...s.pending };
+        delete pending[threadId];
+        const activity = { ...s.activity };
+        delete activity[threadId];
+        return { pending, activity };
+      });
+      // Finished while parked: the saved copy on disk is now the whole story,
+      // so the parked one can go and the next open reads it fresh.
+      const parked = background.get(threadId);
+      if (parked && !parked.messages.some((m) => m.streaming)) background.delete(threadId);
+    },
+
+    stopRequest: (threadId) => {
+      controllers.get(threadId)?.abort();
+    },
+
+    setActivity: (threadId, activity) =>
+      set((s) => {
+        const next = { ...s.activity };
+        if (activity) next[threadId] = activity;
+        else delete next[threadId];
+        return { activity: next };
+      }),
+
+    setSources: (messageId, items) => set((s) => ({ sources: { ...s.sources, [messageId]: items } })),
   };
 });

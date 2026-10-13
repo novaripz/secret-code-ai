@@ -124,6 +124,12 @@ export interface Modes {
 export interface ProfileState {
   hydrated: boolean;
   onboarded: boolean;
+  /**
+   * The setup questions are open again over the app ("Redo setup"). Never
+   * persisted: a reload mid-redo lands back in the app with nothing changed,
+   * which is the same thing Cancel does.
+   */
+  setupOpen: boolean;
   theme: ThemeName;
   appearance: Appearance;
   languages: Languages;
@@ -139,7 +145,10 @@ export interface ProfileState {
   updateProfile: (patch: Partial<Profile>) => void;
   setModes: (patch: Partial<Modes>) => void;
   completeOnboarding: (profile: Partial<Profile>) => void;
+  /** Opens the setup questions again, prefilled. Cancelling changes nothing. */
   resetOnboarding: () => void;
+  /** Closes a redo without saving anything. */
+  closeSetup: () => void;
 
   addLike: (like: string) => void;
   removeLike: (like: string) => void;
@@ -243,6 +252,7 @@ export const useProfileStore = create<ProfileState>((set, get) => {
   return {
     hydrated: false,
     onboarded: false,
+    setupOpen: false,
     theme: "dark",
     appearance: DEFAULT_APPEARANCE,
     languages: DEFAULT_LANGUAGES,
@@ -301,9 +311,15 @@ export const useProfileStore = create<ProfileState>((set, get) => {
     setModes: (patch) => commit({ modes: { ...get().modes, ...patch } }),
 
     completeOnboarding: (profile) =>
-      commit({ onboarded: true, profile: { ...get().profile, ...profile } }),
+      commit({ onboarded: true, setupOpen: false, profile: { ...get().profile, ...profile } }),
 
-    resetOnboarding: () => commit({ onboarded: false }),
+    // This used to set `onboarded: false`, which swapped the whole app for an
+    // empty form with no way back — and finishing it wrote blanks over the
+    // likes, the about-me and the birthday the student had already given.
+    // Now it only opens the questions, and they start from what is saved.
+    resetOnboarding: () => set({ setupOpen: true }),
+
+    closeSetup: () => set({ setupOpen: false }),
 
     addLike: (like) => {
       const trimmed = like.trim();

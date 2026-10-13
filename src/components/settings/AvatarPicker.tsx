@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useProfileStore } from "@/store/useProfileStore";
 import { PandaSitting } from "@/components/Panda";
+import { TrashIcon, UploadIcon } from "@/components/icons";
 
 // Profile picture.
 //
@@ -54,7 +55,9 @@ export function AvatarPicker() {
   }
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-[var(--line)] p-4">
+    // The buttons wrap under the text on a narrow phone instead of squeezing
+    // the hint into a column one word wide.
+    <section className="card flex flex-wrap items-center gap-4 p-5">
       <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--surface-2)]">
         {profile.avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -64,26 +67,25 @@ export function AvatarPicker() {
         )}
       </span>
 
-      <div className="min-w-0 flex-1">
+      <div className="min-w-[10rem] flex-1">
         <p className="cursor-default select-none font-medium text-[var(--text)]">{t("settings.profilePicture")}</p>
-        <p className="mt-1 cursor-default select-none text-sm text-[var(--text-faint)]">
+        <p
+          role={error ? "alert" : undefined}
+          className={`mt-1 cursor-default select-none text-sm ${error ? "text-[var(--danger)]" : "text-[var(--text-faint)]"}`}
+        >
           {error ?? t("settings.avatarHint")}
         </p>
       </div>
 
       <div className="flex shrink-0 gap-2">
-        <button
-          onClick={() => input.current?.click()}
-          className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
-        >
+        <button type="button" onClick={() => input.current?.click()} className="btn btn-secondary">
+          <UploadIcon />
           {t(profile.avatar ? "settings.change" : "settings.upload")}
         </button>
         {profile.avatar && (
-          <button
-            onClick={() => updateProfile({ avatar: undefined })}
-            className="tap inline-flex items-center rounded-xl border border-[var(--line-strong)] px-3.5 py-2 text-sm text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
-          >
-            {t("settings.remove")}
+          <button type="button" onClick={() => updateProfile({ avatar: undefined })} className="btn btn-ghost" aria-label={t("settings.remove")} title={t("settings.remove")}>
+            <TrashIcon />
+            <span className="hidden sm:inline">{t("settings.remove")}</span>
           </button>
         )}
       </div>
@@ -98,6 +100,6 @@ export function AvatarPicker() {
           e.target.value = "";
         }}
       />
-    </div>
+    </section>
   );
 }

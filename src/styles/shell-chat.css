@@ -1,0 +1,577 @@
+/* The shell, the chat, settings and onboarding.
+   Plain CSS on the shared tokens, kept out of globals.css so the areas being
+   redesigned in parallel never edit the same lines. Everything here is in the
+   components layer, so a utility on the same element still wins. */
+
+/* The layer order, restated. This file can reach the page before globals.css
+   does (it is imported from the providers, which the root layout imports
+   first), and the first stylesheet to name a layer fixes where it sits. Without
+   this line "components" was created first and ended up UNDER Tailwind's base
+   reset, which zeroed every padding below. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  /* ---- Sidebar --------------------------------------------------------- */
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: var(--weight-ui);
+    color: var(--text-dim);
+    text-align: start;
+    transition: background-color 140ms ease, color 140ms ease;
+  }
+  .nav-item svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    color: var(--text-faint);
+    transition: color 140ms ease;
+  }
+  .nav-item:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .nav-item:hover svg { color: var(--text-dim); }
+  /* Active is the brand tint plus the brand ink, not just a grey box: it is
+     the one thing in the column that says "you are here". */
+  .nav-item[data-active] {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+  .nav-item[data-active] svg { color: var(--accent-text); }
+  @media (min-width: 768px) {
+    .nav-item { font-size: 14px; padding-block: 0.45rem; }
+  }
+
+  .chat-row {
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-sm);
+    color: var(--text-dim);
+    transition: background-color 140ms ease, color 140ms ease;
+  }
+  .chat-row:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .chat-row[data-active] {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-weight: var(--weight-ui);
+  }
+
+  .profile-card { transition: background-color 140ms ease; }
+  .profile-card:hover { background: var(--surface-2); }
+
+  /* ---- Header ---------------------------------------------------------- */
+
+  .palette-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+    padding: 0 0.6rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-faint);
+    font-size: 13.5px;
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+  }
+  .palette-trigger:hover { background: var(--surface-2); color: var(--text); }
+  @media (max-width: 767px) {
+    .palette-trigger { min-height: 44px; min-width: 44px; }
+  }
+  @media (min-width: 1024px) {
+    .palette-trigger {
+      width: 15rem;
+      justify-content: flex-start;
+      border: 1px solid var(--line);
+      background: var(--surface-1);
+      margin-inline-end: 0.25rem;
+    }
+    .palette-trigger:hover { border-color: var(--line-strong); background: var(--surface-1); }
+  }
+
+  .palette-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .palette-item[aria-selected="true"] {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+  .palette-icon { display: inline-flex; color: var(--text-faint); }
+  .palette-icon svg { width: 1.05rem; height: 1.05rem; }
+  .palette-item[aria-selected="true"] .palette-icon { color: var(--accent-text); }
+
+  /* ---- Chat: landing --------------------------------------------------- */
+
+  .landing-panda {
+    position: relative;
+    /* Its own stacking context, so the glow below sits behind the panda but
+       in front of the page background rather than underneath it. */
+    isolation: isolate;
+  }
+  /* A soft brand glow behind the panda — the one place the gradient is
+     allowed to be loud, because it is the first thing anyone sees. */
+  .landing-panda::before {
+    content: "";
+    position: absolute;
+    inset: 18% -30% 0;
+    z-index: -1;
+    border-radius: 999px;
+    background: var(--brand-gradient);
+    filter: blur(42px);
+    opacity: 0.22;
+  }
+
+  .suggestion-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 0.875rem;
+    cursor: pointer;
+  }
+  .suggestion-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--text-dim);
+  }
+  .suggestion-icon svg { width: 1rem; height: 1rem; }
+  .suggestion-card:hover .suggestion-icon,
+  .suggestion-card[data-personal] .suggestion-icon {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
+  .mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 2rem;
+    padding: 0 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    font-size: 13px;
+    color: var(--text-dim);
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+  }
+  .mode-toggle:hover { color: var(--text); background: var(--surface-2); }
+  .mode-toggle[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
+  /* ---- Chat: composer -------------------------------------------------- */
+
+  /* A soft lift rather than an outline: the hairline is the faintest line in
+     the palette and the shadow does the rest, so on white it is still
+     visibly somewhere to type. */
+  .chat-composer {
+    border-radius: var(--radius-xl);
+    background: var(--surface-1);
+    box-shadow: 0 0 0 1px var(--line), var(--shadow-2);
+  }
+
+  .composer-send {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-contrast);
+    box-shadow: var(--shadow-1);
+    transition: background-color 140ms ease, opacity 140ms ease, transform 80ms ease;
+  }
+  .composer-send:hover:not(:disabled) { background: var(--accent-hover); }
+  .composer-send:active:not(:disabled) { transform: scale(0.94); }
+  .composer-send:disabled {
+    background: var(--surface-3);
+    color: var(--text-faint);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .composer-send[data-stop] {
+    background: var(--text);
+    color: var(--bg);
+  }
+  @media (max-width: 767px) {
+    .composer-send { width: 2.75rem; height: 2.75rem; }
+  }
+
+  .jump-latest {
+    position: absolute;
+    top: -3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface-1);
+    color: var(--text-dim);
+    box-shadow: var(--shadow-2);
+  }
+  .jump-latest:hover { color: var(--text); border-color: var(--line-strong); }
+
+  /* ---- Chat: thread ---------------------------------------------------- */
+
+  .chat-avatar {
+    flex-shrink: 0;
+    align-items: flex-end;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-top: -0.25rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .user-bubble {
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-xl) var(--radius-xl) 6px var(--radius-xl);
+    background: var(--bubble-user);
+    color: var(--text);
+    font-size: var(--chat-text);
+    line-height: 1.6;
+  }
+  :root[dir="rtl"] .user-bubble { border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl) 6px; }
+
+  .chat-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+    background: var(--danger-soft);
+    color: var(--danger);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .reply-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface-1);
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: start;
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+  }
+  .reply-chip svg { color: var(--text-faint); transition: color 140ms ease; }
+  .reply-chip:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+  .reply-chip:hover:not(:disabled) svg { color: var(--accent-text); }
+  .reply-chip:disabled { opacity: 0.45; cursor: not-allowed; }
+  @media (max-width: 767px) {
+    .reply-chip { font-size: 14px; padding-inline: 0.95rem; }
+  }
+
+  /* ---- Chat: prose ----------------------------------------------------- */
+
+  .chat-prose .inline-code {
+    padding: 0.1em 0.4em;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.88em;
+    color: var(--text);
+  }
+  /* Math and inline code read left to right inside any language, and are
+     isolated so they do not reorder the sentence around them. */
+  .chat-prose .math,
+  .chat-prose .inline-code {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  .chat-link {
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent-text) 40%, transparent);
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+  .chat-link:hover { text-decoration-color: currentColor; }
+
+  .chat-table-wrap {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .chat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.93em;
+    line-height: 1.5;
+  }
+  .chat-table th,
+  .chat-table td {
+    padding: 0.5rem 0.75rem;
+    text-align: start;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  .chat-table th {
+    background: var(--surface-1);
+    font-weight: var(--weight-strong);
+    white-space: nowrap;
+  }
+  .chat-table tr:last-child td { border-bottom: 0; }
+
+  /* ---- Chat: code ------------------------------------------------------ */
+
+  .code-block {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface-0);
+  }
+  .code-block-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 2.25rem;
+    padding-block: 0.2rem;
+    padding-inline: 0.85rem 0.3rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-1);
+    font-size: 12px;
+    font-weight: var(--weight-ui);
+    letter-spacing: 0.02em;
+    color: var(--text-faint);
+  }
+  .code-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 1.75rem;
+    padding: 0 0.55rem;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+    transition: background-color 140ms ease, color 140ms ease;
+  }
+  .code-copy svg { width: 0.85rem; height: 0.85rem; }
+  .code-copy:hover { background: var(--surface-2); color: var(--text); }
+  .code-copy[data-state="copied"] { color: var(--success); }
+  .code-copy[data-state="failed"] { color: var(--danger); }
+  .code-block pre {
+    margin: 0;
+    padding: 0.8rem 0.95rem;
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text);
+    tab-size: 2;
+  }
+
+  /* The tint. Dark grounds get light pastels, light grounds get deep inks;
+     each pair stays readable against --surface-0 in its own theme. */
+  .tok-k { color: #c4b5fd; }
+  .tok-s { color: #86efac; }
+  .tok-n { color: #fcd34d; }
+  .tok-c { color: var(--text-faint); font-style: italic; }
+  :root[data-theme="light"] .tok-k { color: #6d28d9; }
+  :root[data-theme="light"] .tok-s { color: #047857; }
+  :root[data-theme="light"] .tok-n { color: #b45309; }
+  :root[data-theme="sepia"] .tok-k { color: #7c2d12; }
+  :root[data-theme="sepia"] .tok-s { color: #166534; }
+  :root[data-theme="sepia"] .tok-n { color: #92400e; }
+  :root[data-theme="ocean"] .tok-k { color: #7dd3fc; }
+  :root[data-theme="forest"] .tok-k { color: #a7f3d0; }
+  :root[data-theme="forest"] .tok-s { color: #fde68a; }
+
+  /* ---- Settings -------------------------------------------------------- */
+
+  .settings-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: var(--weight-ui);
+    color: var(--text-dim);
+    white-space: nowrap;
+    transition: background-color 140ms ease, color 140ms ease;
+  }
+  .settings-tab svg { width: 1rem; height: 1rem; color: var(--text-faint); flex-shrink: 0; }
+  .settings-tab:hover { background: var(--surface-2); color: var(--text); }
+  .settings-tab[aria-selected="true"] {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+  .settings-tab[aria-selected="true"] svg { color: var(--accent-text); }
+  /* On a phone the tabs scroll sideways; the fade at the end says there are
+     more of them than fit. */
+  @media (max-width: 767px) {
+    .settings-tabs {
+      mask-image: linear-gradient(to right, black calc(100% - 2.5rem), transparent);
+      padding-inline-end: 2rem;
+    }
+    :root[dir="rtl"] .settings-tabs {
+      mask-image: linear-gradient(to left, black calc(100% - 2.5rem), transparent);
+    }
+  }
+
+  .field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: var(--weight-ui);
+    color: var(--text);
+  }
+  .field-hint {
+    margin-top: 0.2rem;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-faint);
+  }
+
+  .option-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--surface-1);
+    font-size: 14px;
+    color: var(--text-dim);
+    text-align: start;
+    transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+  }
+  .option-card:hover { border-color: var(--line-strong); color: var(--text); }
+  .option-card[aria-pressed="true"],
+  .option-card[aria-checked="true"],
+  .option-card[aria-selected="true"] {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .select {
+    appearance: none;
+    padding-inline-end: 2.25rem;
+    background-image: linear-gradient(45deg, transparent 50%, var(--text-faint) 50%),
+      linear-gradient(135deg, var(--text-faint) 50%, transparent 50%);
+    background-position: calc(100% - 1.05rem) 52%, calc(100% - 0.7rem) 52%;
+    background-size: 0.35rem 0.35rem, 0.35rem 0.35rem;
+    background-repeat: no-repeat;
+  }
+  :root[dir="rtl"] .select { background-position: 1.05rem 52%, 0.7rem 52%; }
+
+  /* ---- Onboarding & sign-in -------------------------------------------- */
+
+  .brand-panel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--surface-0);
+  }
+  .brand-panel::before {
+    content: "";
+    position: absolute;
+    inset: -20% -10% auto auto;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 999px;
+    z-index: -1;
+    background: var(--brand-gradient);
+    filter: blur(80px);
+    opacity: 0.25;
+  }
+  .brand-panel::after {
+    content: "";
+    position: absolute;
+    inset: auto auto -25% -15%;
+    width: 60%;
+    aspect-ratio: 1;
+    border-radius: 999px;
+    z-index: -1;
+    background: var(--brand-gradient);
+    filter: blur(90px);
+    opacity: 0.15;
+  }
+
+  .step-dot {
+    height: 0.4rem;
+    width: 0.4rem;
+    border-radius: 999px;
+    background: var(--surface-3);
+    transition: width 200ms ease, background-color 200ms ease;
+  }
+  .step-dot[data-done] { background: color-mix(in srgb, var(--accent) 55%, var(--surface-3)); }
+  .step-dot[data-current] { width: 1.5rem; background: var(--accent); }
+
+  .interest-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 2.25rem;
+    padding: 0 0.95rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-1);
+    font-size: 14px;
+    color: var(--text-dim);
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+  }
+  .interest-chip:hover { color: var(--text); border-color: var(--text-faint); }
+  .interest-chip[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--accent-contrast);
+  }
+  .interest-chip svg { width: 0.9rem; height: 0.9rem; }
+}
+
+/* Right-to-left. Outside the layer on purpose: the skip link's rules in
+   globals.css are unlayered, and an unlayered rule beats any layered one.
+   Parked at `left: -9999px`, the link is harmless left-to-right, where the page
+   cannot scroll left. In Arabic the page scrolls in exactly that direction, so
+   the parked link made the document ten thousand pixels wide and a screen
+   reader or a stray scrollIntoView could land the student in empty space. It
+   parks off the trailing edge instead. */
+:root[dir="rtl"] .skip-link { left: auto; right: -9999px; }
+:root[dir="rtl"] .skip-link:focus { left: auto; right: 12px; }

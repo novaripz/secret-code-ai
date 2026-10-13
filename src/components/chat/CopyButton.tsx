@@ -31,7 +31,9 @@ const FEEDBACK_MS = 1800;
 type State = "idle" | "copied" | "failed";
 
 /**
- * "reply" is the labelled button under one of Panda's answers. "own" is the
+ * "icon" is the compact button in the toolbar under one of Panda's answers,
+ * next to read-aloud and the rest; its label is announced and shown as a
+ * tooltip. "reply" is the older labelled pill. "own" is the
  * quiet icon under the student's own message, which exists because re-typing a
  * long prompt to ask it a second way is the most common reason a student gives
  * up on a question. It is small because their own words need no explaining back
@@ -39,7 +41,7 @@ type State = "idle" | "copied" | "failed";
  * no hover, and a control that only exists for mouse users does not exist for
  * most of this app's users.
  */
-type Variant = "reply" | "own";
+type Variant = "reply" | "own" | "icon";
 
 export function CopyButton({ content, variant = "reply" }: { content: string; variant?: Variant }) {
   const { t } = useI18n();
@@ -76,6 +78,21 @@ export function CopyButton({ content, variant = "reply" }: { content: string; va
 
   const label =
     state === "copied" ? t("chat.copied") : state === "failed" ? t("chat.copyFailed") : t("chat.copy");
+
+  if (variant === "icon") {
+    return (
+      <button
+        type="button"
+        onClick={() => void copy()}
+        aria-label={label}
+        title={label}
+        aria-live="polite"
+        className={`icon-btn icon-btn-sm tap-pad ${state === "failed" ? "!text-[var(--danger)]" : state === "copied" ? "!text-[var(--success)]" : ""}`}
+      >
+        {state === "copied" ? <CheckIcon /> : <CopyIcon />}
+      </button>
+    );
+  }
 
   if (variant === "own") {
     return (

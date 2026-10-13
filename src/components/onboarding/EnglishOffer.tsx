@@ -198,7 +198,10 @@ export function EnglishOffer() {
       role="dialog"
       aria-label={t("english.offerLabel")}
       dir={dir}
-      className="animate-rise fixed bottom-4 z-40 w-[calc(100vw-2rem)] max-w-[400px] rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-1)] p-4 shadow-2xl"
+      // Under the header on a phone, bottom corner on a desktop. On a phone
+      // the bottom is the composer — a card parked there covered the one
+      // thing the student came to the chat to use.
+      className="card animate-rise fixed z-40 w-[calc(100vw-2rem)] max-w-[400px] p-4 shadow-ui-pop max-md:top-[4.25rem] md:bottom-4"
       // Logical inset so the card sits on the trailing edge in Arabic too,
       // rather than over the start of every line of text.
       style={{ insetInlineEnd: "1rem" }}
@@ -208,9 +211,10 @@ export function EnglishOffer() {
         <button
           onClick={() => decide("declined")}
           aria-label={t("english.offerDismiss")}
-          className="tap-sq inline-flex items-center justify-center -m-1 shrink-0 rounded-lg p-1 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          title={t("english.offerDismiss")}
+          className="icon-btn icon-btn-sm tap-pad -m-1"
         >
-          <XIcon className="h-4 w-4" />
+          <XIcon />
         </button>
       </div>
 
@@ -220,13 +224,13 @@ export function EnglishOffer() {
       <div className="mt-4 flex flex-wrap justify-end gap-2">
         <button
           onClick={() => decide("declined")}
-          className="tap inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          className="btn btn-ghost"
         >
           {t("english.offerDecline", { language: currentName })}
         </button>
         <button
           onClick={() => decide("accepted")}
-          className="tap inline-flex items-center rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] transition-opacity motion-reduce:transition-none hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+          className="btn btn-primary"
         >
           {t("english.offerAccept")}
         </button>

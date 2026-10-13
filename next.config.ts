@@ -89,7 +89,10 @@ const securityHeaders = [
   {
     key: "Permissions-Policy",
     // Panda captures a browser tab for screenshots, which needs none of these.
-    value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+    // The microphone is allowed for this origin only: the chat's voice typing
+    // uses the browser's own speech recognition, and nothing embedded in the
+    // page (the YouTube player, a student's project preview) gets it.
+    value: "camera=(), microphone=(self), geolocation=(), interest-cohort=()",
   },
   { key: "Content-Security-Policy", value: CSP },
   { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },

@@ -3,10 +3,10 @@
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { useProfileStore } from "@/store/useProfileStore";
 import type { ExplainDepth } from "@/lib/ai/systemPrompt";
+import { CheckIcon, LightbulbIcon } from "@/components/icons";
 
-// The modes, under the composer where they started. Outline-only pills that
-// go green when on. When Explain is on a second compact row appears with the
-// depth chips, so the slider has a home without taking a whole side panel.
+// The modes, under the composer where they started. One toggle for Explain,
+// and when it is on, a segmented control beside it for how much explaining.
 //
 // Humanize and Chill mode used to sit alongside Explain and are gone. The row
 // is written as a list rather than collapsed into a single hard-coded button
@@ -31,54 +31,42 @@ export function ModePills({ className = "" }: { className?: string }) {
   const setModes = useProfileStore((s) => s.setModes);
 
   return (
-    <div className={`flex flex-col items-center gap-2 ${className}`}>
-      <div className="flex flex-wrap items-center justify-center gap-1.5">
-        {MODES.map(({ key, label, title }) => {
-          const on = modes[key];
-          return (
-            <button
-              key={key}
-              onClick={() => setModes({ [key]: !on })}
-              title={t(title)}
-              aria-label={`${t(label)} — ${t(title)}`}
-              aria-pressed={on}
-              className={`tap inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium transition-colors sm:px-3 md:text-xs ${
-                on
-                  ? "border-[var(--success)] text-[var(--success)]"
-                  : "border-[var(--line-strong)] text-[var(--text-faint)] hover:border-[var(--text-faint)] hover:text-[var(--text-dim)]"
-              }`}
-            >
-              {t(label)}
-            </button>
-          );
-        })}
-      </div>
+    <div className={`flex flex-wrap items-center justify-center gap-2 ${className}`}>
+      {MODES.map(({ key, label, title }) => {
+        const on = modes[key];
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setModes({ [key]: !on })}
+            title={t(title)}
+            aria-label={`${t(label)} — ${t(title)}`}
+            aria-pressed={on}
+            className="mode-toggle tap"
+          >
+            {on ? <CheckIcon className="h-3.5 w-3.5" /> : <LightbulbIcon className="h-3.5 w-3.5" />}
+            {t(label)}
+          </button>
+        );
+      })}
 
       {modes.explainMode && (
-        <div className="flex flex-wrap items-center justify-center gap-1">
-          <span className="mr-1 text-[13px] text-[var(--text-faint)] sm:text-[11px]">{t("mode.howMuch")}</span>
-          {DEPTHS.map((d) => {
-            const on = modes.explainDepth === d.key;
-            return (
-              <button
-                key={d.key}
-                onClick={() => setModes({ explainDepth: d.key })}
-                aria-pressed={on}
-                // The depth chips were 24px tall and five of them shared one
-                // row — the smallest thing on the chat screen and the easiest
-                // to hit by accident. `tap` gives them the 44px floor; the row
-                // wraps to two lines on a narrow phone, which is the right
-                // trade for being able to hit the one you meant.
-                className={`tap inline-flex items-center rounded-full px-3 py-1 text-[13px] transition-colors sm:px-2.5 sm:text-[11px] ${
-                  on
-                    ? "bg-[var(--surface-3)] font-medium text-[var(--text)]"
-                    : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)]"
-                }`}
-              >
-                {t(d.label)}
-              </button>
-            );
-          })}
+        <div role="group" aria-label={t("mode.howMuch")} className="flex max-w-full items-center gap-1.5">
+          <span className="hidden text-[12.5px] text-[var(--text-faint)] sm:inline">{t("mode.howMuch")}</span>
+          {/* The depth chips were 24px tall and five of them shared one row —
+              the smallest thing on the chat screen and the easiest to hit by
+              accident. The segmented control scrolls sideways on a narrow
+              phone instead of shrinking them. */}
+          <div className="segmented scroll-x max-w-full">
+            {DEPTHS.map((d) => {
+              const on = modes.explainDepth === d.key;
+              return (
+                <button key={d.key} type="button" onClick={() => setModes({ explainDepth: d.key })} aria-pressed={on} className="tap shrink-0">
+                  {t(d.label)}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
