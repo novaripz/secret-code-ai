@@ -77,6 +77,13 @@ export function validateOperations(ops: FileOperation[]): ValidationResult {
       } else if (op.type === "rename") {
         if (!op.newPath) throw new Error(`"rename" on "${path}" is missing newPath.`);
         const newPath = assertSafePath(op.newPath);
+        // A move into itself (`game` -> `game/v1`) is refused here as well as
+        // in lib/fileSystem.ts. The file system would refuse it too, but only
+        // at apply time; stopping it here means the student is never shown a
+        // proposal that cannot be carried out.
+        if (newPath === path || newPath.startsWith(`${path}/`)) {
+          throw new Error(`"rename" can't move "${path}" inside itself.`);
+        }
         valid.push({ type: "rename", path, newPath });
       } else if (op.type === "generate") {
         if (typeof op.generator !== "string" || !VALID_GENERATORS.has(op.generator)) {

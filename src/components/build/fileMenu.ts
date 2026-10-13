@@ -74,9 +74,11 @@ export function buildFolderMenu(ctx: FolderMenuContext): MenuItemSpec[] {
     { id: "newFile", label: "New file…" },
     { id: "newFolder", label: "New folder…" },
     { id: "rename", label: "Rename…", shortcut: "F2", disabled: locked, separatorBefore: true },
+    { id: "duplicate", label: "Duplicate", shortcut: "Ctrl D", disabled: locked },
     { id: "delete", label: "Delete", shortcut: "Del", danger: true, disabled: locked },
     { id: "copyPath", label: "Copy path", separatorBefore: true },
-    { id: "collapse", label: "Collapse", shortcut: "←", disabled: !ctx.expanded },
+    { id: "download", label: "Download as .zip", disabled: locked },
+    { id: "collapse", label: "Collapse", shortcut: "←", disabled: !ctx.expanded, separatorBefore: true },
   ];
 }
 

@@ -62,7 +62,12 @@ ok("a folder can make files and folders inside itself",
    ids(openFolder).includes("newFile") && ids(openFolder).includes("newFolder"));
 ok("an open folder can be collapsed", find(openFolder, "collapse")?.disabled !== true);
 ok("a closed one cannot", find(buildFolderMenu({ expanded: false }), "collapse")?.disabled === true);
-ok("a folder is not downloadable on its own", !ids(openFolder).includes("download"));
+// A folder used to have no Download at all. It now downloads as a zip of just
+// that folder (lib/zip.ts exportProjectToZip with a folder), and the label has
+// to say so — "Download" on a folder that hands back a .zip would surprise.
+ok("a folder downloads as a zip, and says so", /\.zip/.test(find(openFolder, "download")?.label ?? ""));
+ok("a folder can be duplicated, contents and all", ids(openFolder).includes("duplicate"));
+ok("folder ids are unique too", new Set(ids(openFolder)).size === openFolder.length);
 ok("and has no Open entry — clicking it already toggles it", !ids(openFolder).includes("open"));
 
 console.log("\nthe empty-space menu");

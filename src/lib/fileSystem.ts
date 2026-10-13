@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import type { FileNode, Project } from "@/types";
-import { assertSafePath, fileName, joinPath, parentPath } from "./paths";
+import { assertSafePath, fileName, joinPath, normalizePath, parentPath } from "./paths";
 
 export function createEmptyProject(name: string): Project {
   const now = Date.now();
@@ -35,7 +35,10 @@ export function getChildren(project: Project, folderId: string): FileNode[] {
 }
 
 export function findByPath(project: Project, path: string): FileNode | undefined {
-  const normalized = path.trim();
+  // Normalised, not just trimmed: a link or a tab that says "./app.js" means
+  // the file stored as "app.js", and treating the two as different paths is
+  // how a tab came to be open on a file that "did not exist".
+  const normalized = normalizePath(path.trim());
   return Object.values(project.files).find((f) => f.path === normalized);
 }
 
@@ -46,9 +49,28 @@ function ensureUniqueName(project: Project, parentId: string, name: string, kind
   }
 }
 
+/**
+ * Throws if any segment of a folder path is already a FILE.
+ *
+ * Checked up front, before a single folder is made: creating `foo/x.js` while a
+ * file called `foo` exists used to quietly invent a folder `foo` beside it, and
+ * the project then held two nodes with the same path. Every lookup after that
+ * picked one of them at random, which looked to the student like files
+ * swapping places.
+ */
+function assertFolderPathFree(project: Project, folderPath: string): void {
+  let currentPath = "";
+  for (const seg of folderPath.split("/").filter(Boolean)) {
+    currentPath = currentPath ? `${currentPath}/${seg}` : seg;
+    const clash = Object.values(project.files).find((f) => f.path === currentPath && f.kind === "file");
+    if (clash) throw new Error(`"${currentPath}" is a file, so nothing can go inside it.`);
+  }
+}
+
 /** Ensures every folder segment in a path exists, creating them as needed. Returns the immediate parent folder id. */
 export function ensureFolderPath(project: Project, folderPath: string): string {
   if (!folderPath) return project.rootId;
+  assertFolderPathFree(project, folderPath);
   const segments = folderPath.split("/").filter(Boolean);
   let parentId = project.rootId;
   let currentPath = "";
@@ -233,10 +255,39 @@ export function copyNode(project: Project, path: string, newPath: string): FileN
   return created;
 }
 
+/**
+ * Would moving `path` to `newPath` put it inside itself?
+ *
+ * Exported because the AI's operations are checked against the same rule
+ * before they ever reach a project (lib/ai/validateOperations.ts keeps its own
+ * copy so it stays dependency-free), and the explorer asks it before offering
+ * a folder as a drop target.
+ */
+export function isInsideItself(path: string, newPath: string): boolean {
+  const from = normalizePath(path);
+  const to = normalizePath(newPath);
+  return to === from || to.startsWith(`${from}/`);
+}
+
 export function renameNode(project: Project, path: string, newPath: string): FileNode {
   const node = findByPath(project, path);
   if (!node) throw new Error(`Not found: "${path}"`);
   const safeNewPath = assertSafePath(newPath);
+  // EVERY CHECK BEFORE ANY CHANGE.
+  //
+  // Renaming the folder `game` to `game/v1` used to get as far as making the
+  // new parent folder — which is inside the folder being moved — and then
+  // recurse through its own children forever. The stack overflowed AFTER the
+  // tree had been half rewritten, so the project was saved broken. A folder
+  // can never be moved into itself, and saying so before touching anything is
+  // what keeps a refused rename from costing the student their files.
+  if (safeNewPath === node.path) return node;
+  if (node.kind === "folder" && isInsideItself(node.path, safeNewPath)) {
+    throw new Error(`"${node.name}" can't be moved inside itself.`);
+  }
+  // The parent chain is checked before anything is made, for the same reason:
+  // a rename refused halfway must leave no new folders behind.
+  assertFolderPathFree(project, parentPath(safeNewPath));
   if (findByPath(project, safeNewPath)) {
     throw new Error(`Target already exists: "${safeNewPath}"`);
   }
@@ -248,6 +299,23 @@ export function renameNode(project: Project, path: string, newPath: string): Fil
   retargetSubtreePaths(project, node, safeNewPath, newName);
   project.updatedAt = Date.now();
   return node;
+}
+
+/**
+ * Moves a file or folder into another folder, keeping its name. "" is the top
+ * level. This is what dragging a row onto a folder in the explorer does, and
+ * it is only a rename with the folder part changed — so it inherits every
+ * refusal above, including the one that stops a folder landing inside itself.
+ */
+export function moveNode(project: Project, path: string, targetFolder: string): FileNode {
+  const node = findByPath(project, path);
+  if (!node) throw new Error(`Not found: "${path}"`);
+  const target = normalizePath(targetFolder);
+  if (target) {
+    const folder = findByPath(project, target);
+    if (!folder || folder.kind !== "folder") throw new Error(`"${target}" is not a folder.`);
+  }
+  return renameNode(project, node.path, target ? `${target}/${node.name}` : node.name);
 }
 
 /** Full path list of a folder id up to root, e.g. for breadcrumbs. */
