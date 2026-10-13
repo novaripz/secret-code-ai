@@ -28,6 +28,11 @@ import type { FileNode, Project } from "@/types";
 
 const versionStore = localforage.createInstance({ name: "ai-code-studio", storeName: "versions" });
 
+/** Removes a project's history for good. Called when the project itself is deleted. */
+export async function forgetVersions(projectId: string): Promise<void> {
+  await versionStore.removeItem(`versions:${projectId}`);
+}
+
 const QUIET_MS = 3000;
 const MERGE_WINDOW_MS = 90_000;
 const MAX_VERSIONS = 30;
@@ -114,8 +119,20 @@ interface VersionState {
   /** Oldest first, matching how the rest of the app stores append-only lists. */
   versions: Version[];
   loaded: boolean;
+  /**
+   * The project exactly as it was when the student opened it this time.
+   *
+   * Not a version and never saved: it is what the Changes panel compares
+   * against by default. Comparing against the newest checkpoint meant the
+   * panel nearly always said "nothing has changed", because a checkpoint is
+   * taken a few seconds after typing stops — so the one question it exists to
+   * answer, "what have I done today?", had no answer.
+   */
+  sessionStart: Version | null;
 
   load: (projectId: string) => Promise<void>;
+  /** Remembers the project as it was opened. See `sessionStart`. */
+  beginSession: (project: Project) => void;
   /** Called on every project change; the snapshot itself waits for quiet. */
   noteChange: (project: Project) => void;
   /**
@@ -196,6 +213,20 @@ export const useVersionStore = create<VersionState>((set, get) => {
     projectId: null,
     versions: [],
     loaded: false,
+    sessionStart: null,
+
+    beginSession: (project) =>
+      set({
+        sessionStart: {
+          id: `session-${project.id}`,
+          createdAt: Date.now(),
+          capturedAt: Date.now(),
+          label: "When you opened this project",
+          kind: "auto",
+          rootId: project.rootId,
+          files: cloneFiles(project.files),
+        },
+      }),
 
     load: async (projectId) => {
       cancelPending();

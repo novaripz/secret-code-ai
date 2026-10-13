@@ -1,72 +1,120 @@
 "use client";
 
+import "@/styles/ide.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useStudioStore } from "@/store/useStudioStore";
+import { flushPendingSave, useStudioStore } from "@/store/useStudioStore";
 import { useVersionStore } from "@/store/useVersionStore";
+import { isDarkTheme, useProfileStore } from "@/store/useProfileStore";
 import { FileExplorer } from "@/components/explorer/FileExplorer";
 import { BottomPanel } from "@/components/preview/BottomPanel";
 import { TopBar } from "@/components/layout/TopBar";
-import { ChatIcon } from "@/components/icons";
-import { Pane } from "./Pane";
+import {
+  CopyIcon,
+  DiffIcon,
+  DownloadIcon,
+  DuplicateIcon,
+  FilesIcon,
+  HistoryIcon,
+  KeyboardIcon,
+  MonitorIcon,
+  MoonIcon,
+  PencilIcon,
+  PlayIcon,
+  PlusFileIcon,
+  PlusFolderIcon,
+  ReplaceIcon,
+  ResetIcon,
+  SearchIcon,
+  SlidersIcon,
+  SmartphoneIcon,
+  SparkleIcon,
+  TabletIcon,
+  TrashIcon,
+  UndoIcon,
+  WandIcon,
+  WrapTextIcon,
+  XIcon,
+  ZapIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from "@/components/icons";
+import { exportProjectToZip } from "@/lib/zip";
+import { safeFileName, saveBlob } from "./download";
 import { ResizeHandle } from "./ResizeHandle";
 import { CodeEditor } from "./CodeEditor";
 import { AgentPanel } from "./AgentPanel";
-import { CommandPalette, type Command } from "./CommandPalette";
+import { CommandPalette, type Command, type PaletteMode } from "./CommandPalette";
 import { VersionPanel } from "./VersionPanel";
 import { ChangesPanel } from "./ChangesPanel";
-import { CodeIcon, CommandIcon, DiffIcon, FilesIcon, HistoryIcon, MonitorIcon } from "./icons";
+import { SearchPanel, useSearchState } from "./SearchPanel";
+import { ActivityRail, PhoneNav } from "./ActivityRail";
+import { StatusBar } from "./StatusBar";
+import { EditorSettingsSheet, ShortcutsSheet } from "./WorkspaceSheets";
 import { useFileActions } from "./useFileActions";
+import { useIsPhone } from "./useIsPhone";
 import { ASK_EVENT, prefillComposer, type AskDetail } from "./askPanda";
+import { FONT_SIZES, useEditorSettings } from "./useEditorSettings";
+import { WORKSPACE_EVENTS, emit, isTyping, modKey } from "./events";
 import {
-  clamp,
-  MAX_CHAT,
   MAX_CHANGES,
+  MAX_CHAT,
   MAX_SIDEBAR,
+  MIN_CENTER,
   MIN_CHANGES,
   MIN_CHAT,
   MIN_SIDEBAR,
   MIN_STACKED,
-  type PanelKey,
+  clamp,
+  fitColumns,
   useWorkspaceLayout,
 } from "./useWorkspaceLayout";
 
-// The workspace itself: four panes the student arranges, plus a rail that can
-// bring any of them back. Everything that remembers a size or an open/closed
-// state lives in useWorkspaceLayout; everything that remembers code lives in
-// the studio and version stores. This file is only the wiring between them.
+// The workspace itself: the panes the student arranges, the rail that brings
+// any of them back, and the wiring between them. Everything that remembers a
+// size or an open/closed state lives in useWorkspaceLayout; everything that
+// remembers code lives in the studio and version stores.
 
-const RAIL: { key: PanelKey; label: string; Icon: typeof FilesIcon }[] = [
-  { key: "files", label: "Files", Icon: FilesIcon },
-  { key: "history", label: "History", Icon: HistoryIcon },
-  { key: "changes", label: "Changes", Icon: DiffIcon },
-  { key: "preview", label: "Preview", Icon: MonitorIcon },
-  { key: "chat", label: "Panda chat", Icon: ChatIcon },
-];
+const RAIL_WIDTH = 48;
+const HANDLE_WIDTH = 6;
 
 export function Workspace() {
   const project = useStudioStore((s) => s.project);
   const activeTab = useStudioStore((s) => s.activeTab);
   const lastDeleted = useStudioStore((s) => s.lastDeleted);
+  const tabCount = useStudioStore((s) => s.tabs.length);
   const fileActions = useFileActions();
+  const phone = useIsPhone();
 
   const layout = useWorkspaceLayout();
-  const { visible } = layout;
+  const { visible, side } = layout;
 
   const noteChange = useVersionStore((s) => s.noteChange);
-  const loadVersions = useVersionStore((s) => s.load);
   const projectId = project?.id ?? null;
+  // Read so the palette's labels say what each toggle will DO ("Wrap long
+  // lines" or "Stop wrapping"), not what it did last time.
+  const autoRun = useEditorSettings((s) => s.autoRun);
+  const wordWrap = useEditorSettings((s) => s.wordWrap);
+  const minimap = useEditorSettings((s) => s.minimap);
+  const fontSize = useEditorSettings((s) => s.fontSize);
+  const dark = useProfileStore((s) => isDarkTheme(s.theme));
 
-  // Columns whose splits are fractions need to know how many pixels the column
-  // actually has before a drag can mean anything.
-  const sidebarRef = useRef<HTMLDivElement>(null);
+  const [palette, setPalette] = useState<false | PaletteMode>(false);
+  const [sheet, setSheet] = useState<null | "shortcuts" | "settings">(null);
+  const [rowWidth, setRowWidth] = useState(0);
+
+  const rowRef = useRef<HTMLDivElement>(null);
   const centerRef = useRef<HTMLDivElement>(null);
   // Where a drag began. Read on every move, so a ref rather than state.
   const start = useRef(0);
 
+  // A project opened: its history is loaded, and the moment it was opened is
+  // remembered so Changes can say what has happened since.
   useEffect(() => {
     if (!projectId) return;
-    void loadVersions(projectId);
-  }, [projectId, loadVersions]);
+    void useVersionStore.getState().load(projectId);
+    const opened = useStudioStore.getState().project;
+    if (opened) useVersionStore.getState().beginSession(opened);
+  }, [projectId]);
 
   // Every change to the project is offered to the history; the store decides
   // which ones are worth a snapshot and when the typing has gone quiet.
@@ -75,266 +123,320 @@ export function Workspace() {
     noteChange(project);
   }, [project, noteChange]);
 
-  // The command affordance. Ctrl/Cmd-K is the shortcut every tool this wants to
-  // resemble already uses, so it costs a student nothing to learn here and
-  // carries over when they meet the real thing.
-  const [paletteOpen, setPaletteOpen] = useState(false);
-
+  // SAVE ON THE WAY OUT
+  //
+  // The autosave waits 800ms after the last keystroke, and a student who types
+  // and then closes the tab inside that window lost those keystrokes — the
+  // timer died with the page. The pending write is now made the moment the
+  // page is hidden or closed, and if it is still running as the tab closes the
+  // browser is asked to hold on.
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setPaletteOpen((open) => !open);
-      }
+    function onHide() {
+      if (document.visibilityState === "hidden") flushPendingSave();
     }
-    // Monaco swallows keys while it has focus, so the editor raises this event
-    // from its own Ctrl/Cmd-K binding rather than the shortcut quietly not
-    // working in the one pane the student spends all day in.
-    function openPalette() {
-      setPaletteOpen(true);
+    function onPageHide() {
+      flushPendingSave();
     }
-    window.addEventListener("keydown", onKey);
-    window.addEventListener("panda:open-palette", openPalette);
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      if (flushPendingSave()) e.preventDefault();
+    }
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("beforeunload", onBeforeUnload);
     return () => {
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("panda:open-palette", openPalette);
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      // Leaving for the project list writes too.
+      flushPendingSave();
     };
   }, []);
 
-  // "Ask Panda about this" lands here: the chat is opened first, because the
-  // composer cannot be filled in while it is unmounted, and the fill waits a
-  // frame for that mount to happen.
+  // The row's width, so the side columns can give way to the editor.
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => setRowWidth(entry.contentRect.width));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [phone]);
+
+  const openSearch = useCallback((query?: string) => {
+    useSearchState.getState().focusRequest(query);
+    useWorkspaceLayout.getState().reveal("search");
+  }, []);
+
+  const askToBuild = useCallback(() => {
+    useWorkspaceLayout.getState().reveal("chat");
+    // Two frames: one for the pane to show, one for the composer inside it to
+    // be focusable. A single frame was not enough when the chat was closed.
+    requestAnimationFrame(() => requestAnimationFrame(() => emit(WORKSPACE_EVENTS.focusComposer)));
+  }, []);
+
+  // KEYS THAT WORK ANYWHERE IN THE WORKSPACE.
+  //
+  // Inside Monaco the editor handles its own (see CodeEditor), and stops them
+  // here. Everywhere else — the tree, the preview's buttons, the composer —
+  // these are the same keys, so a shortcut never depends on where the focus
+  // happened to be. Ctrl/Cmd-S in particular used to open the browser's own
+  // "save this web page" dialog anywhere outside the editor.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const mod = e.metaKey || e.ctrlKey;
+      const key = e.key.toLowerCase();
+      if (mod && !e.altKey && !e.shiftKey && (key === "k" || key === "p")) {
+        e.preventDefault();
+        setPalette((open) => (open ? false : "all"));
+      } else if (mod && e.shiftKey && key === "p") {
+        e.preventDefault();
+        setPalette("commands");
+      } else if (mod && !e.shiftKey && key === "s") {
+        e.preventDefault();
+        void useStudioStore.getState().persist();
+      } else if (mod && e.shiftKey && key === "f") {
+        e.preventDefault();
+        openSearch(window.getSelection()?.toString());
+      } else if (mod && !e.shiftKey && key === "b" && !isTyping(e.target)) {
+        e.preventDefault();
+        const l = useWorkspaceLayout.getState();
+        if (l.side) l.closeSide();
+        else l.showSide("files");
+      } else if (mod && key === "enter") {
+        e.preventDefault();
+        emit(WORKSPACE_EVENTS.runPreview);
+      } else if (mod && key === ",") {
+        e.preventDefault();
+        setSheet("settings");
+      } else if (e.key === "?" && !mod && !isTyping(e.target)) {
+        e.preventDefault();
+        setSheet("shortcuts");
+      }
+    }
+    function onOpenPalette(e: Event) {
+      const mode = (e as CustomEvent<{ mode?: PaletteMode }>).detail?.mode;
+      setPalette(mode ?? "all");
+    }
+    function onSettings() {
+      setSheet("settings");
+    }
+    function onShortcuts() {
+      setSheet("shortcuts");
+    }
+    function onFind(e: Event) {
+      openSearch((e as CustomEvent<{ query?: string }>).detail?.query);
+    }
+    window.addEventListener("keydown", onKey);
+    window.addEventListener(WORKSPACE_EVENTS.openPalette, onOpenPalette);
+    window.addEventListener(WORKSPACE_EVENTS.openSettings, onSettings);
+    window.addEventListener(WORKSPACE_EVENTS.openShortcuts, onShortcuts);
+    window.addEventListener(WORKSPACE_EVENTS.findInFiles, onFind);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener(WORKSPACE_EVENTS.openPalette, onOpenPalette);
+      window.removeEventListener(WORKSPACE_EVENTS.openSettings, onSettings);
+      window.removeEventListener(WORKSPACE_EVENTS.openShortcuts, onShortcuts);
+      window.removeEventListener(WORKSPACE_EVENTS.findInFiles, onFind);
+    };
+  }, [openSearch]);
+
+  // "Ask Panda about this" lands here: the chat is brought into view first,
+  // because the composer cannot be filled in while it is hidden, and the fill
+  // waits two frames for it to be shown.
   useEffect(() => {
     function onAsk(e: Event) {
       const prompt = (e as CustomEvent<AskDetail>).detail?.prompt;
       if (!prompt) return;
-      // Read straight off the store rather than through the layout object this
-      // render closed over: the listener is registered once and the layout is
-      // rebuilt constantly, and a stale closure here would open a pane that no
-      // longer exists.
-      useWorkspaceLayout.getState().open("chat");
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => prefillComposer(prompt));
-      });
+      useWorkspaceLayout.getState().reveal("chat");
+      requestAnimationFrame(() => requestAnimationFrame(() => prefillComposer(prompt)));
     }
     window.addEventListener(ASK_EVENT, onAsk);
     return () => window.removeEventListener(ASK_EVENT, onAsk);
   }, []);
 
-  const show = useCallback((key: PanelKey) => layout.open(key), [layout]);
-
-  const commands = useMemo<Command[]>(
-    () => [
-      ...RAIL.map(({ key, label }) => ({
-        id: `panel:${key}`,
-        label: `Show ${label}`,
-        hint: "panel",
-        run: () => show(key),
-      })),
+  const commands = useMemo<Command[]>(() => {
+    const mod = modKey();
+    const short = (path: string) => path.split("/").pop() ?? path;
+    const editorAction = (commandId: string) => emit(WORKSPACE_EVENTS.editorAction, { commandId });
+    const settings = useEditorSettings.getState();
+    const l = useWorkspaceLayout.getState();
+    const list: Command[] = [
+      { id: "action:ask", label: "Ask Panda to build something", icon: <SparkleIcon />, group: "Actions", run: askToBuild },
+      { id: "action:run", label: "Run the preview", icon: <PlayIcon />, keys: `${mod} Enter`, group: "Actions", run: () => { l.reveal("preview"); emit(WORKSPACE_EVENTS.runPreview); } },
+      { id: "action:find", label: "Find in all files", icon: <SearchIcon />, keys: `${mod} Shift F`, group: "Actions", run: () => openSearch() },
+      { id: "action:replace", label: "Find and replace in all files", icon: <ReplaceIcon />, group: "Actions", run: () => { useSearchState.getState().set({ showReplace: true }); openSearch(); } },
+      { id: "file:new", label: "New file…", icon: <PlusFileIcon />, group: "Actions", run: () => void fileActions.create("file", "") },
+      { id: "file:newFolder", label: "New folder…", icon: <PlusFolderIcon />, group: "Actions", run: () => void fileActions.create("folder", "") },
+      { id: "panel:files", label: "Show Files", icon: <FilesIcon />, group: "Actions", run: () => l.reveal("files") },
+      { id: "panel:history", label: "Show History", icon: <HistoryIcon />, group: "Actions", run: () => l.reveal("history") },
+      { id: "panel:changes", label: "Show Changes", icon: <DiffIcon />, group: "Actions", run: () => l.reveal("changes") },
+      { id: "panel:preview", label: "Show the preview", icon: <MonitorIcon />, group: "Actions", run: () => l.reveal("preview") },
+      { id: "panel:console", label: "Show the console", icon: <MonitorIcon />, group: "Actions", run: () => { l.reveal("preview"); requestAnimationFrame(() => emit(WORKSPACE_EVENTS.showPreviewTab, { tab: "console" })); } },
+      { id: "panel:problems", label: "Show problems", icon: <MonitorIcon />, group: "Actions", run: () => { l.reveal("preview"); requestAnimationFrame(() => emit(WORKSPACE_EVENTS.showPreviewTab, { tab: "problems" })); } },
+      { id: "preview:auto", label: autoRun ? "Stop running while I type" : "Run while I type", icon: <ZapIcon />, group: "Actions", run: () => settings.update({ autoRun: !autoRun }) },
+      { id: "preview:phone", label: "Preview at phone size", icon: <SmartphoneIcon />, group: "Actions", run: () => { settings.update({ device: "phone" }); l.reveal("preview"); } },
+      { id: "preview:tablet", label: "Preview at tablet size", icon: <TabletIcon />, group: "Actions", run: () => { settings.update({ device: "tablet" }); l.reveal("preview"); } },
+      { id: "preview:desktop", label: "Preview at full width", icon: <MonitorIcon />, group: "Actions", run: () => { settings.update({ device: "desktop" }); l.reveal("preview"); } },
+      { id: "editor:settings", label: "Editor settings", icon: <SlidersIcon />, keys: `${mod} ,`, group: "Actions", run: () => setSheet("settings") },
+      { id: "editor:wrap", label: wordWrap ? "Stop wrapping long lines" : "Wrap long lines", icon: <WrapTextIcon />, keys: "Alt Z", group: "Actions", run: () => settings.update({ wordWrap: !wordWrap }) },
+      { id: "editor:minimap", label: minimap ? "Hide the minimap" : "Show the minimap", icon: <SlidersIcon />, group: "Actions", run: () => settings.update({ minimap: !minimap }) },
+      { id: "editor:bigger", label: "Make the code text bigger", icon: <ZoomInIcon />, group: "Actions", run: () => settings.update({ fontSize: FONT_SIZES[Math.min(FONT_SIZES.length - 1, FONT_SIZES.indexOf(fontSize as (typeof FONT_SIZES)[number]) + 1)] }) },
+      { id: "editor:smaller", label: "Make the code text smaller", icon: <ZoomOutIcon />, group: "Actions", run: () => settings.update({ fontSize: FONT_SIZES[Math.max(0, FONT_SIZES.indexOf(fontSize as (typeof FONT_SIZES)[number]) - 1)] }) },
+      { id: "help:shortcuts", label: "Keyboard shortcuts", icon: <KeyboardIcon />, keys: "?", group: "Actions", run: () => setSheet("shortcuts") },
+      { id: "app:theme", label: dark ? "Switch to the light theme" : "Switch to the dark theme", icon: <MoonIcon />, group: "Actions", run: () => useProfileStore.getState().toggleTheme() },
+      { id: "layout:reset", label: "Reset the layout", icon: <ResetIcon />, group: "Actions", run: () => l.reset() },
       {
-        id: "action:ask",
-        label: "Ask Panda to build something",
-        hint: "agent",
+        id: "project:download",
+        label: "Download the project as a .zip",
+        icon: <DownloadIcon />,
+        group: "Actions",
         run: () => {
-          show("chat");
-          // The panel owns its own composer, so it is asked rather than told.
-          window.dispatchEvent(new CustomEvent("panda:focus-composer"));
+          const current = useStudioStore.getState().project;
+          if (current) void exportProjectToZip(current).then((blob) => saveBlob(blob, `${safeFileName(current.name)}.zip`));
         },
       },
-      { id: "action:reset", label: "Reset the layout", hint: "layout", run: () => layout.reset() },
+    ];
 
-      // FILE ACTIONS, WITHOUT A POINTER.
-      //
-      // Every one of these is also in the tree's right-click menu. They are
-      // repeated here because the palette is the route that needs no mouse and
-      // no long press, which is the rule this workspace works to: a menu may be
-      // the nicest way to reach an action, never the only one. They name the
-      // current file rather than saying "this file", so the student can see
-      // which one they are about to delete before they press Enter.
-      { id: "file:new", label: "New file…", hint: "files", run: () => void fileActions.create("file", "") },
-      { id: "file:newFolder", label: "New folder…", hint: "files", run: () => void fileActions.create("folder", "") },
-      ...(activeTab
-        ? [
-            { id: "file:rename", label: `Rename ${short(activeTab)}…`, hint: "files", run: () => void fileActions.rename(activeTab) },
-            { id: "file:duplicate", label: `Duplicate ${short(activeTab)}`, hint: "Ctrl D", run: () => void fileActions.duplicate(activeTab) },
-            { id: "file:delete", label: `Delete ${short(activeTab)}`, hint: "files", run: () => void fileActions.remove(activeTab) },
-            { id: "file:copyPath", label: `Copy path of ${short(activeTab)}`, hint: "files", run: () => void fileActions.copyPath(activeTab) },
-            { id: "file:copyRelative", label: `Copy relative path of ${short(activeTab)}`, hint: "files", run: () => void fileActions.copyRelativePath(activeTab) },
-            { id: "file:download", label: `Download ${short(activeTab)}`, hint: "files", run: () => void fileActions.download(activeTab) },
-            { id: "editor:find", label: "Find in this file", hint: "Ctrl F", run: () => editorAction("actions.find") },
-            { id: "editor:replace", label: "Find and replace", hint: "editor", run: () => editorAction("editor.action.startFindReplaceAction") },
-            { id: "editor:goToLine", label: "Go to line…", hint: "editor", run: () => editorAction("editor.action.gotoLine") },
-            { id: "editor:format", label: "Tidy up this file", hint: "editor", run: () => editorAction("editor.action.formatDocument") },
-            { id: "editor:explain", label: "Ask Panda about this", hint: "agent", run: () => askSelection("explain") },
-            { id: "editor:fix", label: "Ask Panda to fix this", hint: "agent", run: () => askSelection("fix") },
-          ]
-        : []),
-      ...(lastDeleted
-        ? [
-            {
-              id: "file:undoDelete",
-              label: `Undo deleting ${short(lastDeleted.path)}`,
-              hint: "files",
-              run: () => fileActions.undoDelete(),
-            },
-          ]
-        : []),
-    ],
-    [layout, show, fileActions, activeTab, lastDeleted],
-  );
+    // FILE ACTIONS, WITHOUT A POINTER.
+    //
+    // Every one of these is also in the tree's right-click menu. They are here
+    // because the palette is the route that needs no mouse and no long press:
+    // a menu may be the nicest way to reach an action, never the only one.
+    // They name the current file, so the student can see which one they are
+    // about to delete before they press Enter.
+    if (activeTab) {
+      list.push(
+        { id: "file:rename", label: `Rename ${short(activeTab)}…`, icon: <PencilIcon />, group: "Actions", run: () => void fileActions.rename(activeTab) },
+        { id: "file:duplicate", label: `Duplicate ${short(activeTab)}`, icon: <DuplicateIcon />, group: "Actions", run: () => void fileActions.duplicate(activeTab) },
+        { id: "file:delete", label: `Delete ${short(activeTab)}`, icon: <TrashIcon />, group: "Actions", run: () => void fileActions.remove(activeTab) },
+        { id: "file:copyPath", label: `Copy the path of ${short(activeTab)}`, icon: <CopyIcon />, group: "Actions", run: () => void fileActions.copyPath(activeTab) },
+        { id: "file:download", label: `Download ${short(activeTab)}`, icon: <DownloadIcon />, group: "Actions", run: () => void fileActions.download(activeTab) },
+        { id: "file:reveal", label: `Show ${short(activeTab)} in Files`, icon: <FilesIcon />, group: "Actions", run: () => { l.reveal("files"); requestAnimationFrame(() => emit(WORKSPACE_EVENTS.revealInTree, { path: activeTab })); } },
+        { id: "editor:find", label: "Find in this file", icon: <SearchIcon />, keys: `${mod} F`, group: "Actions", run: () => editorAction("actions.find") },
+        { id: "editor:replace", label: "Find and replace in this file", icon: <ReplaceIcon />, keys: `${mod} H`, group: "Actions", run: () => editorAction("editor.action.startFindReplaceAction") },
+        { id: "editor:goToLine", label: "Go to line…", icon: <SearchIcon />, keys: `${mod} G`, group: "Actions", run: () => editorAction("editor.action.gotoLine") },
+        { id: "editor:format", label: "Tidy up this file", icon: <WandIcon />, keys: "Shift Alt F", group: "Actions", run: () => editorAction("editor.action.formatDocument") },
+        { id: "editor:explain", label: "Ask Panda about this code", icon: <SparkleIcon />, keys: `${mod} Shift E`, group: "Actions", run: () => emit(WORKSPACE_EVENTS.askSelection, { kind: "explain" }) },
+        { id: "editor:fix", label: "Ask Panda to fix this code", icon: <SparkleIcon />, keys: `${mod} Shift X`, group: "Actions", run: () => emit(WORKSPACE_EVENTS.askSelection, { kind: "fix" }) },
+      );
+      if (tabCount > 1) {
+        list.push({ id: "tabs:closeOthers", label: "Close the other tabs", icon: <XIcon />, group: "Actions", run: () => useStudioStore.getState().closeOtherTabs(activeTab) });
+      }
+    }
+    if (lastDeleted) {
+      list.unshift({ id: "file:undoDelete", label: `Undo deleting ${short(lastDeleted.path)}`, icon: <UndoIcon />, group: "Actions", run: () => fileActions.undoDelete() });
+    }
+    return list;
+  }, [fileActions, activeTab, lastDeleted, tabCount, askToBuild, openSearch, autoRun, wordWrap, minimap, fontSize, dark]);
 
   if (!project) return null;
 
-  // Files keeps its dragged share whenever History is open under it. Changes
-  // used to be stacked here too and is now a column of its own on the right,
-  // so this is a two-way split again.
-  const stackedBelowFiles = Number(visible.history);
-  const bothSidebarPanes = visible.files && stackedBelowFiles > 0;
-  const belowShare = stackedBelowFiles > 0 ? (1 - layout.filesRatio) / stackedBelowFiles : 0;
-  const bothCenterPanes = visible.preview;
+  const closePalette = () => setPalette(false);
+  const sheets = (
+    <>
+      <CommandPalette open={palette !== false} mode={palette || "all"} onClose={closePalette} actions={commands} />
+      <ShortcutsSheet open={sheet === "shortcuts"} onClose={() => setSheet(null)} />
+      <EditorSettingsSheet open={sheet === "settings"} onClose={() => setSheet(null)} />
+    </>
+  );
 
-  function sidebarHeight() {
-    return sidebarRef.current?.getBoundingClientRect().height ?? 0;
+  // ---- PHONE: one pane at a time --------------------------------------------
+  if (phone) {
+    const pane = layout.phonePane;
+    return (
+      <div className="flex h-dvh flex-col bg-[var(--bg)] text-[var(--text)]">
+        <TopBar />
+        <div className="relative min-h-0 flex-1">
+          {pane === "files" && <FileExplorer project={project} activePath={activeTab} />}
+          {pane === "search" && <SearchPanel />}
+          {pane === "history" && <VersionPanel />}
+          {pane === "changes" && <ChangesPanel />}
+          {pane === "preview" && <BottomPanel />}
+          {/* The editor and Panda stay mounted while hidden: the editor keeps
+              every file's undo history, and Panda keeps a turn running while
+              the student looks at their code. */}
+          <div className={pane === "editor" ? "h-full" : "hidden"}>
+            <CodeEditor phone />
+          </div>
+          <div className={pane === "chat" ? "h-full" : "hidden"}>
+            <AgentPanel />
+          </div>
+        </div>
+        <PhoneNav />
+        {sheets}
+      </div>
+    );
   }
+
+  // ---- DESKTOP ---------------------------------------------------------------
+  // Side columns give way before the editor is squeezed below MIN_CENTER.
+  const columns: { key: "side" | "changes" | "chat"; width: number; min: number }[] = [];
+  if (side) columns.push({ key: "side", width: layout.sidebarWidth, min: MIN_SIDEBAR });
+  if (visible.changes) columns.push({ key: "changes", width: layout.changesWidth, min: MIN_CHANGES });
+  if (visible.chat) columns.push({ key: "chat", width: layout.chatWidth, min: MIN_CHAT });
+  const available = rowWidth - RAIL_WIDTH - columns.length * HANDLE_WIDTH;
+  const fitted = rowWidth > 0 ? fitColumns(available, columns) : columns.map((c) => c.width);
+  const widthOf = (key: "side" | "changes" | "chat") => fitted[columns.findIndex((c) => c.key === key)] ?? 0;
+  /** The widest a column may be dragged while the editor keeps its floor. */
+  const maxFor = (key: "side" | "changes" | "chat", cap: number) => {
+    const others = columns.filter((c) => c.key !== key).reduce((sum, c) => sum + widthOf(c.key), 0);
+    return rowWidth > 0 ? Math.max(0, Math.min(cap, available - others - MIN_CENTER)) : cap;
+  };
+
   function centerHeight() {
     return centerRef.current?.getBoundingClientRect().height ?? 0;
   }
-
-  function ratioLimits(total: number) {
-    if (total <= MIN_STACKED * 2) return { min: 0.15, max: 0.85 };
-    return { min: MIN_STACKED / total, max: 1 - MIN_STACKED / total };
-  }
-
-  function setFiles(ratio: number) {
-    const { min, max } = ratioLimits(sidebarHeight());
-    layout.setFilesRatio(clamp(ratio, min, max));
-  }
   function setEditor(ratio: number) {
-    const { min, max } = ratioLimits(centerHeight());
-    layout.setEditorRatio(clamp(ratio, min, max));
+    const total = centerHeight();
+    const min = total > MIN_STACKED * 2 ? MIN_STACKED / total : 0.15;
+    layout.setEditorRatio(clamp(ratio, min, 1 - min));
   }
+
+  const sideView =
+    side === "files" ? (
+      <FileExplorer project={project} activePath={activeTab} onClose={layout.closeSide} />
+    ) : side === "search" ? (
+      <SearchPanel onClose={layout.closeSide} />
+    ) : side === "history" ? (
+      <VersionPanel onClose={layout.closeSide} />
+    ) : null;
 
   return (
     <div className="flex h-dvh flex-col bg-[var(--bg)] text-[var(--text)]">
       <TopBar />
+      <div ref={rowRef} className="flex min-h-0 flex-1">
+        <ActivityRail onShortcuts={() => setSheet("shortcuts")} onSettings={() => setSheet("settings")} />
 
-      {/* `relative` is what makes the phone layout below possible: the side
-          panes become absolutely-positioned overlays inside this box rather
-          than columns competing for a 360px row. */}
-      <div className="relative flex min-h-0 flex-1">
-        {/* Sidebar column: Files above History. */}
-        {(visible.files || visible.history) && (
+        {sideView && (
           <>
-            {/* PHONE: one pane at a time.
-                On a laptop this is a column in a row of columns, and the
-                dragged width is what the student set. On a phone, three
-                columns plus two splitters inside 360px gave every pane about
-                a hundred usable pixels — which is how the old single-panel
-                phone layout got lost. Below `md` this becomes a full-screen
-                overlay over the editor instead, driven by exactly the same
-                visibility toggles: open it to use it, close it to get back.
-                The width lives in a custom property so the class can override
-                it below `md`; an inline `width` would win over any class. */}
-            <div
-              ref={sidebarRef}
-              className="absolute inset-0 z-30 flex min-h-0 w-full flex-col bg-[var(--bg)] md:static md:z-auto md:w-[var(--pane-w)] md:bg-transparent"
-              style={{ "--pane-w": `${layout.sidebarWidth}px`, flex: "0 0 auto" } as React.CSSProperties}
-            >
-              {visible.files && (
-                <div
-                  className="flex min-h-0 flex-col"
-                  style={
-                    bothSidebarPanes
-                      ? { flex: `${layout.filesRatio} 1 0`, minHeight: MIN_STACKED }
-                      : { flex: "1 1 0" }
-                  }
-                >
-                  <Pane title="Files" closeLabel="Close the files list" onClose={() => layout.close("files")}>
-                    <div className="h-full overflow-y-auto">
-                      <FileExplorer project={project} activePath={activeTab} />
-                    </div>
-                  </Pane>
-                </div>
-              )}
-
-              {bothSidebarPanes && (
-                <ResizeHandle
-                  className="hidden md:block"
-                  orientation="horizontal"
-                  label="Resize the files list against what is below it"
-                  value={Math.round(layout.filesRatio * 100)}
-                  min={15}
-                  max={85}
-                  onDragStart={() => {
-                    start.current = layout.filesRatio * sidebarHeight();
-                  }}
-                  onDrag={(delta) => {
-                    const total = sidebarHeight();
-                    if (total > 0) setFiles((start.current + delta) / total);
-                  }}
-                  onNudge={(step) => {
-                    const total = sidebarHeight();
-                    if (total > 0) setFiles((layout.filesRatio * total + step) / total);
-                  }}
-                />
-              )}
-
-              {visible.history && (
-                <div
-                  className="flex min-h-0 flex-col"
-                  style={
-                    bothSidebarPanes
-                      ? { flex: `${belowShare} 1 0`, minHeight: MIN_STACKED }
-                      : { flex: "1 1 0" }
-                  }
-                >
-                  <Pane
-                    title="History"
-                    closeLabel="Close your version history"
-                    onClose={() => layout.close("history")}
-                  >
-                    <div className="h-full min-h-0">
-                      <VersionPanel />
-                    </div>
-                  </Pane>
-                </div>
-              )}
-
-            </div>
-
+            <aside className="flex min-h-0 shrink-0 flex-col" style={{ width: widthOf("side") }}>
+              {sideView}
+            </aside>
             <ResizeHandle
-              className="hidden md:block"
               orientation="vertical"
-              label="Resize the files column"
+              label="Resize the side bar"
               value={layout.sidebarWidth}
               min={MIN_SIDEBAR}
               max={MAX_SIDEBAR}
               onDragStart={() => {
-                start.current = layout.sidebarWidth;
+                start.current = widthOf("side");
               }}
-              onDrag={(delta) => layout.setSidebarWidth(start.current + delta)}
-              onNudge={(step) => layout.setSidebarWidth(layout.sidebarWidth + step)}
+              onDrag={(delta) => layout.setSidebarWidth(Math.min(start.current + delta, maxFor("side", MAX_SIDEBAR)))}
+              onNudge={(step) => layout.setSidebarWidth(Math.min(widthOf("side") + step, maxFor("side", MAX_SIDEBAR)))}
             />
           </>
         )}
 
         {/* Centre column: the editor, and the preview under it. */}
-        <div ref={centerRef} className="flex min-w-0 min-h-0 flex-1 flex-col">
+        <main ref={centerRef} className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div
             className="flex min-h-0 min-w-0 flex-col"
-            style={
-              bothCenterPanes
-                ? { flex: `${layout.editorRatio} 1 0`, minHeight: MIN_STACKED }
-                : { flex: "1 1 0" }
-            }
+            style={visible.preview ? { flex: `${layout.editorRatio} 1 0`, minHeight: MIN_STACKED } : { flex: "1 1 0" }}
           >
             <CodeEditor />
           </div>
-
-          {bothCenterPanes && (
+          {visible.preview && (
             <>
               <ResizeHandle
-                className="hidden md:block"
                 orientation="horizontal"
                 label="Resize the editor against the preview"
                 value={Math.round(layout.editorRatio * 100)}
@@ -352,158 +454,62 @@ export function Workspace() {
                   if (total > 0) setEditor((layout.editorRatio * total + step) / total);
                 }}
               />
-              <div
-                className="flex min-h-0 min-w-0 flex-col"
-                style={{ flex: `${1 - layout.editorRatio} 1 0`, minHeight: MIN_STACKED }}
-              >
-                <Pane
-                  title="Preview"
-                  closeLabel="Close the preview"
-                  onClose={() => layout.close("preview")}
-                >
-                  <div className="h-full min-h-0">
-                    <BottomPanel />
-                  </div>
-                </Pane>
+              <div className="flex min-h-0 min-w-0 flex-col" style={{ flex: `${1 - layout.editorRatio} 1 0`, minHeight: MIN_STACKED }}>
+                <BottomPanel onClose={() => layout.close("preview")} />
               </div>
             </>
           )}
-        </div>
+        </main>
 
-        {/* CHANGES: its own column, to the right of the editor.
-            It used to be stacked under Files in a 232px sidebar, which left a
-            diff about ninety pixels to render code in. A diff is a reading
-            surface — two versions of a line, side by side, with their numbers —
-            and ninety pixels is not one. Placed right of the centre rather than
-            left of it because you read it AGAINST the editor: glance from the
-            file to what changed in it without crossing the whole window. */}
+        {/* CHANGES: its own column, right of the editor, because you read it
+            AGAINST the editor — glance from the file to what changed in it
+            without crossing the whole window. */}
         {visible.changes && (
           <>
             <ResizeHandle
-              className="hidden md:block"
               orientation="vertical"
               label="Resize the changes column"
               value={layout.changesWidth}
               min={MIN_CHANGES}
               max={MAX_CHANGES}
               onDragStart={() => {
-                start.current = layout.changesWidth;
+                start.current = widthOf("changes");
               }}
               // Right of the centre, so dragging left makes it wider.
-              onDrag={(delta) => layout.setChangesWidth(start.current - delta)}
-              onNudge={(step) => layout.setChangesWidth(layout.changesWidth - step)}
+              onDrag={(delta) => layout.setChangesWidth(Math.min(start.current - delta, maxFor("changes", MAX_CHANGES)))}
+              onNudge={(step) => layout.setChangesWidth(Math.min(widthOf("changes") - step, maxFor("changes", MAX_CHANGES)))}
             />
-            <div
-              className="absolute inset-0 z-30 flex min-h-0 w-full flex-col bg-[var(--bg)] md:static md:z-auto md:w-[var(--pane-w)] md:bg-transparent"
-              style={{ "--pane-w": `${layout.changesWidth}px`, flex: "0 0 auto" } as React.CSSProperties}
-            >
-              <Pane
-                title="Changes"
-                closeLabel="Close the list of changes"
-                onClose={() => layout.close("changes")}
-              >
-                <div className="h-full min-h-0">
-                  <ChangesPanel />
-                </div>
-              </Pane>
-            </div>
+            <aside className="flex min-h-0 shrink-0 flex-col" style={{ width: widthOf("changes") }}>
+              <ChangesPanel onClose={() => layout.close("changes")} />
+            </aside>
           </>
         )}
 
-        {/* Panda's chat. Closable like anything else. */}
+        {/* Panda. Hidden rather than removed when closed, so a turn that is
+            running keeps running and the half-typed message stays put. */}
         {visible.chat && (
-          <>
-            <ResizeHandle
-              className="hidden md:block"
-              orientation="vertical"
-              label="Resize the chat"
-              value={layout.chatWidth}
-              min={MIN_CHAT}
-              max={MAX_CHAT}
-              onDragStart={() => {
-                start.current = layout.chatWidth;
-              }}
-              // The chat is on the right, so dragging left makes it wider.
-              onDrag={(delta) => layout.setChatWidth(start.current - delta)}
-              onNudge={(step) => layout.setChatWidth(layout.chatWidth - step)}
-            />
-            <div
-              className="absolute inset-0 z-30 flex min-h-0 w-full flex-col bg-[var(--bg)] md:static md:z-auto md:w-[var(--pane-w)] md:bg-transparent"
-              style={{ "--pane-w": `${layout.chatWidth}px`, flex: "0 0 auto" } as React.CSSProperties}
-            >
-              <Pane title="Agent" closeLabel="Close the chat with Panda" onClose={() => layout.close("chat")}>
-                {/* Marked so "Ask Panda about this" can find THIS composer and
-                    not some other textarea that happens to be on screen. */}
-                <div data-agent-composer className="h-full min-h-0">
-                  <AgentPanel />
-                </div>
-              </Pane>
-            </div>
-          </>
+          <ResizeHandle
+            orientation="vertical"
+            label="Resize the chat"
+            value={layout.chatWidth}
+            min={MIN_CHAT}
+            max={MAX_CHAT}
+            onDragStart={() => {
+              start.current = widthOf("chat");
+            }}
+            onDrag={(delta) => layout.setChatWidth(Math.min(start.current - delta, maxFor("chat", MAX_CHAT)))}
+            onNudge={(step) => layout.setChatWidth(Math.min(widthOf("chat") - step, maxFor("chat", MAX_CHAT)))}
+          />
         )}
-
-        {/* The way back. Anything closed is one click from returning, and the
-            rail never closes, so nothing can be lost behind a closed pane. */}
-        <nav
-          aria-label="Show or hide panels"
-          className="flex w-11 shrink-0 flex-col items-center gap-1 border-l border-[var(--line)] bg-[var(--surface-0)] py-2"
+        <aside
+          className={visible.chat ? "flex min-h-0 shrink-0 flex-col" : "hidden"}
+          style={{ width: visible.chat ? widthOf("chat") : undefined }}
         >
-          {RAIL.map(({ key, label, Icon }) => {
-            const open = visible[key];
-            return (
-              <button
-                key={key}
-                onClick={() => layout.toggle(key)}
-                aria-pressed={open}
-                aria-label={open ? `Hide ${label}` : `Show ${label}`}
-                title={open ? `Hide ${label}` : `Show ${label}`}
-                className={`tap-sq inline-flex items-center justify-center rounded-lg p-2 transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
-                  open
-                    ? "bg-[var(--surface-2)] text-[var(--text)]"
-                    : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)]"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-              </button>
-            );
-          })}
-
-          <span aria-hidden className="my-1 h-px w-5 bg-[var(--line)]" />
-
-          <button
-            onClick={() => setPaletteOpen(true)}
-            aria-label="Find a file or run a command"
-            title="Find a file or run a command (Ctrl K)"
-            className="tap-sq inline-flex items-center justify-center rounded-lg p-2 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-          >
-            <CommandIcon className="h-4 w-4" />
-          </button>
-
-          <button
-            onClick={() => layout.reset()}
-            aria-label="Reset the layout back to normal"
-            title="Reset the layout back to normal"
-            className="tap-sq inline-flex items-center justify-center rounded-lg p-2 text-[var(--text-faint)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-          >
-            <CodeIcon className="h-4 w-4" />
-          </button>
-        </nav>
+          <AgentPanel onClose={() => layout.close("chat")} />
+        </aside>
       </div>
-
-      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={commands} />
+      <StatusBar />
+      {sheets}
     </div>
   );
-}
-
-/** Just the file's name, for a command label that has to stay one line on a phone. */
-function short(path: string): string {
-  return path.split("/").pop() ?? path;
-}
-
-function editorAction(commandId: string): void {
-  window.dispatchEvent(new CustomEvent("panda:editor-action", { detail: { commandId } }));
-}
-
-function askSelection(kind: "explain" | "fix"): void {
-  window.dispatchEvent(new CustomEvent("panda:ask-selection", { detail: { kind } }));
 }

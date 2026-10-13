@@ -13,7 +13,9 @@ import {
   totalAssetBytes,
 } from "@/lib/assets";
 import { fileName, joinPath, parentPath } from "@/lib/paths";
+import { exportProjectToZip } from "@/lib/zip";
 import { displayPath, duplicatePath } from "./fileMenu";
+import { fileBlob, safeFileName, saveBlob } from "./download";
 
 // Everything a context-menu entry actually DOES, in one place that has nothing
 // to do with menus.
@@ -22,25 +24,24 @@ import { displayPath, duplicatePath } from "./fileMenu";
 // repo learned the hard way is that a right-click is never the only route to an
 // action — half the students are on phones and some are on a keyboard — so
 // every action here is called from at least two places: the tree's menu and ⋯
-// button, and the command palette (Ctrl/Cmd-K), which needs no pointer at all.
-// If the behaviour lived inside the menu component, the palette would have to
+// button, and the command palette, which needs no pointer at all. If the
+// behaviour lived inside the menu component, the palette would have to
 // reimplement it, and the two copies would drift until one of them stopped
 // asking before deleting things.
+//
+// The project is read when an action RUNS, not when the hook renders. Holding
+// it as a dependency rebuilt every action on every keystroke, and every row of
+// the file tree uses this hook — so typing one letter re-rendered the whole
+// tree.
 //
 // Everything is async because everything that can go wrong tells the student so
 // in an in-app dialog rather than failing quietly.
 
+const current = () => useStudioStore.getState();
+
 export function useFileActions() {
   const { t } = useI18n();
   const dialog = useDialog();
-  const project = useStudioStore((s) => s.project);
-  const openFile = useStudioStore((s) => s.openFile);
-  const addFile = useStudioStore((s) => s.addFile);
-  const addFolder = useStudioStore((s) => s.addFolder);
-  const removeNode = useStudioStore((s) => s.removeNode);
-  const renamePath = useStudioStore((s) => s.renamePath);
-  const duplicateNode = useStudioStore((s) => s.duplicateNode);
-  const undoDelete = useStudioStore((s) => s.undoDelete);
 
   const report = useCallback(
     async (err: unknown) => {
@@ -75,12 +76,13 @@ export function useFileActions() {
        * student pointed at.
        */
       containerFor(path: string): string {
+        const project = current().project;
         const node = project ? findByPath(project, path) : undefined;
         return node?.kind === "folder" ? node.path : parentPath(path);
       },
 
       async create(kind: "file" | "folder", containerPath: string) {
-        if (!project) return;
+        if (!current().project) return;
         const name = await dialog.prompt({
           title: t(kind === "file" ? "studio.newFile" : "studio.newFolder"),
           description: containerPath
@@ -93,12 +95,12 @@ export function useFileActions() {
         const path = containerPath ? joinPath(containerPath, name) : name;
         try {
           if (kind === "file") {
-            addFile(path, "");
+            current().addFile(path, "");
             // Opened straight away: a new empty file you cannot see is
             // indistinguishable from a new file that was not created.
-            openFile(path);
+            current().openFile(path);
           } else {
-            addFolder(path);
+            current().addFolder(path);
           }
         } catch (err) {
           await report(err);
@@ -106,16 +108,30 @@ export function useFileActions() {
       },
 
       async rename(path: string) {
-        const current = fileName(path);
+        const currentName = fileName(path);
         const name = await dialog.prompt({
-          title: `Rename “${current}”`,
-          defaultValue: current,
+          title: `Rename “${currentName}”`,
+          defaultValue: currentName,
           confirmLabel: t("action.rename"),
         });
         const trimmed = name?.trim();
-        if (!trimmed || trimmed === current) return;
+        if (!trimmed || trimmed === currentName) return;
         try {
-          renamePath(path, joinPath(parentPath(path), trimmed));
+          current().renamePath(path, joinPath(parentPath(path), trimmed));
+        } catch (err) {
+          await report(err);
+        }
+      },
+
+      /**
+       * Moves a file or folder into another folder — what dragging a row onto
+       * a folder does. Refusals (a folder into itself, a name already taken
+       * there) are explained rather than swallowed.
+       */
+      async move(path: string, targetFolder: string) {
+        try {
+          if (parentPath(path) === targetFolder) return;
+          current().moveNode(path, targetFolder);
         } catch (err) {
           await report(err);
         }
@@ -138,6 +154,7 @@ export function useFileActions() {
        *  - an existing path is never silently overwritten.
        */
       async addAssets(files: FileList | File[], folder = "") {
+        const project = current().project;
         if (!project) return [] as string[];
         const incoming = Array.from(files);
         const added: string[] = [];
@@ -151,18 +168,13 @@ export function useFileActions() {
 
           // ANYTHING CAN COME IN.
           //
-          // This used to refuse every extension that was not a known image,
-          // sound or font — so a dropped .json, .md, .csv, .txt or .py was
-          // turned away with "Panda can't store this kind of file yet", which
-          // was both untrue and the opposite of what a file tree is for.
-          //
-          // A file is now stored as TEXT unless its extension says it is one of
+          // A file is stored as TEXT unless its extension says it is one of
           // the binary kinds assets.ts knows how to hold. That split is the
-          // whole rule, and it is the right one: text is what the editor can
-          // show and the model can read, and the binary list is exactly the set
-          // the preview can inline. A binary we do not recognise still comes in
-          // — as an asset with a generic type — because refusing to hold a
-          // student's file is worse than holding one we cannot preview.
+          // whole rule: text is what the editor can show and the model can
+          // read, and the binary list is exactly the set the preview can
+          // inline. A binary we do not recognise still comes in — as an asset
+          // with a generic type — because refusing to hold a student's file is
+          // worse than holding one we cannot preview.
           const isText = !mimeType && looksTextual(file);
           if (file.size > MAX_ASSET_BYTES) {
             refused.push(
@@ -181,14 +193,14 @@ export function useFileActions() {
 
           try {
             if (isText) {
-              addFile(path, await file.text());
+              current().addFile(path, await file.text());
             } else {
-              addFile(path, await readAsDataUrl(file), mimeType ?? "application/octet-stream");
+              current().addFile(path, await readAsDataUrl(file), mimeType ?? "application/octet-stream");
               budget -= file.size;
             }
             added.push(path);
-          } catch {
-            refused.push(`${file.name} — that file could not be read.`);
+          } catch (err) {
+            refused.push(`${file.name} — ${err instanceof Error ? err.message : "that file could not be read."}`);
           }
         }
 
@@ -200,44 +212,49 @@ export function useFileActions() {
         }
         // The last one opens, so a drop is visibly a thing that happened rather
         // than a row appearing somewhere in a tree the student was not looking at.
-        if (added.length > 0) openFile(added[added.length - 1]);
+        if (added.length > 0) current().openFile(added[added.length - 1]);
         return added;
       },
 
       async duplicate(path: string) {
+        const project = current().project;
         if (!project) return;
         try {
           const target = duplicatePath(path, (candidate) => findByPath(project, candidate) !== undefined);
-          const created = duplicateNode(path, target);
-          if (created && findByPath(project, created)?.kind === "file") openFile(created);
+          const created = current().duplicateNode(path, target);
+          if (created && findByPath(project, created)?.kind === "file") current().openFile(created);
         } catch (err) {
           await report(err);
         }
       },
 
       async remove(path: string) {
+        const project = current().project;
         if (!project) return;
         const node = findByPath(project, path);
         if (!node) return;
         const confirmed = await dialog.confirm({
           title: t("studio.deleteNode", { name: node.name }),
-          description: t(node.kind === "folder" ? "studio.deleteFolderBody" : "studio.deleteFileBody"),
+          // "You can't undo this" was not true — the bar under the tree and
+          // the palette both offer Undo — and a warning that overstates the
+          // danger teaches students to stop reading warnings.
+          description: t(node.kind === "folder" ? "explorer.deleteFolderBody" : "explorer.deleteFileBody"),
           confirmLabel: t("action.delete"),
           danger: true,
         });
         if (!confirmed) return;
         try {
-          removeNode(path);
+          current().removeNode(path);
         } catch (err) {
           await report(err);
         }
       },
 
-      undoDelete,
+      undoDelete: () => current().undoDelete(),
 
       /** The project-qualified path, which is the nearest thing to "absolute" here. */
       copyPath(path: string) {
-        return copy(displayPath(project?.name ?? "project", path));
+        return copy(displayPath(current().project?.name ?? "project", path));
       },
 
       copyRelativePath(path: string) {
@@ -245,24 +262,26 @@ export function useFileActions() {
       },
 
       /**
-       * One file, saved to the student's device. Export-as-zip already exists in
-       * the top bar for the whole project; this is for the much commoner "I need
-       * to hand in style.css".
+       * One file, saved to the student's device — the much commoner "I need to
+       * hand in style.css". A folder goes as a zip of just that folder.
        */
       async download(path: string) {
+        const project = current().project;
         if (!project) return;
         const node = findByPath(project, path);
-        if (!node || node.kind !== "file") return;
-        const blob = new Blob([node.content ?? ""], { type: "text/plain;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = node.name;
-        a.click();
-        URL.revokeObjectURL(url);
+        if (!node) return;
+        try {
+          if (node.kind === "folder") {
+            saveBlob(await exportProjectToZip(project, node.path), `${safeFileName(node.name, "folder")}.zip`);
+            return;
+          }
+          saveBlob(fileBlob(node.content ?? "", node.mimeType), node.name);
+        } catch (err) {
+          await report(err);
+        }
       },
     }),
-    [project, dialog, t, addFile, addFolder, openFile, renamePath, duplicateNode, removeNode, undoDelete, copy, report],
+    [dialog, t, copy, report],
   );
 }
 

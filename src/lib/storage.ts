@@ -1,7 +1,11 @@
 "use client";
 
 import localforage from "localforage";
+import { nanoid } from "nanoid";
 import { accountScope } from "@/store/useAuthStore";
+import { forgetChat } from "@/store/useChatStore";
+import { forgetBuildLog } from "@/store/useMemoryStore";
+import { forgetVersions } from "@/store/useVersionStore";
 import type { Project } from "@/types";
 
 // Client-side persistence via IndexedDB (through localforage). Keeps the app
@@ -110,10 +114,52 @@ export async function saveProject(project: Project): Promise<void> {
   await setIndex(index);
 }
 
+/**
+ * Deletes a project and everything that was only ever about it: its chat with
+ * Panda, its version history and its build log.
+ *
+ * Those live in their own stores, keyed by project id, and deleting the
+ * project used to leave all three behind — invisible, unreachable, and taking
+ * up room in a browser database that a whole class shares. Each is removed by
+ * its own module, which knows where it keeps it. A failure there is logged and
+ * not thrown: the project itself is already gone, and the student asked for
+ * it to be.
+ */
 export async function deleteProject(id: string): Promise<void> {
   await store.removeItem(`project:${id}`);
   const index = await getIndex();
   await setIndex(index.filter((p) => p.id !== id));
+  const leftovers = await Promise.allSettled([forgetChat(id), forgetVersions(id), forgetBuildLog(id)]);
+  for (const result of leftovers) {
+    if (result.status === "rejected") console.warn("Could not tidy up after a deleted project", result.reason);
+  }
+}
+
+/** Renames a project without opening it, for the project list's own menu. */
+export async function renameProjectRecord(id: string, name: string): Promise<Project | undefined> {
+  const project = await loadProject(id);
+  const trimmed = name.trim();
+  if (!project || !trimmed) return undefined;
+  const renamed: Project = { ...project, name: trimmed, updatedAt: Date.now() };
+  await saveProject(renamed);
+  return renamed;
+}
+
+/**
+ * A full copy of a project under a new id and name — "make a copy before I try
+ * something risky", which students do far more than version history assumes.
+ * Files are copied node by node, so nothing in the copy shares an object with
+ * the original and editing one can never reach the other.
+ */
+export async function duplicateProject(id: string, name: string): Promise<Project | undefined> {
+  const project = await loadProject(id);
+  if (!project) return undefined;
+  const now = Date.now();
+  const files: Project["files"] = {};
+  for (const [key, node] of Object.entries(project.files)) files[key] = { ...node };
+  const copy: Project = { ...project, id: nanoid(12), name: name.trim() || project.name, createdAt: now, updatedAt: now, files };
+  await saveProject(copy);
+  return copy;
 }
 
 // ---------------------------------------------------------------------------

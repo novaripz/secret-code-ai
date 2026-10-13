@@ -56,14 +56,12 @@ export function askPanda(prompt: string): void {
  * controlled field changed — it is the same path a real keystroke takes.
  */
 export function prefillComposer(text: string): boolean {
-  // Scoped first, and only then anything at all. A comma selector would not do
-  // it: `querySelector` returns the first match in DOCUMENT order, not the
-  // first branch of the selector, and the workspace has another textarea
-  // earlier in the page — which is exactly where the question went the first
-  // time this was tried.
-  const field =
-    document.querySelector<HTMLTextAreaElement>("[data-agent-composer] textarea") ??
-    document.querySelector<HTMLTextAreaElement>("textarea");
+  // The agent's composer and nothing else. There used to be a fallback to "any
+  // textarea on the page", and Monaco keeps a hidden textarea of its own for
+  // keyboard input — so when the composer had not mounted yet the question
+  // was typed straight into the student's code. A question with nowhere to go
+  // is dropped; a question in the middle of someone's script is a bug.
+  const field = document.querySelector<HTMLTextAreaElement>("[data-agent-composer] textarea");
   if (!field) return false;
   const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set;
   setter?.call(field, text);

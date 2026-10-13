@@ -4,9 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useStudioStore } from "@/store/useStudioStore";
 import { useVersionStore, type Version } from "@/store/useVersionStore";
 import type { FileNode, FileOperation } from "@/types";
-import { CheckIcon, FileIcon } from "@/components/icons";
+import { CheckIcon } from "@/components/icons";
+import { Skeleton } from "@/components/ui/primitives";
 import { DiffBody } from "./ActionList";
 import { diffLines, type DiffResult } from "./diff";
+import { PaneHeader } from "./Pane";
+import { FileTypeIcon } from "./fileIcons";
+import { ago, useNow } from "./useNow";
+import { useWorkspaceLayout } from "./useWorkspaceLayout";
 
 // What has changed, on demand.
 //
@@ -18,27 +23,16 @@ import { diffLines, type DiffResult } from "./diff";
 //
 // WHAT IT COMPARES AGAINST, and why.
 //
-// The baseline is a checkpoint out of the History panel, defaulting to the most
-// recent one. That choice is the whole design: the project has no notion of
-// "saved" for a student to point at — edits go to IndexedDB continuously — so
-// "since you last saved" would be comparing against a moment nobody can name.
-// A checkpoint IS nameable. It is the row directly above in History, with the
-// same label and the same time, and the student can already travel to it. So
-// the answer to "what am I looking at?" is a thing on screen they can go back
-// to, and the picker lets them reach further back through the same list.
+// By default: the project as it was when the student opened it this time —
+// "what have I done today?", which is the question this panel is opened to
+// answer. It used to default to the newest checkpoint out of History, and
+// since a checkpoint is taken a few seconds after typing stops, the newest one
+// nearly always already held the latest work and the panel nearly always said
+// "nothing has changed".
 //
-// The cost, stated plainly rather than hidden: checkpoints are taken a few
-// seconds after you stop typing, so the newest one usually already contains
-// what you just wrote, and the honest answer is then "nothing has changed".
-// That is said in words. An empty diff that looks broken would be worse.
-
-/** The same phrasing History uses, so the two panels name a moment alike. */
-function when(at: number): string {
-  const minutes = Math.round((Date.now() - at) / 60_000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes} min ago`;
-  return new Date(at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-}
+// The picker still reaches back through every checkpoint in History, because a
+// checkpoint is a moment the student can name and travel to, with the same
+// label and time it has there.
 
 function contentsByPath(files: Record<string, FileNode>): Map<string, string> {
   const map = new Map<string, string>();
@@ -189,7 +183,7 @@ function FileRow({
           >
             {KIND_LABEL[change.kind]}
           </span>
-          <FileIcon className="h-3.5 w-3.5 shrink-0 text-[var(--text-faint)]" />
+          <FileTypeIcon path={change.path} className="h-3.5 w-3.5" />
           {/* The FULL path, not just the file name. In a narrow sidebar the name
               was all that fit; in a column of its own, "js/shop.js" and
               "old/shop.js" being indistinguishable is a real hazard. */}
@@ -257,14 +251,19 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: "removed", label: "Deleted" },
 ];
 
-export function ChangesPanel() {
+/** The id of the "since you opened this project" baseline in the picker. */
+const SESSION = "session";
+
+export function ChangesPanel({ onClose }: { onClose?: () => void }) {
   const project = useStudioStore((s) => s.project);
   const openFile = useStudioStore((s) => s.openFile);
   const applyOperations = useStudioStore((s) => s.applyOperations);
   const versions = useVersionStore((s) => s.versions);
   const loaded = useVersionStore((s) => s.loaded);
+  const sessionStart = useVersionStore((s) => s.sessionStart);
+  const now = useNow();
 
-  /** Which checkpoint we are comparing against; null means "the newest one". */
+  /** Which baseline we are comparing against; null means "since this project was opened". */
   const [pinned, setPinned] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
@@ -280,9 +279,9 @@ export function ChangesPanel() {
   const [touched, setTouched] = useState<Set<string> | null>(null);
 
   const baseline = useMemo(() => {
-    if (versions.length === 0) return undefined;
-    return versions.find((v) => v.id === pinned) ?? versions[versions.length - 1];
-  }, [versions, pinned]);
+    const picked = pinned && pinned !== SESSION ? versions.find((v) => v.id === pinned) : undefined;
+    return picked ?? sessionStart ?? versions[versions.length - 1];
+  }, [versions, pinned, sessionStart]);
 
   const changes = useMemo(
     () => (baseline && project ? changesBetween(baseline, project.files) : []),
@@ -292,9 +291,7 @@ export function ChangesPanel() {
   const shown = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return changes.filter(
-      (c) =>
-        (filter === "all" || c.kind === filter) &&
-        (needle === "" || c.path.toLowerCase().includes(needle)),
+      (c) => (filter === "all" || c.kind === filter) && (needle === "" || c.path.toLowerCase().includes(needle)),
     );
   }, [changes, filter, query]);
 
@@ -315,31 +312,14 @@ export function ChangesPanel() {
     [touched, changes],
   );
 
-  if (!project) {
-    return <p className="p-3 text-xs text-[var(--text-faint)]">No project open.</p>;
-  }
-
-  if (!loaded) {
-    return <p className="p-3 text-xs text-[var(--text-faint)]">Looking up your history…</p>;
-  }
-
-  // A brand-new project has nothing to compare against, and saying "no changes"
-  // would be a lie by omission — there is no baseline, which is a different
-  // thing from an unchanged one.
-  if (!baseline) {
-    return (
-      <p className="p-3 text-xs leading-relaxed text-[var(--text-faint)]">
-        There&apos;s nothing to compare against yet. Panda keeps a checkpoint every few seconds while you
-        work — as soon as there&apos;s one, this panel will show you exactly what moved since then.
-      </p>
-    );
-  }
+  const isSession = !!baseline && baseline === sessionStart;
+  const since = baseline ? (isSession ? "you opened this project" : ago(baseline.createdAt, now)) : "";
 
   function revert(change: FileChange) {
     // Expressed as file operations so it goes through the same validation and
     // the same autosave as anything else that edits the project. A file that
-    // was created since the checkpoint is deleted; anything else is put back to
-    // the text the checkpoint holds.
+    // was created since the baseline is deleted; anything else is put back to
+    // the text the baseline holds.
     const op: FileOperation =
       change.kind === "added"
         ? { type: "delete", path: change.path }
@@ -349,127 +329,150 @@ export function ChangesPanel() {
 
   const allOpen = shown.length > 0 && shown.every((c) => expanded.has(c.path));
 
-  return (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="shrink-0 space-y-1.5 border-b border-[var(--line)] px-2 py-2">
-        <div>
-          <label
-            htmlFor="changes-baseline"
-            className="block text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]"
-          >
-            Compared with
-          </label>
-          {/* 16px on phones on purpose: anything smaller makes iOS zoom the whole
-              workspace the moment the picker is touched. */}
-          <select
-            id="changes-baseline"
-            value={baseline.id}
-            onChange={(e) => setPinned(e.target.value)}
-            className="tap mt-0.5 w-full min-w-0 truncate rounded-md border border-[var(--line)] bg-[var(--surface-1)] px-2 py-1.5 text-base md:text-xs text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-          >
-            {[...versions].reverse().map((version, index) => (
-              <option key={version.id} value={version.id}>
-                {index === 0 ? "Latest checkpoint" : version.label} · {when(version.createdAt)}
-              </option>
-            ))}
-          </select>
+  let body: React.ReactNode;
+  if (!project || !loaded) {
+    body = (
+      <div className="space-y-2 p-3" aria-label="Looking up your history">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+  } else if (!baseline) {
+    // Nothing to compare against is a different thing from nothing changed,
+    // and is said differently.
+    body = (
+      <p className="p-4 text-[13px] leading-relaxed text-[var(--text-dim)]">
+        There&apos;s nothing to compare against yet. As soon as you start working, this shows you exactly what moved.
+      </p>
+    );
+  } else {
+    body = (
+      <>
+        <div className="shrink-0 space-y-2 border-b border-[var(--line)] p-2.5">
+          <div>
+            <label htmlFor="changes-baseline" className="eyebrow block">
+              Compared with
+            </label>
+            {/* 16px on phones on purpose: anything smaller makes iOS zoom the
+                whole workspace the moment the picker is touched. */}
+            <select
+              id="changes-baseline"
+              value={isSession ? SESSION : baseline.id}
+              onChange={(e) => setPinned(e.target.value)}
+              className="input tap mt-1 !h-9 truncate !text-base md:!text-[13px]"
+            >
+              {sessionStart && <option value={SESSION}>When you opened this project</option>}
+              {[...versions].reverse().map((version, index) => (
+                <option key={version.id} value={version.id}>
+                  {index === 0 ? "Latest checkpoint" : version.label} · {ago(version.createdAt, now)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {changes.length > 0 && (
+            <>
+              {/* The totals, up top. "What did that turn actually do?" is
+                  usually answered by two numbers before anyone opens a file. */}
+              <p className="text-[12.5px] text-[var(--text-faint)]">
+                {changes.length} file{changes.length === 1 ? "" : "s"} ·{" "}
+                <span className="tabular-nums text-[var(--success)]">+{totals.added}</span>{" "}
+                <span className="tabular-nums text-[var(--danger)]">−{totals.removed}</span> · since {since}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-1">
+                {FILTERS.map(({ key, label }) => {
+                  const count = key === "all" ? changes.length : changes.filter((c) => c.kind === key).length;
+                  if (count === 0 && key !== "all") return null;
+                  const on = filter === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setFilter(key)}
+                      aria-pressed={on}
+                      className={`tap inline-flex h-7 items-center gap-1 rounded-full px-2.5 text-[12px] font-[var(--weight-ui)] transition-colors ${
+                        on
+                          ? "bg-[var(--accent-soft)] text-[var(--accent-text)]"
+                          : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                      }`}
+                    >
+                      {label} <span className="tabular-nums opacity-80">{count}</span>
+                    </button>
+                  );
+                })}
+                <span className="flex-1" />
+                <button
+                  type="button"
+                  onClick={() => setTouched(allOpen ? new Set() : new Set(shown.map((c) => c.path)))}
+                  className="btn btn-ghost btn-sm !h-7 !px-2"
+                >
+                  {allOpen ? "Collapse all" : "Expand all"}
+                </button>
+              </div>
+
+              {/* Only worth the row once there are enough files to hunt through. */}
+              {changes.length > 5 && (
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Filter by path…"
+                  aria-label="Filter the changed files by path"
+                  className="input !h-9 !text-base md:!text-[13px]"
+                />
+              )}
+            </>
+          )}
         </div>
 
-        {changes.length > 0 && (
-          <>
-            {/* The totals, up top. "What did that turn actually do?" is usually
-                answered by two numbers before anyone opens a single file. */}
-            <p className="text-[11px] text-[var(--text-faint)]">
-              {changes.length} file{changes.length === 1 ? "" : "s"} ·{" "}
-              <span className="tabular-nums text-[var(--success)]">+{totals.added}</span>{" "}
-              <span className="tabular-nums text-[var(--danger)]">−{totals.removed}</span> · since{" "}
-              {when(baseline.createdAt)}
-            </p>
-
-            <div className="flex flex-wrap items-center gap-1">
-              {FILTERS.map(({ key, label }) => {
-                const count =
-                  key === "all" ? changes.length : changes.filter((c) => c.kind === key).length;
-                if (count === 0 && key !== "all") return null;
-                const on = filter === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setFilter(key)}
-                    aria-pressed={on}
-                    className={`tap rounded-full px-2 py-0.5 text-[11px] transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${
-                      on
-                        ? "bg-[var(--surface-3)] font-medium text-[var(--text)]"
-                        : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)]"
-                    }`}
-                  >
-                    {label} <span className="tabular-nums">{count}</span>
-                  </button>
-                );
-              })}
-              <span className="flex-1" />
-              <button
-                type="button"
-                onClick={() =>
-                  setTouched(allOpen ? new Set() : new Set(shown.map((c) => c.path)))
-                }
-                className="tap rounded-md px-2 py-0.5 text-[11px] text-[var(--text-faint)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-              >
-                {allOpen ? "Collapse all" : "Expand all"}
-              </button>
+        <div className="min-h-0 flex-1 overflow-y-auto p-2">
+          {changes.length === 0 ? (
+            <div className="flex flex-col items-center px-4 py-8 text-center">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--success-soft)] text-[var(--success)]">
+                <CheckIcon className="h-5 w-5" />
+              </span>
+              <p className="mt-3 text-sm font-[var(--weight-strong)] text-[var(--text)]">Nothing has changed</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-[var(--text-dim)]">
+                Your files are exactly as they were when {since === "you opened this project" ? since : `checkpointed ${since}`}.
+              </p>
             </div>
+          ) : shown.length === 0 ? (
+            <p className="p-2 text-[13px] text-[var(--text-faint)]">No changed file matches that filter.</p>
+          ) : (
+            <ul className="space-y-1.5">
+              {shown.map((change) => (
+                <FileRow
+                  key={change.path}
+                  change={change}
+                  open={expanded.has(change.path)}
+                  onToggle={() =>
+                    setTouched(() => {
+                      const next = new Set(expanded);
+                      if (next.has(change.path)) next.delete(change.path);
+                      else next.add(change.path);
+                      return next;
+                    })
+                  }
+                  onOpenFile={() => {
+                    openFile(change.path);
+                    useWorkspaceLayout.getState().reveal("editor");
+                  }}
+                  onRevert={() => revert(change)}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+      </>
+    );
+  }
 
-            {/* Only worth the row once there are enough files to hunt through. */}
-            {changes.length > 5 && (
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Filter by path…"
-                aria-label="Filter the changed files by path"
-                className="w-full rounded-md border border-[var(--line)] bg-[var(--surface-1)] px-2 py-1.5 text-base md:text-xs text-[var(--text)] placeholder:text-[var(--text-faint)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-              />
-            )}
-          </>
-        )}
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto p-1.5">
-        {changes.length === 0 ? (
-          <p className="flex items-start gap-2 p-1.5 text-xs leading-relaxed text-[var(--text-faint)]">
-            <CheckIcon aria-hidden className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--success)]" />
-            <span>
-              Nothing has changed since {when(baseline.createdAt)}. Your files match that checkpoint
-              exactly.
-            </span>
-          </p>
-        ) : shown.length === 0 ? (
-          <p className="p-1.5 text-xs text-[var(--text-faint)]">
-            No changed file matches that filter.
-          </p>
-        ) : (
-          <ul className="space-y-1.5">
-            {shown.map((change) => (
-              <FileRow
-                key={change.path}
-                change={change}
-                open={expanded.has(change.path)}
-                onToggle={() =>
-                  setTouched(() => {
-                    const next = new Set(expanded);
-                    if (next.has(change.path)) next.delete(change.path);
-                    else next.add(change.path);
-                    return next;
-                  })
-                }
-                onOpenFile={() => openFile(change.path)}
-                onRevert={() => revert(change)}
-              />
-            ))}
-          </ul>
-        )}
-      </div>
+  return (
+    <div className="flex h-full min-h-0 flex-col bg-[var(--surface-0)]">
+      <PaneHeader title="Changes" onClose={onClose} closeLabel="Close the list of changes" />
+      {body}
     </div>
   );
 }
