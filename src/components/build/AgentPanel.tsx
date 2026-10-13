@@ -421,7 +421,7 @@ export function AgentPanel({ onClose }: { onClose?: () => void }) {
             title: changed.length === 1 ? `You've changed ${changed[0]} since then` : `You've changed ${changed.length} of these files since then`,
             description:
               `Panda wrote this before your latest edits${changed.length > 1 ? ` to ${changed.join(", ")}` : ""}. ` +
-              "Applying replaces those files with Panda's version, so your newer edits would be lost. " +
+              `Applying replaces ${changed.length === 1 ? "that file" : "those files"} with Panda's version, so your newer edits would be lost. ` +
               "(History still has them if you change your mind.)",
             confirmLabel: "Apply anyway",
             danger: true,

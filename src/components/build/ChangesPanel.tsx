@@ -11,6 +11,7 @@ import { diffLines, type DiffResult } from "./diff";
 import { PaneHeader } from "./Pane";
 import { FileTypeIcon } from "./fileIcons";
 import { ago, useNow } from "./useNow";
+import { useWorkspaceLayout } from "./useWorkspaceLayout";
 
 // What has changed, on demand.
 //
@@ -454,7 +455,10 @@ export function ChangesPanel({ onClose }: { onClose?: () => void }) {
                       return next;
                     })
                   }
-                  onOpenFile={() => openFile(change.path)}
+                  onOpenFile={() => {
+                    openFile(change.path);
+                    useWorkspaceLayout.getState().reveal("editor");
+                  }}
                   onRevert={() => revert(change)}
                 />
               ))}

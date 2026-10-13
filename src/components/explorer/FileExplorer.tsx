@@ -40,6 +40,7 @@ import { useFileActions } from "@/components/build/useFileActions";
 import { FileTypeIcon } from "@/components/build/fileIcons";
 import { PaneHeader } from "@/components/build/Pane";
 import { WORKSPACE_EVENTS } from "@/components/build/events";
+import { useWorkspaceLayout } from "@/components/build/useWorkspaceLayout";
 import {
   ChevronRightIcon,
   FolderIcon,
@@ -387,6 +388,8 @@ function TreeNode({ node, depth, ctx }: { node: FileNode; depth: number; ctx: Tr
       onClick={() => {
         if (longPress.consumedClick()) return;
         openFile(node.path);
+        // On a phone the file opens on the code pane, not behind the list.
+        useWorkspaceLayout.getState().reveal("editor");
       }}
       onContextMenu={(e) => {
         e.preventDefault();
@@ -401,6 +404,7 @@ function TreeNode({ node, depth, ctx }: { node: FileNode; depth: number; ctx: Tr
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           openFile(node.path);
+          useWorkspaceLayout.getState().reveal("editor");
         } else {
           onRowKeyDown(e);
         }

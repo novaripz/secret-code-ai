@@ -6,6 +6,7 @@ import { listAllFiles } from "@/lib/fileSystem";
 import { CommandIcon, SearchIcon } from "@/components/icons";
 import { Kbd } from "@/components/ui/primitives";
 import { FileTypeIcon } from "./fileIcons";
+import { useWorkspaceLayout } from "./useWorkspaceLayout";
 
 // One key for everything. The workspace has panes, a file tree, a history and
 // an editor, and the commands that matter were spread across all of them —
@@ -88,7 +89,10 @@ function Palette({ onClose, actions, initial }: { onClose: () => void; actions: 
         hint: node.path.includes("/") ? node.path.split("/").slice(0, -1).join("/") : "",
         icon: <FileTypeIcon path={node.path} className="h-4 w-4" />,
         group: open.has(node.path) ? "Open files" : "Files",
-        run: () => openFile(node.path),
+        run: () => {
+          openFile(node.path);
+          useWorkspaceLayout.getState().reveal("editor");
+        },
       }))
       .sort((a, b) => (a.group === b.group ? a.label.localeCompare(b.label) : a.group === "Open files" ? -1 : 1));
   }, [project, tabs, openFile]);
