@@ -5,7 +5,8 @@ import type { FileOperation, Project } from "@/types";
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { findByPath } from "@/lib/fileSystem";
 import { useStudioStore } from "@/store/useStudioStore";
-import { CheckIcon, FileIcon, XIcon } from "@/components/icons";
+import { CheckIcon, SpinnerIcon, XIcon } from "@/components/icons";
+import { FileTypeIcon } from "./fileIcons";
 import { diffLines, hunks, type DiffResult } from "./diff";
 
 // What the agent did, written as actions rather than as a paragraph about
@@ -52,7 +53,7 @@ const VERB_STYLE: Record<FileOperation["type"], string> = {
   create: "bg-[var(--success-soft)] text-[var(--success)]",
   modify: "bg-[var(--warn-soft)] text-[var(--warn)]",
   delete: "bg-[var(--danger-soft)] text-[var(--danger)]",
-  rename: "bg-[var(--accent-soft)] text-[var(--accent-strong)]",
+  rename: "bg-[var(--accent-soft)] text-[var(--accent-text)]",
   generate: "bg-[var(--success-soft)] text-[var(--success)]",
 };
 
@@ -189,7 +190,7 @@ function ActionRow({ op, project }: { op: FileOperation; project: Project | null
         >
           {t(VERB[op.type])}
         </span>
-        <FileIcon className="h-3.5 w-3.5 shrink-0 text-[var(--text-faint)]" />
+        <FileTypeIcon path={op.path} className="h-3.5 w-3.5" />
         <span className="min-w-0 flex-1 truncate font-mono text-[var(--text-dim)]" title={op.path}>
           {name}
           {op.type === "rename" && op.newPath && (
@@ -220,6 +221,7 @@ export function ActionList({
   operations,
   applied,
   rejected,
+  busy = false,
   onApply,
   onReject,
   /** Set when these came back from the recovery path — the student is told why. */
@@ -228,6 +230,13 @@ export function ActionList({
   operations: FileOperation[];
   applied?: boolean;
   rejected?: boolean;
+  /**
+   * True while these are being applied. The buttons lock for the duration:
+   * a double click on Apply used to run the whole list twice — every
+   * "create" landing on top of itself, every rename failing the second time —
+   * and the student was shown a page of errors for changes that had worked.
+   */
+  busy?: boolean;
   onApply: () => void;
   onReject: () => void;
   recovered?: RecoveryNote;
@@ -235,9 +244,9 @@ export function ActionList({
   const project = useStudioStore((s) => s.project);
 
   return (
-    <div className="mt-2 space-y-1.5">
+    <div className="mt-2.5 space-y-2">
       {recovered && (
-        <p className="rounded-lg border border-[var(--warn)] bg-[var(--warn-soft)] px-2.5 py-1.5 text-[11px] leading-relaxed text-[var(--warn)]">
+        <p className="rounded-[var(--radius-sm)] border border-[color-mix(in_srgb,var(--warn)_35%,transparent)] bg-[var(--warn-soft)] px-2.5 py-2 text-[12px] leading-relaxed text-[var(--warn)]">
           {NOTE[recovered]}
         </p>
       )}
@@ -250,24 +259,22 @@ export function ActionList({
 
       {!applied && !rejected && (
         <div className="flex flex-wrap items-center gap-2 pt-0.5">
-          <button
-            onClick={onApply}
-            className="tap flex items-center gap-1 rounded-md bg-[var(--success-soft)] px-3 py-1.5 text-sm md:text-xs font-medium text-[var(--success)] transition-[filter] motion-reduce:transition-none hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-          >
-            <CheckIcon className="h-3.5 w-3.5" />
-            Apply {operations.length} change{operations.length === 1 ? "" : "s"}
+          <button type="button" onClick={onApply} disabled={busy} aria-busy={busy || undefined} className="btn btn-primary btn-sm">
+            {busy ? <SpinnerIcon className="animate-spin" /> : <CheckIcon />}
+            {busy ? "Applying…" : `Apply ${operations.length} change${operations.length === 1 ? "" : "s"}`}
           </button>
-          <button
-            onClick={onReject}
-            className="tap flex items-center gap-1 rounded-md bg-[var(--surface-2)] px-3 py-1.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-          >
-            <XIcon className="h-3.5 w-3.5" />
+          <button type="button" onClick={onReject} disabled={busy} className="btn btn-ghost btn-sm">
+            <XIcon />
             Skip
           </button>
         </div>
       )}
-      {applied && <p className="pt-0.5 text-[11px] text-[var(--success)]">Applied to your files.</p>}
-      {rejected && <p className="pt-0.5 text-[11px] text-[var(--text-faint)]">Skipped.</p>}
+      {applied && (
+        <p className="flex items-center gap-1.5 pt-0.5 text-[12px] text-[var(--success)]">
+          <CheckIcon className="h-3.5 w-3.5" /> Applied to your files.
+        </p>
+      )}
+      {rejected && <p className="pt-0.5 text-[12px] text-[var(--text-faint)]">Skipped.</p>}
     </div>
   );
 }

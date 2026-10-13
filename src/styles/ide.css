@@ -1,0 +1,146 @@
+/* The build workspace's own styles.
+   Plain CSS on the theme tokens, imported by the workspace and the project
+   list. Only the things utilities cannot say cleanly live here: tooltips drawn
+   from an attribute, a tab whose dot turns into a close button on hover, and
+   the preview's device frame. */
+
+/* ---- Tooltips --------------------------------------------------------------
+   The activity rail is a column of bare icons, and an icon alone is a guess.
+   The browser's own `title` tooltip takes a second to appear and is invisible
+   to a keyboard user, so the rail draws its own: on hover AND on focus, beside
+   the button, with the shortcut when there is one. */
+.ide-tip { position: relative; }
+.ide-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  z-index: 80;
+  white-space: nowrap;
+  pointer-events: none;
+  padding: 5px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-1);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: var(--weight-ui);
+  line-height: 1.2;
+  box-shadow: var(--shadow-2);
+  opacity: 0;
+  transition: opacity 120ms ease 250ms;
+}
+.ide-tip[data-tip-side="right"]::after { left: calc(100% + 10px); top: 50%; transform: translateY(-50%); }
+.ide-tip[data-tip-side="bottom"]::after { top: calc(100% + 8px); left: 50%; transform: translateX(-50%); }
+.ide-tip[data-tip-side="bottom-end"]::after { top: calc(100% + 8px); right: 0; }
+.ide-tip:hover::after, .ide-tip:focus-visible::after { opacity: 1; }
+/* No hover on a touch screen: a tooltip there sticks after the tap. */
+@media (hover: none) { .ide-tip::after { display: none; } }
+
+/* ---- Activity rail ------------------------------------------------------- */
+.ide-rail-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-faint);
+  transition: background-color 140ms ease, color 140ms ease;
+}
+.ide-rail-btn:hover { background: var(--surface-2); color: var(--text); }
+.ide-rail-btn svg { width: 1.2rem; height: 1.2rem; }
+.ide-rail-btn[aria-pressed="true"], .ide-rail-btn[aria-current="true"] {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+/* The marker on the edge says "this is the open view" without leaning on
+   colour alone. */
+.ide-rail-btn[aria-current="true"]::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+
+/* ---- Editor tabs ---------------------------------------------------------
+   An edited tab shows a dot where its close button sits; hovering or focusing
+   the tab swaps the dot for the ×, which is how every editor a student will
+   meet later behaves. */
+.ide-tab .ide-tab-close { opacity: 0; }
+.ide-tab[data-active] .ide-tab-close,
+.ide-tab:hover .ide-tab-close,
+.ide-tab:focus-within .ide-tab-close { opacity: 1; }
+.ide-tab[data-dirty] .ide-tab-close svg { display: none; }
+.ide-tab[data-dirty] .ide-tab-close::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent-text);
+}
+.ide-tab[data-dirty]:hover .ide-tab-close svg,
+.ide-tab[data-dirty] .ide-tab-close:focus-visible svg { display: block; }
+.ide-tab[data-dirty]:hover .ide-tab-close::before,
+.ide-tab[data-dirty] .ide-tab-close:focus-visible::before { display: none; }
+.ide-tab[data-dirty] .ide-tab-close { opacity: 1; }
+/* On a phone there is no hover, so the × is always there. */
+@media (hover: none) {
+  .ide-tab .ide-tab-close { opacity: 1; }
+}
+
+/* ---- The preview's stage -------------------------------------------------
+   Behind a phone- or tablet-sized frame, a quiet dotted ground so the frame's
+   edge reads as an edge and not as the page ending. */
+.ide-stage {
+  background-color: var(--surface-0);
+  background-image: radial-gradient(color-mix(in srgb, var(--text-faint) 22%, transparent) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+.ide-device {
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px var(--line-strong), var(--shadow-2);
+  overflow: hidden;
+  background: #fff;
+}
+
+/* ---- Small things -------------------------------------------------------- */
+/* The highlighted word in a search result. */
+.ide-hit {
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--warn) 30%, transparent);
+  color: var(--text);
+}
+.ide-hit-replaced {
+  text-decoration: line-through;
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+}
+.ide-hit-insert {
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--success) 25%, transparent);
+  color: var(--text);
+}
+
+/* A drop target in the file tree while something is dragged over it. */
+.ide-drop-target {
+  background: var(--accent-soft) !important;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+/* Monaco's own widgets inherit the app's corners. */
+.monaco-editor .suggest-widget,
+.monaco-editor .find-widget,
+.monaco-editor .monaco-hover {
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+
+/* The build log and the console share a mono face; Geist Mono when it is
+   loaded, the system's otherwise. */
+.ide-mono { font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ide-tip::after { transition: none; }
+}

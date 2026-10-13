@@ -30,9 +30,18 @@ interface LiveWriteState {
   content: string;
   /** True from the first op_start of a turn until the turn ends. */
   streaming: boolean;
+  /**
+   * Whether the editor is showing the live view. A turn turns it on; the
+   * student clicking one of their own tabs turns it off, and it stays off
+   * for the rest of that turn. The live view used to take over the editor
+   * for the whole turn, read-only, so a minute-long build was a minute in
+   * which the student could not touch their own code.
+   */
+  watching: boolean;
 
   begin: (path: string, kind: string) => void;
   append: (path: string, delta: string) => void;
+  setWatching: (watching: boolean) => void;
   /** The turn is over, whatever its outcome. */
   end: () => void;
 }
@@ -42,8 +51,13 @@ export const useLiveWrite = create<LiveWriteState>((set, get) => ({
   kind: null,
   content: "",
   streaming: false,
+  watching: false,
 
-  begin: (path, kind) => set({ path, kind, content: "", streaming: true }),
+  // The first file of a turn starts the watching; later files keep whatever
+  // the student chose, so a student who went back to their own tab is not
+  // dragged away again on every new file.
+  begin: (path, kind) =>
+    set((s) => ({ path, kind, content: "", streaming: true, watching: s.streaming ? s.watching : true })),
 
   // Guarded on the path: deltas and op_start frames are separate messages, and
   // a delta arriving a beat after the next file has been announced would
@@ -53,5 +67,7 @@ export const useLiveWrite = create<LiveWriteState>((set, get) => ({
     set((s) => ({ content: s.content + delta }));
   },
 
-  end: () => set({ path: null, kind: null, content: "", streaming: false }),
+  setWatching: (watching) => set({ watching }),
+
+  end: () => set({ path: null, kind: null, content: "", streaming: false, watching: false }),
 }));

@@ -15,7 +15,7 @@ import { accountScope } from "./useAuthStore";
  * were bare keys in a shared "memory" store, so on a classroom machine the
  * next student to sign in inherited the previous one's build log — and that
  * log is not inert data, it is handed to the model as `projectMemory` (see
- * ChatPanel and AgentPanel), so Panda would cheerfully describe one student's
+ * AgentPanel), so Panda would cheerfully describe one student's
  * project to another. Scoping the store rather than each key fixes both
  * PROFILE_KEY and every buildlog key in one place, and leaves the key names
  * themselves readable.
@@ -79,6 +79,11 @@ async function persistBuildLog(projectId: string, log: BuildLogEntry[]) {
   await memoryStore.setItem(`buildlog:${projectId}`, log);
 }
 
+/** Removes a project's build log for good. Called when the project itself is deleted. */
+export async function forgetBuildLog(projectId: string): Promise<void> {
+  await memoryStore.removeItem(`buildlog:${projectId}`);
+}
+
 export const useMemoryStore = create<MemoryState>((set, get) => ({
   profileFacts: [],
   buildLog: [],
@@ -90,6 +95,9 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
       memoryStore.getItem<string[]>(PROFILE_KEY),
       memoryStore.getItem<BuildLogEntry[]>(`buildlog:${projectId}`),
     ]);
+    // A slower read for a project the student has already left must not
+    // replace the log of the one they are in.
+    if (currentProjectId !== projectId) return;
     set({ profileFacts: facts ?? [], buildLog: log ?? [], hydrated: true });
   },
 
@@ -111,6 +119,17 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
       text: text.trim(),
       timestamp: Date.now(),
     };
+    // An entry for a project that is no longer open goes to THAT project's
+    // stored log. It used to be appended to the log on screen — the open
+    // project's — and saved under the other id, so each project ended up with
+    // the other one's history, which is then handed to the model as memory.
+    if (projectId !== currentProjectId) {
+      void memoryStore
+        .getItem<BuildLogEntry[]>(`buildlog:${projectId}`)
+        .then((log) => persistBuildLog(projectId, [...(log ?? []), entry].slice(-MAX_LOG_ENTRIES)))
+        .catch(() => {});
+      return;
+    }
     set((s) => {
       const buildLog = [...s.buildLog, entry].slice(-MAX_LOG_ENTRIES);
       persistBuildLog(projectId, buildLog);

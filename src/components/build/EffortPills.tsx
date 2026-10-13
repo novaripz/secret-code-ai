@@ -66,7 +66,7 @@ export function EffortPills({ className = "" }: { className?: string }) {
               // easiest thing on this panel to hit by accident.
               className={`tap inline-flex items-center rounded-full px-3 py-1 text-[13px] transition-colors motion-reduce:transition-none sm:px-2.5 sm:text-[11px] ${
                 on
-                  ? "bg-[var(--surface-3)] font-medium text-[var(--text)]"
+                  ? "bg-[var(--accent-soft)] font-medium text-[var(--accent-text)]"
                   : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)]"
               }`}
             >

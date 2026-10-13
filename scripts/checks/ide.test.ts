@@ -37,6 +37,8 @@ import {
 import { MAX_ASSET_BYTES } from "../../src/lib/assets";
 import { replaceAll, searchFiles } from "../../src/components/build/findInFiles";
 import { TEMPLATES, projectFromTemplate } from "../../src/components/build/templates";
+import { fitColumns } from "../../src/components/build/useWorkspaceLayout";
+import { matchScore } from "../../src/components/build/CommandPalette";
 
 let failures = 0;
 function ok(name: string, condition: boolean, detail = ""): void {
@@ -258,6 +260,24 @@ for (const template of TEMPLATES) {
 }
 ok("the multi-page site's links resolve to real pages",
    ["about.html", "contact.html"].every((p) => findByPath(projectFromTemplate("multipage", "x"), resolvePreviewPage(projectFromTemplate("multipage", "x"), "index.html", p))));
+
+console.log("\nthe editor keeps its room");
+
+ok("columns that fit are left alone", fitColumns(1400, [{ width: 250, min: 200 }, { width: 400, min: 300 }], 360).join() === "250,400");
+{
+  // A 1366px Chromebook less the rail: files, changes and the chat all open.
+  const squeezed = fitColumns(1200, [{ width: 250, min: 200 }, { width: 460, min: 320 }, { width: 400, min: 300 }], 360);
+  ok("on a small screen the side columns give way to the editor", 1200 - squeezed.reduce((a, b) => a + b, 0) >= 360, squeezed.join());
+  ok("but never below their own floor", squeezed[0] >= 200 && squeezed[1] >= 320 && squeezed[2] >= 300);
+  const floor = fitColumns(900, [{ width: 250, min: 200 }, { width: 460, min: 320 }, { width: 400, min: 300 }], 360);
+  ok("when even the floors do not fit, they stop at the floors", floor.join() === "200,320,300", floor.join());
+}
+
+console.log("\nthe palette puts the obvious answer first");
+
+ok("a prefix beats a subsequence", matchScore("sty", "style.css") > matchScore("sty", "story-time.js"));
+ok("letters in order still match", matchScore("scjs", "script.js") > 0);
+ok("letters out of order do not", matchScore("jss", "script.js") < 0 || matchScore("zz", "script.js") < 0);
 
 async function main(): Promise<void> {
   await zipImport();
