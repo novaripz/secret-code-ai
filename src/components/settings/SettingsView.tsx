@@ -45,7 +45,9 @@ import {
 //
 // Each section has an address (`/settings?tab=memory`), so the sidebar, the
 // command palette and a teacher's "go to Settings › Language" all land on the
-// right one, and Back steps between them. It used to always open on Profile.
+// right one, and a reload stays put. It used to always open on Profile.
+// Switching tabs replaces the address rather than adding to history, so Back
+// still leaves Settings in one press instead of replaying every tab clicked.
 
 const SECTIONS = [
   { key: "profile", label: "settings.profile", icon: UserIcon },
