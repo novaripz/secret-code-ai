@@ -81,7 +81,6 @@ import {
   Landmark,
   Languages,
   LayoutGrid,
-  LayoutTemplate,
   Lightbulb,
   List,
   ListTodo,
