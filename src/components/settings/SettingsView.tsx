@@ -107,6 +107,12 @@ function SettingsScreen() {
     else if (e.key === "End") go(SECTIONS.length - 1);
   }
 
+  // On a phone the tab row scrolls sideways; a link straight to Memory or
+  // Legal would otherwise open with the selected tab out of sight.
+  useEffect(() => {
+    tabRefs.current[section]?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [section]);
+
   const current = SECTIONS.find((s) => s.key === section)!;
 
   return (

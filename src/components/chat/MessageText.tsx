@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 
@@ -210,7 +211,10 @@ function BlockView({ block, animate }: { block: Block; animate: boolean }) {
   }
 }
 
-export function MessageText({ content, streaming }: { content: string; streaming?: boolean }) {
+// Memoised on its two props: while one reply streams, every earlier message in
+// the thread re-rendered and re-parsed its markdown on each chunk. Now only the
+// message that is actually changing does any work.
+export const MessageText = memo(function MessageText({ content, streaming }: { content: string; streaming?: boolean }) {
   // The remember markers are machinery, not writing. Stripping them here rather
   // than in the store means the raw reply stays intact on disk (so a fact can
   // be re-read if the parser ever changes) while the student never sees the
@@ -228,4 +232,4 @@ export function MessageText({ content, streaming }: { content: string; streaming
       ))}
     </div>
   );
-}
+});

@@ -23,37 +23,46 @@ export function ChatHeader() {
   const { t } = useI18n();
   const router = useRouter();
   const dialog = useDialog();
-  const thread = useAssistantStore((s) => s.activeThread);
+  // Only what the header shows. Subscribing to the whole thread re-rendered
+  // the header on every streamed chunk of a reply.
+  const id = useAssistantStore((s) => s.activeThread?.id);
+  const title = useAssistantStore((s) => s.activeThread?.title ?? "");
+  const pinned = useAssistantStore((s) => s.activeThread?.pinned === true);
+  const saved = useAssistantStore((s) => (s.activeThread?.messages.length ?? 0) > 0);
   const renameThread = useAssistantStore((s) => s.renameThread);
   const pinThread = useAssistantStore((s) => s.pinThread);
   const deleteThread = useAssistantStore((s) => s.deleteThread);
   const displayName = useProfileStore((s) => s.displayName);
 
-  if (!slot) return null;
-  const saved = thread !== null && thread.messages.length > 0;
+  if (!slot || !id) return null;
 
   async function rename() {
-    if (!thread) return;
-    const title = await dialog.prompt({
+    const next = await dialog.prompt({
       title: t("chats.renameTitle"),
-      defaultValue: thread.title,
+      defaultValue: title,
       placeholder: t("chats.namePlaceholder"),
       confirmLabel: t("action.rename"),
     });
-    if (title) await renameThread(thread.id, title);
+    if (next && id) await renameThread(id, next);
   }
 
   async function remove() {
-    if (!thread) return;
     const ok = await dialog.confirm({
       title: t("chats.deleteTitle"),
-      description: t("chats.deleteBody", { title: thread.title }),
+      description: t("chats.deleteBody", { title }),
       confirmLabel: t("action.delete"),
       danger: true,
     });
-    if (!ok) return;
-    await deleteThread(thread.id);
+    if (!ok || !id) return;
+    await deleteThread(id);
     router.replace("/", { scroll: false });
+  }
+
+  function exportChat() {
+    // Read at the moment of the click, so the file has the whole reply even
+    // if the header last rendered mid-stream.
+    const thread = useAssistantStore.getState().activeThread;
+    if (thread) downloadMarkdown(thread, { you: displayName() || t("chat.you"), panda: "Panda" });
   }
 
   return createPortal(
@@ -61,13 +70,13 @@ export function ChatHeader() {
       <span
         dir="auto"
         className={`min-w-0 truncate px-1 text-[15px] font-semibold ${saved ? "text-[var(--text)]" : "text-[var(--text-dim)]"}`}
-        title={saved ? thread.title : undefined}
+        title={saved ? title : undefined}
       >
-        {saved ? thread.title : t("nav.newChat")}
+        {saved ? title : t("nav.newChat")}
       </span>
       {saved && (
         <MenuButton
-          label={t("chats.optionsFor", { title: thread.title })}
+          label={t("chats.optionsFor", { title })}
           icon={<MoreIcon />}
           className="icon-btn icon-btn-sm tap-pad shrink-0"
           align="start"
@@ -75,15 +84,15 @@ export function ChatHeader() {
             { key: "rename", label: t("action.rename"), icon: <PencilIcon />, onSelect: () => void rename() },
             {
               key: "pin",
-              label: t(thread.pinned ? "chats.unpin" : "chats.pin"),
+              label: t(pinned ? "chats.unpin" : "chats.pin"),
               icon: <PinIcon />,
-              onSelect: () => void pinThread(thread.id, !thread.pinned),
+              onSelect: () => void pinThread(id, !pinned),
             },
             {
               key: "export",
               label: t("chat.exportMarkdown"),
               icon: <DownloadIcon />,
-              onSelect: () => downloadMarkdown(thread, { you: displayName() || t("chat.you"), panda: "Panda" }),
+              onSelect: exportChat,
             },
             { key: "delete", label: t("action.delete"), icon: <TrashIcon />, danger: true, onSelect: () => void remove() },
           ]}
