@@ -3,20 +3,32 @@
 import { create } from "zustand";
 import localforage from "localforage";
 import { accountScope } from "./useAuthStore";
-import type { Seed, Video } from "@/app/api/watch/route";
+import {
+  addRecent,
+  addSaved,
+  recordPlay,
+  recordProgress,
+  type HistoryEntry,
+  type SavedVideo,
+} from "@/lib/watch/library";
+import { STARTER_TERMS, titleWords } from "@/lib/watch/query";
+import type { Video } from "@/lib/watch/types";
 
-// Saved videos, and the search terms they turn into.
-//
-// Two things live here because they are the same thing seen twice: the list a
-// student sees under "Saved", and the handful of words that list becomes when
-// the feed asks what to show them. Keeping the derivation next to the data is
-// what lets the UI say out loud where a recommendation came from.
+export type { HistoryEntry, SavedVideo } from "@/lib/watch/library";
+export { toVideo } from "@/lib/watch/library";
+
+// The student's own corner of Watch: Watch later, History, Continue watching
+// and recent searches. None of it costs a single unit of YouTube quota, and
+// none of it leaves the device.
 //
 // Storage is IndexedDB through localforage, in a store named per account, the
 // same way threads are — two students sharing a school laptop must not see
-// each other's saves. The whole list is one row rather than a row per video:
-// saves are counted in tens, never thousands, and one row means a save is one
-// atomic write with no index to fall out of step.
+// each other's saves or history. Each list is one row rather than a row per
+// video: they are counted in tens or a couple of hundred, and one row means a
+// change is one atomic write with no index to fall out of step.
+//
+// Watch later is the list that used to be called "Saved". It keeps the same
+// store and the same key, so everything a student saved before is still there.
 
 const savedStore = localforage.createInstance({
   name: "ai-code-studio",
@@ -24,25 +36,9 @@ const savedStore = localforage.createInstance({
 });
 
 const SAVED_KEY = "__saved_videos__";
-/** A cap, so a stuck finger can't grow the row without bound. */
-const MAX_SAVED = 200;
-
-/**
- * Everything the Saved tab needs to draw a card without asking YouTube again —
- * which is the point: saved videos still list when the API key is missing, out
- * of quota, or the network is having a bad day.
- */
-export interface SavedVideo {
-  id: string;
-  title: string;
-  channel: string;
-  channelId: string;
-  thumbnail: string;
-  publishedAt: string;
-  seconds: number | null;
-  viewCount: number | null;
-  savedAt: number;
-}
+const HISTORY_KEY = "__watch_history__";
+const PAUSED_KEY = "__watch_history_paused__";
+const RECENT_KEY = "__watch_recent_searches__";
 
 /**
  * How the feed is built, in full:
@@ -54,41 +50,28 @@ export interface SavedVideo {
  * YouTube's own search, not a model of anybody's taste, and the UI says so in
  * those words. The upside of it being this plain is that every card can carry
  * a true sentence about why it is there.
+ *
+ * The sentence itself is written by the page, in the student's language, from
+ * the `reason` here.
  */
-const STOPWORDS = new Set([
-  // English function words, plus the ones every video title is made of.
-  "the", "and", "for", "with", "that", "this", "from", "your", "you", "how", "what", "why", "when",
-  "are", "was", "were", "his", "her", "its", "our", "their", "they", "them", "but", "not", "all",
-  "can", "will", "just", "about", "into", "out", "get", "got", "make", "made", "does", "did", "done",
-  "video", "videos", "full", "part", "episode", "official", "new", "best", "top", "watch", "free",
-  "tutorial", "lesson", "class", "course", "guide", "intro", "introduction", "crash", "review",
-  "minutes", "minute", "hour", "hours", "explained", "explain", "learn", "easy", "simple", "quick",
-  // Spanish, because plenty of Panda's students are working in it.
-  "los", "las", "una", "unos", "unas", "por", "para", "con", "que", "como", "del", "más", "muy",
-  "este", "esta", "esto", "son", "ser", "todo", "toda", "sobre", "hacer", "video", "clase",
-]);
+export type SeedReason =
+  | { kind: "channel"; channel: string; count: number }
+  | { kind: "word"; word: string }
+  | { kind: "starter" };
 
-/** Words that carry meaning in a title: long enough, not numbers, not noise. */
-function words(title: string): string[] {
-  return title
-    .toLowerCase()
-    .split(/[^\p{L}\p{N}]+/u)
-    .filter((w) => w.length >= 4 && !STOPWORDS.has(w) && !/^\d+$/.test(w));
-}
-
-function plural(n: number, one: string, many: string) {
-  return n === 1 ? one : many;
+export interface SeedPlan {
+  term: string;
+  reason: SeedReason;
 }
 
 /**
- * Saved videos in, search terms out. Exported rather than hidden in the store
- * so the rule is readable in one place: two channels at most, one topic word,
- * three terms total, because each one costs a YouTube search.
+ * Saved videos in, search terms out. Two channels at most, one topic word,
+ * three terms total, because each one can cost a YouTube search.
  */
-export function deriveSeeds(saved: SavedVideo[]): Seed[] {
+export function deriveSeeds(saved: SavedVideo[]): SeedPlan[] {
   if (saved.length === 0) return [];
 
-  const seeds: Seed[] = [];
+  const seeds: SeedPlan[] = [];
 
   const byChannel = new Map<string, number>();
   for (const v of saved) {
@@ -98,110 +81,189 @@ export function deriveSeeds(saved: SavedVideo[]): Seed[] {
 
   const channels = [...byChannel.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2);
   for (const [channel, count] of channels) {
-    seeds.push({
-      term: channel,
-      because: `Because you saved ${count} ${plural(count, "video", "videos")} from ${channel}`,
-    });
+    seeds.push({ term: channel, reason: { kind: "channel", channel, count } });
   }
 
   // One topic word, and only if it turns up in more than one saved title —
   // a word from a single video is a coincidence, not an interest.
   const byWord = new Map<string, number>();
   for (const v of saved) {
-    for (const w of new Set(words(v.title))) byWord.set(w, (byWord.get(w) ?? 0) + 1);
+    for (const w of new Set(titleWords(v.title))) byWord.set(w, (byWord.get(w) ?? 0) + 1);
   }
 
   const [topic] = [...byWord.entries()]
     .filter(([, count]) => count >= 2)
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
-  if (topic && seeds.length < 3) {
-    seeds.push({
-      term: topic[0],
-      because: `Because “${topic[0]}” keeps coming up in the titles you save`,
-    });
-  }
+  if (topic && seeds.length < 3) seeds.push({ term: topic[0], reason: { kind: "word", word: topic[0] } });
 
   return seeds;
 }
 
 /**
- * What a student sees before they have saved anything. It is a real search for
- * real study videos, and it says so on every card rather than pretending to be
- * personal.
+ * What a student sees before they have saved anything. Real searches for real
+ * study videos, the same for every student (so the server keeps them for most
+ * of a day), and labelled as exactly that on every card.
  */
-export const STARTER_SEEDS: Seed[] = [
-  { term: "study skills for high school students", because: "A starting point — save a video and this changes" },
-  { term: "algebra explained step by step", because: "A starting point — save a video and this changes" },
-  { term: "how to write a better essay", because: "A starting point — save a video and this changes" },
-];
-
-function toSaved(video: Video): SavedVideo {
-  return {
-    id: video.id,
-    title: video.title,
-    channel: video.channel,
-    channelId: video.channelId,
-    thumbnail: video.thumbnail,
-    publishedAt: video.publishedAt,
-    seconds: video.seconds,
-    viewCount: video.viewCount,
-    savedAt: Date.now(),
-  };
-}
-
-/** Back the other way, so one card component can draw both lists. */
-export function toVideo(saved: SavedVideo): Video {
-  return { ...saved, because: null };
-}
+export const STARTER_SEEDS: SeedPlan[] = STARTER_TERMS.map((term) => ({ term, reason: { kind: "starter" } }));
 
 interface WatchState {
   saved: SavedVideo[];
+  history: HistoryEntry[];
+  historyPaused: boolean;
+  recent: string[];
   hydrated: boolean;
 
   hydrate: () => Promise<void>;
   save: (video: Video) => Promise<void>;
   remove: (id: string) => Promise<void>;
+  /** Saves or un-saves, and says which it did, for the toast. */
+  toggleSaved: (video: Video) => Promise<"saved" | "removed">;
   isSaved: (id: string) => boolean;
+
+  /** Called once a video actually starts playing. */
+  recordPlay: (video: Video) => void;
+  /** Called every few seconds while it plays, and once more on the way out. */
+  recordProgress: (id: string, position: number, duration: number | null) => void;
+  removeFromHistory: (id: string) => Promise<void>;
+  clearHistory: () => Promise<void>;
+  setHistoryPaused: (paused: boolean) => Promise<void>;
+
+  addRecentSearch: (query: string) => void;
+  removeRecentSearch: (query: string) => void;
+  clearRecentSearches: () => void;
 }
 
+async function write(key: string, value: unknown) {
+  try {
+    await savedStore.setItem(key, value);
+  } catch {
+    // Private mode, or storage full. The tab keeps working; the change just
+    // won't survive a reload, which is better than throwing at them.
+  }
+}
+
+// Progress arrives every few seconds while a video plays. Writing the whole
+// history row to IndexedDB that often is wasted work, so the writes are
+// gathered up and flushed a few seconds later (and on the way off the page).
+let historyTimer: ReturnType<typeof setTimeout> | null = null;
+
 export const useWatchStore = create<WatchState>((set, get) => {
-  const persist = async (saved: SavedVideo[]) => {
+  const persistSaved = async (saved: SavedVideo[]) => {
     set({ saved });
-    try {
-      await savedStore.setItem(SAVED_KEY, saved);
-    } catch {
-      // Private mode, or storage full. The tab keeps working; the save just
-      // won't survive a reload, which is better than throwing at them.
+    await write(SAVED_KEY, saved);
+  };
+
+  const persistHistory = (history: HistoryEntry[], soon = false) => {
+    set({ history });
+    if (historyTimer) clearTimeout(historyTimer);
+    if (!soon) {
+      historyTimer = null;
+      return write(HISTORY_KEY, history);
     }
+    historyTimer = setTimeout(() => {
+      historyTimer = null;
+      void write(HISTORY_KEY, get().history);
+    }, 4_000);
+    return Promise.resolve();
   };
 
   return {
     saved: [],
+    history: [],
+    historyPaused: false,
+    recent: [],
     hydrated: false,
 
     hydrate: async () => {
       if (get().hydrated) return;
       try {
-        const stored = await savedStore.getItem<SavedVideo[]>(SAVED_KEY);
-        set({ saved: Array.isArray(stored) ? stored : [], hydrated: true });
+        const [saved, history, paused, recent] = await Promise.all([
+          savedStore.getItem<SavedVideo[]>(SAVED_KEY),
+          savedStore.getItem<HistoryEntry[]>(HISTORY_KEY),
+          savedStore.getItem<boolean>(PAUSED_KEY),
+          savedStore.getItem<string[]>(RECENT_KEY),
+        ]);
+        set({
+          saved: Array.isArray(saved) ? saved : [],
+          history: Array.isArray(history) ? history : [],
+          historyPaused: paused === true,
+          recent: Array.isArray(recent) ? recent.filter((r) => typeof r === "string") : [],
+          hydrated: true,
+        });
       } catch {
-        set({ saved: [], hydrated: true });
+        set({ hydrated: true });
       }
     },
 
     save: async (video) => {
-      const saved = get().saved;
-      if (saved.some((v) => v.id === video.id)) return;
-      // Newest first: the Saved tab is mostly used to get back to the thing
-      // they saved a minute ago.
-      await persist([toSaved(video), ...saved].slice(0, MAX_SAVED));
+      const next = addSaved(get().saved, video);
+      if (next !== get().saved) await persistSaved(next);
     },
 
     remove: async (id) => {
-      await persist(get().saved.filter((v) => v.id !== id));
+      await persistSaved(get().saved.filter((v) => v.id !== id));
+    },
+
+    toggleSaved: async (video) => {
+      if (get().saved.some((v) => v.id === video.id)) {
+        await get().remove(video.id);
+        return "removed";
+      }
+      await get().save(video);
+      return "saved";
     },
 
     isSaved: (id) => get().saved.some((v) => v.id === id),
+
+    recordPlay: (video) => {
+      if (get().historyPaused) return;
+      void persistHistory(recordPlay(get().history, video));
+    },
+
+    recordProgress: (id, position, duration) => {
+      if (get().historyPaused) return;
+      const next = recordProgress(get().history, id, position, duration);
+      if (next !== get().history) void persistHistory(next, true);
+    },
+
+    removeFromHistory: async (id) => {
+      await persistHistory(get().history.filter((h) => h.id !== id));
+    },
+
+    clearHistory: async () => {
+      await persistHistory([]);
+    },
+
+    setHistoryPaused: async (paused) => {
+      set({ historyPaused: paused });
+      await write(PAUSED_KEY, paused);
+    },
+
+    addRecentSearch: (query) => {
+      const recent = addRecent(get().recent, query);
+      if (recent === get().recent) return;
+      set({ recent });
+      void write(RECENT_KEY, recent);
+    },
+
+    removeRecentSearch: (query) => {
+      const recent = get().recent.filter((r) => r !== query);
+      set({ recent });
+      void write(RECENT_KEY, recent);
+    },
+
+    clearRecentSearches: () => {
+      set({ recent: [] });
+      void write(RECENT_KEY, []);
+    },
   };
 });
+
+/** Writes any progress still waiting, e.g. when the watch page unmounts. */
+export function flushWatchHistory() {
+  if (!historyTimer) return;
+  clearTimeout(historyTimer);
+  historyTimer = null;
+  void write(HISTORY_KEY, useWatchStore.getState().history);
+}

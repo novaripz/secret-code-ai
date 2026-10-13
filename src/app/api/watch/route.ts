@@ -1,84 +1,58 @@
 import { NextRequest, NextResponse } from "next/server";
-import { guardRequest } from "@/lib/security/apiGuard";
+import { guardRequest, type Identity } from "@/lib/security/apiGuard";
+import { DEVICE_HEADER } from "@/lib/security/deviceHeader";
+import { checkRateLimit, clientIp, tokenKey } from "@/lib/security/rateLimit";
 import { MAX_SMALL_BODY_BYTES, readJsonBody } from "@/lib/security/requestLimits";
+import { bearerToken } from "@/lib/supabase/server";
+import { UnitBudget } from "@/lib/watch/cache";
+import { isVideoId } from "@/lib/watch/parse";
+import { MAX_QUERY, STARTER_TERMS, findTopic, readFilters, relatedQuery, type SearchSpec } from "@/lib/watch/query";
+import { SEARCH_CEILING, UNITS, YouTubeError, createYouTube, type YouTube } from "@/lib/watch/youtube";
+import type { Seed, WatchProblem } from "@/lib/watch/types";
+
+export type { Seed, Video, VideoDetail, WatchProblem } from "@/lib/watch/types";
 
 // The Watch tab's only way out to YouTube.
 //
-// Two jobs, split across two methods because they are genuinely different
-// questions. GET runs a search for whatever the student typed. POST builds the
-// recommendation feed from search terms the browser hands over — the saved
-// videos themselves live in IndexedDB on the student's laptop and never reach
-// a server, so the browser derives the terms and this route just runs them.
-// That split is deliberate: nothing about what a student saves leaves their
-// machine except a few keywords, and only while the tab is open.
+// GET answers four questions, picked by which parameter is present:
+//   ?q=…        a search for whatever the student typed, plus filters
+//   ?topic=…    one of the home page's category chips (a fixed search)
+//   ?v=…        one video's details for the watch page, with its channel
+//   ?related=…  "More like this" for one video
+// POST builds the home feed from search terms the browser hands over. The
+// saved videos themselves live in IndexedDB on the student's laptop and never
+// reach a server, so the browser derives the terms and this route just runs
+// them: nothing about what a student saves leaves their machine except a few
+// keywords, and only while the tab is open.
 //
-// youtube.com refuses to be framed (X-Frame-Options), and framing it would
-// hand over the whole of the internet anyway, so results come back as data and
-// are drawn natively. Only a single chosen video gets an iframe, through the
-// youtube-nocookie embed player.
+// youtube.com refuses to be framed, and framing it would hand over the whole of
+// the internet anyway, so results come back as data and are drawn natively.
+// Only a single chosen video gets an iframe, through the youtube-nocookie embed.
 //
-// Quota is what shapes the rest. search.list costs 100 units against a default
-// of 10,000 a day, so: at most three terms per feed, and a small cache in front
-// of them. That cache lives in this process and dies with it — it is there to
-// stop someone flipping between tabs from spending a day's quota in a minute,
-// not to be a real cache.
+// Quota shapes the rest, and lib/watch/youtube.ts holds those rules: one shared
+// cache keyed on a normalised spelling, one promise per question in flight, a
+// daily budget that turns searching into cache-only before YouTube cuts it off.
 
 export const runtime = "nodejs";
 
-// Watch spends YouTube quota (100 units a search against a daily 10,000), so
-// it is worth rate limiting for exactly the reason /api/ai is: a loop here
-// costs the owner the Watch tab for the rest of the day. The in-process cache
-// below already absorbs repeat terms; these limits cover the case where the
-// terms keep changing. Guests are held tighter because a guest is anonymous.
+// Watch spends YouTube quota, so it is rate limited for exactly the reason
+// /api/ai is: a loop here costs the owner the Watch tab for the rest of the day.
 //
-// A burst is spelled out here for the same reason it is on /api/ai: browsing is
-// bursty. Someone landing on the Watch tab and trying four phrasings of the
-// same topic in twenty seconds is normal use, and a flat ten a minute refused
-// them. The sustained rate stays deliberately low, though, because unlike AI
-// quota the YouTube budget is a hard daily number that does not refill until
-// tomorrow — here the limiter really is protecting a scarce resource, not
-// pacing anyone.
+// Two layers. The guard counts requests, with a burst because browsing is
+// bursty (four phrasings of the same topic in twenty seconds is normal). The
+// second counts *searches* — only the ones that would actually reach YouTube —
+// so a feed of three new terms is three, a search answered from the cache is
+// none, and a script cannot buy 100 units with every request.
 const WATCH_USER_RULE = { limit: 30, windowMs: 60_000, burst: 15 };
 const WATCH_GUEST_RULE = { limit: 15, windowMs: 60_000, burst: 10 };
+const SEARCH_USER_RULE = { limit: 20, windowMs: 60_000, burst: 10 };
+const SEARCH_GUEST_RULE = { limit: 10, windowMs: 60_000, burst: 8 };
 const WATCH_BUSY =
   "Panda has hit its limit on video searches for the moment. " +
   "Wait a few seconds and search again.";
 
-export interface Video {
-  id: string;
-  title: string;
-  channel: string;
-  channelId: string;
-  thumbnail: string;
-  publishedAt: string;
-  /** Seconds, already parsed out of ISO 8601. Null for live streams. */
-  seconds: number | null;
-  viewCount: number | null;
-  /**
-   * Why this video is in the feed, in the client's own words. The browser is
-   * what knows the reason (it holds the saves), so it sends the sentence along
-   * with the term and we hand it back attached to whatever that term found.
-   * Null for plain search results, which need no explaining.
-   */
-  because: string | null;
-}
-
-export interface Seed {
-  /** Handed to YouTube search verbatim. */
-  term: string;
-  /** Shown on every card the term produced. */
-  because: string;
-}
-
-/** What went wrong, so the UI can branch without parsing English. */
-export type WatchProblem = "missing-key" | "quota" | "wrong-key" | "failed";
-
 /** Three terms at 100 units each is already 300; more would be reckless. */
 const MAX_SEEDS = 3;
-const PER_SEED = 8;
-const FEED_LIMIT = 24;
-const SEARCH_LIMIT = 24;
-const CACHE_TTL_MS = 10 * 60 * 1000;
 
 // Only ever YOUTUBE_API_KEY. This used to fall back to GEMINI_API_KEY, which
 // cannot work: an AI Studio key is scoped to the Generative Language API, and
@@ -90,21 +64,23 @@ function apiKey(): string | null {
 }
 
 const NOT_SET_UP =
-  "Watch isn't set up on this copy of Panda yet. Someone needs to add a YOUTUBE_API_KEY: make a key in Google Cloud Console with \"YouTube Data API v3\" enabled on the project. A Gemini key won't work here — it only opens the AI, not YouTube.";
+  "Watch isn't set up on this copy of Panda yet. Someone needs to add a YOUTUBE_API_KEY: make a key in Google Cloud Console with \"YouTube Data API v3\" enabled on the project (the steps are in .env.example). A Gemini key won't work here — it only opens the AI, not YouTube.";
 
-class YouTubeError extends Error {
-  problem: WatchProblem;
-  status: number;
+// One budget for the life of the process, however many times the client below
+// is rebuilt: the quota belongs to the key's project, not to an object.
+const budget = new UnitBudget(SEARCH_CEILING);
+let client: { key: string; yt: YouTube } | null = null;
 
-  constructor(problem: WatchProblem, status: number, message: string) {
-    super(message);
-    this.problem = problem;
-    this.status = status;
-  }
+function youtube(key: string): YouTube {
+  if (client?.key !== key) client = { key, yt: createYouTube({ fetch, key, budget }) };
+  return client.yt;
 }
 
-function problemResponse(problem: WatchProblem, status: number, error: string) {
-  return NextResponse.json({ error, problem }, { status });
+function problemResponse(problem: WatchProblem, status: number, error: string, retryAfter?: number) {
+  return NextResponse.json(
+    retryAfter ? { error, problem, retryAfter } : { error, problem },
+    { status, headers: retryAfter ? { "Retry-After": String(retryAfter) } : undefined },
+  );
 }
 
 function failed(err: unknown) {
@@ -113,188 +89,122 @@ function failed(err: unknown) {
   return problemResponse("failed", 502, "Couldn't reach YouTube just now. Try again in a moment.");
 }
 
-interface SearchItem {
-  id?: { videoId?: string };
-  snippet?: {
-    title?: string;
-    channelTitle?: string;
-    channelId?: string;
-    publishedAt?: string;
-    thumbnails?: { medium?: { url?: string }; high?: { url?: string } };
-  };
-}
-
-interface DetailItem {
-  id?: string;
-  contentDetails?: { duration?: string };
-  statistics?: { viewCount?: string };
-}
-
-async function call(
-  endpoint: "search" | "videos",
-  params: Record<string, string>,
-  key: string,
-): Promise<{ items?: unknown[] }> {
-  const url = new URL(`https://www.googleapis.com/youtube/v3/${endpoint}`);
-  url.searchParams.set("key", key);
-  for (const [name, value] of Object.entries(params)) url.searchParams.set(name, value);
-
-  const res = await fetch(url, { cache: "no-store" });
-  const data = await res.json().catch(() => ({}));
-  if (res.ok) return data;
-
-  const reason: string = data?.error?.errors?.[0]?.reason ?? "";
-  const raw: string = data?.error?.message ?? "YouTube didn't answer.";
-
-  // Quota is worth telling apart from every other 403: nothing is broken and
-  // nobody needs to go and fix a key — it comes back on its own at midnight.
-  if (/quota|rateLimit|dailyLimit/i.test(reason)) {
-    throw new YouTubeError(
-      "quota",
-      429,
-      "This YouTube key has used up today's quota. It resets at midnight Pacific time, and saved videos still play until then.",
-    );
-  }
-
-  // Google's own wording for a key pointed at the wrong API talks about OAuth
-  // and about APIs "not being used in a project before", which reads like a
-  // billing problem. Say the actual next step instead.
-  if (/API keys are not supported|API key not valid|has not been used|is disabled|forbidden/i.test(raw + reason)) {
-    throw new YouTubeError(
-      "wrong-key",
-      502,
-      "YouTube turned this key down. In Google Cloud Console, enable \"YouTube Data API v3\" on the project the key belongs to, then set that key as YOUTUBE_API_KEY. An AI Studio key can't be used here.",
-    );
-  }
-
-  throw new YouTubeError("failed", 502, raw);
-}
-
-/** "PT1H2M3S" -> 3723. Null when YouTube gives no real length (live streams). */
-function seconds(iso: string | undefined): number | null {
-  if (!iso) return null;
-  const parts = /^P(?:(\d+)D)?T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(iso);
-  if (!parts) return null;
-  const [, d, h, m, s] = parts;
-  const total = Number(d ?? 0) * 86400 + Number(h ?? 0) * 3600 + Number(m ?? 0) * 60 + Number(s ?? 0);
-  return total > 0 ? total : null;
-}
-
-const cache = new Map<string, { at: number; videos: Video[] }>();
-
 /**
- * One term in, a page of playable videos out.
- *
- * Two calls, not one: search.list has no duration or view count in it, so the
- * ids come back first and videos.list fills in the numbers. The second call
- * costs 1 unit against search.list's 100, which is why it is worth making
- * rather than drawing cards with holes in them.
+ * The guard's refusal, labelled. Its 429 carries a message and a wait but no
+ * `problem`, and without one the page used to call a five-second pause
+ * "Couldn't reach YouTube" — the wrong diagnosis, with the wrong button.
  */
-async function forTerm(term: string, key: string, count: number): Promise<Video[]> {
-  const cacheKey = `${term}::${count}`;
-  const hit = cache.get(cacheKey);
-  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.videos;
-
-  const found = await call(
-    "search",
-    {
-      part: "snippet",
-      q: term,
-      type: "video",
-      maxResults: String(count),
-      // Embeddable and syndicated only, so nothing in the grid dead-ends on a
-      // player that refuses to load inside Panda.
-      videoEmbeddable: "true",
-      videoSyndicated: "true",
-      safeSearch: "strict",
-    },
-    key,
-  );
-
-  const items = (found.items ?? []) as SearchItem[];
-  const ids = items.map((i) => i.id?.videoId).filter((id): id is string => Boolean(id));
-  if (ids.length === 0) return [];
-
-  const detailed = await call("videos", { part: "contentDetails,statistics", id: ids.join(",") }, key);
-  const extra = new Map<string, DetailItem>(
-    ((detailed.items ?? []) as DetailItem[]).map((d) => [d.id ?? "", d]),
-  );
-
-  const videos: Video[] = items
-    .filter((i) => i.id?.videoId)
-    .map((i) => {
-      const id = i.id!.videoId!;
-      const d = extra.get(id);
-      const views = Number(d?.statistics?.viewCount);
-      return {
-        id,
-        title: i.snippet?.title ?? "Untitled",
-        channel: i.snippet?.channelTitle ?? "",
-        channelId: i.snippet?.channelId ?? "",
-        thumbnail: i.snippet?.thumbnails?.medium?.url ?? i.snippet?.thumbnails?.high?.url ?? "",
-        publishedAt: i.snippet?.publishedAt ?? "",
-        seconds: seconds(d?.contentDetails?.duration),
-        viewCount: Number.isFinite(views) ? views : null,
-        because: null,
-      };
-    });
-
-  cache.set(cacheKey, { at: Date.now(), videos });
-  return videos;
+async function labelled(response: NextResponse): Promise<NextResponse> {
+  if (response.status !== 429) return response;
+  const body = (await response.clone().json().catch(() => ({}))) as Record<string, unknown>;
+  return NextResponse.json({ ...body, problem: "busy" }, { status: 429, headers: response.headers });
 }
 
-/**
- * Round-robin the terms rather than concatenating them, so a feed built from
- * three saved channels leads with one video from each instead of eight from
- * whichever term happened to be first. A video that two terms both found keeps
- * the reason from the term that reached it first.
- */
-function blend(groups: { seed: Seed; videos: Video[] }[], limit: number): Video[] {
-  const out: Video[] = [];
-  const seen = new Set<string>();
-  const deepest = groups.reduce((n, g) => Math.max(n, g.videos.length), 0);
-
-  for (let rank = 0; rank < deepest && out.length < limit; rank++) {
-    for (const group of groups) {
-      if (out.length >= limit) break;
-      const video = group.videos[rank];
-      if (!video || seen.has(video.id)) continue;
-      seen.add(video.id);
-      out.push({ ...video, because: group.seed.because });
-    }
-  }
-  return out;
-}
-
-/**
- * A net for a POST with no usable body. The real default — the one a student
- * sees before they have saved anything — is written in the store alongside the
- * rest of the feed's reasoning, because that is where it can be explained.
- */
-const FALLBACK_SEEDS: Seed[] = [
-  { term: "study skills for high school", because: "A starting point until you save something." },
-];
-
-/** Search: exactly what was typed, no reasoning attached. */
-export async function GET(req: NextRequest) {
-  const guard = await guardRequest(req, {
+async function guard(req: NextRequest) {
+  return guardRequest(req, {
     route: "watch",
     user: WATCH_USER_RULE,
     guest: WATCH_GUEST_RULE,
     busyMessage: WATCH_BUSY,
   });
-  if (!guard.ok) return guard.response;
+}
 
-  // A query longer than this is not a search, it is someone probing. Trimming
-  // rather than rejecting keeps a long paste working.
-  const q = req.nextUrl.searchParams.get("q")?.trim().slice(0, 200);
-  if (!q) return NextResponse.json({ videos: [] });
+/**
+ * Spends `n` searches from this caller's allowance. The bucket is keyed the way
+ * the guard keys people — a verified token for a signed-in student, the device
+ * id inside the address for a guest — so one student's searches never spend
+ * another's.
+ */
+function spendSearches(req: NextRequest, identity: Identity, n: number): { ok: true } | { ok: false; retryAfter: number } {
+  if (n <= 0) return { ok: true };
+  const token = bearerToken(req);
+  const who =
+    identity.kind === "user" && token
+      ? `u:${tokenKey(token)}`
+      : `d:${clientIp(req)}:${req.headers.get(DEVICE_HEADER)?.slice(0, 64) ?? "-"}`;
+  const rule = identity.kind === "user" ? SEARCH_USER_RULE : SEARCH_GUEST_RULE;
+  for (let i = 0; i < n; i++) {
+    const result = checkRateLimit(`watch-search:${who}`, rule);
+    if (!result.ok) return { ok: false, retryAfter: result.retryAfterSeconds };
+  }
+  return { ok: true };
+}
 
+function busy(retryAfter: number) {
+  return problemResponse("busy", 429, WATCH_BUSY, retryAfter);
+}
+
+function langOf(req: NextRequest): string | null {
+  const lang = req.nextUrl.searchParams.get("lang");
+  return lang && /^[a-z]{2}(?:-[A-Za-z]{2,4})?$/.test(lang) ? lang : null;
+}
+
+export async function GET(req: NextRequest) {
+  const checked = await guard(req);
+  if (!checked.ok) return labelled(checked.response);
+
+  const params = req.nextUrl.searchParams;
+  const lang = langOf(req);
   const key = apiKey();
+
+  // A watch page: one video, usually already known from a search, so free.
+  const v = params.get("v");
+  if (v !== null) {
+    if (!isVideoId(v)) return NextResponse.json({ video: null, channel: null, blocked: "missing" });
+    if (!key) return problemResponse("missing-key", 503, NOT_SET_UP);
+    try {
+      return NextResponse.json(await youtube(key).video(v));
+    } catch (err) {
+      return failed(err);
+    }
+  }
+
+  // "More like this": one search built from the video's own words.
+  const related = params.get("related");
+  if (related !== null) {
+    if (!isVideoId(related)) return NextResponse.json({ videos: [] });
+    if (!key) return problemResponse("missing-key", 503, NOT_SET_UP);
+    try {
+      const yt = youtube(key);
+      // Only charge the caller a search when one will really happen.
+      const lookup = await yt.video(related, false);
+      if (!lookup.video) return NextResponse.json({ videos: [] });
+      const spec: SearchSpec = { q: relatedQuery(lookup.video), lang };
+      if (!yt.isFresh(spec)) {
+        const spent = spendSearches(req, checked.identity, 1);
+        if (!spent.ok) return busy(spent.retryAfter);
+      }
+      return NextResponse.json({ videos: await yt.related(related, lang) });
+    } catch (err) {
+      return failed(err);
+    }
+  }
+
+  // A search: a chip's fixed query, or exactly what was typed. A query longer
+  // than MAX_QUERY is not a search, it is someone probing; trimming rather than
+  // rejecting keeps a long paste working.
+  const topic = findTopic(params.get("topic"));
+  const q = topic ? topic.query : params.get("q")?.trim().slice(0, MAX_QUERY);
+  if (!q) return NextResponse.json({ videos: [], nextPageToken: null });
+
   if (!key) return problemResponse("missing-key", 503, NOT_SET_UP);
 
+  const page = params.get("page");
+  const spec: SearchSpec = {
+    q,
+    lang,
+    filters: topic ? {} : readFilters(params),
+    categoryId: topic?.categoryId ?? null,
+    pageToken: page && /^[A-Za-z0-9_-]{1,64}$/.test(page) ? page : null,
+  };
+
   try {
-    return NextResponse.json({ videos: await forTerm(q, key, SEARCH_LIMIT) });
+    const yt = youtube(key);
+    if (!yt.isFresh(spec)) {
+      const spent = spendSearches(req, checked.identity, 1);
+      if (!spent.ok) return busy(spent.retryAfter);
+    }
+    return NextResponse.json(await yt.search(spec));
   } catch (err) {
     return failed(err);
   }
@@ -302,18 +212,16 @@ export async function GET(req: NextRequest) {
 
 /** The feed: run the terms the browser derived from what the student saved. */
 export async function POST(req: NextRequest) {
-  const guard = await guardRequest(req, {
-    route: "watch",
-    user: WATCH_USER_RULE,
-    guest: WATCH_GUEST_RULE,
-    busyMessage: WATCH_BUSY,
-  });
-  if (!guard.ok) return guard.response;
+  const checked = await guard(req);
+  if (!checked.ok) return labelled(checked.response);
 
   const key = apiKey();
   if (!key) return problemResponse("missing-key", 503, NOT_SET_UP);
 
-  let seeds = FALLBACK_SEEDS;
+  // A net for a POST with no usable body. The real starting feed — the one a
+  // student sees before saving anything — is built in the browser, where its
+  // reason can be written in their language.
+  let seeds: Seed[] = [{ term: STARTER_TERMS[0], because: "" }];
   {
     // A feed body is a handful of short strings; anything larger is refused
     // outright rather than silently truncated, so the caller learns why.
@@ -331,12 +239,30 @@ export async function POST(req: NextRequest) {
     if (clean.length) seeds = clean;
   }
 
+  const lang = langOf(req);
+  const yt = youtube(key);
+
+  // A POST is counted by the searches it would really run. Terms the cache
+  // already holds are free; when the allowance runs short, the remaining terms
+  // are answered from the cache only, and the feed is built from what is left.
+  const fresh = new Set(seeds.filter((s) => yt.isFresh({ q: s.term, lang })).map((s) => s.term));
+  const allowed = new Set<string>(fresh);
+  let refusal = 0;
+  for (const seed of seeds) {
+    if (allowed.has(seed.term)) continue;
+    const spent = spendSearches(req, checked.identity, 1);
+    if (spent.ok) allowed.add(seed.term);
+    else refusal = Math.max(refusal, spent.retryAfter);
+  }
+
   try {
-    const groups = await Promise.all(
-      seeds.map(async (seed) => ({ seed, videos: await forTerm(seed.term, key, PER_SEED) })),
-    );
-    return NextResponse.json({ videos: blend(groups, FEED_LIMIT), seeds });
+    const result = await yt.feed(seeds, lang, { cacheOnlyFor: (seed) => !allowed.has(seed.term) });
+    return NextResponse.json(result);
   } catch (err) {
+    // Every term came up empty because this caller ran out of searches, not
+    // because the day's budget did: that is a short wait, not a closed door.
+    const ourLimit = budget.canSpend(UNITS.search + UNITS.list, SEARCH_CEILING);
+    if (refusal && ourLimit && err instanceof YouTubeError && err.problem === "quota") return busy(refusal);
     return failed(err);
   }
 }

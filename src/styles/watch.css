@@ -1,0 +1,174 @@
+/* The Watch tab's own CSS: the few things utilities can't say cleanly.
+   Plain CSS over the shared tokens, so every theme gets it for free. */
+
+/* The thin bar across the top while a newer answer is on its way. It is
+   indeterminate on purpose: YouTube doesn't say how long it will take, and a
+   bar that pretends to know is worse than one that only says "working". */
+.watch-progress {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+  z-index: 40;
+}
+.watch-progress[data-active="true"] { opacity: 1; }
+.watch-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 70%, transparent);
+  animation: watch-progress 1.1s ease-in-out infinite;
+}
+@keyframes watch-progress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(260%); }
+}
+
+/* The Watch later button on a thumbnail shows on hover and focus — and always
+   on a touch screen, which has no hover to reveal it with. */
+.watch-hover-action {
+  opacity: 0;
+  transition: opacity 140ms ease, background-color 140ms ease;
+}
+.group:hover .watch-hover-action,
+.group:focus-within .watch-hover-action,
+.watch-hover-action[aria-pressed="true"],
+.watch-hover-action:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .watch-hover-action { opacity: 1; }
+}
+
+/* Shelves scroll sideways with snapping and no visible scrollbar; the arrow
+   buttons and a swipe are how you move them. */
+.watch-shelf {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(232px, 1fr);
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 2px;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.watch-shelf::-webkit-scrollbar { display: none; }
+.watch-shelf > * { scroll-snap-align: start; }
+@container (min-width: 640px) {
+  .watch-shelf { grid-auto-columns: calc((100% - 2 * 16px) / 3); }
+}
+@container (min-width: 900px) {
+  .watch-shelf { grid-auto-columns: calc((100% - 3 * 16px) / 4); }
+}
+@container (min-width: 1300px) {
+  .watch-shelf { grid-auto-columns: calc((100% - 4 * 16px) / 5); }
+}
+
+/* The chip row scrolls sideways on a phone, with a soft fade at the edge so
+   it is obvious there is more. */
+.watch-chips {
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+}
+.watch-chips::-webkit-scrollbar { display: none; }
+
+/* Theater: the player takes the full width but never more height than leaves
+   the title in view. */
+.watch-theater-frame {
+  max-height: min(calc(100dvh - 220px), 76vh);
+  aspect-ratio: 16 / 9;
+  margin-inline: auto;
+  width: 100%;
+}
+
+/* A video that ended or could not play gets a quiet backdrop of its own
+   thumbnail, so the end card still looks like it belongs to that video. */
+.watch-backdrop {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(18px) saturate(1.1);
+  transform: scale(1.15);
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watch-progress::before { animation-duration: 2.4s; }
+}
+:root[data-reduce-motion="on"] .watch-progress::before { animation-duration: 2.4s; }
+
+/* The watch page's layout. One DOM order (player, details, rail) for every
+   mode, rearranged with grid areas, because moving the player to a different
+   place in the tree would reload the iframe and restart the video every time
+   theater mode was toggled. */
+.watch-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "player" "details" "rail";
+  padding-bottom: 40px;
+}
+.watch-layout > .wl-player {
+  grid-area: player;
+  /* On a phone the player stays put while the details scroll under it. */
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #000;
+}
+.watch-layout > .wl-details { grid-area: details; min-width: 0; }
+.watch-layout > .wl-rail { grid-area: rail; min-width: 0; }
+.watch-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  overflow: hidden;
+}
+@container (min-width: 1000px) {
+  .watch-layout {
+    grid-template-columns: minmax(0, 1fr) clamp(320px, 27vw, 402px);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "player rail" "details rail";
+    column-gap: 24px;
+    padding: 20px 24px 48px;
+    max-width: 1760px;
+    margin: 0 auto;
+  }
+  .watch-layout > .wl-player {
+    position: static;
+    background: transparent;
+  }
+  .watch-layout > .wl-player .watch-frame { border-radius: var(--radius-lg); }
+  .watch-layout[data-theater="true"] {
+    grid-template-areas: "player player" "details rail";
+    grid-template-rows: auto auto;
+    padding-top: 0;
+    max-width: none;
+  }
+  .watch-layout[data-theater="true"] > .wl-player {
+    margin: 0 -24px 4px;
+    background: #000;
+  }
+  .watch-layout[data-theater="true"] > .wl-player .watch-frame {
+    border-radius: 0;
+    aspect-ratio: auto;
+    height: min(56.25cqw, calc(100dvh - 210px));
+    max-height: 78vh;
+  }
+}
+
+/* Subject tile icons: a lighter ink on dark paper, a darker one on light. */
+:root[data-theme="light"],
+:root[data-theme="sepia"] {
+  --watch-tile-l: 40%;
+}
