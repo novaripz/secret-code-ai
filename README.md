@@ -1,5 +1,7 @@
 # Studio — chat with an AI that knows you, and build things with it
 
+> **New:** this branch carries a full UI/UX overhaul — a brand palette, free Lucide icons, a YouTube-style Watch tab, a real editor in Build, and a planner with a focus timer. See [docs/OVERHAUL.md](docs/OVERHAUL.md) for everything that changed and how to switch back.
+
 Chat, drop in files and screenshots, and build real projects — entirely in the browser. No VS Code, no CLI tools, no local installs. Chat-first: you land on a conversation, and the Build tab is there when you want to make something.
 
 ## What it is
