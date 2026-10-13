@@ -19,7 +19,16 @@ import {
   isPastDue,
   toTimeInput,
 } from "../../src/lib/school/due";
-import { isOverdue, type ActivityEvent, type Assignment, type GradeCategory, type SchoolClass } from "../../src/lib/school/types";
+import {
+  DEFAULT_RULES,
+  EMPTY_SCHOOL,
+  isOverdue,
+  type ActivityEvent,
+  type Assignment,
+  type GradeCategory,
+  type SchoolClass,
+} from "../../src/lib/school/types";
+import { mergeFromSchool } from "../../src/lib/school/sync";
 import { buildPlan, describeReasons, rankAssignments, remainingMinutes } from "../../src/lib/school/planner";
 import { parseQuickAdd } from "../../src/lib/school/quickAdd";
 import { buildWeek } from "../../src/lib/school/week";
@@ -411,6 +420,49 @@ console.log("\nwhat-if grades");
     cats,
   ).percent as number;
   ok("and that score really does reach a B", check >= 83, `${check}%`);
+}
+
+// ---------------------------------------------------------------------------
+// Folding the class database into the device copy
+// ---------------------------------------------------------------------------
+
+console.log("\nschool sync merge");
+
+{
+  const mine: SchoolClass = { id: "mine", name: "Robotics club", source: "local", createdAt: 0 };
+  const stale: SchoolClass = { id: "old-uuid", name: "Dropped class", source: "local", createdAt: 0, origin: "school" };
+  const ownTask = assignment({ id: "m1", classId: "mine" });
+  const staleTask = assignment({ id: "s-old", classId: "old-uuid", origin: "school" });
+  const local = {
+    ...EMPTY_SCHOOL,
+    classes: [mine, stale],
+    assignments: [ownTask, staleTask],
+    rules: [{ assignmentId: "m1", ...DEFAULT_RULES }],
+    steps: { m1: [{ id: "x", text: "Wire it", done: false }], "s-old": [{ id: "y", text: "Gone", done: false }] },
+    doOn: { "s-old": "2026-10-14", s1: "2026-10-15" },
+    pendingStatus: { s1: "done" as const, "s-old": "done" as const },
+  };
+  const remoteClass: SchoolClass = { id: "c1", name: "Biology", source: "local", createdAt: 0, teacher: "Ms. Alvarez" };
+  const s1 = assignment({ id: "s1", classId: "c1", status: "todo" });
+  const s2 = assignment({ id: "s2", classId: "c1", status: "doing" });
+  const notMine = assignment({ id: "s3", classId: "someone-elses" });
+  const rules = (id: string) => ({ assignmentId: id, ...DEFAULT_RULES, answers: "allowed" as const });
+  const merged = mergeFromSchool(local, {
+    classes: [{ ...remoteClass, teacherId: "teacher-uuid" } as SchoolClass],
+    items: [s1, s2, notMine].map((a) => ({ assignment: a, rules: rules(a.id) })),
+  });
+
+  eq("the teacher's classes arrive, the student's own stay, a dropped class goes", merged.classes.map((c) => [c.id, c.origin ?? "device"]), [
+    ["c1", "school"],
+    ["mine", "device"],
+  ]);
+  eq("assignments likewise, and only for classes the student is in", merged.assignments.map((a) => a.id), ["s1", "s2", "m1"]);
+  eq("a tick the database has not seen yet is not undone by the refresh", merged.assignments.find((a) => a.id === "s1")?.status, "done");
+  eq("the database's own answer is used otherwise", merged.assignments.find((a) => a.id === "s2")?.status, "doing");
+  eq("the student's notes survive for work that still exists", [Object.keys(merged.steps), Object.keys(merged.doOn)], [["m1"], ["s1"]]);
+  eq("queued writes for work that vanished are dropped", Object.keys(merged.pendingStatus), ["s1"]);
+  eq("teacher rules arrive with their assignments; the student's own stay", merged.rules.map((r) => r.assignmentId), ["s1", "s2", "m1"]);
+  ok("nothing the query returned beyond what the screens use is stored", !("teacherId" in merged.classes[0]));
 }
 
 // ---------------------------------------------------------------------------
