@@ -286,6 +286,7 @@ export const en = {
   "plan.progressLabel": "Your progress",
   "plan.progressDone": "done today",
   "plan.progressDoneZero": "The first one's the hardest.",
+  "plan.progressDoneClear": "Your list is clear.",
   "plan.progressDoneNice": "Nice start.",
   "plan.progressDoneWeek": "{count} this week",
   "plan.progressStreakOne": "day streak",

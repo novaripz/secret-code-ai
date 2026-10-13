@@ -15,6 +15,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { AlertIcon, ArrowLeftIcon, CalendarIcon, CheckIcon, ClockIcon, PinIcon } from "@/components/icons";
 import { useI18n } from "@/lib/i18n";
 import { formatDue, type DueLabel } from "@/lib/school/due";
+import { PageHeader } from "@/components/ui/primitives";
 
 /** The page column every school screen uses. */
 export const PAGE_WIDTH = "mx-auto w-full max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pt-8";
@@ -33,6 +34,26 @@ export function SchoolPage({ children, wide = false }: { children: React.ReactNo
         <div className={wide ? WIDE_PAGE_WIDTH : PAGE_WIDTH}>{children}</div>
       </div>
     </AppShell>
+  );
+}
+
+/**
+ * The shared PageHeader, with its actions on their own row on a phone.
+ *
+ * Inside PageHeader the actions share a wrapping row with the title, and the
+ * title is allowed to shrink to nothing -- so two buttons that very nearly fit
+ * beside it on a 390px screen squeezed "Your classes" down to one letter per
+ * line. Here the actions sit under the title until there is room beside it.
+ */
+export function SchoolHeader({
+  actions,
+  ...header
+}: { actions?: React.ReactNode } & Omit<React.ComponentProps<typeof PageHeader>, "actions">) {
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+      <PageHeader {...header} className="min-w-0 flex-1" />
+      {actions && <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">{actions}</div>}
+    </div>
   );
 }
 

@@ -37,7 +37,7 @@ function Tile({ icon, value, label, hint }: { icon: React.ReactNode; value: Reac
   );
 }
 
-export function ProgressStrip() {
+export function ProgressStrip({ listClear = false }: { listClear?: boolean } = {}) {
   const { t } = useI18n();
   const activity = useSchoolStore((s) => s.activity);
   const p = useMemo(() => summarizeProgress(activity), [activity]);
@@ -48,7 +48,7 @@ export function ProgressStrip() {
         icon={<CircleCheckIcon aria-hidden />}
         value={p.doneToday}
         label={t("plan.progressDone")}
-        hint={p.doneToday === 0 ? t("plan.progressDoneZero") : p.doneWeek > p.doneToday ? t("plan.progressDoneWeek", { count: p.doneWeek }) : t("plan.progressDoneNice")}
+        hint={p.doneToday === 0 ? t(listClear ? "plan.progressDoneClear" : "plan.progressDoneZero") : p.doneWeek > p.doneToday ? t("plan.progressDoneWeek", { count: p.doneWeek }) : t("plan.progressDoneNice")}
       />
       <Tile
         icon={<Flame aria-hidden="true" strokeWidth={1.85} />}

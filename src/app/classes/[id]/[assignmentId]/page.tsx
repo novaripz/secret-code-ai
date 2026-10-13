@@ -409,7 +409,9 @@ export default function AssignmentPage({ params }: { params: Promise<{ id: strin
               <div className="min-w-0 flex-1">
                 <h1 className="text-xl leading-snug tracking-tight text-ink sm:text-2xl">{assignment.title}</h1>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <DueBadge dueAt={assignment.dueAt} done={done} />
+                  {/* Once done, the "Done" control on the right says so; the
+                      badge would only repeat it. */}
+                  {!done && <DueBadge dueAt={assignment.dueAt} />}
                   {assignment.teacherPinned && !done && <LiftChip kind="pinned" />}
                   {assignment.points !== undefined && (
                     <span className="badge">

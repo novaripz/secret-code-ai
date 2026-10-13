@@ -7,10 +7,10 @@ import { useFocusStore } from "@/store/useFocusStore";
 import { buildPlan, remainingMinutes } from "@/lib/school/planner";
 import { focusedMinutesByAssignment } from "@/lib/school/progress";
 import type { Assignment } from "@/lib/school/types";
-import { EmptyState, PageHeader, Skeleton } from "@/components/ui/primitives";
+import { EmptyState, Skeleton } from "@/components/ui/primitives";
 import { LinkButton } from "@/components/ui/Button";
 import { BookIcon, CalendarCheckIcon, CalendarDaysIcon, ListTodoIcon, TimerIcon } from "@/components/icons";
-import { SchoolPage, useNow } from "@/components/home/SchoolKit";
+import { SchoolHeader, SchoolPage, useNow } from "@/components/home/SchoolKit";
 import { SyncNote } from "@/components/home/SyncNote";
 import { QuickAdd } from "@/components/home/QuickAdd";
 import { FocusPanel, FocusStarter, useFocusHydrated } from "@/components/home/FocusTimer";
@@ -107,7 +107,7 @@ export default function PlanPage() {
 
   return (
     <SchoolPage wide={hydrated && view === "week" && !nothingSet}>
-      <PageHeader
+      <SchoolHeader
         icon={<CalendarCheckIcon />}
         title={t("plan.title")}
         description={t("plan.subtitle")}
@@ -136,7 +136,7 @@ export default function PlanPage() {
           </div>
         ) : (
           <>
-            {!nothingSet && <ProgressStrip />}
+            {!nothingSet && <ProgressStrip listClear={open.length === 0} />}
             <QuickAdd />
 
             {nothingSet ? (

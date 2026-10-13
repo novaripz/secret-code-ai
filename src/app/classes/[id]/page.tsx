@@ -212,29 +212,33 @@ export default function ClassPage({ params }: { params: Promise<{ id: string }> 
     <SchoolPage>
       <BackLink href="/classes">{t("classes.title")}</BackLink>
 
-      <div className="flex flex-wrap items-start gap-x-4 gap-y-3">
-        <span
-          aria-hidden
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-ui text-white"
-          style={{ background: cls.color ?? "var(--surface-3)" }}
-        >
-          <span className="text-lg font-[var(--weight-strong)]">{cls.name.trim().charAt(0).toUpperCase()}</span>
-        </span>
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl tracking-tight text-ink md:text-[26px]">{cls.name}</h1>
-          <p className="mt-1 flex flex-wrap items-center gap-2 text-[15px] text-ink-dim md:text-sm">
-            {cls.teacher && <span>{cls.teacher}</span>}
-            {cls.origin === "school" ? (
-              <span className="badge badge-accent">
-                <GraduationCapIcon aria-hidden />
-                {t("classes.fromTeacher")}
-              </span>
-            ) : (
-              <span className="badge">{t("classes.addedByYou")}</span>
-            )}
-          </p>
+      {/* Title and actions side by side from `sm`; on a phone the actions take
+          their own row, so three buttons never squeeze the class name. */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+        <div className="flex min-w-0 flex-1 items-start gap-4">
+          <span
+            aria-hidden
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-ui text-white"
+            style={{ background: cls.color ?? "var(--surface-3)" }}
+          >
+            <span className="text-lg font-[var(--weight-strong)]">{cls.name.trim().charAt(0).toUpperCase()}</span>
+          </span>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl tracking-tight text-ink md:text-[26px]">{cls.name}</h1>
+            <p className="mt-1 flex flex-wrap items-center gap-2 text-[15px] text-ink-dim md:text-sm">
+              {cls.teacher && <span>{cls.teacher}</span>}
+              {cls.origin === "school" ? (
+                <span className="badge badge-accent">
+                  <GraduationCapIcon aria-hidden />
+                  {t("classes.fromTeacher")}
+                </span>
+              ) : (
+                <span className="badge">{t("classes.addedByYou")}</span>
+              )}
+            </p>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
           {!adding && (
             <Button variant="primary" size="sm" icon={<PlusIcon />} onClick={() => setAdding(true)}>
               {t("assignments.add")}

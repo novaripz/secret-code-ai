@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { useSchoolStore } from "@/store/useSchoolStore";
 import { isOverdue, urgencyScore, type Assignment, type SchoolClass } from "@/lib/school/types";
-import { EmptyState, PageHeader, Section, Skeleton } from "@/components/ui/primitives";
+import { EmptyState, Section, Skeleton } from "@/components/ui/primitives";
 import { Button } from "@/components/ui/Button";
 import { AlertIcon, BookIcon, ChevronRightIcon, GraduationCapIcon, PlusIcon } from "@/components/icons";
 import { MyGrades } from "@/components/home/MyGrades";
-import { DueBadge, SchoolPage } from "@/components/home/SchoolKit";
+import { DueBadge, SchoolHeader, SchoolPage } from "@/components/home/SchoolKit";
 import { SyncNote } from "@/components/home/SyncNote";
 import { AddClassForm } from "@/components/home/ClassForms";
 import { CalendarExport } from "@/components/home/CalendarExport";
@@ -118,7 +118,7 @@ export default function ClassesPage() {
 
   return (
     <SchoolPage>
-      <PageHeader
+      <SchoolHeader
         icon={<BookIcon />}
         title={t("classes.title")}
         description={t("classes.subtitle")}

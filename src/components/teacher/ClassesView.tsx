@@ -12,7 +12,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useTeacherStore } from "./store";
 import { ActionErrorNote, Chip, LoadNote, Stat, formatDue } from "./primitives";
-import { EmptyState, PageHeader } from "@/components/ui/primitives";
+import { EmptyState } from "@/components/ui/primitives";
+import { SchoolHeader } from "@/components/home/SchoolKit";
 import { Button } from "@/components/ui/Button";
 import { AlertIcon, ChevronRightIcon, GraduationCapIcon, PlusIcon, XIcon } from "@/components/icons";
 
@@ -64,7 +65,7 @@ export function ClassesView() {
 
   return (
     <>
-      <PageHeader
+      <SchoolHeader
         icon={<GraduationCapIcon />}
         title="Your classes"
         description="Sorted by how many students are behind, so the one that needs you is first."
