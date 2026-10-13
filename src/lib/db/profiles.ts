@@ -121,7 +121,22 @@ export async function redeemTeacherCode(supabase: SupabaseClient, code: string):
   const result = (await supabase.rpc("redeem_teacher_code", {
     p_code: code.trim(),
   })) as unknown as Result<Role>;
-  return unwrap(result, "redeeming your teacher code");
+  const role = unwrap(result, "redeeming your teacher code");
+  roleChanges += 1;
+  return role;
+}
+
+/**
+ * Counts the role changes this page has made. The role is read once per page
+ * load and then cached (it is asked for by every screen, and it only changes
+ * when one of the two calls here succeeds), so a reader compares this counter
+ * to the one it saw last time to know whether its cached answer went stale.
+ * An account switch reloads the page, which resets everything anyway.
+ */
+let roleChanges = 0;
+
+export function roleVersion(): number {
+  return roleChanges;
 }
 
 /**
@@ -137,5 +152,7 @@ export async function redeemTeacherCode(supabase: SupabaseClient, code: string):
  */
 export async function leaveTeacherMode(supabase: SupabaseClient): Promise<Role> {
   const result = (await supabase.rpc("leave_teacher_mode")) as unknown as Result<Role>;
-  return unwrap(result, "turning off teacher mode");
+  const role = unwrap(result, "turning off teacher mode");
+  roleChanges += 1;
+  return role;
 }

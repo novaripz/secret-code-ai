@@ -38,6 +38,7 @@ import {
   type Role,
 } from "@/lib/school/types";
 import { getSupabase } from "@/lib/supabase/browser";
+import { dayKey, dueFromInputs, isPastDue } from "@/lib/school/due";
 import {
   DatabaseError,
   addStudentByEmail,
@@ -61,6 +62,7 @@ import {
   listStudentProfiles,
   listStudentSignals,
   removeStudent as dbRemoveStudent,
+  roleVersion,
   deleteClass as dbDeleteClass,
   reorderCategories,
   revokeInvite,
@@ -101,6 +103,8 @@ export interface AssignmentDraft {
   instructions: string;
   /** `yyyy-mm-dd` from a date input, or "" for no deadline. */
   due: string;
+  /** `HH:MM` from a time input, or "" for "by the end of that day". */
+  time: string;
   points: string;
   /** "" means uncategorised, which is a real answer and not a missing one. */
   categoryId: string;
@@ -167,7 +171,8 @@ interface TeacherState {
   actionError: string | null;
   clearActionError: () => void;
 
-  loadRole: () => Promise<void>;
+  /** Cached per page load; `force` re-reads it regardless. */
+  loadRole: (opts?: { force?: boolean }) => Promise<void>;
   loadClasses: () => Promise<void>;
   loadClass: (classId: string) => Promise<void>;
 
@@ -224,11 +229,14 @@ function looksLikeEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function dueToMillis(due: string): number | null {
-  // A date input gives a local date; noon keeps the day from flipping either
-  // way across a timezone boundary. Same trick as the student assignment form.
-  return due ? new Date(`${due}T12:00:00`).getTime() : null;
-}
+// Stable empties for selectors. `s.roster[id] ?? []` builds a new array on
+// every snapshot, which React reads as a change every time -- at best a wasted
+// render, at worst "getSnapshot should be cached" and a render loop on a class
+// whose roster has not loaded yet. Every screen uses these instead.
+export const NO_STUDENTS: readonly RosterStudent[] = Object.freeze([]);
+export const NO_INVITES: readonly RosterInvite[] = Object.freeze([]);
+export const NO_ASSIGNMENTS: readonly TeacherAssignment[] = Object.freeze([]);
+export const NO_CATEGORIES: readonly GradeCategory[] = Object.freeze([]);
 
 /**
  * Two ways this app can have no database at all — nobody configured Supabase,
@@ -328,7 +336,7 @@ async function loadBundle(
   const wanted =
     options.withStatuses === "all"
       ? assignments
-      : assignments.filter((a) => a.assignment.dueAt !== null && a.assignment.dueAt < now);
+      : assignments.filter((a) => isPastDue(a.assignment.dueAt, now));
 
   const statuses = await Promise.all(
     assignments.map(async (a) =>
@@ -374,7 +382,7 @@ function stripId(rules: AssignmentRules): Omit<AssignmentRules, "assignmentId"> 
 /** How many enrolled students have at least one past-due assignment unfinished. */
 function countBehind(bundle: ClassBundle, now: number): number {
   const overdue = bundle.assignments.filter(
-    (a) => a.assignment.dueAt !== null && a.assignment.dueAt < now,
+    (a) => isPastDue(a.assignment.dueAt, now),
   );
   if (overdue.length === 0) return 0;
   return bundle.studentIds.filter((id) =>
@@ -386,7 +394,7 @@ function summarize(bundle: ClassBundle): TeacherClass {
   const now = Date.now();
   const due = bundle.assignments
     .map((a) => a.assignment.dueAt)
-    .filter((d): d is number => d !== null && d >= now)
+    .filter((d): d is number => d !== null && !isPastDue(d, now))
     .sort((a, b) => a - b);
 
   return toTeacherClass(bundle.klass, {
@@ -397,6 +405,9 @@ function summarize(bundle: ClassBundle): TeacherClass {
     studentsBehind: countBehind(bundle, now),
   });
 }
+
+/** The `roleVersion()` the cached role answer belongs to, or null before one exists. */
+let roleSettledAt: number | null = null;
 
 // In-flight de-duplication. Two components on the same screen each ask for the
 // class they are rendering; without this they would each start a round trip.
@@ -433,9 +444,16 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
   actionError: null,
   clearActionError: () => set({ actionError: null }),
 
-  loadRole: () =>
+  // Asked for by the sidebar on every page and by every teacher screen, and
+  // it used to answer each time with two round trips -- students included.
+  // Now it is read once per page load and again only when this page has
+  // changed the role (a code redeemed, teacher mode turned off; see
+  // `roleVersion`) or a caller insists. "No database" and "signed out" are
+  // settled answers too: neither changes without a page reload.
+  loadRole: ({ force = false } = {}) =>
     once("role", async () => {
       if (get().roleState.loading) return;
+      if (!force && roleSettledAt === roleVersion()) return;
       set({ roleState: { loading: true, error: null, loaded: get().roleState.loaded } });
       try {
         const { supabase, userId } = await session();
@@ -462,11 +480,13 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
           return;
         }
 
+        roleSettledAt = roleVersion();
         set({
           role: profile.role,
           roleState: { loading: false, error: null, loaded: true },
         });
       } catch (err) {
+        if (err instanceof UnavailableError) roleSettledAt = roleVersion();
         set({
           role: null,
           roleState: {
@@ -553,7 +573,7 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
             if (status === "done") counts.done += 1;
             else if (status === "doing") counts.doing += 1;
             else counts.todo += 1;
-            if (status !== "done" && a.assignment.dueAt !== null && a.assignment.dueAt < now) {
+            if (status !== "done" && isPastDue(a.assignment.dueAt, now)) {
               counts.overdue += 1;
             }
           }
@@ -777,7 +797,9 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
       classId,
       title: draft.title.trim(),
       instructions: draft.instructions.trim() || undefined,
-      dueAt: dueToMillis(draft.due),
+      // A blank time is a date-only deadline: the end of that day, by the
+      // same rule the student's screens use (lib/school/due.ts).
+      dueAt: dueFromInputs(draft.due, draft.time),
       points: draft.points ? Number(draft.points) : undefined,
       // "" from the select means uncategorised. It travels as null rather than
       // undefined because the data layer reads undefined as "leave it alone",
@@ -788,7 +810,12 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
       rules,
     };
 
-    const existing = previous.find((a) => a.id === assignmentId);
+    // Create or update is decided by the route, never by the cache. The editor
+    // used to ask "is this id in the list I happen to have loaded?", and on a
+    // direct load of an edit link the list was empty, so saving an edit
+    // created a second copy of the assignment.
+    const isUpdate = assignmentId !== null;
+    const existing = isUpdate ? previous.find((a) => a.id === assignmentId) : undefined;
     // `categoryId` is null in `base` because that is what the write wants; the
     // UI's Assignment shape says undefined for the same state, so it is mapped
     // once here rather than at every read.
@@ -811,9 +838,11 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
         ...s.assignments,
         [classId]: existing
           ? previous.map((a) => (a.id === optimisticId ? optimistic : a))
-          : [...previous, optimistic],
+          : isUpdate
+            ? previous
+            : [...previous, optimistic],
       },
-      classes: existing
+      classes: isUpdate
         ? s.classes
         : s.classes.map((c) =>
             c.id === classId ? { ...c, assignmentCount: c.assignmentCount + 1 } : c,
@@ -822,7 +851,7 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
 
     try {
       const { supabase } = await session();
-      const saved = existing
+      const saved = isUpdate
         ? await updateAssignment(
             supabase,
             assignmentId as string,
@@ -858,12 +887,17 @@ export const useTeacherStore = create<TeacherState>((set, get) => ({
         doing: optimistic.doing,
         todo: optimistic.todo,
       };
-      set((s) => ({
-        assignments: {
-          ...s.assignments,
-          [classId]: (s.assignments[classId] ?? []).map((a) => (a.id === optimisticId ? real : a)),
-        },
-      }));
+      set((s) => {
+        const list = s.assignments[classId] ?? [];
+        return {
+          assignments: {
+            ...s.assignments,
+            [classId]: list.some((a) => a.id === optimisticId)
+              ? list.map((a) => (a.id === optimisticId ? real : a))
+              : [...list, real],
+          },
+        };
+      });
       return real.id;
     } catch (err) {
       set((s) => ({
@@ -1277,8 +1311,10 @@ export async function studentAnalytics(
     // Distinct days with a signal, not sessions. `struggle_signals` has no
     // session column — the student's session ids stay in their browser — so
     // this counts days and the screen says "days", rather than printing a
-    // session number nothing measured.
-    sessions: new Set(signals.map((s) => Math.floor(s.at / 86_400_000))).size,
+    // session number nothing measured. Local days, not UTC ones: a student
+    // in California working at 6pm and again at 7pm worked on one day, and
+    // dividing the timestamp by a day's length split that evening in two.
+    sessions: new Set(signals.map((s) => dayKey(s.at))).size,
     topics: [...byTopic.entries()].map(([label, list]) =>
       toTopicSignal(`t:${label}`, list, 1, klass?.name ?? "This class"),
     ),
