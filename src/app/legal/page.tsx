@@ -53,7 +53,7 @@ export default function LegalIndexPage() {
             <li key={page.href}>
               <Link
                 href={page.href}
-                className="block rounded-2xl border border-[var(--line)] p-5 transition-colors hover:bg-[var(--surface-2)]"
+                className="card card-interactive block p-5"
               >
                 <p className="font-semibold text-[var(--text)]">{page.title}</p>
                 <p className="mt-1.5 max-w-[65ch] text-sm leading-relaxed text-[var(--text-dim)]">
