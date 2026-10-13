@@ -9,36 +9,30 @@
 // cannot see the logic of reads as the app being broken, and the next thing
 // they do is stop using it — so the box is right there, with the sentence they
 // will read previewed underneath.
+//
+// Opened straight from a link, the editor used to read only whatever the store
+// happened to hold -- nothing, on a fresh tab -- so it showed an empty form,
+// and saving it created a second assignment. Now the class frame around it
+// loads the class, the form waits for it (a skeleton, then the real draft),
+// and the save is an update whenever the route names an assignment.
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
   isSafeResourceUrl,
   type AssignmentResource,
   type AssignmentRules,
-  type GradeCategory,
 } from "@/lib/school/types";
-import { useTeacherStore, type AssignmentDraft } from "./store";
+import { toDateInput, toTimeInput } from "@/lib/school/due";
+import { NO_ASSIGNMENTS, NO_CATEGORIES, useTeacherStore, type AssignmentDraft } from "./store";
+import type { TeacherAssignment } from "./types";
 import { useDialog } from "@/components/ui/Dialog";
-import {
-  ActionErrorNote,
-  Crumb,
-  buttonClass,
-  cardClass,
-  fieldClass,
-  labelClass,
-  quietButtonClass,
-  toDateInput,
-} from "./primitives";
+import { EmptyState } from "@/components/ui/primitives";
+import { Link2 } from "lucide-react";
+import { ArrowLeftIcon, ChevronDownIcon, ChevronUpIcon, FileTextIcon, PinIcon, PlusIcon, TrashIcon } from "@/components/icons";
+import { ActionErrorNote, ListSkeleton, LoadNote, buttonClass, labelClass, quietButtonClass } from "./primitives";
 import { RuleChips } from "./RuleChips";
-
-// A zustand selector has to return the *same* reference when nothing changed,
-// and `?? []` returns a fresh array on every snapshot — which React reads as a
-// new value forever and turns into "Maximum update depth exceeded". One frozen
-// empty array, shared, so the no-categories case is a stable reference rather
-// than a render loop. This is the case a teacher who has not set any weights
-// hits, which is most of them.
-const NO_CATEGORIES: readonly GradeCategory[] = Object.freeze([]);
 
 const ANSWER_CHOICES: { value: AssignmentRules["answers"]; label: string; blurb: string }[] = [
   { value: "guided", label: "Guided only", blurb: "Panda asks questions and gives hints. It never states the answer." },
@@ -47,11 +41,45 @@ const ANSWER_CHOICES: { value: AssignmentRules["answers"]; label: string; blurb:
 ];
 
 export function AssignmentEditor({ classId, assignmentId }: { classId: string; assignmentId: string | null }) {
+  const existing = useTeacherStore((s) =>
+    assignmentId ? (s.assignments[classId] ?? NO_ASSIGNMENTS).find((a) => a.id === assignmentId) : undefined,
+  );
+  const state = useTeacherStore((s) => s.classState[classId]);
+  const loadClass = useTeacherStore((s) => s.loadClass);
+
+  if (assignmentId && !existing) {
+    if (state?.error) return <LoadNote state={state} what="this assignment" onRetry={() => void loadClass(classId)} />;
+    if (!state?.loaded) return <ListSkeleton rows={2} className="h-48" />;
+    return (
+      <EmptyState
+        icon={<FileTextIcon />}
+        title="That assignment isn't here"
+        description="It may have been deleted. Nothing was changed."
+        action={
+          <Link href={`/teacher/classes/${classId}/assignments`} className="btn btn-secondary">
+            Back to assignments
+          </Link>
+        }
+      />
+    );
+  }
+
+  // Keyed by the assignment, so the draft is built once, from the loaded row,
+  // and never from the empty cache that came before it.
+  return <EditorForm key={existing?.id ?? "new"} classId={classId} assignmentId={assignmentId} existing={existing} />;
+}
+
+function EditorForm({
+  classId,
+  assignmentId,
+  existing,
+}: {
+  classId: string;
+  assignmentId: string | null;
+  existing: TeacherAssignment | undefined;
+}) {
   const router = useRouter();
   const dialog = useDialog();
-  const existing = useTeacherStore((s) =>
-    assignmentId ? (s.assignments[classId] ?? []).find((a) => a.id === assignmentId) : undefined,
-  );
   const categories = useTeacherStore((s) => s.categories[classId] ?? NO_CATEGORIES);
   const loadGradebook = useTeacherStore((s) => s.loadGradebook);
   const saveAssignment = useTeacherStore((s) => s.saveAssignment);
@@ -64,6 +92,7 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
     title: existing?.title ?? "",
     instructions: existing?.instructions ?? "",
     due: toDateInput(existing?.dueAt ?? null),
+    time: toTimeInput(existing?.dueAt ?? null),
     points: existing?.points !== undefined ? String(existing.points) : "",
     categoryId: existing?.categoryId ?? "",
     teacherPinned: existing?.teacherPinned ?? false,
@@ -82,8 +111,7 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
   const restricted = draft.rules.translation === "disabled" || draft.rules.simplification === "disabled";
   const canSave = draft.title.trim().length > 0;
 
-  const setRules = (patch: Partial<Omit<AssignmentRules, "assignmentId">>) =>
-    setDraft((d) => ({ ...d, rules: { ...d.rules, ...patch } }));
+  const setRules = (patch: Partial<Omit<AssignmentRules, "assignmentId">>) => setDraft((d) => ({ ...d, rules: { ...d.rules, ...patch } }));
 
   const preview = useMemo(() => {
     const off = [
@@ -94,6 +122,8 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
     return `On this assignment Panda can't ${off.join(" or ")}. ${draft.rules.restrictionReason?.trim() || "Your teacher hasn't given a reason yet."}`;
   }, [draft.rules]);
 
+  const base = `/teacher/classes/${classId}`;
+
   // Navigating away only after the write lands: leaving early and letting the
   // rollback happen on a screen the teacher is no longer looking at would mean
   // they find out their assignment vanished the next time they teach.
@@ -103,7 +133,7 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
     setSaving(true);
     const id = await saveAssignment(classId, assignmentId, draft);
     setSaving(false);
-    if (id) router.push(`/teacher/classes/${classId}/assignments`);
+    if (id) router.push(`${base}/assignments`);
   }
 
   async function remove() {
@@ -116,36 +146,29 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
     });
     if (ok) {
       await deleteAssignment(classId, assignmentId);
-      router.push(`/teacher/classes/${classId}/assignments`);
+      router.push(`${base}/assignments`);
     }
   }
 
-  const base = `/teacher/classes/${classId}`;
-
   return (
     <form onSubmit={(e) => void submit(e)}>
-      <nav aria-label="Breadcrumb" className="text-xs">
-        <Crumb href="/teacher">Classes</Crumb>
-        <span className="mx-1.5 text-[var(--text-faint)]">/</span>
-        <Crumb href={`${base}/assignments`}>Assignments</Crumb>
-        <span className="mx-1.5 text-[var(--text-faint)]">/</span>
-        <span className="text-[var(--text-dim)]">{assignmentId ? "Edit" : "New"}</span>
-      </nav>
+      <div className="mb-5 flex items-center gap-2">
+        <Link href={`${base}/assignments`} className="icon-btn" aria-label="Back to assignments" title="Back to assignments">
+          <ArrowLeftIcon aria-hidden />
+        </Link>
+        <h2 className="text-lg font-[var(--weight-strong)] tracking-tight text-ink">{assignmentId ? "Edit assignment" : "New assignment"}</h2>
+      </div>
 
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--text)]">
-        {assignmentId ? "Edit assignment" : "New assignment"}
-      </h1>
-
-      <section className={`${cardClass} mt-5 p-4`}>
+      <section className="card p-4 sm:p-5">
         <div className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
             <span className={labelClass}>Title</span>
             <input
-              autoFocus
+              autoFocus={!assignmentId}
               value={draft.title}
               onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
               placeholder="Factoring quadratics — practice set B"
-              className={fieldClass}
+              className="input"
             />
           </label>
 
@@ -156,19 +179,25 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
               value={draft.instructions}
               onChange={(e) => setDraft((d) => ({ ...d, instructions: e.target.value }))}
               placeholder="Problems 1–18. Show the factored form and the check."
-              className={`${fieldClass} resize-y`}
+              className="input resize-y"
             />
           </label>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <label className="flex flex-col gap-1.5">
               <span className={labelClass}>Due date</span>
+              <input type="date" value={draft.due} onChange={(e) => setDraft((d) => ({ ...d, due: e.target.value }))} className="input" />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className={labelClass}>Time (optional)</span>
               <input
-                type="date"
-                value={draft.due}
-                onChange={(e) => setDraft((d) => ({ ...d, due: e.target.value }))}
-                className={fieldClass}
+                type="time"
+                value={draft.time}
+                disabled={!draft.due}
+                onChange={(e) => setDraft((d) => ({ ...d, time: e.target.value }))}
+                className="input"
               />
+              <span className="text-xs text-ink-faint">Blank means by the end of that day.</span>
             </label>
             <label className="flex flex-col gap-1.5">
               <span className={labelClass}>Points</span>
@@ -179,18 +208,14 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
                 value={draft.points}
                 onChange={(e) => setDraft((d) => ({ ...d, points: e.target.value }))}
                 placeholder="20"
-                className={fieldClass}
+                className="input"
               />
             </label>
           </div>
 
           <label className="flex flex-col gap-1.5">
             <span className={labelClass}>Category</span>
-            <select
-              value={draft.categoryId}
-              onChange={(e) => setDraft((d) => ({ ...d, categoryId: e.target.value }))}
-              className={fieldClass}
-            >
+            <select value={draft.categoryId} onChange={(e) => setDraft((d) => ({ ...d, categoryId: e.target.value }))} className="input">
               {/* "No category" is a real choice and the default, not a prompt to
                   pick something. An assignment that is not filed still counts —
                   it lands in its own bucket in the grade breakdown. */}
@@ -201,54 +226,44 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
                 </option>
               ))}
             </select>
-            <span className="text-[11px] leading-relaxed text-[var(--text-faint)]">
-              {categories.length === 0 ? (
-                <>
-                  This class has no categories yet, so grades are plain points across everything
-                  marked. Add weights on the Grades tab when you want tests to count for more.
-                </>
-              ) : (
-                <>Decides which weight this counts under when a grade is worked out.</>
-              )}
+            <span className="text-xs leading-relaxed text-ink-faint">
+              {categories.length === 0
+                ? "This class has no categories yet, so grades are plain points across everything marked. Add weights on the Grades section when you want tests to count for more."
+                : "Decides which weight this counts under when a grade is worked out."}
             </span>
           </label>
 
-          {/* The pin lives here, in the same card as the due date and the
+          {/* The flag lives here, in the same card as the due date and the
               points, because it is a fact about the work rather than a
-              preference about the app — and because a teacher deciding "this is
-              the one that matters this week" is deciding it while they look at
-              when it is due and what it is worth.
+              preference about the app.
 
               The sentence underneath is the honest one, and it is deliberately
               not "students see this first". src/lib/school/planner.ts lifts a
-              pinned assignment by two days and clamps the lift at today, so
-              genuinely overdue work still sits above it. A teacher who pins
+              priority assignment by two days and clamps the lift at today, so
+              genuinely overdue work still sits above it. A teacher who flags
               three things expecting three things at the top, and finds last
-              week's lab report above them, concludes the pin is broken — so the
-              control says what the planner actually does. */}
-          <div className="border-t border-[var(--line)] pt-4">
+              week's lab report above them, concludes the flag is broken — so
+              the control says what the planner actually does. Students see it
+              as "Teacher priority", the same words as here. */}
+          <div className="border-t border-line pt-4">
             <Toggle
-              label="Priority"
+              label="Teacher priority"
+              icon={<PinIcon aria-hidden />}
               onWord="on"
               offWord="off"
-              help="Moves it up each student's plan by about two days. It never moves above work that's already overdue — late work stays first."
+              help="Moves it up each student's plan by about two days, with a “Teacher priority” tag. It never moves above work that's already overdue — late work stays first."
               on={draft.teacherPinned}
               onChange={(on) => setDraft((d) => ({ ...d, teacherPinned: on }))}
             />
           </div>
 
-          <ResourceEditor
-            resources={draft.resources}
-            onChange={(resources) => setDraft((d) => ({ ...d, resources }))}
-          />
+          <ResourceEditor resources={draft.resources} onChange={(resources) => setDraft((d) => ({ ...d, resources }))} />
         </div>
       </section>
 
-      <section className={`${cardClass} mt-4 p-4`}>
-        <h2 className="text-base font-semibold tracking-tight text-[var(--text)]">What Panda may do here</h2>
-        <p className="mt-0.5 text-xs text-[var(--text-faint)]">
-          Enforced on the server, not suggested in a prompt. Students see these before they start.
-        </p>
+      <section className="card mt-4 p-4 sm:p-5">
+        <h3 className="text-base font-[var(--weight-strong)] tracking-tight text-ink">What Panda may do here</h3>
+        <p className="mt-0.5 text-[13px] text-ink-faint">Enforced on the server, not suggested in a prompt. Students see these before they start.</p>
 
         <fieldset className="mt-4">
           <legend className={labelClass}>Answers</legend>
@@ -258,22 +273,20 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
               return (
                 <label
                   key={c.value}
-                  className={`flex cursor-pointer gap-3 rounded-xl border p-3 transition-colors ${
-                    active
-                      ? "border-[var(--text)] bg-[var(--surface-1)]"
-                      : "border-[var(--line)] hover:bg-[var(--surface-1)]"
+                  className={`flex cursor-pointer gap-3 rounded-ui border p-3 transition-colors ${
+                    active ? "border-accent bg-accent-soft" : "border-line hover:bg-surface-2"
                   }`}
                 >
                   <input
                     type="radio"
                     name="answers"
-                    className="mt-0.5 accent-[var(--text)]"
+                    className="mt-0.5 accent-[var(--accent)]"
                     checked={active}
                     onChange={() => setRules({ answers: c.value })}
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm font-medium text-[var(--text)]">{c.label}</span>
-                    <span className="block text-xs leading-relaxed text-[var(--text-dim)]">{c.blurb}</span>
+                    <span className="block text-sm font-[var(--weight-ui)] text-ink">{c.label}</span>
+                    <span className="block text-[13px] leading-relaxed text-ink-dim">{c.blurb}</span>
                   </span>
                 </label>
               );
@@ -303,11 +316,9 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
             value={draft.rules.pandaInstructions ?? ""}
             onChange={(e) => setRules({ pandaInstructions: e.target.value })}
             placeholder="Don't give the factored form. Ask what two numbers multiply to c and add to b."
-            className={`${fieldClass} resize-y`}
+            className="input resize-y"
           />
-          <span className="text-xs text-[var(--text-faint)]">
-            Folded into Panda&apos;s instructions for this assignment. Students don&apos;t see this.
-          </span>
+          <span className="text-xs text-ink-faint">Folded into Panda&apos;s instructions for this assignment. Students don&apos;t see this.</span>
         </label>
 
         {restricted && (
@@ -318,16 +329,13 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
               value={draft.rules.restrictionReason ?? ""}
               onChange={(e) => setRules({ restrictionReason: e.target.value })}
               placeholder="The exam is in English and this is the practice for it."
-              className={`${fieldClass} resize-y`}
+              className="input resize-y"
             />
           </label>
         )}
 
         {preview && (
-          <div
-            className="mt-3 rounded-xl border border-[var(--line)] p-3 text-sm leading-relaxed text-[var(--text-dim)]"
-            style={{ background: "var(--surface-1)" }}
-          >
+          <div className="mt-3 rounded-ui border border-line bg-surface-1 p-3 text-sm leading-relaxed text-ink-dim">
             <p className={labelClass}>Preview — what the student reads</p>
             <p className="mt-1.5">{preview}</p>
           </div>
@@ -348,11 +356,8 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
           Cancel
         </button>
         {assignmentId && (
-          <button
-            type="button"
-            onClick={remove}
-            className="tap inline-flex items-center ml-auto rounded-xl px-3.5 py-2 text-sm text-[var(--danger)] transition-colors hover:bg-[var(--danger-soft)]"
-          >
+          <button type="button" onClick={() => void remove()} className="btn btn-danger ml-auto">
+            <TrashIcon aria-hidden />
             Delete
           </button>
         )}
@@ -364,12 +369,14 @@ export function AssignmentEditor({ classId, assignmentId }: { classId: string; a
 /**
  * A switch rather than a checkbox, because "allowed / disabled" is a state the
  * teacher should be able to read from across the room without parsing a label.
+ * Drawn with the app's own `.switch`, so it matches the one in Settings.
  */
 function Toggle({
   label,
   help,
   on,
   onChange,
+  icon,
   onWord = "allowed",
   offWord = "off",
 }: {
@@ -377,7 +384,8 @@ function Toggle({
   help: string;
   on: boolean;
   onChange: (on: boolean) => void;
-  /** The state read aloud. "allowed/off" suits a rule; a pin is "on/off". */
+  icon?: React.ReactNode;
+  /** The state read aloud. "allowed/off" suits a rule; a flag is "on/off". */
   onWord?: string;
   offWord?: string;
 }) {
@@ -387,56 +395,22 @@ function Toggle({
       role="switch"
       aria-checked={on}
       onClick={() => onChange(!on)}
-      className="flex items-start gap-3 rounded-xl border border-[var(--line)] p-3 text-left transition-colors hover:bg-[var(--surface-1)]"
+      className="flex w-full items-start gap-3 rounded-ui border border-line p-3 text-left transition-colors hover:bg-surface-2"
     >
-      <span
-        aria-hidden
-        className="mt-0.5 flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors"
-        style={{ background: on ? "var(--success)" : "var(--surface-3)" }}
-      >
-        <span
-          className="h-4 w-4 rounded-full transition-transform"
-          style={{ background: "var(--surface-0)", transform: on ? "translateX(16px)" : "none" }}
-        />
+      <span aria-hidden className="switch mt-0.5" aria-checked={on}>
+        <span className="switch-knob" />
       </span>
       <span className="min-w-0">
-        <span className="block text-sm font-medium text-[var(--text)]">
+        <span className="flex items-center gap-1.5 text-sm font-[var(--weight-ui)] text-ink [&>svg]:h-3.5 [&>svg]:w-3.5">
+          {icon}
           {label}: {on ? onWord : offWord}
         </span>
-        <span className="block text-xs leading-relaxed text-[var(--text-faint)]">{help}</span>
+        <span className="block text-[13px] leading-relaxed text-ink-faint">{help}</span>
       </span>
     </button>
   );
 }
 
-/**
- * The links and materials a student can open from this assignment.
- *
- * Kept as a list of label-and-URL pairs rather than free text with links in it,
- * because the student's page renders these as buttons they can tap on a phone,
- * and because a URL we have parsed is a URL we can refuse. `javascript:` and
- * `data:` never make it to an anchor — the check is here for the teacher's
- * benefit (it tells them why the row is marked), in the data layer because that
- * is the last code before the write, and again on the way out of the database
- * because rows can be written by hand.
- *
- * No file upload, and that is a decision rather than an omission. Panda has no
- * storage bucket: building one that a teacher could trust with a worksheet
- * means a private bucket, policies mirroring the class rules, a progress and
- * failure story for a 20MB PDF on school wifi, and a server-side check on what
- * the file actually is. A half-built uploader that swallows a worksheet is
- * worse than a link field that works, and nearly every worksheet a teacher has
- * is already in Drive or Classroom with a link attached. So this makes the link
- * route obvious and quick instead of pretending to be something else — see the
- * note under the heading, which says outright that files are not stored here.
- *
- * The two bits of help below are for what teachers actually paste. A copied
- * Drive URL arrives complete; a typed one arrives as "docs.google.com/..." with
- * no scheme, which `isSafeResourceUrl` rejects and `cleanResources` then drops
- * on save — a silently missing resource. So a bare host gets https:// on blur.
- * And a pasted link with an empty label gets the host as a starting point,
- * because an unlabelled resource is dropped on save too.
- */
 /**
  * What a teacher's pasted link needs before it can be saved, or null when it
  * needs nothing. Runs on blur rather than on every keystroke: rewriting a URL
@@ -463,21 +437,30 @@ function repairLink(url: string, label: string): Partial<AssignmentResource> | n
   return Object.keys(patch).length > 0 ? patch : null;
 }
 
-function ResourceEditor({
-  resources,
-  onChange,
-}: {
-  resources: AssignmentResource[];
-  onChange: (next: AssignmentResource[]) => void;
-}) {
-  const set = (index: number, patch: Partial<AssignmentResource>) =>
-    onChange(resources.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+/**
+ * The links and materials a student can open from this assignment.
+ *
+ * Kept as a list of label-and-URL pairs rather than free text with links in it,
+ * because the student's page renders these as buttons they can tap on a phone,
+ * and because a URL we have parsed is a URL we can refuse. `javascript:` and
+ * `data:` never make it to an anchor — the check is here for the teacher's
+ * benefit (it tells them why the row is marked), in the data layer because that
+ * is the last code before the write, and again on the way out of the database
+ * because rows can be written by hand.
+ *
+ * No file upload, and that is a decision rather than an omission: Panda has no
+ * storage bucket, and a half-built uploader that swallows a worksheet is worse
+ * than a link field that works. Nearly every worksheet a teacher has is already
+ * in Drive or Classroom with a link attached, so the note under the heading
+ * says outright that files are not stored here.
+ */
+function ResourceEditor({ resources, onChange }: { resources: AssignmentResource[]; onChange: (next: AssignmentResource[]) => void }) {
+  const set = (index: number, patch: Partial<AssignmentResource>) => onChange(resources.map((r, i) => (i === index ? { ...r, ...patch } : r)));
 
   // Order is the teacher's, and it is information: "read this first, then the
-  // slides" is a sentence they should not have to write in the instructions
-  // because the list already says it. Two buttons rather than drag-and-drop —
-  // dragging has no keyboard story worth the name, and this list is three items
-  // long on the days it exists at all.
+  // slides". Two buttons rather than drag-and-drop — dragging has no keyboard
+  // story worth the name, and this list is three items long on the days it
+  // exists at all.
   const move = (index: number, direction: -1 | 1) => {
     const to = index + direction;
     if (to < 0 || to >= resources.length) return;
@@ -487,91 +470,78 @@ function ResourceEditor({
   };
 
   return (
-    <fieldset className="border-t border-[var(--line)] pt-4">
+    <fieldset className="border-t border-line pt-4">
       <legend className="sr-only">Resources</legend>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className={labelClass}>Resources</span>
-        <button
-          type="button"
-          onClick={() => onChange([...resources, { label: "", url: "" }])}
-          className="tap inline-flex items-center rounded-lg px-2 py-1 text-sm md:text-xs text-[var(--text-dim)] underline underline-offset-4 transition-colors hover:text-[var(--text)]"
-        >
+        <button type="button" onClick={() => onChange([...resources, { label: "", url: "" }])} className="btn btn-ghost btn-sm">
+          <PlusIcon aria-hidden />
           Add a link
         </button>
       </div>
-      <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-faint)]">
-        The reading, the slide deck, the practice set. Students see these on the assignment.
-      </p>
-      <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-faint)]">
-        Panda doesn&apos;t store files. To share a worksheet or a photo of the board, put it in
-        Drive, Classroom or OneDrive, set it so anyone with the link can view, and paste that link
-        here.
+      <p className="mt-1 text-xs leading-relaxed text-ink-faint">
+        The reading, the slide deck, the practice set. Students see these on the assignment. Panda doesn&apos;t store files: put a
+        worksheet in Drive, Classroom or OneDrive, set it so anyone with the link can view, and paste that link here.
       </p>
 
       {resources.length > 0 && (
         <div className="mt-3 flex flex-col gap-2">
           {resources.map((r, i) => {
             const bad = r.url.trim().length > 0 && !isSafeResourceUrl(r.url);
+            const name = r.label.trim() || `resource ${i + 1}`;
             return (
-              <div key={i} className="flex flex-wrap items-start gap-2">
+              <div key={i} className="flex flex-wrap items-start gap-2 rounded-ui border border-line bg-surface-0 p-2">
                 <input
                   value={r.label}
                   onChange={(e) => set(i, { label: e.target.value })}
                   placeholder="Chapter 4 reading"
                   aria-label={`Resource ${i + 1} label`}
-                  className={`${fieldClass} min-w-0 flex-1 sm:max-w-[14rem]`}
+                  className="input min-w-0 flex-1 sm:max-w-[14rem]"
                 />
                 <div className="min-w-0 flex-1">
-                  <input
-                    value={r.url}
-                    onChange={(e) => set(i, { url: e.target.value })}
-                    onBlur={(e) => {
-                      const patch = repairLink(e.target.value, r.label);
-                      if (patch) set(i, patch);
-                    }}
-                    placeholder="Paste a Drive or Classroom link"
-                    inputMode="url"
-                    aria-label={`Resource ${i + 1} link`}
-                    aria-invalid={bad || undefined}
-                    className={fieldClass}
-                    style={bad ? { borderColor: "var(--danger)" } : undefined}
-                  />
-                  {bad && (
-                    <p className="mt-1 text-[11px] text-[var(--danger)]">
-                      Only http:// and https:// links can be shown to students. This one will not be
-                      saved.
-                    </p>
-                  )}
+                  <div className="relative">
+                    <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" aria-hidden="true" strokeWidth={1.85} />
+                    <input
+                      value={r.url}
+                      onChange={(e) => set(i, { url: e.target.value })}
+                      onBlur={(e) => {
+                        const patch = repairLink(e.target.value, r.label);
+                        if (patch) set(i, patch);
+                      }}
+                      placeholder="Paste a Drive or Classroom link"
+                      inputMode="url"
+                      aria-label={`Resource ${i + 1} link`}
+                      aria-invalid={bad || undefined}
+                      className={`input pl-9 ${bad ? "!border-danger" : ""}`}
+                    />
+                  </div>
+                  {bad && <p className="mt-1 text-xs text-danger">Only http:// and https:// links can be shown to students. This one will not be saved.</p>}
                 </div>
-                <div className="flex items-center gap-1">
-                  {/* Labelled by position and by what the link is called, so a
-                      screen reader announces "Move Chapter 4 reading up" rather
-                      than four identical arrows. */}
-                  <button
-                    type="button"
-                    onClick={() => move(i, -1)}
-                    disabled={i === 0}
-                    aria-label={`Move ${r.label.trim() || `resource ${i + 1}`} up`}
-                    className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2 py-2.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
-                  >
-                    ↑
+                <div className="flex items-center">
+                  {/* Labelled by what the link is called, so a screen reader
+                      announces "Move Chapter 4 reading up" rather than four
+                      identical arrows. */}
+                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label={`Move ${name} up`} title={`Move ${name} up`} className="icon-btn">
+                    <ChevronUpIcon aria-hidden />
                   </button>
                   <button
                     type="button"
                     onClick={() => move(i, 1)}
                     disabled={i === resources.length - 1}
-                    aria-label={`Move ${r.label.trim() || `resource ${i + 1}`} down`}
-                    className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2 py-2.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
+                    aria-label={`Move ${name} down`}
+                    title={`Move ${name} down`}
+                    className="icon-btn"
                   >
-                    ↓
+                    <ChevronDownIcon aria-hidden />
                   </button>
                   <button
                     type="button"
                     onClick={() => onChange(resources.filter((_, j) => j !== i))}
-                    aria-label={`Remove ${r.label.trim() || `resource ${i + 1}`}`}
-                    className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2.5 py-2.5 text-sm md:text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+                    aria-label={`Remove ${name}`}
+                    title={`Remove ${name}`}
+                    className="icon-btn hover:!text-danger"
                   >
-                    Remove
+                    <TrashIcon aria-hidden />
                   </button>
                 </div>
               </div>

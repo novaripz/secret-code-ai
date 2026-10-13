@@ -43,8 +43,10 @@ export function SignalCard({ signal, rank }: { signal: TopicSignal; rank?: numbe
         {/* The evidence, one line each, with a bar sized against the loudest
             piece so the mix is readable without any of it becoming a score. */}
         <ul className="mt-3 flex flex-col gap-1.5">
-          {signal.evidence.map((e) => (
-            <li key={e.kind + e.label} className="flex items-center gap-2.5">
+          {signal.evidence.map((e, i) => (
+            // By position: two students can produce the very same evidence
+            // line, so the text is not a unique key.
+            <li key={i} className="flex items-center gap-2.5">
               <span className="w-9 shrink-0 text-right text-sm font-semibold tabular-nums text-[var(--text)]">
                 {e.count}
               </span>

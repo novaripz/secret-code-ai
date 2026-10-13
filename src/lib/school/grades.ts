@@ -319,6 +319,90 @@ export function letterFor(percent: number): string {
   return "F";
 }
 
+/** The lowest percentage for each letter, best first. Same scale as `letterFor`. */
+export const LETTER_FLOORS: readonly { letter: string; floor: number }[] = [
+  { letter: "A", floor: 93 },
+  { letter: "A-", floor: 90 },
+  { letter: "B+", floor: 87 },
+  { letter: "B", floor: 83 },
+  { letter: "B-", floor: 80 },
+  { letter: "C+", floor: 77 },
+  { letter: "C", floor: 73 },
+  { letter: "C-", floor: 70 },
+  { letter: "D+", floor: 67 },
+  { letter: "D", floor: 60 },
+];
+
+// ------------------------------------------------------------------ what-if
+//
+// "What do I need on the final to get a B?" -- the question every student
+// asks the week before, and one they usually answer with a guess. The answer
+// here comes from the same `buildGrades` that produced their real grade, so it
+// honours the same weights, the same normalisation and the same rule that
+// unmarked work is left out. A what-if calculator with its own arithmetic
+// would disagree with the grade above it, and then neither would be believed.
+
+/** The items with some marks pretended. Real marks are never changed by this. */
+export function withHypothetical(
+  items: readonly GradedAssignment[],
+  pretend: Record<string, number>,
+): GradedAssignment[] {
+  return items.map((item) => {
+    const points = pretend[item.assignment.id];
+    if (points === undefined || item.grade !== null) return item;
+    return {
+      assignment: item.assignment,
+      grade: { assignmentId: item.assignment.id, studentId: "what-if", pointsEarned: points, recordedBy: null, updatedAt: 0 },
+    };
+  });
+}
+
+export type NeededScore =
+  /** Any score at all gets there, even zero. */
+  | { kind: "already" }
+  /** Full marks would not be enough; `best` is where full marks would leave them. */
+  | { kind: "unreachable"; best: number }
+  | { kind: "needs"; points: number; possible: number };
+
+/**
+ * The lowest mark on one unmarked assignment that lifts the grade to
+ * `targetPercent`, with every other mark as it is (plus any pretended ones).
+ *
+ * A grade only goes up as one mark goes up, so this is a binary search on that
+ * mark, to a hundredth of a point, then rounded up to a half point: the answer
+ * a student can actually aim for, never a fraction below what they need.
+ */
+export function neededScore(
+  items: readonly GradedAssignment[],
+  categories: readonly GradeCategory[],
+  assignmentId: string,
+  targetPercent: number,
+  pretend: Record<string, number> = {},
+): NeededScore | null {
+  const target = items.find((i) => i.assignment.id === assignmentId);
+  const possible = target?.assignment.points ?? 0;
+  if (!target || target.grade !== null || possible <= 0) return null;
+
+  const others = { ...pretend };
+  delete others[assignmentId];
+  const gradeWith = (points: number): number =>
+    buildGrades(withHypothetical(items, { ...others, [assignmentId]: points }), categories).percent ?? 0;
+
+  if (gradeWith(0) >= targetPercent) return { kind: "already" };
+  const best = gradeWith(possible);
+  if (best < targetPercent) return { kind: "unreachable", best };
+
+  let lo = 0;
+  let hi = possible;
+  while (hi - lo > 0.01) {
+    const mid = (lo + hi) / 2;
+    if (gradeWith(mid) >= targetPercent) hi = mid;
+    else lo = mid;
+  }
+  const rounded = Math.min(possible, Math.ceil(hi * 2 - 1e-9) / 2);
+  return { kind: "needs", points: rounded, possible };
+}
+
 /** "87.5%" — trailing zeros dropped, because 87.00% reads as false precision. */
 export function formatPercent(percent: number | null): string {
   if (percent === null) return "—";

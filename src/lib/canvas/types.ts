@@ -58,11 +58,10 @@ export function stripHtml(html: string | null | undefined): string | undefined {
 }
 
 /**
- * A Canvas base URL the server is willing to call.
+ * A Canvas base URL in its one canonical spelling, or null.
  *
- * Only https, and only something that looks like a real hostname: this string
- * ends up in a server-side fetch, so a crafted value must not be able to point
- * the server at somewhere internal.
+ * Only https, and only something that looks like a real hostname. This alone
+ * is NOT permission to call the host -- see `allowedCanvasBase`, which is.
  */
 export function normalizeBaseUrl(input: string): string | null {
   const trimmed = input.trim().replace(/\/+$/, "");
@@ -77,4 +76,73 @@ export function normalizeBaseUrl(input: string): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * The Canvas hosts this deployment has agreed to talk to, from
+ * `CANVAS_BASE_URLS` (comma-separated, e.g. "myschool.instructure.com").
+ *
+ * Why an allowlist and not "any https host": the token exchange sends this
+ * deployment's client id AND client secret to `${baseUrl}/login/oauth2/token`.
+ * When the base URL came from the request body, anybody could type their own
+ * server into the connect box and be handed the secret. A school runs one
+ * Canvas (two at most), so the people who set up the developer key name it
+ * here, and every other host is refused before a single byte leaves.
+ *
+ * Unset or empty means nothing is allowed, which is the safe way round: a
+ * deployment that forgot this setting cannot leak anything, it can only fail
+ * to connect -- and the error says which variable to set.
+ */
+export function allowedCanvasBases(raw: string | undefined = process.env.CANVAS_BASE_URLS): string[] {
+  if (!raw) return [];
+  const seen = new Set<string>();
+  for (const part of raw.split(",")) {
+    const base = normalizeBaseUrl(part);
+    if (base) seen.add(base);
+  }
+  return [...seen];
+}
+
+/**
+ * The canonical base URL when `input` is on the allowlist, otherwise null.
+ * Every route that is about to send a secret or a token calls this first,
+ * including the ones whose base URL came out of our own cookie: a cookie set
+ * before the allowlist existed is exactly the stale input this has to catch.
+ */
+export function allowedCanvasBase(
+  input: string | null | undefined,
+  raw: string | undefined = process.env.CANVAS_BASE_URLS,
+): string | null {
+  if (!input) return null;
+  const base = normalizeBaseUrl(input);
+  if (!base) return null;
+  return allowedCanvasBases(raw).includes(base) ? base : null;
+}
+
+/**
+ * The `rel="next"` URL from a Canvas `Link` header, or null.
+ *
+ * Canvas paginates every list (ten items by default, a hundred at most) and
+ * says where the next page is only in this header. Ignoring it is how a
+ * student with sixty assignments in one course used to see the first fifty.
+ *
+ * The URL is only returned when it is on the same origin as `base`. The
+ * request that follows it carries the student's bearer token, and a header
+ * that points somewhere else is a header we do not follow.
+ */
+export function nextPageUrl(linkHeader: string | null | undefined, base: string): string | null {
+  if (!linkHeader) return null;
+  for (const part of linkHeader.split(",")) {
+    const match = /<([^>]+)>\s*;\s*(.*)$/.exec(part.trim());
+    if (!match) continue;
+    const rels = /rel="?([^";]+)"?/i.exec(match[2])?.[1]?.split(/\s+/) ?? [];
+    if (!rels.includes("next")) continue;
+    try {
+      const url = new URL(match[1], base);
+      return url.origin === new URL(base).origin ? url.toString() : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
 }

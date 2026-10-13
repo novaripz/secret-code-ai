@@ -22,8 +22,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useTeacherStore } from "./store";
+import { NO_ASSIGNMENTS, NO_CATEGORIES, NO_STUDENTS, useTeacherStore } from "./store";
 import { useDialog } from "@/components/ui/Dialog";
+import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "@/components/icons";
 import { gradeKey } from "@/lib/db";
 import { buildGrades, formatPercent, letterFor, type GradedAssignment } from "@/lib/school/grades";
 import type { Grade, GradeCategory } from "@/lib/school/types";
@@ -85,7 +86,7 @@ export function GradesView({ classId }: { classId: string }) {
  * they stand, which is the only version of this message worth printing.
  */
 function CategoryPanel({ classId }: { classId: string }) {
-  const categories = useTeacherStore((s) => s.categories[classId] ?? []);
+  const categories = useTeacherStore((s) => s.categories[classId] ?? NO_CATEGORIES);
   const addCategory = useTeacherStore((s) => s.addCategory);
   const editCategory = useTeacherStore((s) => s.editCategory);
   const removeCategory = useTeacherStore((s) => s.removeCategory);
@@ -117,7 +118,7 @@ function CategoryPanel({ classId }: { classId: string }) {
       />
 
       {categories.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-[var(--line-strong)] px-4 py-6 text-center text-sm leading-relaxed text-[var(--text-faint)]">
+        <p className="rounded-ui-lg border border-dashed border-line-strong px-4 py-6 text-center text-sm leading-relaxed text-[var(--text-faint)]">
           No categories yet. Grades are worked out as plain points across everything you have
           marked, which is right for a lot of classes. Add categories when you want tests to count
           for more than homework.
@@ -153,24 +154,27 @@ function CategoryPanel({ classId }: { classId: string }) {
                   onClick={() => void moveCategory(classId, c.id, -1)}
                   disabled={i === 0}
                   aria-label={`Move ${c.name} up`}
-                  className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2 py-1.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
+                  title={`Move ${c.name} up`}
+                  className="icon-btn"
                 >
-                  ↑
+                  <ChevronUpIcon aria-hidden />
                 </button>
                 <button
                   onClick={() => void moveCategory(classId, c.id, 1)}
                   disabled={i === categories.length - 1}
                   aria-label={`Move ${c.name} down`}
-                  className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2 py-1.5 text-sm md:text-xs text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] disabled:opacity-40"
+                  title={`Move ${c.name} down`}
+                  className="icon-btn"
                 >
-                  ↓
+                  <ChevronDownIcon aria-hidden />
                 </button>
                 <button
                   onClick={() => void confirmRemove(c)}
                   aria-label={`Delete ${c.name}`}
-                  className="tap inline-flex items-center rounded-lg border border-[var(--line-strong)] px-2.5 py-1.5 text-sm md:text-xs text-[var(--text-faint)] transition-colors hover:border-[var(--danger)] hover:text-[var(--danger)]"
+                  title={`Delete ${c.name}`}
+                  className="icon-btn hover:!text-danger"
                 >
-                  Delete
+                  <TrashIcon aria-hidden />
                 </button>
               </div>
             </div>
@@ -255,9 +259,9 @@ function CategoryPanel({ classId }: { classId: string }) {
  * itself never slides sideways, which is the rule on every screen here.
  */
 function GradeGrid({ classId }: { classId: string }) {
-  const roster = useTeacherStore((s) => s.roster[classId] ?? []);
-  const assignments = useTeacherStore((s) => s.assignments[classId] ?? []);
-  const categories = useTeacherStore((s) => s.categories[classId] ?? []);
+  const roster = useTeacherStore((s) => s.roster[classId] ?? NO_STUDENTS);
+  const assignments = useTeacherStore((s) => s.assignments[classId] ?? NO_ASSIGNMENTS);
+  const categories = useTeacherStore((s) => s.categories[classId] ?? NO_CATEGORIES);
   const grades = useTeacherStore((s) => s.grades[classId]);
   const saveGrade = useTeacherStore((s) => s.saveGrade);
 
@@ -300,7 +304,7 @@ function GradeGrid({ classId }: { classId: string }) {
     return (
       <section>
         <SectionHeading title="Grades" />
-        <p className="rounded-2xl border border-dashed border-[var(--line-strong)] px-4 py-8 text-center text-sm leading-relaxed text-[var(--text-faint)]">
+        <p className="rounded-ui-lg border border-dashed border-line-strong px-4 py-8 text-center text-sm leading-relaxed text-[var(--text-faint)]">
           {roster.length === 0
             ? "Nobody is in this class yet. Add students on the Roster tab and they will appear here."
             : "No assignment in this class is worth any points yet. Give one a point value and a column appears."}
@@ -531,7 +535,7 @@ function GradeCell({
       // a row, so it gets the 44px floor even though the grid around it stays
       // a desktop shape. The row grows; the grid still scrolls sideways in its
       // own container, which is what keeps the page itself from doing so.
-      className="tap inline-flex items-center w-20 rounded-lg border border-[var(--line)] bg-[var(--surface-1)] px-2 py-1.5 text-sm tabular-nums text-[var(--text)] outline-none transition-colors placeholder:text-[var(--text-faint)] focus:border-[var(--focus)]"
+      className="input tap h-9 w-20 px-2 text-right tabular-nums"
       style={over ? { borderColor: "var(--warn)" } : undefined}
     />
   );
@@ -548,9 +552,9 @@ function GradeCell({
  * doing" — it gives each person one vote.
  */
 function ClassSummary({ classId }: { classId: string }) {
-  const roster = useTeacherStore((s) => s.roster[classId] ?? []);
-  const assignments = useTeacherStore((s) => s.assignments[classId] ?? []);
-  const categories = useTeacherStore((s) => s.categories[classId] ?? []);
+  const roster = useTeacherStore((s) => s.roster[classId] ?? NO_STUDENTS);
+  const assignments = useTeacherStore((s) => s.assignments[classId] ?? NO_ASSIGNMENTS);
+  const categories = useTeacherStore((s) => s.categories[classId] ?? NO_CATEGORIES);
   const grades = useTeacherStore((s) => s.grades[classId]);
 
   const rows = useMemo(

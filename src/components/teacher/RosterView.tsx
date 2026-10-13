@@ -15,7 +15,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useTeacherStore } from "./store";
+import { NO_INVITES, NO_STUDENTS, useTeacherStore } from "./store";
 import {
   ActionErrorNote,
   Chip,
@@ -28,11 +28,13 @@ import {
   formatDate,
 } from "./primitives";
 import { TrashIcon } from "@/components/icons";
+import { Users } from "lucide-react";
+import { EmptyState } from "@/components/ui/primitives";
 import { useDialog } from "@/components/ui/Dialog";
 
 export function RosterView({ classId }: { classId: string }) {
-  const students = useTeacherStore((s) => s.roster[classId] ?? []);
-  const invites = useTeacherStore((s) => s.invites[classId] ?? []);
+  const students = useTeacherStore((s) => s.roster[classId] ?? NO_STUDENTS);
+  const invites = useTeacherStore((s) => s.invites[classId] ?? NO_INVITES);
   const invite = useTeacherStore((s) => s.invite);
   const cancelInvite = useTeacherStore((s) => s.cancelInvite);
   const removeStudent = useTeacherStore((s) => s.removeStudent);
@@ -135,10 +137,18 @@ export function RosterView({ classId }: { classId: string }) {
           sub="Signed in, enrolled, and visible in this class's analytics."
         />
 
+        {students.length === 0 ? (
+          <EmptyState
+            icon={<Users aria-hidden="true" strokeWidth={1.85} />}
+            title="Nobody has joined yet"
+            description="Add a student by email above. If they already use Panda they appear here straight away; if not, they join the first time they sign in."
+          />
+        ) : (
+        <div className="card overflow-hidden">
         <Scroller>
           <table className="w-full min-w-[620px] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-[var(--line)] text-left">
+              <tr className="border-b border-line bg-surface-0 text-left">
                 <th scope="col" className="px-3 py-2 text-xs font-medium text-[var(--text-faint)]">Student</th>
                 <th scope="col" className="px-3 py-2 text-xs font-medium text-[var(--text-faint)]">Progress</th>
                 <th scope="col" className="px-3 py-2 text-xs font-medium text-[var(--text-faint)]">Last active</th>
@@ -193,6 +203,8 @@ export function RosterView({ classId }: { classId: string }) {
             </tbody>
           </table>
         </Scroller>
+        </div>
+        )}
       </div>
 
       <div className="mt-7">
@@ -201,8 +213,8 @@ export function RosterView({ classId }: { classId: string }) {
           sub="No account yet. Nothing to see from them until they sign in."
         />
         {invites.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-[var(--line-strong)] px-4 py-6 text-center text-sm text-[var(--text-faint)]">
-            Everyone you&apos;ve added has signed in.
+          <p className="rounded-ui-lg border border-dashed border-line-strong px-4 py-5 text-center text-sm text-ink-faint">
+            {students.length > 0 ? "Everyone you've added has signed in." : "No invites waiting."}
           </p>
         ) : (
           <ul className="flex flex-col gap-2">
