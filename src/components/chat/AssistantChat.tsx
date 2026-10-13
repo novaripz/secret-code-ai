@@ -1,28 +1,34 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { authHeader, authReady, deviceHeader } from "@/lib/security/device";
-import { isCutShort, showsText, usableAsHistory, useAssistantStore } from "@/store/useAssistantStore";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  isCutShort,
+  restoreAttachment,
+  showsText,
+  usableAsHistory,
+  useAssistantStore,
+  type AssistantMessage,
+} from "@/store/useAssistantStore";
 import { useProfileStore } from "@/store/useProfileStore";
 import { attachmentsToPromptText, type Attachment } from "@/lib/attachments";
-import { Composer } from "./Composer";
-import { MessageText } from "./MessageText";
-import { ModePills } from "./ModePills";
-import { PandaSitting } from "@/components/Panda";
-import { MessageActions, actionPrompt, type MessageAction } from "./MessageActions";
 import { useI18n } from "@/lib/i18n";
+import { findLocale } from "@/lib/i18n/locales";
 import { useInsightsStore } from "@/store/useInsightsStore";
 import { NEUTRAL_ACTIONS, actionableFindings, signalFromAction, type Topic } from "@/lib/insights";
 import { Priorities } from "@/components/home/Priorities";
-import { findLocale } from "@/lib/i18n/locales";
-import { FileIcon } from "@/components/icons";
+import { ArrowUpIcon } from "@/components/icons";
+import { Composer } from "./Composer";
+import { ModePills } from "./ModePills";
+import { MessageActions, actionPrompt, type MessageAction } from "./MessageActions";
 import { buildSuggestions } from "./suggestions";
 import { deriveFollowUps, type FollowUp } from "./followUps";
-import { CopyButton } from "./CopyButton";
-import { parseRemembered } from "./remember";
-import { frameReader, type Source } from "./frames";
-import { Activity, Sources, type ActivityState } from "./Activity";
-
+import { ActivityAnnouncer } from "./Activity";
+import { ChatHero, ChatSuggestions } from "./ChatLanding";
+import { ChatMessages } from "./ChatMessages";
+import { ChatHeader } from "./ChatHeader";
+import { runReply } from "./runner";
+import { useReadAloud, useStopSpeakingOnUnmount } from "./speech";
 
 /**
  * Personal Panda has no assignment and no class, so it has no honest topic.
@@ -53,19 +59,78 @@ const GENERAL_TOPIC: Topic = { id: "general", label: "General chat" };
 const CONTINUE_PROMPT =
   "You stopped partway through that answer. Carry on from exactly where you stopped — do not start again or repeat what you already wrote.";
 
+/**
+ * "Quiz me on this". Written as the student would say it, like the other
+ * canned prompts, and specific about pacing: a quiz that dumps five questions
+ * and their answers in one message is a worksheet with the key stapled on.
+ */
+const QUIZ_PROMPT =
+  "Quiz me on what you just explained. Ask me 3 to 5 short practice questions, one at a time, and wait for my answer before the next one. Don't tell me the answers until I've tried.";
+
+/**
+ * The key the Watch tab (and anything else) leaves a draft under before
+ * sending the student here: `{ text: string, newThread?: boolean }`. Read once
+ * on arrival, put in the composer — never sent on the student's behalf — and
+ * removed, so a reload does not paste it twice.
+ */
+const PENDING_DRAFT_KEY = "panda:pending-draft";
+
+/** The handed-over draft, if there is a well-formed one waiting. */
+function readPendingDraft(): { text: string; newThread: boolean } | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(PENDING_DRAFT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { text?: unknown; newThread?: unknown };
+    if (typeof parsed.text !== "string") return null;
+    return { text: parsed.text, newThread: parsed.newThread === true };
+  } catch {
+    return null;
+  }
+}
+
+interface SendOptions {
+  /** Sent with the message; defaults to none. The composer passes its own. */
+  attachments?: Attachment[];
+  simplify?: boolean;
+  /** The student typed this, so it counts as their writing. Buttons don't. */
+  typed?: boolean;
+  /** Drop this message and everything after it first (edit, regenerate). */
+  replaceFrom?: string;
+}
+
 export function AssistantChat() {
-  const {
-    activeThread,
-    loading,
-    hydrate,
-    hydrated,
-    addUserMessage,
-    addErrorMessage,
-    setLoading,
-    startAssistantMessage,
-    appendToAssistantMessage,
-    finishAssistantMessage,
-  } = useAssistantStore();
+  // `useSearchParams` needs a Suspense boundary above it, or a prerendered
+  // route bails out to client rendering all the way up to the nearest one.
+  return (
+    <Suspense fallback={null}>
+      <ChatScreen />
+    </Suspense>
+  );
+}
+
+/** Desktop only: on a phone, focusing pops the keyboard over the greeting. */
+function focusIfPointer(el: HTMLElement | null) {
+  if (el && window.matchMedia("(pointer: fine)").matches) el.focus({ preventScroll: true });
+}
+
+function ChatScreen() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const requested = params.get("c");
+
+  const activeThread = useAssistantStore((s) => s.activeThread);
+  const hydrated = useAssistantStore((s) => s.hydrated);
+  const hydrate = useAssistantStore((s) => s.hydrate);
+  const openThread = useAssistantStore((s) => s.openThread);
+  const newThread = useAssistantStore((s) => s.newThread);
+  const stopRequest = useAssistantStore((s) => s.stopRequest);
+  const sources = useAssistantStore((s) => s.sources);
+  const activeId = activeThread?.id;
+  // One "busy" for the open chat: from the moment it was sent until the stream
+  // has closed. Composer, chips and edit all read this one flag.
+  const busy = useAssistantStore((s) => !!(s.activeThread && s.pending[s.activeThread.id]));
+  const activity = useAssistantStore((s) => (s.activeThread ? (s.activity[s.activeThread.id] ?? null) : null));
 
   const modes = useProfileStore((s) => s.modes);
   const languages = useProfileStore((s) => s.languages);
@@ -94,22 +159,20 @@ export function AssistantChat() {
     [insightsHydrated, signals],
   );
 
-  const [input, setInput] = useState("");
+  // A draft handed over from elsewhere (see PENDING_DRAFT_KEY), read once as
+  // the screen mounts so it is in the composer on the very first frame.
+  const [draft] = useState(readPendingDraft);
+  const [input, setInput] = useState(() => draft?.text ?? "");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const stickToBottom = useRef(true);
-  // Held so the student can stop a reply that is going the wrong way.
-  const abortRef = useRef<AbortController | null>(null);
-  // What Panda is doing right now, or null when it is doing nothing. Set the
-  // moment a message is sent rather than when the server first speaks, because
-  // the wait the student complained about starts at the button, not at the
-  // first byte.
-  const [activity, setActivity] = useState<ActivityState | null>(null);
-  // Citations, by the message they belong to. Kept in this component rather
-  // than in the thread store because the stored message shape is owned
-  // elsewhere; the cost is that sources are lost on reload, which is the right
-  // trade for not reaching into another module's data model.
-  const [sources, setSources] = useState<Record<string, Source[]>>({});
+  // Which chat the "jump to newest" button is showing for. Keyed by chat, so
+  // opening another one hides it without anything having to reset it.
+  const [jumpFor, setJumpFor] = useState<string | null>(null);
+  const showJump = jumpFor !== null && jumpFor === activeThread?.id;
+  const { stop: stopReading } = useReadAloud();
+  useStopSpeakingOnUnmount();
 
   useEffect(() => {
     if (!hydrated) void hydrate();
@@ -121,8 +184,72 @@ export function AssistantChat() {
     if (!insightsHydrated) void hydrateInsights();
   }, [insightsHydrated, hydrateInsights]);
 
-  const messages = activeThread?.messages ?? [];
+  // ---- The address bar names the chat -------------------------------------
+  //
+  // Every chat link used to be "/", so a reload opened an empty chat and Back
+  // never moved between conversations. Now `?c=<id>` is the open chat: a link
+  // in the sidebar, Back and Forward, and a reload all go through here.
+  useEffect(() => {
+    if (!hydrated) return;
+    if (requested) {
+      if (useAssistantStore.getState().activeThread?.id === requested) return;
+      let cancelled = false;
+      void openThread(requested).then((found) => {
+        // A link to a chat that is not on this device (deleted, or made on
+        // another one) lands on a fresh chat rather than an error.
+        if (!found && !cancelled) router.replace("/", { scroll: false });
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+    // No chat named: the student asked for a fresh one ("New chat", the
+    // logo). One that is already fresh is kept rather than replaced.
+    const current = useAssistantStore.getState().activeThread;
+    if (current && current.messages.length > 0) newThread();
+  }, [requested, hydrated, openThread, newThread, router]);
 
+  // A new chat gets its address the moment it has something in it. Replace,
+  // not push: Back from here should go to where the student was before, not to
+  // the empty version of this same chat.
+  const hasMessages = (activeThread?.messages.length ?? 0) > 0;
+  useEffect(() => {
+    if (!activeId || !hasMessages || requested === activeId) return;
+    router.replace(`/?c=${activeId}`, { scroll: false });
+    // `requested` is left out on purpose: this follows the store to the URL;
+    // the effect above follows the URL to the store, and reacting to both
+    // here would bounce between two chats during a switch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeId, hasMessages, router]);
+
+  // ---- A draft handed over from elsewhere ----------------------------------
+  useEffect(() => {
+    if (!draft) return;
+    try {
+      sessionStorage.removeItem(PENDING_DRAFT_KEY);
+    } catch {
+      // Nothing to clean up if storage is blocked.
+    }
+    if (draft.newThread) {
+      newThread();
+      if (requested) router.replace("/", { scroll: false });
+    }
+    // Focused on every device here, unlike the landing: the student pressed a
+    // button that said "ask Panda", so the keyboard is what they came for.
+    const raf = requestAnimationFrame(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    });
+    return () => cancelAnimationFrame(raf);
+    // Once per arrival.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ---- Scrolling ----------------------------------------------------------
+  const messages = useMemo(() => activeThread?.messages ?? [], [activeThread]);
+  const empty = messages.length === 0;
   // Total length changes on every chunk, so this runs as the reply grows.
   const streamedLength = messages.reduce((n, m) => n + m.content.length, 0);
 
@@ -130,8 +257,29 @@ export function AssistantChat() {
     const el = scrollRef.current;
     if (!el) return;
     // A small slack, so being a pixel or two off the bottom still counts.
-    stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    stickToBottom.current = atBottom;
+    setJumpFor(atBottom ? null : (activeThread?.id ?? null));
   }
+
+  function jumpToLatest() {
+    const el = scrollRef.current;
+    if (!el) return;
+    stickToBottom.current = true;
+    setJumpFor(null);
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  }
+
+  // A different chat starts at its newest message, following along. It used
+  // to inherit "the student scrolled up" from whichever chat was open before,
+  // so a fresh conversation could open frozen halfway up.
+  useEffect(() => {
+    stickToBottom.current = true;
+    stopReading();
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+    if (useAssistantStore.getState().activeThread?.messages.length === 0) focusIfPointer(inputRef.current);
+  }, [activeId, stopReading]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -139,457 +287,217 @@ export function AssistantChat() {
     // `auto` rather than `smooth`: a smooth scroll retargeted many times a
     // second never settles and the view visibly lags the text.
     el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
-  }, [streamedLength, messages.length, loading]);
+  }, [streamedLength, messages.length, activity]);
 
-  function stop() {
-    abortRef.current?.abort();
-    abortRef.current = null;
-  }
+  // ---- Sending ------------------------------------------------------------
+  function send(text: string, opts: SendOptions = {}) {
+    const store = useAssistantStore.getState();
+    const current = store.activeThread;
+    // One reply at a time per chat. Enter mid-reply used to start a second
+    // request on top of the first and orphan the first one's Stop button.
+    if (current && store.pending[current.id]) return;
+    const typed = text.trim();
+    const outgoing = opts.attachments ?? [];
+    if (!typed && outgoing.length === 0) return;
 
-  async function send(promptOverride?: string, opts?: { simplify?: boolean }) {
-    const typed = (promptOverride ?? input).trim();
-    const outgoing = attachments;
-    if ((!typed && outgoing.length === 0) || loading) return;
+    if (opts.replaceFrom) store.truncateFrom(opts.replaceFrom);
+    // History is what came BEFORE this message. It used to be read after the
+    // message was added and then trimmed with `.slice(-20, -1)` — which, for a
+    // message with only an attachment (no text, so not in history at all),
+    // cut Panda's previous reply instead.
+    const before = useAssistantStore.getState().activeThread?.messages ?? [];
+    const history = usableAsHistory(before)
+      .slice(-19)
+      .map((m) => ({ role: m.role, content: m.content }));
 
-    setInput("");
-    setAttachments([]);
-    addUserMessage(typed, outgoing);
-    setLoading(true);
-    setActivity({ phase: "thinking" });
+    useAssistantStore.getState().addUserMessage(typed, outgoing);
+    const threadId = useAssistantStore.getState().activeThread?.id;
+    if (!threadId) return;
+    stickToBottom.current = true;
+    setJumpFor(null);
 
     const insights = useInsightsStore.getState();
     // Only what the student typed themselves. A button's canned prompt is our
     // sentence, not theirs, and counting it would flatter the English estimate.
-    if (!promptOverride && typed) insights.noteWriting(typed);
+    if (opts.typed && typed) insights.noteWriting(typed);
 
-    try {
-      const attachedText = attachmentsToPromptText(outgoing);
-      const prompt = [typed, attachedText].filter(Boolean).join("\n\n");
-
-      // Partial answers count. They were really shown to the student, so
-      // leaving them out is what made Panda repeat or contradict itself on the
-      // next turn; `usableAsHistory` keeps them and drops only the turns that
-      // never said anything. See the comment on it for the full reasoning.
-      const history = usableAsHistory(useAssistantStore.getState().activeThread?.messages ?? [])
-        .slice(-20, -1)
-        .map((m) => ({ role: m.role, content: m.content }));
-
-      const controller = new AbortController();
-      abortRef.current = controller;
-
-      await authReady();
-
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        signal: controller.signal,
-        headers: { "Content-Type": "application/json", ...deviceHeader(), ...authHeader() },
-        body: JSON.stringify({
-          prompt: prompt || "(the user sent attachments with no message)",
-          chatOnly: true,
-          stream: true,
-          // Opt into the framed (newline-delimited JSON) stream. Without this
-          // the route writes raw prose and there is no channel for progress —
-          // and, on a deployment with search configured, no tool calling
-          // either, precisely because a client that cannot draw progress
-          // should not be made to wait through an invisible round-trip.
-          events: true,
-          fileTree: "",
-          contextFiles: {},
-          history,
-          explainMode: modes.explainMode,
-          explainDepth: modes.explainDepth,
-          learningMode: "coaching",
-          simplify: opts?.simplify === true,
-          replyLanguage,
-          studentProfile: memoryBlock(),
-          // Pure arithmetic over signals already in memory — no await, so this
-          // adds nothing measurable before the request leaves.
-          adaptation: insights.adaptation(),
-          images: outgoing
-            .filter((a) => a.kind === "image" && a.base64 && a.mimeType)
-            .map((a) => ({ data: a.base64!, mimeType: a.mimeType! })),
-        }),
-      });
-
-      if (!res.ok) {
-        // A failure before the stream opens still comes back as JSON.
-        const data = await res.json().catch(() => ({}));
-        addErrorMessage(data.error ?? t("error.chatFailed"));
-        return;
-      }
-
-      if (!res.body) {
-        addErrorMessage(t("error.emptyReply"));
-        return;
-      }
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      const frames = frameReader();
-      const id = startAssistantMessage();
-      // The bubble exists now, but nothing has landed in it yet. The waiting
-      // state stays up and is driven by the stream from here on — it is the
-      // status line, not `loading`, that tells the student what is happening.
-      setLoading(false);
-
-      // Only text counts as a reply. A stream that carried nothing but a
-      // status frame and then closed is an empty answer, however many bytes
-      // crossed the wire.
-      let received = false;
-      let failure: string | undefined;
-
-      // Chunks can arrive faster than the screen refreshes. Coalesce whatever
-      // lands within a frame into one update: fewer renders, and the fade
-      // groups a few words instead of flickering per token. No artificial
-      // delay is added — a frame is the display's own tick.
-      let pending = "";
-      let raf = 0;
-
-      const flush = () => {
-        raf = 0;
-        if (!pending) return;
-        appendToAssistantMessage(id, pending);
-        pending = "";
-      };
-
-      const handle = (frame: ReturnType<typeof frames.push>[number]) => {
-        if (frame.t === "text") {
-          // The first token is the end of the wait, so the indicator goes
-          // here and not in a timeout: it clears on the same event that gives
-          // the student something to read, and can never linger over prose.
-          if (!received) {
-            received = true;
-            setActivity(null);
-          }
-          pending += frame.v;
-          if (!raf) raf = requestAnimationFrame(flush);
-          return;
-        }
-        if (frame.t === "status") {
-          // Late status frames are ignored once text is flowing. The server
-          // drains its queue as it streams, so a search that finished before
-          // the first word can otherwise arrive after it and reinstate a
-          // spinner over an answer already being written.
-          if (!received) {
-            setActivity({ phase: frame.phase, query: frame.query, count: frame.count, reason: frame.reason });
-          }
-          return;
-        }
-        if (frame.t === "sources") {
-          setSources((prev) => ({ ...prev, [id]: frame.items }));
-          return;
-        }
-        // An error frame is prose the route already wrote for a student, and
-        // it is terminal: whatever text arrived stays, and this is what the
-        // bubble reports when the stream closes.
-        failure = frame.message;
-      };
-
-      try {
-        for (;;) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const text = decoder.decode(value, { stream: true });
-          if (!text) continue;
-          for (const frame of frames.push(text)) handle(frame);
-        }
-      } finally {
-        if (raf) cancelAnimationFrame(raf);
-        // The decoder's tail can complete a multi-byte character that ends the
-        // last line, so it is pushed through the splitter before the splitter
-        // is asked for its own leftovers.
-        for (const frame of frames.push(decoder.decode())) handle(frame);
-        for (const frame of frames.end()) handle(frame);
-        flush();
-        // Whatever happened — finished, errored, or stopped mid-sentence —
-        // the indicator comes down here. This is the one path every ending
-        // goes through, which is what stops a spinner outliving its stream.
-        setActivity(null);
-        // Stopping on purpose is a choice, not an error — the same rule
-        // `streamChat.ts` already applies to the assignment chat, followed here
-        // rather than inventing a second answer to the same question. The
-        // check has to happen in this `finally` and not in the outer `catch`,
-        // because aborting rejects `reader.read()` and this block runs first:
-        // reading `received` alone recorded a student pressing Stop before the
-        // first token as "The reply came back empty." in a red box.
-        const stopped = controller.signal.aborted;
-        finishAssistantMessage(
-          id,
-          failure ?? (received || stopped ? undefined : t("error.emptyReply")),
-        );
-
-        // A student who says "my name is Santi, not S" has corrected Panda for
-        // every future conversation, not just this one. The model marks the
-        // durable fact itself; we only store what it marked, and only from a
-        // reply that actually finished, so an aborted stream cannot half-write
-        // a fact. `addMemory` is the same list Settings shows and lets them
-        // delete, which is what makes writing to it acceptable at all.
-        const finished =
-          useAssistantStore.getState().activeThread?.messages.find((m) => m.id === id)?.content ?? "";
-        for (const fact of parseRemembered(finished)) addMemory(fact, "chat");
-      }
-    } catch (err) {
-      // Stopping on purpose is not an error; the partial reply stays as it is.
-      if (!(err instanceof DOMException && err.name === "AbortError")) {
-        addErrorMessage(err instanceof Error ? err.message : t("error.chatFailed"));
-      }
-    } finally {
-      abortRef.current = null;
-      setLoading(false);
-      // Belt and braces for the paths that never reached the stream at all —
-      // a non-OK response, a thrown fetch. A stuck "Thinking" with no stream
-      // behind it is the exact failure this feature exists to remove.
-      setActivity(null);
-    }
+    void runReply({
+      threadId,
+      prompt: [typed, attachmentsToPromptText(outgoing)].filter(Boolean).join("\n\n"),
+      images: outgoing
+        .filter((a) => a.kind === "image" && a.base64 && a.mimeType)
+        .map((a) => ({ data: a.base64!, mimeType: a.mimeType! })),
+      history,
+      simplify: opts.simplify,
+      explainMode: modes.explainMode,
+      explainDepth: modes.explainDepth,
+      replyLanguage,
+      studentProfile: memoryBlock(),
+      // Pure arithmetic over signals already in memory — no await, so this
+      // adds nothing measurable before the request leaves.
+      adaptation: insights.adaptation(),
+      messages: { chatFailed: t("error.chatFailed"), emptyReply: t("error.emptyReply"), offline: t("error.offline") },
+      // A student who says "my name is Santi, not S" has corrected Panda for
+      // every future conversation. `addMemory` is the same list Settings shows
+      // and lets them delete, which is what makes writing to it acceptable.
+      onRemember: (facts) => facts.forEach((fact) => addMemory(fact, "chat")),
+    });
   }
 
-  const name = profileHydrated ? displayName() : "";
-  const empty = messages.length === 0;
-  // Actions belong on the newest reply only; older ones are history.
-  // A cut-short reply still anchors the actions: it is the newest thing Panda
-  // said and it is on screen, so hanging "Explain another way" under the reply
-  // above it would point the student at the wrong paragraph. Only a turn with
-  // no text at all is skipped, since there is nothing there to act on.
-  const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant" && showsText(m));
-  const lastAssistantId = lastAssistant?.id;
-  const streaming = messages.some((m) => m.streaming);
+  function sendFromComposer() {
+    const text = input;
+    const outgoing = attachments;
+    if (busy || (!text.trim() && outgoing.length === 0)) return;
+    setInput("");
+    setAttachments([]);
+    send(text, { attachments: outgoing, typed: true });
+  }
 
+  /** The last thing the student sent, and the answer to it, asked again. */
+  const lastUser = [...messages].reverse().find((m) => m.role === "user");
+  function resend(message: AssistantMessage, text: string) {
+    send(text, {
+      attachments: message.attachments?.map(restoreAttachment),
+      replaceFrom: message.id,
+      typed: text !== message.content,
+    });
+  }
+
+  // ---- What sits under the newest reply -----------------------------------
+  const name = profileHydrated ? displayName() : "";
+  // Actions belong on the newest reply only; older ones are history. A
+  // cut-short reply still anchors them: it is the newest thing Panda said and
+  // it is on screen. Only a turn with no text at all is skipped.
+  const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant" && showsText(m));
   // Chips derived from the reply they sit under. Memoised on the finished text
-  // so the parse does not run on every token: while `streaming` is true this
-  // stays an empty list, which is also the answer to "what shows mid-stream" —
-  // nothing, because a chip about a numbered list is a lie until the list has
-  // finished arriving.
-  // Cut short counts as unfinished here too: a chip like "Where's that formula
-  // from?" derived from half an explanation asks about something the student
-  // was never actually told.
+  // so the parse does not run on every token: while streaming this stays an
+  // empty list — a chip about a numbered list is a lie until the list has
+  // finished arriving. Cut short counts as unfinished too.
   const finishedReply =
     lastAssistant && !lastAssistant.streaming && !isCutShort(lastAssistant) ? lastAssistant.content : "";
   const followUps: FollowUp[] = useMemo(() => deriveFollowUps(finishedReply), [finishedReply]);
 
+  // A link to a chat that is still being read off disk shows a quiet
+  // placeholder rather than flashing the empty greeting first.
+  const opening = !!requested && activeId !== requested;
+  const landing = empty && !opening;
+
   return (
-    <div className="flex h-full flex-col">
-      {empty ? (
-        // Landing state: greeting and composer centered, like a fresh chat.
-        // `overflow-y-auto` and `justify-center` together, on purpose: the
-        // greeting stays optically centred while there is room, and the moment
-        // the keyboard halves the screen the whole landing state becomes
-        // scrollable instead of clipping the panda and the suggestion chips.
-        // A centred flex child with no scroller is the classic way to make
-        // content unreachable rather than merely cramped.
-        <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-6">
-          <div className="w-full max-w-2xl animate-rise">
-            <div className="mb-4 flex justify-center sm:mb-5">
-              <PandaSitting className="h-[130px] w-[104px] sm:h-[190px] sm:w-[152px]" />
-            </div>
-            <h1 className="mb-6 text-center text-[28px] font-semibold tracking-tight text-[var(--text)] sm:mb-8 sm:text-4xl">
-              {name ? t("chat.greeting", { name }) : t("chat.greetingNoName")}
-            </h1>
+    // ONE composer, at the same place in the tree whether the chat is empty or
+    // not. There used to be two — one under the greeting, one docked — so the
+    // first send unmounted the textarea the student was typing in, dropped
+    // focus, and on a phone closed the keyboard mid-thought.
+    <div className={`relative flex h-full flex-col ${landing ? "overflow-y-auto" : ""}`}>
+      <ActivityAnnouncer state={activity} />
+      <ChatHeader />
 
-            <Composer
-              autoFocus
-              value={input}
-              onChange={setInput}
-              attachments={attachments}
-              onAttachmentsChange={setAttachments}
-              onSend={() => void send()}
-              loading={loading}
-              placeholder={t("chat.placeholder")}
-              footer={<ModePills />}
-            />
-
-            <Priorities />
-
-            <div className="mt-6 flex flex-wrap justify-center gap-2 sm:mt-8" aria-label={t("chat.suggestionsLabel")} role="group">
-              {suggestions.map((s) => {
-                const text = t(s.key, s.vars);
-                return (
-                  <button
-                    key={s.id}
-                    onClick={() => void send(text)}
-                    aria-label={text}
-                    className="tap inline-flex items-center rounded-full border border-[var(--line)] px-4 py-2 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] sm:px-3.5 md:text-xs"
-                  >
-                    {text}
-                  </button>
-                );
-              })}
+      <div
+        ref={landing ? undefined : scrollRef}
+        onScroll={landing ? undefined : onScroll}
+        className={landing ? "mt-auto shrink-0" : "min-h-0 flex-1 overflow-y-auto"}
+      >
+        {landing ? (
+          <ChatHero name={name} />
+        ) : opening ? (
+          <div className="mx-auto w-full max-w-3xl space-y-6 px-4 pt-8 sm:px-6" aria-hidden="true">
+            <div className="skeleton ms-auto h-10 w-1/2 rounded-[var(--radius-lg)]" />
+            <div className="space-y-2.5">
+              <div className="skeleton h-4 w-11/12" />
+              <div className="skeleton h-4 w-4/5" />
+              <div className="skeleton h-4 w-2/3" />
             </div>
           </div>
+        ) : (
+          <ChatMessages
+            messages={messages}
+            sources={sources}
+            activity={activity}
+            busy={busy}
+            replyLocale={replyLocale}
+            lastAssistantId={lastAssistant?.id}
+            handlers={{
+              onContinue: () => send(CONTINUE_PROMPT),
+              onRegenerate: lastUser ? () => resend(lastUser, lastUser.content) : undefined,
+              onEdit: (id, text) => {
+                const message = messages.find((m) => m.id === id);
+                if (message) resend(message, text);
+              },
+            }}
+            actions={(m, tools) => (
+              <MessageActions
+                replyLocale={replyLocale}
+                showTranslate={replyLocale !== "en"}
+                showHint={messages.length > 1}
+                disabled={busy}
+                followUps={followUps}
+                tools={tools}
+                onQuiz={isCutShort(m) ? undefined : () => send(QUIZ_PROMPT)}
+                // Derived chips carry their own prompt and are not
+                // MessageActions, so they deliberately bypass the insights
+                // `record` below: we know the student asked about a formula,
+                // which is curiosity, not the struggle signal that path scores.
+                onFollowUp={(f: FollowUp) => send(f.prompt)}
+                onAction={(action: MessageAction) => {
+                  if (NEUTRAL_ACTIONS.includes(action)) {
+                    useInsightsStore.getState().record(
+                      signalFromAction(action, {
+                        topic: GENERAL_TOPIC,
+                        sessionId: activeThread?.id,
+                      }),
+                    );
+                  }
+                  send(actionPrompt(action, replyLanguage), {
+                    simplify: action === "simplify" || action === "different",
+                  });
+                }}
+              />
+            )}
+          />
+        )}
+      </div>
+
+      {/* The dock. `pb` carries the home-indicator inset on top of its own
+          padding, because `viewportFit: cover` means the bottom of the dvh box
+          is under the indicator on a modern iPhone. */}
+      <div className={landing ? "shrink-0 px-4" : "relative shrink-0 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-0 sm:pb-5"}>
+        {showJump && !landing && (
+          <button
+            type="button"
+            onClick={jumpToLatest}
+            aria-label={t("chat.jumpToLatest")}
+            title={t("chat.jumpToLatest")}
+            className="jump-latest"
+          >
+            <ArrowUpIcon className="h-4 w-4 rotate-180" />
+          </button>
+        )}
+        {/* Same width and inset as the messages above it, so the composer
+            lines up with the text it continues. */}
+        <div className={`mx-auto ${landing ? "max-w-2xl" : "max-w-3xl sm:px-6"}`}>
+          <Composer
+            inputRef={inputRef}
+            value={input}
+            onChange={setInput}
+            attachments={attachments}
+            onAttachmentsChange={setAttachments}
+            onSend={sendFromComposer}
+            loading={busy}
+            onStop={activeId ? () => stopRequest(activeId) : undefined}
+            voiceLang={replyLocale}
+            placeholder={t("chat.placeholder")}
+            footer={landing ? <ModePills /> : undefined}
+          />
         </div>
-      ) : (
-        <>
-          <div ref={scrollRef} onScroll={onScroll} className="flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-3xl space-y-6 overflow-x-hidden px-3 py-6 sm:px-4 sm:py-8">
-              {messages.map((m) => (
-                <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
-                  {m.role === "assistant" && (
-                    <PandaSitting
-                      className="mr-1.5 h-[34px] w-[27px] shrink-0 sm:mr-3 sm:h-[46px] sm:w-[37px]"
-                      bamboo={false}
-                      idle={m.streaming !== true}
-                    />
-                  )}
-                  <div className={m.role === "user" ? "min-w-0 max-w-[88%] sm:max-w-[85%]" : "min-w-0 flex-1"}>
-                    {m.attachments && m.attachments.length > 0 && (
-                      <div className="mb-2 flex flex-wrap justify-end gap-2">
-                        {m.attachments.map((a) =>
-                          a.dataUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              key={a.id}
-                              src={a.dataUrl}
-                              alt={a.name}
-                              className="max-h-40 max-w-full rounded-xl border border-[var(--line)] object-cover sm:max-h-48"
-                            />
-                          ) : (
-                            <span
-                              key={a.id}
-                              className="flex max-w-full items-center gap-1.5 rounded-lg bg-[var(--surface-2)] px-2.5 py-1.5 text-[13px] text-[var(--text-dim)] md:text-xs"
-                            >
-                              <FileIcon className="h-3.5 w-3.5" />
-                              {a.name}
-                            </span>
-                          ),
-                        )}
-                      </div>
-                    )}
+      </div>
 
-                    {/* An error no longer hides the text. A reply that broke
-                        mid-stream keeps everything that arrived and gets a
-                        notice underneath; only a turn that failed before
-                        saying anything is shown as a bare error box, because
-                        there it is genuinely all there is. */}
-                    {m.error && !showsText(m) ? (
-                      <div className="rounded-2xl border border-[var(--danger)] bg-[var(--danger-soft)] px-4 py-3 text-sm text-[var(--danger)]">
-                        {m.error}
-                      </div>
-                    ) : showsText(m) ? (
-                      <div
-                        className={
-                          // --chat-text is the Appearance text-size setting.
-                          // It was declared in globals.css and never consumed,
-                          // so the small/large choice did nothing to the one
-                          // surface it names; the weight pass is the moment to
-                          // hook it up rather than hard-code 15px again.
-                          m.role === "user"
-                            ? "rounded-3xl bg-[var(--bubble-user)] px-4 py-2.5 text-[length:var(--chat-text)] leading-relaxed text-[var(--text)]"
-                            : "text-[length:var(--chat-text)] text-[var(--text)]"
-                        }
-                      >
-                        <MessageText content={m.content} streaming={m.streaming} />
-                        {/* Copy sits on every finished reply, not just the
-                            newest: the answer a student wants in their notes is
-                            usually a few turns back by the time they decide to
-                            keep it. Never while streaming — half a reply
-                            copied silently is worse than no button. */}
-                        {/* Citations as their own block, below the prose —
-                            never woven into the sentence, which is why the
-                            route sends them as data in the first place. */}
-                        {m.role === "assistant" && sources[m.id] && <Sources items={sources[m.id]} />}
-                        {/* The cut-short notice. Quiet rather than alarming:
-                            what is above it is a real, usable piece of an
-                            answer, and a red box over the top would tell the
-                            student to distrust text that is perfectly good as
-                            far as it goes. "Continue" is the way forward that
-                            matters — the text is already in history, so Panda
-                            can pick the sentence back up instead of making the
-                            student retype the question and read it all again.
-                            A silent auto-retry was rejected: the chain does not
-                            replay words already read, so it would land the
-                            student in the middle of a second, different
-                            explanation with no idea why. */}
-                        {isCutShort(m) && (
-                          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-dim)]">
-                            <span className="min-w-0 flex-1">{m.error}</span>
-                            <button
-                              onClick={() => void send(CONTINUE_PROMPT)}
-                              disabled={loading}
-                              className="tap inline-flex shrink-0 items-center rounded-full border border-[var(--line-strong)] px-3.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-[var(--surface)] disabled:opacity-50 md:text-xs"
-                            >
-                              {t("action.continue")}
-                            </button>
-                          </div>
-                        )}
-                        {m.role === "assistant" && !m.streaming && <CopyButton content={m.content} />}
-                        {m.role === "assistant" && !m.streaming && m.id === lastAssistantId && (
-                          <MessageActions
-                            replyLocale={replyLocale}
-                            showTranslate={replyLocale !== "en"}
-                            showHint={messages.length > 1}
-                            disabled={loading}
-                            followUps={followUps}
-                            // Derived chips carry their own prompt and are not
-                            // MessageActions, so they deliberately bypass the
-                            // insights `record` above: we know the student
-                            // asked about a formula, which is curiosity, not
-                            // the struggle signal that path is scored for.
-                            onFollowUp={(f: FollowUp) => void send(f.prompt)}
-                            onAction={(action: MessageAction) => {
-                              if (NEUTRAL_ACTIONS.includes(action)) {
-                                useInsightsStore.getState().record(
-                                  signalFromAction(action, {
-                                    topic: GENERAL_TOPIC,
-                                    sessionId: activeThread?.id,
-                                  }),
-                                );
-                              }
-                              void send(actionPrompt(action, findLocale(replyLocale)?.englishName ?? "English"), {
-                                simplify: action === "simplify" || action === "different",
-                              });
-                            }}
-                          />
-                        )}
-                      </div>
-                    ) : null}
-
-                    {/* Copy under the student's own message too. Asking the
-                        same question a different way means retyping it, and a
-                        long prompt retyped from memory comes back shorter and
-                        vaguer — which is usually why the second answer is
-                        worse than the first. Not shown on an errored turn:
-                        there is nothing there to copy. */}
-                    {m.role === "user" && m.content && !m.error && (
-                      <CopyButton content={m.content} variant="own" />
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              {(loading || streaming || activity) && (
-                <div className="flex flex-wrap items-center gap-3">
-                  {/* Replaces the three bouncing dots. The dots were the same
-                      shape whether Panda was composing a sentence or waiting
-                      on a web search, which is what made the wait feel like a
-                      hang. */}
-                  <Activity state={activity} />
-                  <button
-                    onClick={stop}
-                    className="tap inline-flex items-center rounded-full border border-[var(--line-strong)] px-4 py-1.5 text-sm text-[var(--text-dim)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)] sm:px-3 md:text-xs"
-                  >
-                    {t("chat.stop")}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* The dock. `pb` carries the home-indicator inset on top of its own
-              padding, because `viewportFit: cover` means the bottom of the dvh
-              box is under the indicator on a modern iPhone. */}
-          <div className="shrink-0 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4 sm:pb-5">
-            <div className="mx-auto max-w-3xl">
-              <Composer
-                value={input}
-                onChange={setInput}
-                attachments={attachments}
-                onAttachmentsChange={setAttachments}
-                onSend={() => void send()}
-                loading={loading}
-                />
-            </div>
-          </div>
-        </>
-      )}
+      <div className={landing ? "mb-auto shrink-0 px-4 pb-10" : "hidden"}>
+        {landing && (
+          <>
+            <Priorities />
+            <ChatSuggestions suggestions={suggestions} onPick={(text) => send(text)} />
+          </>
+        )}
+      </div>
     </div>
   );
 }

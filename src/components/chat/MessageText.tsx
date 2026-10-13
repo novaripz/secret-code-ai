@@ -5,6 +5,7 @@ import "katex/dist/katex.min.css";
 
 import { parseMarkdown, type Block, type Inline } from "@/lib/markdown";
 import { stripRemembered } from "./remember";
+import { CodeBlock } from "./CodeBlock";
 
 // Renders an assistant reply, including one that is still arriving.
 //
@@ -76,15 +77,22 @@ function MathRun({ tex, display, animate }: { tex: string; display: boolean; ani
 
 function InlineRun({ run, animate }: { run: Inline; animate: boolean }) {
   if (run.kind === "code") {
-    return (
-      <code className="rounded bg-[var(--surface-2)] px-1.5 py-0.5 font-mono text-[13px] text-[var(--text)]">
-        {run.text}
-      </code>
-    );
+    return <code className="inline-code">{run.text}</code>;
   }
 
   if (run.kind === "math") {
     return <MathRun tex={run.tex} display={run.display} animate={animate} />;
+  }
+
+  if (run.kind === "link") {
+    // Every link leaves the app in a new tab, and `noopener` stops the page it
+    // opens from reaching back into this one. Only http(s) and mailto ever get
+    // this far — the parser leaves anything else as plain text.
+    return (
+      <a href={run.href} target="_blank" rel="noopener noreferrer" className="chat-link">
+        {run.text}
+      </a>
+    );
   }
 
   const body = animate ? (
@@ -99,7 +107,7 @@ function InlineRun({ run, animate }: { run: Inline; animate: boolean }) {
     run.text
   );
 
-  if (run.kind === "bold") return <strong className="font-semibold">{body}</strong>;
+  if (run.kind === "bold") return <strong className="font-semibold text-[var(--text)]">{body}</strong>;
   if (run.kind === "italic") return <em className="italic">{body}</em>;
   return <>{body}</>;
 }
@@ -117,10 +125,9 @@ function Inlines({ runs, animate }: { runs: Inline[]; animate: boolean }) {
 function BlockView({ block, animate }: { block: Block; animate: boolean }) {
   switch (block.type) {
     case "h": {
-      const size =
-        block.level === 1 ? "text-xl" : block.level === 2 ? "text-lg" : "text-base";
+      const size = block.level === 1 ? "text-[1.3em]" : block.level === 2 ? "text-[1.15em]" : "text-[1.05em]";
       return (
-        <h3 className={`${size} font-semibold tracking-tight text-[var(--text)]`}>
+        <h3 className={`${size} pt-1 font-semibold tracking-tight text-[var(--text)]`}>
           <Inlines runs={block.inlines} animate={animate} />
         </h3>
       );
@@ -128,9 +135,9 @@ function BlockView({ block, animate }: { block: Block; animate: boolean }) {
 
     case "ul":
       return (
-        <ul className="list-disc space-y-1.5 break-words pl-5 leading-[1.7]">
+        <ul className="list-disc space-y-1.5 break-words ps-5 leading-[1.7] marker:text-[var(--text-faint)]">
           {block.items.map((item) => (
-            <li key={item.offset}>
+            <li key={item.offset} className="ps-0.5">
               <Inlines runs={item.inlines} animate={animate} />
             </li>
           ))}
@@ -139,9 +146,9 @@ function BlockView({ block, animate }: { block: Block; animate: boolean }) {
 
     case "ol":
       return (
-        <ol className="list-decimal space-y-1.5 break-words pl-5 leading-[1.7]">
+        <ol start={block.start} className="list-decimal space-y-1.5 break-words ps-6 leading-[1.7] marker:font-medium marker:text-[var(--text-dim)]">
           {block.items.map((item) => (
-            <li key={item.offset}>
+            <li key={item.offset} className="ps-0.5">
               <Inlines runs={item.inlines} animate={animate} />
             </li>
           ))}
@@ -149,19 +156,47 @@ function BlockView({ block, animate }: { block: Block; animate: boolean }) {
       );
 
     case "code":
-      return (
-        <pre className="scroll-x rounded-xl border border-[var(--line)] bg-[var(--surface-0)] p-3 text-[13px] leading-relaxed">
-          {block.language && (
-            <div className="mb-2 text-xs uppercase tracking-wide text-[var(--text-faint)]">
-              {block.language}
-            </div>
-          )}
-          <code className="font-mono text-[var(--text)]">{block.code}</code>
-        </pre>
-      );
+      return <CodeBlock code={block.code} language={block.language} open={block.open} />;
 
     case "math":
       return <MathRun tex={block.tex} display animate={animate} />;
+
+    case "quote":
+      return (
+        <blockquote className="whitespace-pre-wrap break-words border-s-2 border-[var(--line-strong)] ps-3.5 leading-[1.7] text-[var(--text-dim)]">
+          <Inlines runs={block.inlines} animate={animate} />
+        </blockquote>
+      );
+
+    case "table":
+      return (
+        // Its own scroller: a five-column table is wider than a phone, and the
+        // page itself must never scroll sideways.
+        <div className="scroll-x chat-table-wrap">
+          <table className="chat-table">
+            <thead>
+              <tr>
+                {block.head.map((cell, i) => (
+                  <th key={cell.offset} style={{ textAlign: block.align[i] }}>
+                    <Inlines runs={cell.inlines} animate={animate} />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {block.rows.map((row, r) => (
+                <tr key={row[0]?.offset ?? r}>
+                  {row.map((cell, i) => (
+                    <td key={cell.offset} style={{ textAlign: block.align[i] }}>
+                      <Inlines runs={cell.inlines} animate={animate} />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
 
     case "hr":
       return <hr className="border-[var(--line)]" />;
@@ -183,7 +218,7 @@ export function MessageText({ content, streaming }: { content: string; streaming
   const blocks = parseMarkdown(stripRemembered(content, streaming === true));
 
   return (
-    <div className="min-w-0 space-y-3">
+    <div className="chat-prose min-w-0 space-y-3">
       {blocks.map((block) => (
         <BlockView key={block.offset} block={block} animate={streaming === true} />
       ))}

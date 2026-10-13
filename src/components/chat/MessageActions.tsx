@@ -1,7 +1,20 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { ListChecks, Shuffle } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { findLocale } from "@/lib/i18n/locales";
+import {
+  BookIcon,
+  ChatIcon,
+  CircleCheckIcon,
+  CodeIcon,
+  HelpIcon,
+  LanguagesIcon,
+  LightbulbIcon,
+  ListIcon,
+  SigmaIcon,
+} from "@/components/icons";
 import type { FollowUp } from "./followUps";
 
 // The row of follow-ups under an assistant reply.
@@ -40,6 +53,30 @@ export type MessageAction =
 /** Four chips is a row; more is a menu nobody reads. */
 const MAX_CHIPS = 4;
 
+// Icons, not emoji. The row used to lead every chip with an emoji, and a
+// screen reader reads those out by name — "thinking face, I don't
+// understand" — on every reply. The glyphs here are decorative, so the chip
+// is announced as just its words.
+const glyph = "h-4 w-4 shrink-0 md:h-3.5 md:w-3.5";
+const ShuffleIcon = () => <Shuffle aria-hidden="true" strokeWidth={1.85} className={glyph} />;
+const QuizIcon = () => <ListChecks aria-hidden="true" strokeWidth={1.85} className={glyph} />;
+
+/** The glyph for a chip derived from the reply, by the kind of thing it names. */
+function followUpIcon(id: string): ReactNode {
+  switch (id) {
+    case "term":
+      return <BookIcon className={glyph} />;
+    case "steps":
+      return <ListIcon className={glyph} />;
+    case "code":
+      return <CodeIcon className={glyph} />;
+    case "formula":
+      return <SigmaIcon className={glyph} />;
+    default:
+      return <ChatIcon className={glyph} />;
+  }
+}
+
 export function MessageActions({
   onAction,
   onFollowUp,
@@ -48,6 +85,8 @@ export function MessageActions({
   showTranslate,
   showHint,
   disabled,
+  onQuiz,
+  tools,
 }: {
   onAction: (action: MessageAction) => void;
   /**
@@ -63,11 +102,20 @@ export function MessageActions({
   showTranslate: boolean;
   showHint: boolean;
   disabled?: boolean;
+  /**
+   * "Quiz me on this". Not a MessageAction on purpose: asking to be tested is
+   * the opposite of a struggle signal, and the insights path that scores
+   * MessageActions must never count it as one. Pinned beside "I don't
+   * understand" when given; the row stays four chips long.
+   */
+  onQuiz?: () => void;
+  /** Icon buttons drawn at the end of the same row (copy, read aloud…). */
+  tools?: ReactNode;
 }) {
   const { t } = useI18n();
   const language = findLocale(replyLocale)?.nativeName ?? replyLocale;
 
-  type Chip = { id: string; label: string; onPress: () => void };
+  type Chip = { id: string; label: string; icon: ReactNode; onPress: () => void };
 
   // Order is priority, because the tail is what gets cut at MAX_CHIPS.
   // "I don't understand" is pinned at the front and so can never be cut.
@@ -78,9 +126,11 @@ export function MessageActions({
   const pinned: Chip[] = [
     {
       id: "simplify",
-      label: `🤔 ${t("chat.dontUnderstand")}`,
+      label: t("chat.dontUnderstand"),
+      icon: <HelpIcon className={glyph} />,
       onPress: () => onAction("simplify"),
     },
+    ...(onQuiz ? [{ id: "quiz", label: t("chat.quizMe"), icon: <QuizIcon />, onPress: onQuiz }] : []),
   ];
 
   const optional: Chip[] = [
@@ -88,7 +138,8 @@ export function MessageActions({
       ? [
           {
             id: "translate",
-            label: `🌐 ${t("chat.translate", { language })}`,
+            label: t("chat.translate", { language }),
+            icon: <LanguagesIcon className={glyph} />,
             onPress: () => onAction("translate"),
           },
         ]
@@ -98,34 +149,41 @@ export function MessageActions({
     // reply used, which is the language the student just read it in.
     ...(onFollowUp ? followUps : []).map((f) => ({
       id: `derived:${f.id}`,
-      label: `💬 ${t(f.key, f.vars)}`,
+      label: t(f.key, f.vars),
+      icon: followUpIcon(f.id),
       onPress: () => onFollowUp?.(f),
     })),
-    { id: "different", label: `🧠 ${t("chat.explainDifferently")}`, onPress: () => onAction("different") },
+    { id: "different", label: t("chat.explainDifferently"), icon: <ShuffleIcon />, onPress: () => onAction("different") },
     ...(showHint
-      ? [{ id: "hint", label: `💡 ${t("chat.hint")}`, onPress: () => onAction("hint") }]
+      ? [{ id: "hint", label: t("chat.hint"), icon: <LightbulbIcon className={glyph} />, onPress: () => onAction("hint") }]
       : []),
-    { id: "check", label: `✏️ ${t("chat.checkMyWork")}`, onPress: () => onAction("check") },
+    { id: "check", label: t("chat.checkMyWork"), icon: <CircleCheckIcon className={glyph} />, onPress: () => onAction("check") },
   ];
 
   const chips = [...pinned, ...optional].slice(0, MAX_CHIPS);
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2 sm:gap-1.5">
+    // One row: the chips that move the conversation on, then the tools that
+    // act on this reply. They used to be two rows — Copy alone above, chips
+    // below — which read as two unrelated toolbars.
+    <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-1.5">
       {chips.map((a) => (
-          <button
-            key={a.id}
-            onClick={a.onPress}
-            disabled={disabled}
-            // These are the buttons a stuck student reaches for, so they are
-            // the last thing that should be fiddly. 44px tall and 14px type on
-            // a phone; the old 30px/12px read fine at desk distance and not at
-            // all at arm's length on a bus.
-            className="tap inline-flex items-center rounded-full border border-[var(--line)] px-4 py-1.5 text-sm text-[var(--text-dim)] transition-colors motion-reduce:transition-none hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-40 sm:px-3 md:text-xs"
-          >
-            {a.label}
-          </button>
-        ))}
+        <button
+          key={a.id}
+          type="button"
+          onClick={a.onPress}
+          disabled={disabled}
+          // These are the buttons a stuck student reaches for, so they are
+          // the last thing that should be fiddly. 44px tall and 14px type on
+          // a phone; the old 30px/12px read fine at desk distance and not at
+          // all at arm's length on a bus.
+          className="reply-chip tap"
+        >
+          {a.icon}
+          {a.label}
+        </button>
+      ))}
+      {tools && <div className="ms-auto flex items-center gap-0.5">{tools}</div>}
     </div>
   );
 }
