@@ -68,9 +68,9 @@ function matchesIn(text: string, pattern: RegExp, cap: number): SearchMatch[] {
         continue;
       }
       const start = m.index;
-      // A long minified line is shown from a little before the match, so the
-      // match is on screen rather than three hundred characters to the right.
-      const from = Math.max(0, start - 40);
+      // A long line is shown from just before the match, so the match is on
+      // screen in a narrow side bar rather than cut off by the ellipsis.
+      const from = Math.max(0, start - 16);
       const leading = line.slice(from).length - line.slice(from).trimStart().length;
       const preview = line.slice(from + leading, from + 200).trimEnd();
       out.push({ line: i + 1, col: start + 1, length: m[0].length, preview, previewStart: start - from - leading });

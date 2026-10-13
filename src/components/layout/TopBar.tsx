@@ -95,7 +95,9 @@ export function TopBar() {
           aria-label={t("studio.backToProjects")}
           className="tap-sq flex shrink-0 items-center gap-2 rounded-[var(--radius-sm)] px-1.5 py-1 text-[var(--text-dim)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
         >
-          <PandaMark className="h-7 w-7" />
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--surface-2)] ring-1 ring-[var(--line)]">
+            <PandaMark className="h-6 w-6" />
+          </span>
           <span className="hidden text-[13.5px] font-[var(--weight-ui)] lg:inline">{t("studio.projects")}</span>
         </Link>
         {project && (

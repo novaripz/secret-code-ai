@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { useDialog } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
-import { EmptyState, PageHeader, Skeleton } from "@/components/ui/primitives";
+import { EmptyState, Skeleton } from "@/components/ui/primitives";
 import { PandaSitting } from "@/components/Panda";
 import { useI18n, type StringKey } from "@/lib/i18n";
 import { useProfileStore } from "@/store/useProfileStore";
@@ -216,21 +216,30 @@ export default function BuildPage() {
               e.target.value = "";
             }}
           />
-          <PageHeader
-            icon={<HammerIcon />}
-            title={name ? t("build.namedProjects", { name }) : t("build.yourProjects")}
-            description={t("build.subtitle")}
-            actions={
-              <>
-                <Button variant="outline" icon={<UploadIcon />} onClick={() => importRef.current?.click()} disabled={busy}>
-                  {t("build.importZip")}
-                </Button>
-                <Button variant="primary" icon={<PlusIcon />} onClick={() => setCreating("blank")} disabled={busy}>
-                  {t("build.newProject")}
-                </Button>
-              </>
-            }
-          />
+          {/* The page header, laid out here rather than with PageHeader: two
+              buttons beside the title squeezed it into a one-word column on
+              a phone, so on a phone the buttons take a row of their own. */}
+          <header className="flex flex-col gap-4 sm:flex-row sm:items-start">
+            <div className="flex min-w-0 flex-1 items-start gap-4">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent-text)] [&>svg]:h-5 [&>svg]:w-5">
+                <HammerIcon />
+              </span>
+              <div className="min-w-0">
+                <h1 className="text-2xl tracking-tight text-[var(--text)] md:text-[26px]">
+                  {name ? t("build.namedProjects", { name }) : t("build.yourProjects")}
+                </h1>
+                <p className="mt-1 text-[15px] leading-relaxed text-[var(--text-dim)] md:text-sm">{t("build.subtitle")}</p>
+              </div>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <Button variant="outline" icon={<UploadIcon />} onClick={() => importRef.current?.click()} disabled={busy} className="flex-1 sm:flex-none">
+                {t("build.importZip")}
+              </Button>
+              <Button variant="primary" icon={<PlusIcon />} onClick={() => setCreating("blank")} disabled={busy} className="flex-1 sm:flex-none">
+                {t("build.newProject")}
+              </Button>
+            </div>
+          </header>
 
           {list.length > 0 && (
             <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -249,7 +258,7 @@ export default function BuildPage() {
               </span>
               <div className="segmented" role="radiogroup" aria-label={t("build.sortLabel")}>
                 {(["recent", "name"] as Sort[]).map((key) => (
-                  <button key={key} type="button" role="radio" aria-checked={sort === key} data-active={sort === key || undefined} onClick={() => setSort(key)}>
+                  <button key={key} type="button" role="radio" aria-checked={sort === key} data-active={sort === key || undefined} onClick={() => setSort(key)} className="tap-pad">
                     {t(key === "recent" ? "build.sortRecent" : "build.sortName")}
                   </button>
                 ))}
@@ -365,7 +374,9 @@ function FirstProject({ onPick }: { onPick: (templateId: string) => void }) {
   return (
     <div className="card overflow-hidden">
       <div className="flex flex-col items-center gap-2 px-6 pb-8 pt-10 text-center">
-        <PandaSitting className="h-28 w-28" />
+        <span className="flex h-32 w-32 items-center justify-center rounded-full bg-[var(--accent-soft)]">
+          <PandaSitting className="h-28 w-28" />
+        </span>
         <h2 className="mt-2 text-[22px] tracking-tight text-[var(--text)]">{t("build.emptyTitle")}</h2>
         <p className="max-w-md text-[15px] leading-relaxed text-[var(--text-dim)]">{t("build.emptyBody")}</p>
         <Button variant="primary" size="lg" icon={<PlusIcon />} className="mt-3" onClick={() => onPick("blank")}>

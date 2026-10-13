@@ -325,7 +325,7 @@ export function BottomPanel({ onClose }: { onClose?: () => void }) {
               aria-checked={autoRun}
               onClick={() => updateSettings({ autoRun: !autoRun })}
               title={autoRun ? t("ide.autoRunOnTitle") : t("ide.autoRunOffTitle")}
-              className={`tap hidden h-7 items-center gap-1.5 rounded-full border px-2.5 text-[12px] font-[var(--weight-ui)] transition-colors @sm:inline-flex ${
+              className={`tap-pad hidden h-7 items-center gap-1.5 rounded-full border px-2.5 text-[12px] font-[var(--weight-ui)] transition-colors @sm:inline-flex ${
                 autoRun
                   ? "border-transparent bg-[var(--accent-soft)] text-[var(--accent-text)]"
                   : "border-[var(--line)] text-[var(--text-faint)] hover:text-[var(--text)]"
@@ -347,7 +347,7 @@ export function BottomPanel({ onClose }: { onClose?: () => void }) {
           </>
         }
       >
-        <div role="tablist" aria-label={t("studio.preview")} className="segmented min-w-0 flex-1 !inline-flex max-w-max !p-[2px]">
+        <div role="tablist" aria-label={t("studio.preview")} className="segmented shrink-0 !p-[2px]">
           {TABS.map((item) => (
             <button
               key={item.key}
@@ -356,7 +356,7 @@ export function BottomPanel({ onClose }: { onClose?: () => void }) {
               aria-selected={tab === item.key}
               onClick={() => setTab(item.key)}
               title={item.label}
-              className="!h-7 !px-2.5 !text-[12.5px]"
+              className="tap-pad !h-7 !px-2.5 !text-[12.5px]"
             >
               {item.icon}
               <span className="hidden @md:inline">{item.label}</span>
@@ -499,7 +499,7 @@ function AddressBar({
         )}
         {pages.length > 1 && <ChevronRightIcon aria-hidden className="h-3.5 w-3.5 rotate-90 text-[var(--text-faint)]" />}
       </label>
-      <div className="segmented ml-1 hidden !p-[2px] @xs:inline-flex" role="radiogroup" aria-label={t("ide.deviceLabel")}>
+      <div className="segmented ml-1 hidden !p-[2px] @md:inline-flex" role="radiogroup" aria-label={t("ide.deviceLabel")}>
         {DEVICES.map(({ key, Icon }) => (
           <button
             key={key}
@@ -510,7 +510,7 @@ function AddressBar({
             onClick={() => onDevice(key)}
             title={`${deviceLabel[key]}${DEVICE_WIDTH[key] ? ` · ${DEVICE_WIDTH[key]}px` : ""}`}
             aria-label={deviceLabel[key]}
-            className="!h-6 !px-2"
+            className="tap-pad !h-6 !px-2"
           >
             <Icon />
           </button>

@@ -89,7 +89,9 @@ function WorkspaceSkeleton({ label }: { label: string }) {
   return (
     <div className="flex h-dvh flex-col bg-[var(--bg)]" aria-busy="true" aria-label={label}>
       <div className="flex h-12 shrink-0 items-center gap-3 border-b border-[var(--line)] bg-[var(--surface-0)] px-3">
-        <PandaMark className="h-7 w-7 opacity-80" />
+        <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--surface-2)] ring-1 ring-[var(--line)]">
+          <PandaMark className="h-6 w-6" />
+        </span>
         <Skeleton className="h-4 w-40" />
         <span className="flex-1" />
         <Skeleton className="hidden h-8 w-72 md:block" />

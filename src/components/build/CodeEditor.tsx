@@ -462,15 +462,21 @@ export function CodeEditor({ phone = false }: { phone?: boolean }) {
               onMount={(editor, monaco) => {
                 editorRef.current = editor;
                 registerActions(editor, monaco);
-                // The status bar's "Ln 12, Col 4".
-                editor.onDidChangeCursorSelection((e) => {
+                // The status bar's "Ln 12, Col 4" — on every move, and again
+                // when the editor switches files, which restores a cursor
+                // without announcing it as a move.
+                const reportCursor = () => {
                   const model = editor.getModel();
+                  const selection = editor.getSelection();
+                  if (!selection) return;
                   useCursor.getState().set({
-                    line: e.selection.positionLineNumber,
-                    col: e.selection.positionColumn,
-                    selected: model && !e.selection.isEmpty() ? model.getValueLengthInRange(e.selection) : 0,
+                    line: selection.positionLineNumber,
+                    col: selection.positionColumn,
+                    selected: model && !selection.isEmpty() ? model.getValueLengthInRange(selection) : 0,
                   });
-                });
+                };
+                editor.onDidChangeCursorSelection(reportCursor);
+                editor.onDidChangeModel(() => requestAnimationFrame(reportCursor));
                 setMonacoReady(true);
               }}
             />

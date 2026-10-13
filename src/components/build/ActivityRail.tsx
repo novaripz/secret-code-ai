@@ -124,7 +124,7 @@ const PHONE_MAIN: { pane: PhonePane; label: string; Icon: React.ReactNode }[] = 
   { pane: "files", label: "Files", Icon: <FilesIcon /> },
   { pane: "editor", label: "Code", Icon: <CodeIcon /> },
   { pane: "preview", label: "Preview", Icon: <MonitorIcon /> },
-  { pane: "chat", label: "Panda", Icon: <PandaMark className="h-5 w-5" /> },
+  { pane: "chat", label: "Panda", Icon: <PandaMark className="h-5 w-5 rounded-full ring-1 ring-[var(--line-strong)]" /> },
 ];
 
 const PHONE_MORE: { pane: PhonePane; label: string; Icon: React.ReactNode }[] = [

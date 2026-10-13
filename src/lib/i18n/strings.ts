@@ -572,6 +572,8 @@ export const en = {
   "ide.whileRunning": "While running",
   "ide.askFix": "Ask Panda",
   "ide.askFixTitle": "Ask Panda to explain and fix this",
+  "ide.composerPlaceholder": "What should we make?",
+  "ide.composerPlaceholderShort": "Ask Panda\u2026",
 
   // Build: the file tree
   "explorer.title": "Files",

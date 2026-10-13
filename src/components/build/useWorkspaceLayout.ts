@@ -87,7 +87,7 @@ type Persisted = Pick<LayoutState, "sidebarWidth" | "chatWidth" | "changesWidth"
 
 const DEFAULTS: Persisted = {
   sidebarWidth: 248,
-  chatWidth: 380,
+  chatWidth: 400,
   changesWidth: 460,
   editorRatio: 0.6,
   side: "files",

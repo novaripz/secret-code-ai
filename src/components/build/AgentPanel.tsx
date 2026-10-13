@@ -26,6 +26,7 @@ import { studentSafeMessage } from "@/lib/ai/turn";
 import { PaneHeader } from "./Pane";
 import { WORKSPACE_EVENTS } from "./events";
 import { ago, useNow } from "./useNow";
+import { useIsPhone } from "./useIsPhone";
 
 // The agent panel: the workspace's own chat, and deliberately not the general
 // one in components/chat. That panel is a conversation; this one is a build
@@ -167,6 +168,7 @@ export function AgentPanel({ onClose }: { onClose?: () => void }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const now = useNow();
+  const phone = useIsPhone();
   const projectId = project?.id;
 
   // A new project gets its own chat and log — and whatever was running for the
@@ -469,7 +471,7 @@ export function AgentPanel({ onClose }: { onClose?: () => void }) {
         }
       >
         <h2 className="flex min-w-0 flex-1 items-center gap-2">
-          <PandaMark className="h-5 w-5 shrink-0" />
+          <PandaMark className="h-6 w-6 shrink-0 rounded-full bg-[var(--surface-2)] p-0.5 ring-1 ring-[var(--line)]" />
           <span className="truncate text-[13.5px] font-[var(--weight-strong)] text-[var(--text)]">Panda</span>
           {changed > 0 && (
             <span className="badge badge-success !h-5 shrink-0 tabular-nums">
@@ -486,7 +488,9 @@ export function AgentPanel({ onClose }: { onClose?: () => void }) {
           {messages.length === 0 && !loading && (
             <div className="space-y-4 pt-2">
               <div className="flex flex-col items-center text-center">
-                <PandaSitting className="h-24 w-24" bamboo />
+                <span className="flex h-28 w-28 items-center justify-center rounded-full bg-[var(--accent-soft)]">
+                  <PandaSitting className="h-24 w-24" bamboo />
+                </span>
                 <p className="mt-2 max-w-xs text-[14px] leading-relaxed text-[var(--text-dim)]">
                   {name ? t("studio.emptyGreeting", { name }) : t("studio.emptyGreetingNoName")}
                 </p>
@@ -523,7 +527,7 @@ export function AgentPanel({ onClose }: { onClose?: () => void }) {
             }
             return (
               <div key={m.id} className="flex gap-2.5">
-                <PandaMark className="mt-0.5 h-6 w-6 shrink-0" />
+                <PandaMark className="mt-0.5 h-7 w-7 shrink-0 rounded-full bg-[var(--surface-2)] p-0.5 ring-1 ring-[var(--line)]" />
                 <div className="min-w-0 flex-1 text-[14px] text-[var(--text)]">
                   {m.error ? (
                     <div className="rounded-[var(--radius)] border border-[color-mix(in_srgb,var(--danger)_35%,transparent)] bg-[var(--danger-soft)] px-3 py-2.5 text-[13px] text-[var(--danger)]">
@@ -595,7 +599,9 @@ export function AgentPanel({ onClose }: { onClose?: () => void }) {
           onSend={() => void send()}
           loading={loading}
           disabled={!project}
-          placeholder={t(project ? "studio.placeholder" : "studio.placeholderNoProject")}
+          // Short enough to sit on one line beside the composer's three buttons
+          // in a 400px column; the longer chat placeholder wrapped and clipped.
+          placeholder={t(project ? (phone ? "ide.composerPlaceholderShort" : "ide.composerPlaceholder") : "studio.placeholderNoProject")}
           footer={<EffortPills />}
         />
       </div>

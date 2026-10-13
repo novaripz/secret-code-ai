@@ -65,7 +65,9 @@ function Thumbnail({ summary }: { summary: ProjectSummary }) {
           .then((project) => {
             if (cancelled) return;
             const doc = project ? buildPreviewDocument(project) : null;
-            setHtml(doc?.entryFound ? doc.html : null);
+            // The scripts are taken out as well as forbidden: a sandbox with
+            // no permissions refuses them anyway, but logs an error for each.
+            setHtml(doc?.entryFound ? doc.html.replace(/<script\b[\s\S]*?<\/script\s*>/gi, "") : null);
           })
           .catch(() => !cancelled && setHtml(null));
       },

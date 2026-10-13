@@ -62,9 +62,10 @@ export function EffortPills({ className = "" }: { className?: string }) {
               aria-checked={on}
               onClick={() => setModes({ buildEffort: level })}
               title={t(NOTES[level])}
-              // `tap` for the 44px floor: five chips sharing one row is the
-              // easiest thing on this panel to hit by accident.
-              className={`tap inline-flex items-center rounded-full px-3 py-1 text-[13px] transition-colors motion-reduce:transition-none sm:px-2.5 sm:text-[11px] ${
+              // `tap-pad` for the 44px floor: an invisible pad catches the
+              // thumb without drawing five 44px ovals, which wrapped the row
+              // onto two lines on a phone.
+              className={`tap-pad inline-flex items-center rounded-full px-2.5 py-1 text-[12.5px] transition-colors motion-reduce:transition-none sm:text-[11px] ${
                 on
                   ? "bg-[var(--accent-soft)] font-medium text-[var(--accent-text)]"
                   : "text-[var(--text-faint)] hover:bg-[var(--surface-2)] hover:text-[var(--text-dim)]"

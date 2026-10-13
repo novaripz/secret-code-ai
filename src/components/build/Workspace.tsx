@@ -1,7 +1,7 @@
 "use client";
 
 import "@/styles/ide.css";
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushPendingSave, useStudioStore } from "@/store/useStudioStore";
 import { useVersionStore } from "@/store/useVersionStore";
 import { isDarkTheme, useProfileStore } from "@/store/useProfileStore";
@@ -51,6 +51,7 @@ import { ActivityRail, PhoneNav } from "./ActivityRail";
 import { StatusBar } from "./StatusBar";
 import { EditorSettingsSheet, ShortcutsSheet } from "./WorkspaceSheets";
 import { useFileActions } from "./useFileActions";
+import { useIsPhone } from "./useIsPhone";
 import { ASK_EVENT, prefillComposer, type AskDetail } from "./askPanda";
 import { FONT_SIZES, useEditorSettings } from "./useEditorSettings";
 import { WORKSPACE_EVENTS, emit, isTyping, modKey } from "./events";
@@ -72,19 +73,6 @@ import {
 // any of them back, and the wiring between them. Everything that remembers a
 // size or an open/closed state lives in useWorkspaceLayout; everything that
 // remembers code lives in the studio and version stores.
-
-const PHONE_QUERY = "(max-width: 767px)";
-
-function subscribePhone(onChange: () => void) {
-  const query = window.matchMedia(PHONE_QUERY);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-}
-
-/** Phone or not, live. The workspace only ever renders in the browser, so there is no server answer to disagree with. */
-function useIsPhone(): boolean {
-  return useSyncExternalStore(subscribePhone, () => window.matchMedia(PHONE_QUERY).matches, () => false);
-}
 
 const RAIL_WIDTH = 48;
 const HANDLE_WIDTH = 6;
