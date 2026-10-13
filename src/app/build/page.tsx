@@ -82,6 +82,7 @@ export default function BuildPage() {
   const [creating, setCreating] = useState<string | null>(null);
   const [now, setNow] = useState(0);
   const importRef = useRef<HTMLInputElement>(null);
+  const creatingRef = useRef(false);
 
   const load = useCallback(() => {
     listProjects()
@@ -112,12 +113,18 @@ export default function BuildPage() {
   };
 
   async function create(templateId: string, name: string) {
+    // A ref, not the `busy` state: a double-click on a template card calls
+    // this twice in the same tick, before React has re-rendered with busy set,
+    // and the student got two identical projects.
+    if (creatingRef.current) return;
+    creatingRef.current = true;
     setBusy(true);
     try {
       const project = projectFromTemplate(templateId, name);
       await saveProject(project);
       router.push(`/project/${project.id}`);
     } catch (err) {
+      creatingRef.current = false;
       setBusy(false);
       await dialog.alert({ title: t("studio.didntWork"), description: err instanceof Error ? err.message : String(err) });
     }
