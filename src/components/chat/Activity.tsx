@@ -15,22 +15,20 @@
 // feel shorter. A status line that guesses is worse than none, because the
 // student learns to stop believing it.
 //
-// And it is announced rather than merely drawn: `role="status"` with
-// aria-live="polite" means a screen reader hears "Searching the web for
-// photosynthesis" at the moment it becomes true, and waits its turn instead of
-// interrupting. The dot is decorative and is hidden from that announcement.
+// And it is announced rather than merely drawn: a polite live region means a
+// screen reader hears "Searching the web for photosynthesis" at the moment it
+// becomes true, and waits its turn instead of interrupting.
 
 import { useI18n } from "@/lib/i18n";
-import type { Phase, Source } from "./frames";
+import type { ActivityState } from "@/store/useAssistantStore";
+import type { Source } from "./frames";
 
-/** The live state, or null when there is nothing being done. */
-export interface ActivityState {
-  phase: Phase;
-  query?: string;
-  count?: number;
-  reason?: string;
-}
+export type { ActivityState } from "@/store/useAssistantStore";
 
+/**
+ * The status line as drawn. Hidden from assistive tech, because the sentence
+ * is announced by `ActivityAnnouncer` instead — see there for why.
+ */
 export function Activity({ state }: { state: ActivityState | null }) {
   const { t } = useI18n();
   if (!state) return null;
@@ -38,17 +36,11 @@ export function Activity({ state }: { state: ActivityState | null }) {
   const label = describe(state, t);
 
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      // The label is the accessible name as well as the visible text, so a
-      // screen reader hears one sentence rather than the sentence twice.
-      className="flex items-start gap-2.5 text-[13px] font-medium leading-5 text-[var(--text-dim)]"
-    >
+    <div aria-hidden="true" className="flex items-start gap-2.5 text-[13.5px] font-medium leading-5 text-[var(--text-dim)]">
       {/* Top-aligned rather than centred: a long query wraps to two or three
           lines on a phone, and a dot floating beside the middle of that block
           reads as unrelated to the sentence it belongs to. */}
-      <span aria-hidden="true" className="activity-dot mt-1.5 h-2 w-2 shrink-0 rounded-full bg-current" />
+      <span className="activity-dot mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--accent-text)]" />
       <span className="min-w-0">
         {label}
         {/* The query is the most useful part of the whole indicator: seeing
@@ -56,12 +48,30 @@ export function Activity({ state }: { state: ActivityState | null }) {
             about to be relevant. Quoted and dimmed so it reads as the
             student's words being used, not as Panda's prose. */}
         {state.query ? (
-          <span className="ml-1 break-words font-normal text-[var(--text-faint)]">
-            &ldquo;{state.query}&rdquo;
-          </span>
+          <span className="ml-1 break-words font-normal text-[var(--text-faint)]">&ldquo;{state.query}&rdquo;</span>
         ) : null}
       </span>
     </div>
+  );
+}
+
+/**
+ * The same sentence, for screen readers.
+ *
+ * A live region only announces CHANGES to content that was already on the
+ * page. The status line used to mount with its text already inside it, so the
+ * region and the words arrived together and most screen readers said nothing
+ * at all. This one is mounted for as long as the chat is, empty while Panda is
+ * idle, so "Searching the web for photosynthesis" is a change it hears —
+ * politely, after whatever it was reading.
+ */
+export function ActivityAnnouncer({ state }: { state: ActivityState | null }) {
+  const { t } = useI18n();
+  const text = state ? `${describe(state, t)}${state.query ? ` “${state.query}”` : ""}` : "";
+  return (
+    <p role="status" aria-live="polite" className="sr-only">
+      {text}
+    </p>
   );
 }
 
@@ -107,10 +117,8 @@ export function Sources({ items }: { items: Source[] }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="mt-4 border-t border-[var(--line)] pt-3">
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">
-        {t("chat.sourcesTitle")}
-      </h3>
+    <div className="mt-4 rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface-1)] px-3.5 pb-2 pt-3">
+      <h3 className="eyebrow mb-1.5">{t("chat.sourcesTitle")}</h3>
       <ul className="flex flex-col gap-0.5 sm:gap-1.5">
         {items.map((s, i) => (
           <li key={`${s.url}-${i}`}>

@@ -24,8 +24,15 @@ const MARKER = /\[\[remember:\s*([^\]]{1,200})\]\]/gi;
  * Without this the student watches "[[remem" appear and then vanish, which
  * looks like a bug and gives away the mechanism. Only matched at the end, so a
  * stray bracket mid-sentence still renders as the student typed it.
+ *
+ * It has to look like the START of the marker, letter by letter. It used to
+ * be `\[\[?r?e?m?…[^\]]*$`, which every letter optional made match any lone
+ * `[` — so a reply writing `arr = [1, 2, 3` or "see [1" hid everything after
+ * the bracket until a `]` happened to arrive. A single `[` is only held back
+ * when it is the very last character, which is the one moment it could still
+ * become `[[`.
  */
-const PARTIAL = /\[\[?r?e?m?e?m?b?e?r?:?[^\]]*$/i;
+const PARTIAL = /\[(?:\[(?:r(?:e(?:m(?:e(?:m(?:b(?:e(?:r(?::[^\]]*\]?)?)?)?)?)?)?)?)?)?)?$/i;
 
 /** The facts Panda asked to keep. Trimmed, deduped, empty ones dropped. */
 export function parseRemembered(text: string): string[] {
