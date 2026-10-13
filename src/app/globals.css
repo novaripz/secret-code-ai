@@ -1,40 +1,70 @@
 @import "tailwindcss";
 
 /* Dark-first theme. Dark is the default (no attribute needed) so a brand-new
-   visitor lands in dark mode; `data-theme="light"` on <html> opts into light. */
+   visitor lands in dark mode; `data-theme="light"` on <html> opts into light.
+
+   THE REDESIGN PALETTE
+   The old palette was pure grey with a white "accent", which made every screen
+   read as a wireframe: nothing told a student where to look. Panda now has a
+   brand colour — a friendly violet-indigo — and it carries the things that
+   matter: the primary button, the active tab, the focus ring, a link. Neutrals
+   lean very slightly cool so the violet sits on them instead of fighting them.
+
+   Every text pair was checked: --text ≥ 15:1 on --bg, --text-dim ≥ 7:1,
+   --text-faint ≥ 4.5:1 (hints only), and --accent-contrast on --accent ≥ 4.5:1
+   so a label on a primary button is always readable. --accent-text is the
+   brand colour tuned for TEXT on the page background (links, active labels),
+   which needs more contrast than a filled button does. */
 :root {
-  --bg: #0d0d0d;
-  --surface-0: #171717;
-  --surface-1: #1e1e1e;
-  --surface-2: #262626;
-  --surface-3: #333333;
-  --line: #2a2a2a;
-  --line-strong: #3d3d3d;
+  --bg: #0b0c10;
+  --surface-0: #111318;
+  --surface-1: #16181f;
+  --surface-2: #1d2029;
+  --surface-3: #282c38;
+  --line: #22252f;
+  --line-strong: #323745;
 
-  --text: #ececec;
-  --text-dim: #b4b4b4;
-  --text-faint: #8a8a8a;
+  --text: #eceef4;
+  --text-dim: #b3b8c7;
+  --text-faint: #878d9f;
 
-  --accent: #ffffff;
-  --accent-contrast: #0d0d0d;
-  --accent-soft: #2a2a2a;
-  --focus: #6b6b6b;
+  --accent: #6c5ce7;
+  --accent-hover: #7b6cf0;
+  --accent-contrast: #ffffff;
+  --accent-soft: #221f3d;
+  --accent-text: #a5a0ff;
+  --focus: #8b83ff;
 
-  --bubble-user: #2f2f2f;
+  --bubble-user: #232634;
 
   --danger: #f87171;
-  --danger-soft: #3a1f1f;
-  --success: #4ade80;
-  --success-soft: #16301f;
+  --danger-soft: #3a1f24;
+  --success: #34d399;
+  --success-soft: #0f2e25;
   --warn: #fbbf24;
-  --warn-soft: #322612;
+  --warn-soft: #33280f;
+  --info: #60a5fa;
+  --info-soft: #14243d;
 
-  /* The switch accent. Deliberately blue rather than --accent: --accent is the
-     app's monochrome ink, and an on/off control reads as "on" far faster in a
-     colour nothing else on the page is wearing. --control-knob is the ink that
-     sits ON that blue, so it is chosen per theme rather than reused. */
-  --control-on: #3b82f6;
+  /* The switch accent follows the brand: one "on" colour for the whole app. */
+  --control-on: #6c5ce7;
   --control-knob: #ffffff;
+
+  /* Elevation. Dark grounds need a hairline highlight more than a shadow, so
+     each step pairs a soft drop with a 1px inner top edge. */
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-2: 0 4px 14px -2px rgb(0 0 0 / 0.45), 0 1px 3px rgb(0 0 0 / 0.3);
+  --shadow-pop: 0 18px 50px -12px rgb(0 0 0 / 0.65), 0 2px 8px rgb(0 0 0 / 0.35);
+  --glow-accent: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+
+  /* The brand gradient: hero headings, the logo tile, the onboarding art. */
+  --brand-gradient: linear-gradient(135deg, #8b7bff 0%, #6c5ce7 45%, #22c1c3 130%);
+
+  /* One radius scale, so a card, a button and a chip read as one family. */
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
 
   --background: var(--bg);
   --foreground: var(--text);
@@ -42,23 +72,16 @@
   /* TYPE WEIGHT
      Geist is loaded as a variable font (layout.tsx asks for no specific
      weights, which is what makes next/font serve the whole 100-900 axis), so
-     every number below is a real instance the file can draw. Nothing here is
-     faux-bolded by the browser — that is the failure mode this was checked
-     for, because synthetic bold on a thin face looks worse than the thin face.
-
-     Three steps, and only three, because the app read washed out for want of
-     weight rather than for want of variety. Body sits above the browser's 400,
-     UI labels sit a step above body so a control reads as a control, and
-     strong sits above that. If everything were bold none of it would be. */
+     every number below is a real instance the file can draw. Three steps, and
+     only three: body, UI labels a step above body, and strong above that. */
   --weight-body: 450;
   --weight-ui: 550;
   --weight-strong: 650;
 }
 
 /* Dark ink on light paper renders optically heavier than light ink on dark —
-   the same numeric weight that reads crisp on the dark theme goes muddy on
-   sepia. So the light-ground themes step back by 20 rather than sharing the
-   dark numbers. */
+   so the light-ground themes step back by 20 rather than sharing the dark
+   numbers. */
 :root[data-theme="light"],
 :root[data-theme="sepia"] {
   --weight-body: 430;
@@ -68,45 +91,51 @@
 
 :root[data-theme="light"] {
   --bg: #ffffff;
-  --surface-0: #f9f9f9;
+  --surface-0: #f6f7fb;
   --surface-1: #ffffff;
-  --surface-2: #ececec;
-  --surface-3: #e0e0e0;
-  --line: #e5e5e5;
-  --line-strong: #d0d0d0;
+  --surface-2: #eef0f6;
+  --surface-3: #e1e4ee;
+  --line: #e4e7ef;
+  --line-strong: #cfd4e0;
 
-  --text: #0d0d0d;
-  --text-dim: #4d4d4d;
-  --text-faint: #8f8f8f;
+  --text: #0f1117;
+  --text-dim: #4a5163;
+  --text-faint: #666e81;
 
-  --accent: #0d0d0d;
+  --accent: #5b50f0;
+  --accent-hover: #4f44e2;
   --accent-contrast: #ffffff;
-  --accent-soft: #ececec;
-  --focus: #a0a0a0;
+  --accent-soft: #eeedfe;
+  --accent-text: #4b3fe0;
+  --focus: #6c5ce7;
 
-  --bubble-user: #ececec;
+  --bubble-user: #eef0f6;
 
-  --danger: #b42318;
-  --danger-soft: #fde8e6;
-  --success: #17803d;
-  --success-soft: #e4f6ea;
+  --danger: #c0262d;
+  --danger-soft: #fdecec;
+  --success: #0f7a52;
+  --success-soft: #e3f6ee;
   --warn: #9a6400;
   --warn-soft: #fbf0da;
+  --info: #1d5fd1;
+  --info-soft: #e7effd;
 
-  --control-on: #2563eb;
+  --control-on: #5b50f0;
   --control-knob: #ffffff;
+
+  --shadow-1: 0 1px 2px rgb(16 18 30 / 0.06);
+  --shadow-2: 0 4px 14px -4px rgb(16 18 30 / 0.12), 0 1px 3px rgb(16 18 30 / 0.06);
+  --shadow-pop: 0 18px 50px -12px rgb(16 18 30 / 0.25), 0 2px 8px rgb(16 18 30 / 0.08);
+  --brand-gradient: linear-gradient(135deg, #7b6cf6 0%, #5b50f0 45%, #0fb5b8 130%);
 }
 
 /* Beyond dark and light.
-   Each theme below restates the COMPLETE token set, not a tint of another one:
+   Each theme below restates the COMPLETE colour set, not a tint of another one:
    a partial theme leaves one palette's ink on another's paper the moment a
    token is missed, and that failure is invisible until a student hits the one
-   screen that uses it. Every pair here was checked for text-on-surface
-   contrast — --text clears 12:1 on --bg, --text-dim clears 7:1, and --text-faint
-   (hints only, never the only copy of anything) clears 4.5:1. */
+   screen that uses it. Radius, weight and elevation are shared via :root. */
 
-/* Ocean. Deep navy paper with a cold cyan edge — the dark theme for anyone who
-   finds neutral grey flat. */
+/* Ocean. Deep navy paper with a cold cyan edge. */
 :root[data-theme="ocean"] {
   --bg: #0a1220;
   --surface-0: #0f1a2c;
@@ -120,9 +149,11 @@
   --text-dim: #adbfd8;
   --text-faint: #8098b5;
 
-  --accent: #7dd3fc;
-  --accent-contrast: #06263a;
+  --accent: #0b73a3;
+  --accent-hover: #0d82b8;
+  --accent-contrast: #ffffff;
   --accent-soft: #17324b;
+  --accent-text: #7dd3fc;
   --focus: #5aa9d6;
 
   --bubble-user: #1b2b44;
@@ -133,9 +164,12 @@
   --success-soft: #10312e;
   --warn: #fcd34d;
   --warn-soft: #33280f;
+  --info: #7dd3fc;
+  --info-soft: #17324b;
 
-  --control-on: #38bdf8;
-  --control-knob: #06263a;
+  --control-on: #0b73a3;
+  --control-knob: #ffffff;
+  --brand-gradient: linear-gradient(135deg, #38bdf8 0%, #0b73a3 50%, #5eead4 130%);
 }
 
 /* Forest. Warm-dark green, lower glare than the neutral dark at night. */
@@ -152,9 +186,11 @@
   --text-dim: #b0c9b8;
   --text-faint: #86a291;
 
-  --accent: #86efac;
-  --accent-contrast: #08251a;
+  --accent: #1a7a50;
+  --accent-hover: #1d8a5a;
+  --accent-contrast: #ffffff;
   --accent-soft: #17332a;
+  --accent-text: #86efac;
   --focus: #5fae85;
 
   --bubble-user: #1b2f26;
@@ -165,9 +201,12 @@
   --success-soft: #10301f;
   --warn: #f5cf7a;
   --warn-soft: #31280f;
+  --info: #93c5fd;
+  --info-soft: #172a3a;
 
-  --control-on: #4f9cf9;
-  --control-knob: #06203a;
+  --control-on: #1a7a50;
+  --control-knob: #ffffff;
+  --brand-gradient: linear-gradient(135deg, #86efac 0%, #1a7a50 50%, #0e7490 130%);
 }
 
 /* Sepia. A light theme that is not a lightbulb — warm paper, brown-black ink,
@@ -183,11 +222,13 @@
 
   --text: #2b251b;
   --text-dim: #564c3a;
-  --text-faint: #746851;
+  --text-faint: #6f6450;
 
-  --accent: #2b251b;
-  --accent-contrast: #fdf8ee;
-  --accent-soft: #e7dac3;
+  --accent: #9a4f1c;
+  --accent-hover: #87441a;
+  --accent-contrast: #fffaf1;
+  --accent-soft: #f0dcc4;
+  --accent-text: #8a4416;
   --focus: #9a7f4f;
 
   --bubble-user: #e7dac3;
@@ -198,9 +239,16 @@
   --success-soft: #e1eedf;
   --warn: #8a5c07;
   --warn-soft: #f3e6c9;
+  --info: #1d5fbf;
+  --info-soft: #e3e9f3;
 
-  --control-on: #1d5fbf;
+  --control-on: #9a4f1c;
   --control-knob: #ffffff;
+
+  --shadow-1: 0 1px 2px rgb(60 40 10 / 0.08);
+  --shadow-2: 0 4px 14px -4px rgb(60 40 10 / 0.16), 0 1px 3px rgb(60 40 10 / 0.08);
+  --shadow-pop: 0 18px 50px -12px rgb(60 40 10 / 0.3), 0 2px 8px rgb(60 40 10 / 0.1);
+  --brand-gradient: linear-gradient(135deg, #c2763a 0%, #9a4f1c 55%, #5c3a1a 130%);
 }
 
 @theme inline {
@@ -208,6 +256,318 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* The theme tokens as Tailwind colours, so new code can write
+     `bg-surface-2 text-ink-dim border-line` instead of `bg-[var(--surface-2)]`.
+     Both spellings resolve to the same variable, so they mix freely. */
+  --color-bg: var(--bg);
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--text);
+  --color-ink-dim: var(--text-dim);
+  --color-ink-faint: var(--text-faint);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --radius-ui-sm: var(--radius-sm);
+  --radius-ui: var(--radius);
+  --radius-ui-lg: var(--radius-lg);
+  --radius-ui-xl: var(--radius-xl);
+
+  --shadow-ui-1: var(--shadow-1);
+  --shadow-ui-2: var(--shadow-2);
+  --shadow-ui-pop: var(--shadow-pop);
+}
+
+/* ---------------------------------------------------------------------------
+   THE COMPONENT LAYER
+   ---------------------------------------------------------------------------
+   One definition of a button, a card, an input and a chip, used by the React
+   primitives in components/ui/ and available as plain classes anywhere. Before
+   the redesign every screen spelled its own button out of a dozen utilities,
+   and no two of them agreed on a height, a radius or a hover. These live in
+   `@layer components`, so a utility on the same element still wins — a call
+   site can always say `btn btn-primary w-full` and get its way. */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.5rem;
+    padding: 0 1rem;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    font-size: 14px;
+    font-weight: var(--weight-ui);
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease,
+      box-shadow 140ms ease, transform 80ms ease, opacity 140ms ease;
+  }
+  .btn:active:not(:disabled) { transform: translateY(0.5px) scale(0.985); }
+  .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+  .btn svg { width: 1.05em; height: 1.05em; flex-shrink: 0; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    box-shadow: var(--shadow-1), inset 0 1px 0 rgb(255 255 255 / 0.12);
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+  .btn-secondary {
+    background: var(--surface-2);
+    color: var(--text);
+    border-color: var(--line);
+  }
+  .btn-secondary:hover:not(:disabled) { background: var(--surface-3); border-color: var(--line-strong); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+  .btn-outline:hover:not(:disabled) { background: var(--surface-2); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-dim);
+  }
+  .btn-ghost:hover:not(:disabled) { background: var(--surface-2); color: var(--text); }
+
+  .btn-danger {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-color: color-mix(in srgb, var(--danger) 25%, transparent);
+  }
+  .btn-danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 18%, var(--danger-soft)); }
+
+  .btn-sm { height: 2rem; padding: 0 0.75rem; font-size: 13px; border-radius: var(--radius-sm); gap: 0.375rem; }
+  .btn-lg { height: 2.875rem; padding: 0 1.25rem; font-size: 15px; border-radius: var(--radius); }
+  .btn-pill { border-radius: 999px; }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.25rem;
+    width: 2.25rem;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    color: var(--text-faint);
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 140ms ease, color 140ms ease;
+  }
+  .icon-btn:hover:not(:disabled) { background: var(--surface-2); color: var(--text); }
+  .icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .icon-btn[aria-pressed="true"], .icon-btn[data-active] { background: var(--accent-soft); color: var(--accent-text); }
+  .icon-btn svg { width: 1.125rem; height: 1.125rem; }
+  .icon-btn-sm { height: 1.75rem; width: 1.75rem; border-radius: 6px; }
+  .icon-btn-sm svg { width: 0.95rem; height: 0.95rem; }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+  }
+  .card-interactive {
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background-color 160ms ease;
+  }
+  .card-interactive:hover {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-2);
+    transform: translateY(-1px);
+  }
+
+  .input {
+    width: 100%;
+    height: 2.5rem;
+    padding: 0 0.875rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line-strong);
+    background: var(--surface-0);
+    color: var(--text);
+    font-size: 14px;
+    transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+  }
+  textarea.input { height: auto; padding: 0.625rem 0.875rem; line-height: 1.5; }
+  .input::placeholder { color: var(--text-faint); }
+  .input:hover { border-color: color-mix(in srgb, var(--text-faint) 55%, var(--line-strong)); }
+  .input:focus, .input:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--glow-accent);
+    background: var(--surface-1);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 2rem;
+    padding: 0 0.875rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: var(--weight-ui);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+  }
+  .chip:hover { background: var(--surface-3); }
+  .chip svg { width: 0.95rem; height: 0.95rem; }
+  .chip[aria-pressed="true"], .chip[aria-selected="true"], .chip[data-active] {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    height: 1.375rem;
+    padding: 0 0.5rem;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: var(--weight-ui);
+    background: var(--surface-2);
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .badge svg { width: 0.8rem; height: 0.8rem; }
+  .badge-accent { background: var(--accent-soft); color: var(--accent-text); }
+  .badge-success { background: var(--success-soft); color: var(--success); }
+  .badge-warn { background: var(--warn-soft); color: var(--warn); }
+  .badge-danger { background: var(--danger-soft); color: var(--danger); }
+  .badge-info { background: var(--info-soft); color: var(--info); }
+
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    padding: 0 0.35rem;
+    border-radius: 6px;
+    border: 1px solid var(--line-strong);
+    border-bottom-width: 2px;
+    background: var(--surface-2);
+    color: var(--text-dim);
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .segmented {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+  }
+  .segmented > button, .segmented > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 1.875rem;
+    padding: 0 0.75rem;
+    border-radius: calc(var(--radius) - 4px);
+    font-size: 13px;
+    color: var(--text-dim);
+    transition: background-color 140ms ease, color 140ms ease;
+  }
+  .segmented > button:hover, .segmented > a:hover { color: var(--text); }
+  .segmented > [aria-selected="true"], .segmented > [aria-pressed="true"], .segmented > [aria-current="page"], .segmented > [data-active] {
+    background: var(--surface-1);
+    color: var(--text);
+    box-shadow: var(--shadow-1);
+  }
+  .segmented svg { width: 0.95rem; height: 0.95rem; }
+
+  .menu {
+    min-width: 12rem;
+    padding: 0.3rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-pop);
+  }
+  .menu-item {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+  }
+  .menu-item:hover, .menu-item[data-active] { background: var(--surface-2); }
+  .menu-item svg { width: 1rem; height: 1rem; color: var(--text-faint); flex-shrink: 0; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: var(--weight-strong);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .gradient-text {
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .skeleton {
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* The phone floor applies to the shared controls too: a .btn on a phone is a
+   thumb target first. */
+@media (max-width: 767px) {
+  .btn:not(.btn-sm) { min-height: 44px; }
+  .icon-btn:not(.icon-btn-sm) { min-height: 44px; min-width: 44px; }
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 body {
@@ -467,11 +827,11 @@ code, kbd, samp {
    cannot read the live tokens — every other theme's variables are simply not in
    scope. These per-swatch values are the one honest place to restate them: they
    live next to the themes above, so a palette and its swatch change together. */
-.theme-swatch[data-swatch="dark"]   { --sw-bg: #0d0d0d; --sw-surface: #262626; --sw-text: #ececec; --sw-accent: #3b82f6; }
-.theme-swatch[data-swatch="light"]  { --sw-bg: #ffffff; --sw-surface: #ececec; --sw-text: #0d0d0d; --sw-accent: #2563eb; }
-.theme-swatch[data-swatch="ocean"]  { --sw-bg: #0a1220; --sw-surface: #1b2b44; --sw-text: #e8eefa; --sw-accent: #38bdf8; }
-.theme-swatch[data-swatch="forest"] { --sw-bg: #0b1310; --sw-surface: #1b2f26; --sw-text: #e7f1e9; --sw-accent: #86efac; }
-.theme-swatch[data-swatch="sepia"]  { --sw-bg: #f4ecdd; --sw-surface: #e7dac3; --sw-text: #2b251b; --sw-accent: #1d5fbf; }
+.theme-swatch[data-swatch="dark"]   { --sw-bg: #0b0c10; --sw-surface: #1d2029; --sw-text: #eceef4; --sw-accent: #6c5ce7; }
+.theme-swatch[data-swatch="light"]  { --sw-bg: #ffffff; --sw-surface: #eef0f6; --sw-text: #0f1117; --sw-accent: #5b50f0; }
+.theme-swatch[data-swatch="ocean"]  { --sw-bg: #0a1220; --sw-surface: #1b2b44; --sw-text: #e8eefa; --sw-accent: #0b73a3; }
+.theme-swatch[data-swatch="forest"] { --sw-bg: #0b1310; --sw-surface: #1b2f26; --sw-text: #e7f1e9; --sw-accent: #1a7a50; }
+.theme-swatch[data-swatch="sepia"]  { --sw-bg: #f4ecdd; --sw-surface: #e7dac3; --sw-text: #2b251b; --sw-accent: #9a4f1c; }
 
 /* The switch. Written here rather than as utilities because the knob has to
    move on the SAME transition in both directions — the usual bug is a class

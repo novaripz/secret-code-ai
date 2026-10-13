@@ -46,3 +46,6 @@ design/pandai-app-flow.html
 # .env.example carries no values, only the names and setup notes, and is the
 # only place the setup is written down.
 !.env.example
+
+# Overhaul scratch (audit notes for agents)
+.overhaul/

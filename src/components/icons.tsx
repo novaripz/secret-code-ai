@@ -1,294 +1,322 @@
-// Tiny inline icon set (no external icon package dependency).
-import type { SVGProps } from "react";
+// The app's icon set.
+//
+// Every glyph comes from Lucide (https://lucide.dev), an open-source icon
+// family under the ISC license — free to use, modify and redistribute, which
+// is what lets this app be handed to a whole school without anyone checking a
+// licence first. Nothing here is hand-drawn any more: a hand-made set drifts
+// (stroke widths, corner radii, optical size) one icon at a time, and students
+// read that drift as "this app is unfinished".
+//
+// The exports keep the names the app already used, so a call site never needs
+// to know which library is underneath. Add new icons the same way: pick one at
+// lucide.dev, import it, and wrap it below.
+import type { ComponentType, SVGProps } from "react";
+import {
+  AlarmClock,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  Award,
+  Bookmark,
+  BookOpen,
+  Bot,
+  Brain,
+  Braces,
+  Bug,
+  Calculator,
+  Calendar,
+  CalendarCheck,
+  CalendarDays,
+  Camera,
+  Captions,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  CircleAlert,
+  CircleCheck,
+  CircleHelp,
+  Clapperboard,
+  ClipboardList,
+  Clock,
+  Code,
+  Columns2,
+  Command,
+  Copy,
+  CopyPlus,
+  Diff,
+  Download,
+  Ellipsis,
+  EllipsisVertical,
+  Expand,
+  ExternalLink,
+  Eye,
+  File,
+  FileCode,
+  FileDown,
+  FileJson,
+  FilePlus,
+  Files,
+  FileText,
+  FileType,
+  Film,
+  Filter,
+  Flame,
+  FlaskConical,
+  Folder,
+  FolderOpen,
+  FolderPlus,
+  Gamepad2,
+  Globe,
+  GraduationCap,
+  GripVertical,
+  Hammer,
+  Heart,
+  History,
+  House,
+  Image,
+  Info,
+  Keyboard,
+  Landmark,
+  Languages,
+  LayoutGrid,
+  LayoutTemplate,
+  Lightbulb,
+  List,
+  ListTodo,
+  ListVideo,
+  LoaderCircle,
+  Lock,
+  LogOut,
+  Map as MapGlyph,
+  Maximize2,
+  Menu,
+  MessageCircle,
+  Mic,
+  Minimize2,
+  Monitor,
+  Moon,
+  Music,
+  NotebookPen,
+  Palette,
+  PanelLeft,
+  PanelRight,
+  Paperclip,
+  Pause,
+  Pencil,
+  PictureInPicture2,
+  Pin,
+  Play,
+  Plus,
+  RectangleHorizontal,
+  RefreshCw,
+  Replace,
+  Rocket,
+  RotateCcw,
+  Save,
+  Search,
+  Settings,
+  Share2,
+  Shield,
+  ShieldCheck,
+  Shrink,
+  Sigma,
+  SkipForward,
+  SlidersHorizontal,
+  Smartphone,
+  Sparkle,
+  Sparkles,
+  Square,
+  SquareCode,
+  Star,
+  Sun,
+  Tablet,
+  Target,
+  Terminal,
+  ThumbsUp,
+  Timer,
+  Trash2,
+  TriangleAlert,
+  Trophy,
+  TvMinimalPlay,
+  Type,
+  Undo2,
+  Redo2,
+  Upload,
+  User,
+  Video,
+  Volume2,
+  WandSparkles,
+  WrapText,
+  X,
+  Zap,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
+import type { LucideProps } from "lucide-react";
 
-export function ChevronRightIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
-      <path d="M7 5l6 5-6 5V5z" />
-    </svg>
-  );
+export type IconProps = SVGProps<SVGSVGElement> & { strokeWidth?: number | string };
+export type IconComponent = (props: IconProps) => React.ReactElement;
+
+/**
+ * Wraps a Lucide glyph with the app's defaults: decorative unless told
+ * otherwise (every icon here sits next to a visible label or inside a button
+ * that carries an aria-label), and a slightly lighter stroke than Lucide's 2px,
+ * which reads cleaner at the 16–20px sizes this interface draws them at.
+ */
+function wrap(Glyph: ComponentType<LucideProps>, defaults: Partial<LucideProps> = {}): IconComponent {
+  function Icon(props: IconProps) {
+    return <Glyph aria-hidden="true" strokeWidth={1.85} {...defaults} {...(props as LucideProps)} />;
+  }
+  Icon.displayName = `Icon(${Glyph.displayName ?? "lucide"})`;
+  return Icon;
 }
-export function ChevronLeftIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
-      {/* The mirror of ChevronRightIcon above: same triangle, apex on the left. */}
-      <path d="M13 5l-6 5 6 5V5z" />
-    </svg>
-  );
-}
-export function FolderIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
-      <path d="M2 5a1 1 0 0 1 1-1h4l1.5 2H17a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z" />
-    </svg>
-  );
-}
-export function FolderOpenIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
-      <path d="M2 6a1 1 0 0 1 1-1h4l1.5 2H17a1 1 0 0 1 .96 1.28l-1.8 6A1 1 0 0 1 15.2 15H3a1 1 0 0 1-1-1V6z" />
-    </svg>
-  );
-}
-export function FileIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
-      <path d="M5 2a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7l-5-5H5zm6 1.5L14.5 7H12a1 1 0 0 1-1-1V3.5z" />
-    </svg>
-  );
-}
-export function PlusFileIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
-      <path d="M5 2.5h6l3 3v12h-9z" />
-      <path d="M9.5 9v4M7.5 11h4" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function ImageIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
-      <rect x="2.5" y="4" width="15" height="12" rx="1.5" />
-      {/* The hill-and-sun mark rather than a camera: this is what is IN the
-          file, and the camera icon is already spoken for by "take a photo" in
-          the composer. */}
-      <path d="M2.5 13l4-4 3.5 3.5L13 9l4.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12.5" cy="7.5" r="1.25" />
-    </svg>
-  );
-}
-export function PlusFolderIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
-      <path d="M2 5.5a1 1 0 0 1 1-1h4l1.5 2H17a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-9z" />
-      <path d="M10 9v4M8 11h4" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function TrashIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
-      <path d="M7 2a1 1 0 0 0-1 1v1H3v2h14V4h-3V3a1 1 0 0 0-1-1H7zM4 7l1 11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-11H4z" />
-    </svg>
-  );
-}
-export function PlayIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
-      <path d="M6 4l10 6-10 6V4z" />
-    </svg>
-  );
-}
-export function RefreshIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M4 10a6 6 0 0 1 10.2-4.3M16 10a6 6 0 0 1-10.2 4.3" strokeLinecap="round" />
-      <path d="M14 3v3h-3M6 17v-3h3" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function DownloadIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M10 3v10M6 9l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M4 16h12" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function UploadIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M10 13V3M6 7l4-4 4 4" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M4 16h12" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function SaveIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M4 3h10l3 3v11H4z" strokeLinejoin="round" />
-      <path d="M7 3v5h6V3M6 12h8v5H6z" strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function SendIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
-      <path d="M3 10l14-7-4 7 4 7-14-7zM3 10h9" />
-    </svg>
-  );
-}
-export function CheckIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
-      <path d="M4 10l4 4 8-8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function XIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
-      <path d="M5 5l10 10M15 5L5 15" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function SparkleIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
-      <path d="M10 2l1.6 4.9L16.5 8.5l-4.9 1.6L10 15l-1.6-4.9L3.5 8.5l4.9-1.6L10 2z" />
-    </svg>
-  );
-}
-export function CameraIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M3 7a1 1 0 0 1 1-1h1.5l1-1.5h5l1 1.5H16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7z" strokeLinejoin="round" />
-      <circle cx="10" cy="11" r="2.5" />
-    </svg>
-  );
-}
-export function CopyIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <rect x="7" y="7" width="9" height="9" rx="1.5" />
-      <path d="M13 7V5.5A1.5 1.5 0 0 0 11.5 4h-6A1.5 1.5 0 0 0 4 5.5v6A1.5 1.5 0 0 0 5.5 13H7" strokeLinecap="round" />
-    </svg>
-  );
-}
+
+// ---- Names the app already used ---------------------------------------------
+export const ChevronRightIcon = wrap(ChevronRight);
+export const ChevronLeftIcon = wrap(ChevronLeft);
+export const ChevronDownIcon = wrap(ChevronDown);
+export const ChevronUpIcon = wrap(ChevronUp);
+export const FolderIcon = wrap(Folder);
+export const FolderOpenIcon = wrap(FolderOpen);
+export const FileIcon = wrap(File);
+export const PlusFileIcon = wrap(FilePlus);
+export const ImageIcon = wrap(Image);
+export const PlusFolderIcon = wrap(FolderPlus);
+export const TrashIcon = wrap(Trash2);
+export const PlayIcon = wrap(Play);
+export const RefreshIcon = wrap(RefreshCw);
+export const DownloadIcon = wrap(Download);
+export const UploadIcon = wrap(Upload);
+export const SaveIcon = wrap(Save);
+/** An arrow, not a paper plane: the send button reads "go" at a glance. */
+export const SendIcon = wrap(ArrowUp, { strokeWidth: 2.25 });
+export const CheckIcon = wrap(Check, { strokeWidth: 2.25 });
+export const XIcon = wrap(X, { strokeWidth: 2.1 });
+export const SparkleIcon = wrap(Sparkles);
+export const CameraIcon = wrap(Camera);
+export const CopyIcon = wrap(Copy);
 /** The screen-share capture, as distinct from the camera that takes a photo. */
-export function MonitorIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <rect x="2.5" y="4" width="15" height="10" rx="1.5" />
-      <path d="M7 17h6M10 14v3" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function LightbulbIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M10 2.5a4.5 4.5 0 0 0-2.5 8.24c.4.28.63.74.63 1.22V13h3.74v-1.04c0-.48.23-.94.63-1.22A4.5 4.5 0 0 0 10 2.5z" strokeLinejoin="round" />
-      <path d="M8 16h4M8.5 17.5h3" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function BookIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M3 4.5c1.8-.9 4-.9 6 0v11c-2-.9-4.2-.9-6 0v-11zM17 4.5c-1.8-.9-4-.9-6 0v11c2-.9 4.2-.9 6 0v-11z" strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function SettingsIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M3 6h9M15 6h2M3 14h2M8 14h9" strokeLinecap="round" />
-      <circle cx="13.5" cy="6" r="2" />
-      <circle cx="6.5" cy="14" r="2" />
-    </svg>
-  );
-}
-export function ChatIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M3 8.5a5 5 0 0 1 5-5h4a5 5 0 0 1 0 10H7.5L4 16.5v-3.2A5 5 0 0 1 3 8.5z" strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function HammerIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M11.5 3.5 8 7l-1.5-1.5L3 9l3 3 3.5-3.5L11 10l3.5-3.5-3-3z" strokeLinejoin="round" />
-      <path d="m12 9 5 5-2 2-5-5" strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function PaperclipIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M14.5 9.5 9.8 14.2a3 3 0 0 1-4.3-4.3l5.4-5.4a2 2 0 0 1 2.9 2.9l-5.4 5.4a1 1 0 0 1-1.4-1.4l4.7-4.7" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function MenuIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M3.5 6h13M3.5 10h13M3.5 14h13" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function SunIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <circle cx="10" cy="10" r="3.5" />
-      <path d="M10 1.5v2M10 16.5v2M3.5 3.5l1.4 1.4M15.1 15.1l1.4 1.4M1.5 10h2M16.5 10h2M3.5 16.5l1.4-1.4M15.1 4.9l1.4-1.4" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function MoonIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M16 11.5A6.5 6.5 0 0 1 8.5 4a6.5 6.5 0 1 0 7.5 7.5z" strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function UserIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <circle cx="10" cy="7" r="3" />
-      <path d="M4 16.5a6 6 0 0 1 12 0" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function BrainIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M8 3.5a2.2 2.2 0 0 0-2.2 2.2A2.3 2.3 0 0 0 4 8a2.3 2.3 0 0 0 1.4 2.1A2.2 2.2 0 0 0 7.6 13H8V3.5zM12 3.5a2.2 2.2 0 0 1 2.2 2.2A2.3 2.3 0 0 1 16 8a2.3 2.3 0 0 1-1.4 2.1A2.2 2.2 0 0 1 12.4 13H12V3.5z" strokeLinejoin="round" />
-      <path d="M10 3.5v13" strokeLinecap="round" />
-    </svg>
-  );
-}
-export function PencilIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M13.5 3.5 16.5 6.5 7 16H4v-3l9.5-9.5z" strokeLinejoin="round" />
-    </svg>
-  );
-}
-export function PlusIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
-      <path d="M10 4v12M4 10h12" strokeLinecap="round" />
-    </svg>
-  );
-}
+export const MonitorIcon = wrap(Monitor);
+export const LightbulbIcon = wrap(Lightbulb);
+export const BookIcon = wrap(BookOpen);
+export const SettingsIcon = wrap(Settings);
+export const ChatIcon = wrap(MessageCircle);
+export const HammerIcon = wrap(Hammer);
+export const PaperclipIcon = wrap(Paperclip);
+export const MenuIcon = wrap(Menu);
+export const SunIcon = wrap(Sun);
+export const MoonIcon = wrap(Moon);
+export const UserIcon = wrap(User);
+export const BrainIcon = wrap(Brain);
+export const PencilIcon = wrap(Pencil);
+export const PlusIcon = wrap(Plus, { strokeWidth: 2.1 });
+export const SearchIcon = wrap(Search);
+export const VideoIcon = wrap(TvMinimalPlay);
+export const LockIcon = wrap(Lock);
 
-export function SearchIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor"
-         strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" />
-      <path d="M20 20l-3.9-3.9" />
-    </svg>
-  );
-}
-
-export function VideoIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor"
-         strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="2.5" y="5" width="19" height="14" rx="4" />
-      <path d="M10 9.2l5.5 2.8L10 14.8z" />
-    </svg>
-  );
-}
-
-export function LockIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor"
-         strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-    </svg>
-  );
-}
+// ---- Added with the redesign --------------------------------------------------
+export const AlarmIcon = wrap(AlarmClock);
+export const AlertIcon = wrap(TriangleAlert);
+export const ArrowLeftIcon = wrap(ArrowLeft);
+export const ArrowRightIcon = wrap(ArrowRight);
+export const ArrowUpIcon = wrap(ArrowUp);
+export const AwardIcon = wrap(Award);
+export const BookmarkIcon = wrap(Bookmark);
+export const BookmarkFilledIcon = wrap(Bookmark, { fill: "currentColor" });
+export const BotIcon = wrap(Bot);
+export const BracesIcon = wrap(Braces);
+export const BugIcon = wrap(Bug);
+export const CalculatorIcon = wrap(Calculator);
+export const CalendarIcon = wrap(Calendar);
+export const CalendarCheckIcon = wrap(CalendarCheck);
+export const CalendarDaysIcon = wrap(CalendarDays);
+export const CaptionsIcon = wrap(Captions);
+export const CircleAlertIcon = wrap(CircleAlert);
+export const CircleCheckIcon = wrap(CircleCheck);
+export const ClapperboardIcon = wrap(Clapperboard);
+export const ClipboardIcon = wrap(ClipboardList);
+export const ClockIcon = wrap(Clock);
+export const CodeIcon = wrap(Code);
+export const ColumnsIcon = wrap(Columns2);
+export const CommandIcon = wrap(Command);
+export const DiffIcon = wrap(Diff);
+export const DuplicateIcon = wrap(CopyPlus);
+export const ExpandIcon = wrap(Expand);
+export const ExternalLinkIcon = wrap(ExternalLink);
+export const EyeIcon = wrap(Eye);
+export const FileCodeIcon = wrap(FileCode);
+export const FileDownIcon = wrap(FileDown);
+export const FileJsonIcon = wrap(FileJson);
+export const FilesIcon = wrap(Files);
+export const FileTextIcon = wrap(FileText);
+export const FileTypeIcon = wrap(FileType);
+export const FilmIcon = wrap(Film);
+export const FilterIcon = wrap(Filter);
+export const FlameIcon = wrap(Flame);
+export const FlaskIcon = wrap(FlaskConical);
+export const GamepadIcon = wrap(Gamepad2);
+export const GlobeIcon = wrap(Globe);
+export const GraduationCapIcon = wrap(GraduationCap);
+export const GripIcon = wrap(GripVertical);
+export const HeartIcon = wrap(Heart);
+export const HelpIcon = wrap(CircleHelp);
+export const HistoryIcon = wrap(History);
+export const HomeIcon = wrap(House);
+export const InfoIcon = wrap(Info);
+export const KeyboardIcon = wrap(Keyboard);
+export const LandmarkIcon = wrap(Landmark);
+export const LanguagesIcon = wrap(Languages);
+export const LayoutGridIcon = wrap(LayoutGrid);
+export const ListIcon = wrap(List);
+export const ListTodoIcon = wrap(ListTodo);
+export const ListVideoIcon = wrap(ListVideo);
+export const LogOutIcon = wrap(LogOut);
+export const MapIcon = wrap(MapGlyph);
+export const MaximizeIcon = wrap(Maximize2);
+export const MicIcon = wrap(Mic);
+export const MinimizeIcon = wrap(Minimize2);
+export const MoreIcon = wrap(Ellipsis);
+export const MoreVerticalIcon = wrap(EllipsisVertical);
+export const MusicIcon = wrap(Music);
+export const NotebookIcon = wrap(NotebookPen);
+export const PaletteIcon = wrap(Palette);
+export const PanelLeftIcon = wrap(PanelLeft);
+export const PanelRightIcon = wrap(PanelRight);
+export const PauseIcon = wrap(Pause);
+export const PipIcon = wrap(PictureInPicture2);
+export const PinIcon = wrap(Pin);
+export const RedoIcon = wrap(Redo2);
+export const ReplaceIcon = wrap(Replace);
+export const ResetIcon = wrap(RotateCcw);
+export const RocketIcon = wrap(Rocket);
+export const ShareIcon = wrap(Share2);
+export const ShieldIcon = wrap(Shield);
+export const ShieldCheckIcon = wrap(ShieldCheck);
+export const ShrinkIcon = wrap(Shrink);
+export const SigmaIcon = wrap(Sigma);
+export const SkipForwardIcon = wrap(SkipForward);
+export const SlidersIcon = wrap(SlidersHorizontal);
+export const SmartphoneIcon = wrap(Smartphone);
+export const SparkleSmallIcon = wrap(Sparkle);
+export const SpinnerIcon = wrap(LoaderCircle);
+export const SquareCodeIcon = wrap(SquareCode);
+export const StarIcon = wrap(Star);
+export const StopIcon = wrap(Square, { fill: "currentColor" });
+export const TabletIcon = wrap(Tablet);
+export const TargetIcon = wrap(Target);
+export const TerminalIcon = wrap(Terminal);
+export const TheaterIcon = wrap(RectangleHorizontal);
+export const ThumbsUpIcon = wrap(ThumbsUp);
+export const TimerIcon = wrap(Timer);
+export const TrophyIcon = wrap(Trophy);
+export const TypeIcon = wrap(Type);
+export const UndoIcon = wrap(Undo2);
+export const CameraVideoIcon = wrap(Video);
+export const VolumeIcon = wrap(Volume2);
+export const WandIcon = wrap(WandSparkles);
+export const WrapTextIcon = wrap(WrapText);
+export const ZapIcon = wrap(Zap);
+export const ZoomInIcon = wrap(ZoomIn);
+export const ZoomOutIcon = wrap(ZoomOut);
