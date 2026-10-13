@@ -53,11 +53,25 @@ export const viewport: Viewport = {
 // this runs before any module loads, so it cannot import THEMES from the store.
 // "system", and anyone who has never chosen, follow prefers-color-scheme; dark
 // is the fallback when nothing is saved.
-const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("sca:profile:v1");var t=s?JSON.parse(s).theme:null;var ok=["dark","light","ocean","forest","sepia"];var d=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=ok.indexOf(t)>=0?t:(t==="system"||!t?d:"dark");}catch(e){document.documentElement.dataset.theme="dark";}})();`;
+//
+// The profile key carries the signed-in account's id (see `accountScope` in
+// useAuthStore), so the script reads the account first. It used to read only
+// the signed-out key, which meant every signed-in student got the guest's
+// theme — or dark — for a frame, then a flash to their own. The text size,
+// motion settings and language go on <html> here too, for the same reason.
+const THEME_SCRIPT = `(function(){var r=document.documentElement;try{var a=localStorage.getItem("sca:account:v1");var id=a?JSON.parse(a).id:null;var k="sca:profile:v1"+(typeof id==="string"&&id?":"+id:"");var s=localStorage.getItem(k);var p=s?JSON.parse(s):{};var t=p.theme;var ok=["dark","light","ocean","forest","sepia"];var d=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";r.dataset.theme=ok.indexOf(t)>=0?t:(t==="system"||!t?d:"dark");var ap=p.appearance||{};if(ap.textSize)r.dataset.textSize=ap.textSize;r.dataset.pandaMotion=ap.pandaMotion===false?"off":"on";r.dataset.reduceMotion=ap.reduceMotion?"on":"off";var l=p.languages&&p.languages.interface;if(typeof l==="string"&&/^[a-z]{2,3}$/.test(l)){r.lang=l;r.dir=l==="ar"?"rtl":"ltr";}}catch(e){r.dataset.theme="dark";}})();`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-theme="dark" className={`${geistSans.variable} ${geistMono.variable} ${wordmark.variable} h-full antialiased`}>
+    // suppressHydrationWarning: the script above rewrites data-theme, lang and
+    // dir on this element before React hydrates, on purpose. Without it every
+    // non-dark or non-English student got a hydration warning on every load.
+    <html
+      lang="en"
+      data-theme="dark"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${wordmark.variable} h-full antialiased`}
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

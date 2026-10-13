@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, createElement, useContext, type ReactNode } from "react";
+import { createContext, createElement, useContext, useEffect, type ReactNode } from "react";
 import { CATALOGS, en, type StringKey } from "./strings";
 import { DEFAULT_LOCALE, findLocale } from "./locales";
 
@@ -38,11 +38,25 @@ const I18nContext = createContext<I18n>({
 });
 
 export function I18nProvider({ locale, children }: { locale: string; children: ReactNode }) {
+  const dir = findLocale(locale)?.rtl ? "rtl" : "ltr";
   const value: I18n = {
     locale,
     t: (key, vars) => translate(locale, key, vars),
-    dir: findLocale(locale)?.rtl ? "rtl" : "ltr",
+    dir,
   };
+
+  // The document has to say which language it is in. `<html lang="en">` was
+  // hard-coded, so a screen reader read Spanish buttons with an English voice,
+  // the browser offered to translate a page that was already translated, and
+  // Arabic — which locales.ts marks right-to-left — was drawn left-to-right.
+  // The before-paint script in layout.tsx sets both for the first frame; this
+  // keeps them right when the student changes language.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.lang = locale;
+    root.dir = dir;
+  }, [locale, dir]);
+
   return createElement(I18nContext.Provider, { value }, children);
 }
 
