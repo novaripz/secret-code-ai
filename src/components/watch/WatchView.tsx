@@ -228,7 +228,7 @@ function WatchPage({ id }: { id: string }) {
                 if (p) recordProgress(id, p.duration() || p.time(), p.duration() || null);
                 setPhase({ kind: "ended" });
               }}
-              onError={(code) => setPhase({ kind: "error", reason: code === 100 ? "missing" : code === 101 || code === 150 ? "embed" : "player", code })}
+              onError={(code) => setPhase({ kind: "error", reason: code === 100 ? "missing" : code === 101 || code === 150 || code === 153 ? "embed" : "player", code })}
             />
           )}
           {shown.kind === "ended" && video && (
@@ -268,7 +268,7 @@ function WatchPage({ id }: { id: string }) {
           <div className="mr-auto flex min-w-0 items-center gap-3">
             {video ? (
               <>
-                <ChannelAvatar name={video.channel} src={channel?.avatar} size={40} />
+                {video.channel && <ChannelAvatar name={video.channel} src={channel?.avatar} size={40} />}
                 <div className="min-w-0">
                   <p className="truncate text-[14.5px] font-semibold text-ink">{video.channel}</p>
                   {video.viewCount != null && <p className="text-[12.5px] text-ink-faint">{views(video.viewCount, t, locale)}</p>}

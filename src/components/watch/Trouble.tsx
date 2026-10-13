@@ -75,7 +75,7 @@ export function Trouble({
       <div className="min-w-0 flex-1">
         <p className="text-[15px] font-semibold text-ink">{t(HEADLINE[failure.problem])}</p>
         <p className="mt-1 text-[13.5px] leading-relaxed text-ink-dim">{t(HINT[failure.problem])}</p>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-2 empty:hidden">
           {retryable && onRetry && (
             <button type="button" className="btn btn-secondary btn-sm tap" onClick={onRetry}>
               <RefreshIcon />

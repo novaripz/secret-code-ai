@@ -5,7 +5,6 @@ import { useI18n } from "@/lib/i18n";
 import {
   BookmarkFilledIcon,
   BookmarkIcon,
-  ClockIcon,
   CopyIcon,
   SparkleIcon,
   TrashIcon,
@@ -79,7 +78,7 @@ function LaterButton({ saved, onToggle, title }: { saved: boolean; onToggle: () 
       title={label}
       className="watch-hover-action tap-sq absolute right-1.5 top-1.5 z-10 inline-flex h-9 w-9 items-center justify-center rounded-ui-sm bg-black/70 text-white backdrop-blur-sm hover:bg-black/85"
     >
-      {saved ? <BookmarkFilledIcon className="h-[18px] w-[18px]" /> : <ClockIcon className="h-[18px] w-[18px]" />}
+      {saved ? <BookmarkFilledIcon className="h-[18px] w-[18px]" /> : <BookmarkIcon className="h-[18px] w-[18px]" />}
     </button>
   );
 }
@@ -93,7 +92,7 @@ export function VideoCard({ video, queue, progress, playing, showBecause, extraI
   return (
     <article className="group relative min-w-0">
       <div className="relative">
-        <Link href={href} onClick={() => prepareOpen(video, queue)} tabIndex={-1} aria-hidden="true" className="block">
+        <Link href={href} prefetch={false} onClick={() => prepareOpen(video, queue)} tabIndex={-1} aria-hidden="true" className="block">
           <Thumbnail video={video} progress={progress} playing={playing} eager={eager} />
         </Link>
         <LaterButton saved={saved} onToggle={toggle} title={video.title} />
@@ -104,6 +103,7 @@ export function VideoCard({ video, queue, progress, playing, showBecause, extraI
         <div className="min-w-0 flex-1">
           <h3 className="text-[14.5px] font-semibold leading-snug text-ink">
             <Link
+              prefetch={false}
               href={href}
               onClick={() => prepareOpen(video, queue)}
               title={video.title}
@@ -141,7 +141,7 @@ export function VideoRow({ video, queue, progress, extraItems, eager }: CardProp
   return (
     <article className="group relative flex min-w-0 flex-col gap-3 sm:flex-row sm:gap-4">
       <div className="relative w-full shrink-0 sm:w-[min(360px,42%)]">
-        <Link href={href} onClick={() => prepareOpen(video, queue)} tabIndex={-1} aria-hidden="true" className="block">
+        <Link href={href} prefetch={false} onClick={() => prepareOpen(video, queue)} tabIndex={-1} aria-hidden="true" className="block">
           <Thumbnail video={video} progress={progress} eager={eager} sizes="(max-width: 640px) 100vw, 360px" />
         </Link>
         <LaterButton saved={saved} onToggle={toggle} title={video.title} />
@@ -151,6 +151,7 @@ export function VideoRow({ video, queue, progress, extraItems, eager }: CardProp
         <div className="flex items-start gap-2">
           <h3 className="min-w-0 flex-1 text-[15.5px] font-semibold leading-snug text-ink sm:text-[17px]">
             <Link
+              prefetch={false}
               href={href}
               onClick={() => prepareOpen(video, queue)}
               title={video.title}
@@ -197,6 +198,7 @@ export function CompactRow({ video, queue, progress, playing, extraItems }: Card
   return (
     <article className="group relative flex min-w-0 gap-2.5">
       <Link
+        prefetch={false}
         href={href}
         onClick={() => prepareOpen(video, queue)}
         tabIndex={-1}
@@ -208,6 +210,7 @@ export function CompactRow({ video, queue, progress, playing, extraItems }: Card
       <div className="min-w-0 flex-1">
         <h3 className="text-[13.5px] font-semibold leading-snug text-ink">
           <Link
+            prefetch={false}
             href={href}
             onClick={() => prepareOpen(video, queue)}
             title={video.title}

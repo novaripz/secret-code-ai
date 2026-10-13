@@ -50,7 +50,7 @@ export function LibraryView({ list }: { list: LibraryList }) {
   // On a phone the tab row can scroll; keep the open tab on screen.
   useEffect(() => {
     tabsRef.current?.querySelector<HTMLElement>("[aria-selected=true]")?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [list]);
+  }, [list, hydrated]);
 
   const counts: Record<LibraryList, number> = {
     later: saved.length,
@@ -98,7 +98,7 @@ export function LibraryView({ list }: { list: LibraryList }) {
                 aria-controls={`watch-panel-${tab.id}`}
                 tabIndex={selected ? 0 : -1}
                 onClick={() => nav.library(tab.id, true)}
-                className={`tap flex shrink-0 items-center gap-2 border-b-2 px-3 pb-2.5 pt-1.5 text-[14px] transition-colors ${
+                className={`tap flex shrink-0 items-center gap-1.5 border-b-2 px-2.5 pb-2.5 sm:gap-2 sm:px-3 pt-1.5 text-[14px] transition-colors ${
                   selected
                     ? "border-accent font-semibold text-ink"
                     : "border-transparent text-ink-dim hover:border-line-strong hover:text-ink"
