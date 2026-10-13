@@ -6,53 +6,95 @@
 // themselves. The model is good at explaining a plan; it is not the right tool
 // for deciding one, because it cannot be held to the numbers.
 //
-// Two things now lift work up the list: a teacher pinning it, and it being
-// worth far more than the rest of the class's open work. Both are lifts, not
-// overrides. A student who misses something overdue because a shinier thing sat
-// on top of it is worse off than one who was never shown the pin at all, so the
-// lift is measured in days and clamped so it can never reach past today into
-// the overdue pile. Everything it does to the order it also says out loud in
-// `why`, because an order a student cannot argue with is not one they can
-// trust.
+// Two things now lift work up the list: a teacher marking it a priority, and it
+// being worth far more than the rest of the class's open work. Both are lifts,
+// not overrides. A student who misses something overdue because a shinier
+// thing sat on top of it is worse off than one who was never shown the flag at
+// all, so the lift is measured in days and clamped so it can never reach past
+// today into the overdue pile. Everything it does to the order it also says out
+// loud in `reasons`, because an order a student cannot argue with is not one
+// they can trust.
+//
+// The reasons are data, not sentences: `describeReasons` turns them into words
+// in the student's own language. They used to be English baked in here, which
+// made the plan the one screen that ignored the language picker.
 //
 // `urgencyScore` in ./types.ts is still what the class pages sort by: one class
 // on screen has no cross-class spread to read and no room for a chip. The plan
 // is where the lift belongs, because the plan is the thing that claims to know
 // what you should do first.
 
-import { daysUntil, type Assignment, type SchoolClass } from "./types";
+import type { Translate } from "./due";
+import { daysUntil, isOverdue, urgencyDays, type Assignment, type SchoolClass, type Subtask } from "./types";
+
+/** Why an item sits where it does, as facts the UI puts into words. */
+export type PlanReason =
+  | { kind: "pinned" }
+  | { kind: "overdue"; days: number }
+  | { kind: "dueToday" }
+  | { kind: "dueTomorrow" }
+  | { kind: "dueIn"; days: number }
+  | { kind: "noDue" }
+  | { kind: "started" }
+  | { kind: "steps"; left: number; total: number }
+  | { kind: "points"; points: number; multiple?: number };
 
 export interface PlanItem {
   assignment: Assignment;
   className: string;
+  /** Minutes the plan gives it tonight. */
   minutes: number;
-  /** Plain-language reason this sits where it does. */
-  why: string;
-  /** The teacher marked it. Shown as a chip, not just a colour. */
+  /** Plain-language reasons this sits where it does. */
+  reasons: PlanReason[];
+  /** The teacher marked it a priority. Shown as a chip, not just a colour. */
   pinned: boolean;
   /** Worth well above the rest of the open work in its class. */
   heavy: boolean;
+  /** Not enough time to finish it tonight, but enough to make a real dent. */
+  partial: boolean;
+  /** The first unticked step of the student's own checklist, when there is one. */
+  nextStep?: string;
+}
+
+export interface PlanOverflow {
+  assignment: Assignment;
+  className: string;
+  minutes: number;
 }
 
 export interface Plan {
   items: PlanItem[];
   /** Minutes left over after the plan. */
   spare: number;
-  /** Work that did not fit in the time available. */
-  overflow: Assignment[];
+  /** Work that did not fit in the time available, in the order it would come next. */
+  overflow: PlanOverflow[];
+}
+
+/** What the student has told Panda about their own work, beyond the assignment row. */
+export interface PlanContext {
+  /** Checklists by assignment id. */
+  steps?: Record<string, Subtask[]>;
+  /** Minutes already spent in focus sessions, by assignment id. */
+  focused?: Record<string, number>;
 }
 
 /** Fallback when nobody has said how long something takes. */
-const DEFAULT_MINUTES = 30;
+export const DEFAULT_MINUTES = 30;
+
+/** The smallest block worth putting on a plan. */
+const MIN_BLOCK = 5;
+
+/** Below this, a partial start is not worth sitting down for. */
+const MIN_PARTIAL = 15;
 
 // How far up the list each kind of lift may carry something, in days.
 //
 // Days, not points, because days are the unit the rest of the ordering already
 // speaks and a lift expressed in the same unit is one a student can reason
-// about: "your teacher pinned this, so Panda treats it as two days sooner". Two
-// and one are small on purpose. A pinned essay due Friday should beat an
-// unpinned worksheet due Thursday; it should not beat the lab report that was
-// due last week.
+// about: "your teacher made this a priority, so Panda treats it as two days
+// sooner". Two and one are small on purpose. A priority essay due Friday
+// should beat an ordinary worksheet due Thursday; it should not beat the lab
+// report that was due last week.
 const PINNED_LIFT_DAYS = 2;
 const HEAVY_LIFT_DAYS = 1;
 
@@ -121,29 +163,26 @@ function isHeavy(a: Assignment, medians: Map<string, number>): boolean {
  * Where one assignment sits in the queue. Lower is sooner.
  *
  * The precedence, deliberately, is: overdue, then due date (with the lift
- * applied), then the pin, then what it is worth. Two decisions in that are
- * worth defending.
+ * applied), then the priority flag, then what it is worth. Two decisions in
+ * that are worth defending.
  *
  * First, the lift is clamped at today. `Math.max(days - lift, 0)` means nothing
- * a teacher pins and nothing worth a fortune can be scored as though it were
+ * a teacher flags and nothing worth a fortune can be scored as though it were
  * overdue, so an assignment that is genuinely late always sits above one that
  * is merely important. Late work is the thing that costs a student a grade they
- * cannot get back.
+ * cannot get back. "Late" includes work whose time has passed earlier today,
+ * which `urgencyDays` counts as a day behind.
  *
  * Second, everything below the day figure is scaled to stay inside one day
- * (1000 + 500 + 250 < 2000). The pin breaks ties between things due the same
+ * (1000 + 500 + 250 < 2000). The flag breaks ties between things due the same
  * day and never silently jumps one; a student comparing two rows due Thursday
- * sees the pinned one first, which is exactly what their teacher meant, and
+ * sees the priority one first, which is exactly what their teacher meant, and
  * nothing more than that.
  */
-export function planScore(
-  a: Assignment,
-  medians: Map<string, number>,
-  now = Date.now(),
-): number {
+export function planScore(a: Assignment, medians: Map<string, number>, now = Date.now()): number {
   if (a.status === "done") return Number.MAX_SAFE_INTEGER;
 
-  const days = a.dueAt === null ? 60 : daysUntil(a.dueAt, now);
+  const days = urgencyDays(a, now);
   const pinned = a.teacherPinned === true;
   const heavy = isHeavy(a, medians);
 
@@ -155,31 +194,35 @@ export function planScore(
   return effectiveDays * 2000 - (pinned ? 1000 : 0) - (heavy ? 250 : 0) - weight;
 }
 
-/** An assignment with the two facts the UI needs to label it. */
+/** An assignment with the facts the UI needs to label it. */
 export interface RankedAssignment {
   assignment: Assignment;
   pinned: boolean;
   heavy: boolean;
-  /** Plain-language reason this sits where it does. */
-  why: string;
+  /** Plain-language reasons this sits where it does. */
+  reasons: PlanReason[];
 }
 
-function reason(a: Assignment, medians: Map<string, number>, now: number): string {
-  const bits: string[] = [];
+function reasonsFor(a: Assignment, medians: Map<string, number>, now: number, steps?: Subtask[]): PlanReason[] {
+  const out: PlanReason[] = [];
 
-  if (a.teacherPinned === true) bits.push("pinned by your teacher");
+  if (a.teacherPinned === true) out.push({ kind: "pinned" });
 
   if (a.dueAt !== null) {
     const days = daysUntil(a.dueAt, now);
-    if (days < 0) bits.push(`overdue by ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"}`);
-    else if (days === 0) bits.push("due today");
-    else if (days === 1) bits.push("due tomorrow");
-    else bits.push(`due in ${days} days`);
+    if (isOverdue(a, now)) out.push({ kind: "overdue", days: Math.max(0, -days) });
+    else if (days === 0) out.push({ kind: "dueToday" });
+    else if (days === 1) out.push({ kind: "dueTomorrow" });
+    else out.push({ kind: "dueIn", days });
   } else {
-    bits.push("no due date");
+    out.push({ kind: "noDue" });
   }
 
-  if (a.status === "doing") bits.push("already started");
+  if (steps && steps.length > 0) {
+    out.push({ kind: "steps", left: steps.filter((s) => !s.done).length, total: steps.length });
+  } else if (a.status === "doing") {
+    out.push({ kind: "started" });
+  }
 
   // The multiple, not the raw number, when there is a spread to compare
   // against: "worth 3x the usual" is a sentence a student can check by looking
@@ -187,14 +230,48 @@ function reason(a: Assignment, medians: Map<string, number>, now: number): strin
   const multiple = pointMultiple(a, medians);
   if (a.points !== undefined) {
     if (multiple !== null && multiple >= HEAVY_MULTIPLE) {
-      const rounded = Math.round(multiple * 10) / 10;
-      bits.push(`worth ${a.points} points, ${rounded}x the usual for this class`);
+      out.push({ kind: "points", points: a.points, multiple: Math.round(multiple * 10) / 10 });
     } else {
-      bits.push(`worth ${a.points} points`);
+      out.push({ kind: "points", points: a.points });
     }
   }
 
-  return bits.join(", ");
+  return out;
+}
+
+/** One reason in the student's language. */
+export function describeReason(r: PlanReason, t: Translate): string {
+  switch (r.kind) {
+    case "pinned":
+      return t("plan.reasonPinned");
+    case "overdue":
+      return r.days === 0
+        ? t("plan.reasonOverdueToday")
+        : r.days === 1
+          ? t("plan.reasonOverdueOne")
+          : t("plan.reasonOverdue", { count: r.days });
+    case "dueToday":
+      return t("plan.reasonDueToday");
+    case "dueTomorrow":
+      return t("plan.reasonDueTomorrow");
+    case "dueIn":
+      return t("plan.reasonDueIn", { count: r.days });
+    case "noDue":
+      return t("plan.reasonNoDue");
+    case "started":
+      return t("plan.reasonStarted");
+    case "steps":
+      return t("plan.reasonSteps", { left: r.left, total: r.total });
+    case "points":
+      return r.multiple !== undefined
+        ? t("plan.reasonPointsHeavy", { points: r.points, multiple: r.multiple })
+        : t("plan.reasonPoints", { points: r.points });
+  }
+}
+
+/** All of an item's reasons as one line. */
+export function describeReasons(reasons: PlanReason[], t: Translate): string {
+  return reasons.map((r) => describeReason(r, t)).join(t("plan.reasonJoin"));
 }
 
 /**
@@ -205,18 +282,55 @@ function reason(a: Assignment, medians: Map<string, number>, now: number): strin
  * ordering, computed one way, so the strip on the home page and the plan can
  * never disagree with each other in front of a student.
  */
-export function rankAssignments(assignments: Assignment[], now = Date.now()): RankedAssignment[] {
+export function rankAssignments(
+  assignments: Assignment[],
+  now = Date.now(),
+  context: PlanContext = {},
+): RankedAssignment[] {
   const open = assignments.filter((a) => a.status !== "done");
   const medians = classPointMedians(open);
 
   return open
-    .map((a) => ({
+    .map((a) => ({ a, score: planScore(a, medians, now) }))
+    .sort((x, y) => x.score - y.score)
+    .map(({ a }) => ({
       assignment: a,
       pinned: a.teacherPinned === true,
       heavy: isHeavy(a, medians),
-      why: reason(a, medians, now),
-    }))
-    .sort((x, y) => planScore(x.assignment, medians, now) - planScore(y.assignment, medians, now));
+      reasons: reasonsFor(a, medians, now, context.steps?.[a.id]),
+    }));
+}
+
+function roundUp(minutes: number, step: number): number {
+  return Math.ceil(minutes / step) * step;
+}
+
+/**
+ * How long is left on one assignment, as honestly as Panda can tell.
+ *
+ * Three sources, best first. A checklist the student wrote is the best: the
+ * unticked steps, at the minutes they gave each one (and an even share of the
+ * estimate for the steps they gave none). Failing that, time already spent in
+ * focus sessions comes off the estimate -- this is what makes "already
+ * started" actually shrink the plan, which it used to say and never did. It is
+ * floored rather than allowed to reach zero, because an estimate is a guess and
+ * "nothing left" is a claim only the student can make, by ticking it done.
+ */
+export function remainingMinutes(a: Assignment, steps?: Subtask[], focusedMinutes = 0): number {
+  const estimate = a.estimateMinutes ?? DEFAULT_MINUTES;
+
+  if (steps && steps.length > 0) {
+    const share = estimate / steps.length;
+    const left = steps.filter((s) => !s.done).reduce((n, s) => n + (s.minutes ?? share), 0);
+    return Math.max(MIN_BLOCK, roundUp(left, MIN_BLOCK));
+  }
+
+  if (focusedMinutes > 0) {
+    const floor = Math.min(10, estimate);
+    return Math.max(MIN_BLOCK, roundUp(Math.max(estimate - focusedMinutes, floor), MIN_BLOCK));
+  }
+
+  return Math.max(MIN_BLOCK, estimate);
 }
 
 /**
@@ -231,49 +345,33 @@ export function buildPlan(
   classes: SchoolClass[],
   availableMinutes: number,
   now = Date.now(),
+  context: PlanContext = {},
 ): Plan {
   const byId = new Map(classes.map((c) => [c.id, c.name]));
-  const ranked = rankAssignments(assignments, now);
+  const ranked = rankAssignments(assignments, now, context);
 
   const items: PlanItem[] = [];
-  const overflow: Assignment[] = [];
+  const overflow: PlanOverflow[] = [];
   let left = availableMinutes;
 
-  for (const { assignment: a, pinned, heavy, why } of ranked) {
-    const needs = a.estimateMinutes ?? DEFAULT_MINUTES;
+  for (const { assignment: a, pinned, heavy, reasons } of ranked) {
+    const steps = context.steps?.[a.id];
+    const needs = remainingMinutes(a, steps, context.focused?.[a.id] ?? 0);
+    const className = byId.get(a.classId) ?? "";
+    const nextStep = steps?.find((s) => !s.done)?.text;
+
     if (needs <= left) {
-      items.push({
-        assignment: a,
-        className: byId.get(a.classId) ?? "",
-        minutes: needs,
-        why,
-        pinned,
-        heavy,
-      });
+      items.push({ assignment: a, className, minutes: needs, reasons, pinned, heavy, partial: false, nextStep });
       left -= needs;
-    } else if (left >= 15) {
+    } else if (left >= MIN_PARTIAL) {
       // Not enough time to finish, but enough to make a real dent. Better than
       // leaving the most urgent thing untouched because it does not fit whole.
-      items.push({
-        assignment: a,
-        className: byId.get(a.classId) ?? "",
-        minutes: left,
-        why: `${why} — start it, you won't finish tonight`,
-        pinned,
-        heavy,
-      });
+      items.push({ assignment: a, className, minutes: left, reasons, pinned, heavy, partial: true, nextStep });
       left = 0;
     } else {
-      overflow.push(a);
+      overflow.push({ assignment: a, className, minutes: needs });
     }
   }
 
   return { items, spare: left, overflow };
-}
-
-/** One sentence explaining why the first item is first. */
-export function explainOrder(plan: Plan): string {
-  const first = plan.items[0];
-  if (!first) return "";
-  return `${first.assignment.title} is first because it's ${first.why}.`;
 }

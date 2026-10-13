@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
 import { useSchoolStore } from "@/store/useSchoolStore";
 import { useI18n } from "@/lib/i18n";
-import { buildPlan, explainOrder } from "@/lib/school/planner";
+import { buildPlan, describeReasons } from "@/lib/school/planner";
 import { isOverdue } from "@/lib/school/types";
 import { CheckIcon, PlayIcon } from "@/components/icons";
 
@@ -197,7 +197,7 @@ export default function PlanPage() {
                         {item.assignment.title}
                       </Link>
                       <p className="mt-0.5 truncate text-xs text-[var(--text-faint)]">
-                        {item.className} · {item.why}
+                        {item.className} · {describeReasons(item.reasons, t)}
                       </p>
                     </div>
 
@@ -241,7 +241,7 @@ export default function PlanPage() {
 
               {showWhy && plan.items.length > 0 && (
                 <p className="mt-2.5 animate-rise rounded-xl border border-[var(--line)] bg-[var(--surface-0)] p-3.5 text-sm leading-relaxed text-[var(--text-dim)]">
-                  {explainOrder(plan)} Everything after it is ordered the same way: what&apos;s overdue
+                  Everything it is ordered the same way: what&apos;s overdue
                   first, then what&apos;s due soonest, then what&apos;s worth the most. Anything your
                   teacher pinned, or that&apos;s worth far more than the rest of that class, moves up a
                   couple of days — never past something that&apos;s already late.

@@ -8,9 +8,23 @@
 // `externalId` exists on the entities an LMS owns, so a Canvas import can find
 // the row it created last time instead of duplicating it.
 
+import { daysUntil, isPastDue } from "./due";
+
+export { daysUntil, startOfDay } from "./due";
+
 export type Role = "student" | "teacher";
 
 export type Source = "local" | "canvas";
+
+/**
+ * Where a class or assignment on a student's device came from.
+ *
+ * "school" is a copy of a row in the class database: the teacher owns it, and
+ * the student can only mark it done (and keep their own notes on it). Absent
+ * means the student made it on this device, which is the only kind a guest has
+ * and the only kind a student can edit or delete.
+ */
+export type Origin = "school";
 
 export interface SchoolClass {
   id: string;
@@ -22,6 +36,7 @@ export interface SchoolClass {
   source: Source;
   externalId?: string;
   createdAt: number;
+  origin?: Origin;
 }
 
 export type AssignmentStatus = "todo" | "doing" | "done";
@@ -65,6 +80,7 @@ export interface Assignment {
   externalId?: string;
   createdAt: number;
   updatedAt: number;
+  origin?: Origin;
 }
 
 /**
@@ -160,11 +176,52 @@ export interface Grade {
   updatedAt: number;
 }
 
+// ------------------------------------------------------- the student's layer
+//
+// Things a student keeps about their work that are nobody else's business and
+// never leave the device: how they broke a task down, which day they mean to
+// do it, and what they have finished. Keyed by assignment id and stored beside
+// the assignments rather than on them, so a refresh from the class database --
+// which replaces the teacher's rows wholesale -- cannot wipe a student's notes.
+
+/** One step of a checklist a student made for an assignment. */
+export interface Subtask {
+  id: string;
+  text: string;
+  /** Their own guess. Feeds the planner when present. */
+  minutes?: number;
+  done: boolean;
+}
+
+/**
+ * Something the student did, for the gentle progress line: a piece of work
+ * finished or a focus session sat through. A day with either counts towards a
+ * streak. No content, only what and when.
+ */
+export interface ActivityEvent {
+  at: number;
+  kind: "done" | "focus";
+  assignmentId?: string;
+  /** Focus sessions only. */
+  minutes?: number;
+}
+
 export interface SchoolData {
   role: Role;
   classes: SchoolClass[];
   assignments: Assignment[];
   rules: AssignmentRules[];
+  /** Checklists, by assignment id. */
+  steps: Record<string, Subtask[]>;
+  /** The `yyyy-mm-dd` a student plans to do something on, by assignment id. */
+  doOn: Record<string, string>;
+  activity: ActivityEvent[];
+  /**
+   * Done-ness that has not reached the class database yet (offline, or the
+   * write failed). Re-sent on the next sync, and laid over what the database
+   * says until then, so a refresh never undoes a tick the student just made.
+   */
+  pendingStatus: Record<string, AssignmentStatus>;
 }
 
 export const EMPTY_SCHOOL: SchoolData = {
@@ -172,6 +229,10 @@ export const EMPTY_SCHOOL: SchoolData = {
   classes: [],
   assignments: [],
   rules: [],
+  steps: {},
+  doOn: {},
+  activity: [],
+  pendingStatus: {},
 };
 
 export const DEFAULT_RULES: Omit<AssignmentRules, "assignmentId"> = {
@@ -186,20 +247,24 @@ export const CLASS_COLORS = [
 ];
 
 // ---------------------------------------------------------------- due dates
+//
+// The date arithmetic and the definition of "past due" live in ./due.ts, which
+// the teacher screens use too. This is the assignment-shaped wrapper.
 
-export function startOfDay(ms: number): number {
-  const d = new Date(ms);
-  d.setHours(0, 0, 0, 0);
-  return d.getTime();
-}
-
-/** Whole days from today. Negative is overdue, 0 is today, 1 is tomorrow. */
-export function daysUntil(dueAt: number, now = Date.now()): number {
-  return Math.round((startOfDay(dueAt) - startOfDay(now)) / 86_400_000);
-}
-
+/** Unfinished and past its deadline. The same rule a teacher's "behind" uses. */
 export function isOverdue(a: Assignment, now = Date.now()): boolean {
-  return a.status !== "done" && a.dueAt !== null && daysUntil(a.dueAt, now) < 0;
+  return a.status !== "done" && isPastDue(a.dueAt, now);
+}
+
+/**
+ * Days until due for ordering. Work that is already past its time today
+ * counts as a day late, so it sorts with the rest of the late work rather
+ * than among today's.
+ */
+export function urgencyDays(a: Assignment, now = Date.now()): number {
+  if (a.dueAt === null) return 60;
+  const days = daysUntil(a.dueAt, now);
+  return isOverdue(a, now) ? Math.min(days, 0) - 1 : days;
 }
 
 /**
@@ -211,7 +276,7 @@ export function isOverdue(a: Assignment, now = Date.now()): boolean {
  */
 export function urgencyScore(a: Assignment, now = Date.now()): number {
   if (a.status === "done") return Number.MAX_SAFE_INTEGER;
-  const days = a.dueAt === null ? 60 : daysUntil(a.dueAt, now);
+  const days = urgencyDays(a, now);
   const weight = a.points ?? 10;
   // Days dominate; points break ties between things due the same day.
   return days * 1000 - Math.min(weight, 500);

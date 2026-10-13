@@ -36,6 +36,7 @@ function read(): SchoolData {
     if (!raw) return EMPTY_SCHOOL;
     const parsed = JSON.parse(raw) as Partial<SchoolData>;
     return {
+      ...EMPTY_SCHOOL,
       role: parsed.role === "teacher" ? "teacher" : "student",
       classes: Array.isArray(parsed.classes) ? parsed.classes : [],
       assignments: Array.isArray(parsed.assignments) ? parsed.assignments : [],
@@ -91,7 +92,7 @@ export const useSchoolStore = create<SchoolState>((set, get) => {
   const commit = (patch: Partial<SchoolData>) => {
     set(patch);
     const s = get();
-    write({ role: s.role, classes: s.classes, assignments: s.assignments, rules: s.rules });
+    write({ ...EMPTY_SCHOOL, role: s.role, classes: s.classes, assignments: s.assignments, rules: s.rules });
   };
 
   return {

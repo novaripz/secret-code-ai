@@ -121,6 +121,16 @@ export const en = {
   "classes.teacher": "Teacher",
   "classes.assignments": "Assignments",
   "classes.askPanda": "Ask Panda about this class",
+  // Due dates, said one way on every screen. {time} and {date} arrive already
+  // formatted for the student's language.
+  "classes.noDue": "No due date",
+  "classes.dueTodayAt": "Due today, {time}",
+  "classes.dueTomorrowAt": "Due tomorrow, {time}",
+  "classes.dueOn": "Due {date}",
+  "classes.dueOnAt": "Due {date}, {time}",
+  "classes.overdueSince": "Overdue since {time}",
+  "classes.overdueOne": "1 day overdue",
+  "classes.overdueDays": "{count} days overdue",
 
   // Assignments
   "assignments.title": "Assignments",
@@ -143,6 +153,20 @@ export const en = {
   "plan.startFocus": "Start focus",
   "plan.why": "Why this order?",
   "plan.noData": "Panda needs some assignments before it can plan your night.",
+  // Why each item sits where it does. Joined with plan.reasonJoin.
+  "plan.reasonPinned": "your teacher made it a priority",
+  "plan.reasonOverdueToday": "past its due time",
+  "plan.reasonOverdueOne": "1 day overdue",
+  "plan.reasonOverdue": "{count} days overdue",
+  "plan.reasonDueToday": "due today",
+  "plan.reasonDueTomorrow": "due tomorrow",
+  "plan.reasonDueIn": "due in {count} days",
+  "plan.reasonNoDue": "no due date",
+  "plan.reasonStarted": "already started",
+  "plan.reasonSteps": "{left} of {total} steps left",
+  "plan.reasonPoints": "worth {points} points",
+  "plan.reasonPointsHeavy": "worth {points} points, {multiple}x the usual for this class",
+  "plan.reasonJoin": " · ",
 
   // Focus
   "focus.title": "Focus",
