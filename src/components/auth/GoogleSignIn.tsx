@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useI18n } from "@/lib/i18n";
 
 // Google's own sign-in button, via Google Identity Services.
 //
@@ -52,6 +53,7 @@ function loadScript(): Promise<void> {
 }
 
 export function GoogleSignIn({ onDone }: { onDone?: () => void }) {
+  const { t } = useI18n();
   const signIn = useAuthStore((s) => s.signIn);
   const error = useAuthStore((s) => s.error);
   const busy = useAuthStore((s) => s.busy);
@@ -101,10 +103,17 @@ export function GoogleSignIn({ onDone }: { onDone?: () => void }) {
 
   if (status === "unconfigured") {
     return (
-      <p className="text-sm leading-relaxed text-[var(--text-faint)]">
-        Google sign-in isn&apos;t set up yet. Create an OAuth client ID in Google Cloud Console and set{" "}
-        <code className="rounded bg-[var(--surface-2)] px-1 py-0.5 font-mono text-xs">GOOGLE_CLIENT_ID</code>.
-      </p>
+      <div className="text-start text-sm leading-relaxed">
+        <p className="font-medium text-[var(--text)]">{t("auth.notSetUpTitle")}</p>
+        <p className="mt-1 text-[var(--text-dim)]">{t("auth.notSetUpBody")}</p>
+        <details className="mt-3 text-[13px] text-[var(--text-faint)]">
+          <summary className="cursor-pointer select-none font-medium text-[var(--text-dim)]">{t("auth.forAdmins")}</summary>
+          <p className="mt-2">
+            Create an OAuth client ID in Google Cloud Console and set{" "}
+            <code className="rounded bg-[var(--surface-2)] px-1 py-0.5 font-mono text-xs">GOOGLE_CLIENT_ID</code>.
+          </p>
+        </details>
+      </div>
     );
   }
 
@@ -118,7 +127,7 @@ export function GoogleSignIn({ onDone }: { onDone?: () => void }) {
         </p>
       )}
       {busy && <p className="text-sm text-[var(--text-faint)]">Signing you in…</p>}
-      {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
+      {error && <p role="alert" className="text-sm text-[var(--danger)]">{error}</p>}
     </div>
   );
 }
