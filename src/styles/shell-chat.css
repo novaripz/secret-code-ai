@@ -316,6 +316,14 @@
     font-size: 0.88em;
     color: var(--text);
   }
+  /* Math and inline code read left to right inside any language, and are
+     isolated so they do not reorder the sentence around them. */
+  .chat-prose .math,
+  .chat-prose .inline-code {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
   .chat-link {
     color: var(--accent-text);
     text-decoration: underline;
@@ -363,7 +371,8 @@
     justify-content: space-between;
     gap: 0.5rem;
     min-height: 2.25rem;
-    padding: 0.2rem 0.3rem 0.2rem 0.85rem;
+    padding-block: 0.2rem;
+    padding-inline: 0.85rem 0.3rem;
     border-bottom: 1px solid var(--line);
     background: var(--surface-1);
     font-size: 12px;
@@ -556,3 +565,13 @@
   }
   .interest-chip svg { width: 0.9rem; height: 0.9rem; }
 }
+
+/* Right-to-left. Outside the layer on purpose: the skip link's rules in
+   globals.css are unlayered, and an unlayered rule beats any layered one.
+   Parked at `left: -9999px`, the link is harmless left-to-right, where the page
+   cannot scroll left. In Arabic the page scrolls in exactly that direction, so
+   the parked link made the document ten thousand pixels wide and a screen
+   reader or a stray scrollIntoView could land the student in empty space. It
+   parks off the trailing edge instead. */
+:root[dir="rtl"] .skip-link { left: auto; right: -9999px; }
+:root[dir="rtl"] .skip-link:focus { left: auto; right: 12px; }

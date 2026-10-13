@@ -204,14 +204,14 @@ export function Sidebar({ onClose }: { onClose: () => void }) {
       <div className="px-3 pb-1 pt-3">
         <label className="relative block">
           <span className="sr-only">{t("chats.search")}</span>
-          <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-faint)]" />
+          <SearchIcon className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-faint)]" />
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onClick={(e) => e.stopPropagation()}
             placeholder={t("chats.search")}
-            className="input h-9 pl-8 text-[13px]"
+            className="input h-9 ps-8 text-[13px]"
           />
         </label>
       </div>
@@ -244,10 +244,12 @@ export function Sidebar({ onClose }: { onClose: () => void }) {
                       <Link
                         href={`/?c=${thread.id}`}
                         aria-current={active ? "page" : undefined}
-                        className="tap flex min-w-0 flex-1 items-center gap-2 py-2 pl-2.5 pr-1 text-[14px] md:text-[13.5px]"
+                        className="tap flex min-w-0 flex-1 items-center gap-2 py-2 ps-2.5 pe-1 text-[14px] md:text-[13.5px]"
                         title={thread.title}
                       >
-                        <span className="truncate">{thread.title}</span>
+                        <span dir="auto" className="truncate">
+                          {thread.title}
+                        </span>
                         {/* A reply still arriving in a chat you have left. */}
                         {busy && (
                           <span className="activity-dot ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent-text)]" aria-label={t("chats.replying")} />
@@ -261,7 +263,7 @@ export function Sidebar({ onClose }: { onClose: () => void }) {
                       <MenuButton
                         label={t("chats.optionsFor", { title: thread.title })}
                         icon={<MoreIcon />}
-                        className="icon-btn icon-btn-sm tap-pad mr-1 opacity-100 md:opacity-0 md:focus-visible:opacity-100 md:group-hover:opacity-100 md:group-data-[active]:opacity-100 data-[active]:opacity-100"
+                        className="icon-btn icon-btn-sm tap-pad me-1 opacity-100 md:opacity-0 md:focus-visible:opacity-100 md:group-hover:opacity-100 md:group-data-[active]:opacity-100 data-[active]:opacity-100"
                         items={[
                           {
                             key: "pin",
@@ -323,7 +325,7 @@ export function Sidebar({ onClose }: { onClose: () => void }) {
             <span className="block truncate text-sm font-medium text-[var(--text)]">{name || t("nav.yourProfile")}</span>
             <span className="block truncate text-[12.5px] text-[var(--text-faint)]">{t("nav.profileAndSettings")}</span>
           </span>
-          <ChevronRightIcon className="h-4 w-4 shrink-0 text-[var(--text-faint)]" />
+          <ChevronRightIcon className="h-4 w-4 shrink-0 text-[var(--text-faint)] rtl:rotate-180" />
         </Link>
       </div>
     </div>

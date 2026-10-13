@@ -321,7 +321,7 @@ export function Composer({
               <MicIcon className={dictation.listening ? "animate-pulse" : undefined} />
             </ToolButton>
           )}
-          {busy && <SpinnerIcon className="ml-1 h-4 w-4 animate-spin text-[var(--text-faint)]" aria-label={t("composer.reading")} />}
+          {busy && <SpinnerIcon className="ms-1 h-4 w-4 animate-spin text-[var(--text-faint)]" aria-label={t("composer.reading")} />}
 
           {showStop ? (
             <button

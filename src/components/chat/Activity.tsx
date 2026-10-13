@@ -48,7 +48,7 @@ export function Activity({ state }: { state: ActivityState | null }) {
             about to be relevant. Quoted and dimmed so it reads as the
             student's words being used, not as Panda's prose. */}
         {state.query ? (
-          <span className="ml-1 break-words font-normal text-[var(--text-faint)]">&ldquo;{state.query}&rdquo;</span>
+          <span className="ms-1 break-words font-normal text-[var(--text-faint)]">&ldquo;{state.query}&rdquo;</span>
         ) : null}
       </span>
     </div>
@@ -136,7 +136,7 @@ export function Sources({ items }: { items: Source[] }) {
                 <span className="font-medium underline decoration-[var(--line-strong)] underline-offset-2 group-hover:decoration-current">
                   {s.title}
                 </span>
-                <span className="ml-1.5 text-[var(--text-faint)]">{domainOf(s.url)}</span>
+                <span className="ms-1.5 text-[var(--text-faint)]">{domainOf(s.url)}</span>
               </span>
             </a>
           </li>

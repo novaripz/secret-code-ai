@@ -194,7 +194,7 @@ export function ModalHeader({
         {description && <div className="mt-1.5 text-sm leading-relaxed text-[var(--text-dim)]">{description}</div>}
       </div>
       {onClose && (
-        <button type="button" onClick={onClose} aria-label={closeLabel} title={closeLabel} className="icon-btn -mr-1.5 -mt-1.5">
+        <button type="button" onClick={onClose} aria-label={closeLabel} title={closeLabel} className="icon-btn -me-1.5 -mt-1.5">
           <XIcon />
         </button>
       )}

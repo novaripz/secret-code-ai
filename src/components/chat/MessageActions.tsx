@@ -180,7 +180,9 @@ export function MessageActions({
           className="reply-chip tap"
         >
           {a.icon}
-          {a.label}
+          {/* A chip quoting an English term inside the Arabic interface keeps
+              its own reading order. */}
+          <span dir="auto">{a.label}</span>
         </button>
       ))}
       {tools && <div className="ms-auto flex items-center gap-0.5">{tools}</div>}

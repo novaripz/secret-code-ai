@@ -59,6 +59,7 @@ export function ChatHeader() {
   return createPortal(
     <>
       <span
+        dir="auto"
         className={`min-w-0 truncate px-1 text-[15px] font-semibold ${saved ? "text-[var(--text)]" : "text-[var(--text-dim)]"}`}
         title={saved ? thread.title : undefined}
       >

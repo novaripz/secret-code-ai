@@ -159,7 +159,8 @@ export function CodeBlock({ code, language, open }: { code: string; language?: s
           </button>
         )}
       </div>
-      <pre className="scroll-x">
+      {/* Code reads left to right in every interface language. */}
+      <pre dir="ltr" className="scroll-x">
         <code>
           <Highlighted code={code} language={lang} />
         </code>

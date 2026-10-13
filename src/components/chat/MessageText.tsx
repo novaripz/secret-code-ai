@@ -218,7 +218,11 @@ export function MessageText({ content, streaming }: { content: string; streaming
   const blocks = parseMarkdown(stripRemembered(content, streaming === true));
 
   return (
-    <div className="chat-prose min-w-0 space-y-3">
+    // `dir="auto"`: a reply follows its own language, not the interface's.
+    // An English answer in the Arabic interface reads left to right with its
+    // full stop at the end, and an Arabic answer in the English one the other
+    // way round.
+    <div dir="auto" className="chat-prose min-w-0 space-y-3">
       {blocks.map((block) => (
         <BlockView key={block.offset} block={block} animate={streaming === true} />
       ))}
