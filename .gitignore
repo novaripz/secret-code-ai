@@ -49,3 +49,5 @@ design/pandai-app-flow.html
 
 # Overhaul scratch (audit notes for agents)
 .overhaul/
+# Agent worktrees (local only)
+.claude/worktrees/
